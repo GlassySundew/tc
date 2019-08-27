@@ -1,0 +1,21 @@
+-D hlc=true
+-cp src
+-cp .
+-lib heeps
+-lib heaps
+-lib hlsdl
+-lib castle
+-lib format
+-lib hxbit
+-lib gasm
+-lib gasm-heaps
+-lib structural
+
+
+-D analyzer-optimize
+-D hl=true
+-D resourcesPath=res
+-main Main
+-hl out/main.c
+-dce full
+-debug

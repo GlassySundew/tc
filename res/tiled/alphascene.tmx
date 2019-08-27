@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.1.6" orientation="isometric" renderorder="right-down" width="32" height="32" tilewidth="48" tileheight="24" infinite="0" nextobjectid="2">
+ <tileset firstgid="1" source="walls_floor.tsx"/>
+ <layer name="ground" width="32" height="32">
+  <data encoding="base64" compression="zlib">
+   eJztz7EJADAMBDFDgjfI/qvGU/gbFcfV6qo6U4d+pxd8ys3Pz8/Pz8/Pz8/Pz8/Pv/kPR7QiAQ==
+  </data>
+ </layer>
+ <layer name="anna" width="32" height="32">
+  <data encoding="base64" compression="zlib">
+   eJztzgENAAAIA6AnsH9cY9w5SEACALdMOwAA8NACk3gADw==
+  </data>
+ </layer>
+ <layer name="walls" width="32" height="32">
+  <data encoding="base64" compression="zlib">
+   eJztwQENAAAAwqD3T20PBxQAAADwbhAAAAE=
+  </data>
+ </layer>
+</map>

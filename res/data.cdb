@@ -1,0 +1,80 @@
+{
+	"sheets": [
+		{
+			"name": "tiles",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "id"
+				},
+				{
+					"typeStr": "7",
+					"name": "image",
+					"display": null
+				}
+			],
+			"lines": [
+				{
+					"id": "anna",
+					"image": "0d933790e4e295147a8c8faf6cad6b0c"
+				},
+				{
+					"id": "floor_1",
+					"image": "6cb50d3014b65075d76e2ade4f64f3b6"
+				},
+				{
+					"id": "floor_2",
+					"image": "d3ef64d7b0a649d1acaa01e59164f51e"
+				},
+				{
+					"id": "floor_3",
+					"image": "119decee426bae9f51a0e273d38ccb1b"
+				},
+				{
+					"id": "floor_4",
+					"image": "db2bdfa2f71cff0c14cbd2d6816ad19f"
+				},
+				{
+					"id": "tree",
+					"image": "bd920bd0d1821249fee6af03c1efb03b"
+				},
+				{
+					"id": "wall_1",
+					"image": "d948867481a730b161f6d73d9bc88557"
+				},
+				{
+					"id": "wall_2",
+					"image": "26d2f10ceb9a707ef5641de76d85197e"
+				},
+				{
+					"id": "wall_contour",
+					"image": "b63145dbf7daba5197dcbc64e1df23d8"
+				},
+				{
+					"id": "wall_corner_1",
+					"image": "30e332a1f2c92346d08d3c609f73c443"
+				},
+				{
+					"id": "wall_corner_2",
+					"image": "931575de3e643dd00dcd02a88f706647"
+				},
+				{
+					"id": "wall_ground_1",
+					"image": "18dc0f2e49e37e4b48f97693b46af8dc"
+				},
+				{
+					"id": "wall_ground_2",
+					"image": "c65b014287189db8bf06d206f4f6a41d"
+				},
+				{
+					"id": "wall_precorner",
+					"image": "15fec0cc6a5e2609a783da715f03742a"
+				}
+			],
+			"separators": [],
+			"props": {}
+		}
+	],
+	"customTypes": [],
+	"compress": false
+}
