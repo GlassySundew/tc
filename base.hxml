@@ -1,0 +1,19 @@
+-cp src
+-cp .
+
+-lib format-tiled
+-lib heeps
+-lib heaps
+-lib castle
+
+-lib hxbit
+-lib gasm
+-lib structural
+-lib msignal
+-lib differ
+-lib deepnightLibs
+
+-dce full
+
+-main Boot
+

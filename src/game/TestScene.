@@ -1,0 +1,394 @@
+package game;
+
+import en.Player;
+import haxe.macro.Context.Message;
+import h3d.scene.CameraController;
+import h3d.Vector;
+import h2d.Tile;
+import hxd.Res;
+import cdb.TileBuilder;
+import h2d.Bitmap;
+import hxd.Key in K;
+import h3d.prim.*;
+import h3d.scene.Object;
+import hxd.fmt.hmd.Library;
+import h3d.scene.Mesh;
+import h3d.mat.Texture;
+import h3d.Matrix;
+import h3d.col.Point;
+import tiled.TileLayerRenderer;
+import format.tmx.*;
+import format.tmx.Data;
+import format.tmx.Data.TmxMap;
+import format.tmx.Data.TmxTileLayer;
+import format.tmx.Data.TmxTileset;
+import format.tmx.Data.TmxTile;
+
+class TestScene {
+	public static var instance:TestScene;
+
+	private var r:Reader;
+	private var obj:Mesh;
+	private var ground:Texture;
+	private var player:Player;
+	private var prim:h3d.prim.Cube;
+	private var tsx:Map<String, TmxTileset>;
+	private var camOffset:Vector = new Vector(0, 256, 0);
+	private var cam:CameraController;
+
+	public var frames:Map<String, Map<String, Array<h2d.Tile>>>;
+
+	public var key:{
+		left:Bool,
+		right:Bool,
+		up:Bool,
+		down:Bool,
+		left_isReleased:Bool,
+		right_isReleased:Bool,
+		up_isReleased:Bool,
+		down_isReleased:Bool,
+		left_isPressed:Bool,
+		right_isPressed:Bool,
+		up_isPressed:Bool,
+		down_isPressed:Bool,
+		action:Bool,
+	};
+
+	public function new() {
+		instance = this;
+		
+	}
+
+	private function getTSX(name:String):TmxTileset {
+		var cached:TmxTileset = tsx.get(name);
+		if (cached != null)
+			return cached;
+		cached = r.readTSX(Xml.parse(Res.loader.load('tiled/' + name).entry.getText()));
+		tsx.set(name, cached);
+		return cached;
+	}
+
+	public function setup() {
+		initFrames();
+
+		r = new Reader();
+		r.resolveTSX = getTSX;
+		tsx = new Map();
+		var t:TmxMap = r.read(Xml.parse(Res.tiled.alphamap.entry.getText()));
+		s3d.camera.setFovX(70, s3d.camera.screenRatio);
+		new AxesHelper(s3d);
+		new GridHelper(s3d, 10, 10);
+		HXP.engine.engine.backgroundColor = t.backgroundColor;
+		Boot.inst.s3d.camera.setFovX(70, Boot.inst.s3d.camera.screenRatio);
+		ground = new h3d.mat.Texture(t.width * t.tileWidth, t.height * t.tileHeight, [Target]);
+		ground.filter = Nearest;
+		for (a in t.layers) {
+			switch (a) {
+				case TmxLayer.LObjectGroup(tl):
+					for (i in 0...tl.objects.length) {
+						var isoX = ground.width / 2 + cart_to_iso(new Vector(tl.objects[i].x, tl.objects[i].y)).x;
+						var isoY = ground.height - cart_to_iso(new Vector(tl.objects[i].x, tl.objects[i].y)).y;
+						switch (tl.objects[i].objectType) {
+							case TmxObjectType.OTRectangle: {
+									switch (tl.objects[i].name) {
+										case "start": {
+												player = new Player(isoX, isoY, Player, this);
+											}
+									}
+								}
+							case OTTile(gid): {
+									switch (tl.objects[i].name) {
+										case "rock": new game.comps.Entity(isoX, isoY, Rock, this);
+									}
+								}
+							default:
+						}
+					}
+
+				case TmxLayer.LTileLayer(tl):
+					{
+						//	switch (tl.name) {
+						//	case "ground":
+
+						new LayerRender(t, tl).render.g.drawTo(ground);
+						//	}
+					}
+				default:
+			}
+		}
+		if (player != null) {
+			s3d.camera.target.set(player.obj.x, player.obj.y, player.obj.z);
+			s3d.camera.pos = s3d.camera.target.add(camOffset);
+		}
+		prim = new h3d.prim.Cube(ground.width, 0, ground.height);
+		prim.unindex();
+		prim.addUVs();
+		prim.addNormals();
+		obj = new h3d.scene.Mesh(prim, h3d.mat.Material.create(ground), s3d);
+		// obj.material.blendMode = Alpha;
+		// obj.material.mainPass.setPassName("alpha");
+		
+		// obj.visible = false;
+		obj.material.shadows = false;
+		obj.material.mainPass.enableLights = false;
+		// owner.add(mesh = new S3DComponent(obj));
+		// add(this.owner);
+
+		DebugDisplay.beginGroup("Chars", false);
+		DebugDisplay.addButton("Anim: Idle", () -> {
+			// trace("govno");
+		});
+		DebugDisplay.endGroup();
+		DebugDisplay.flow.visible = false;
+	}
+
+	override public function begin() {
+		s3d.lightSystem.ambientLight.set(0.3, 0.3, 0.3);
+
+		cam = new h3d.scene.CameraController(s3d);
+		cam.loadFromCamera();
+		s3d.addChild(cam);
+	}
+
+	override public function update(delta:Float) {
+		super.update(delta);
+		if (K.isReleased(K.W) && K.isDown(K.SHIFT)) {
+			DebugDisplay.flow.visible = !DebugDisplay.flow.visible;
+		}
+		key = {
+			up: K.isDown("W".code),
+			left: K.isDown("A".code),
+			down: K.isDown("S".code),
+			right: K.isDown("D".code),
+
+			up_isReleased: K.isReleased("W".code),
+			left_isReleased: K.isReleased("A".code),
+			down_isReleased: K.isReleased("S".code),
+			right_isReleased: K.isReleased("D".code),
+
+			up_isPressed: K.isPressed("W".code),
+			left_isPressed: K.isPressed("A".code),
+			down_isPressed: K.isPressed("S".code),
+			right_isPressed: K.isPressed("D".code),
+
+			action: K.isDown("E".code)
+		};
+
+		var desiredPos = new Vector(player.obj.x, player.obj.y, player.obj.z).add(camOffset);
+		var smoothPos = new Vector();
+
+		// smoothPos.lerp(s3d.camera.pos, desiredPos, 4 * delta);
+		// s3d.camera.pos.x = smoothPos.x;
+		// s3d.camera.pos.z = smoothPos.z;
+		// s3d.camera.target = s3d.camera.pos.sub(camOffset);
+
+		if (key.action) {}
+	}
+
+	function initFrames() {
+		frames = new Map();
+		var direc:Array<String> = ["down", "up", "right", "left", "down_right", "down_left", "up_right", "up_left"];
+		var action:Array<String> = ["idle", "walk"];
+		var a:Array<{
+			k:Kind,
+			w:Int,
+			h:Int,
+			?l:Array<Dynamic>
+		}> = [
+				{
+					k: Player,
+					w: 1,
+					h: 1,
+					l: []
+				},
+				{
+					k: Rock,
+					w: 1,
+					h: 1,
+					l: ["idle_down_", 1]
+				},
+
+			];
+		/**
+		 * Добавление тайлов с кол-вом фреймов в массив l
+		 */
+		for (i in 0...a.length) {
+			if (a[i].k == Player) {
+				for (ac in 0...action.length)
+					for (sd in 0...direc.length) {
+						a[i].l.push(action[ac] + '_' + direc[sd] + '_');
+						switch (action[ac]) {
+							case "idle":
+								a[i].l.push(1);
+							case "walk":
+								a[i].l.push(4);
+						}
+					}
+
+				break;
+			}
+		}
+		for (inf in a) {
+			var anims = new Map();
+			if (inf.l == null)
+				inf.l = ["default", 1];
+			for (i in 0...inf.l.length >> 1) {
+				var name:String = inf.l[i * 2];
+				var count:Int = inf.l[i * 2 + 1];
+				var tiles = [];
+				for (i in 1...count + 1) {
+					switch (inf.k) {
+						case Player:
+							tiles.push(Res.tiled.player_move.get(name + i));
+
+						case Rock:
+							{
+								tiles.push(Res.tiled.separated.q.rock.toTile());
+							}
+						default:
+					}
+				}
+				anims.set(name, tiles);
+			}
+			frames.set(inf.k.getName(), anims);
+		}
+	}
+
+	function cart_to_iso(vec:Vector):Vector
+		return new Vector(vec.x - vec.y, (vec.x + vec.y) / 2);
+}
+
+class LayerRender extends h2d.Object {
+	public var render:InternalRender;
+
+	public function new(map:TmxMap, layer:TmxTileLayer) {
+		super();
+		render = new InternalRender(map, layer);
+		render.g = new h2d.Graphics();
+		render.tex = new Texture(map.tileWidth * map.width, map.tileHeight * map.height, [Target]);
+		render.render();
+	}
+}
+
+private class InternalRender extends TileLayerRenderer {
+	public var g:h2d.Graphics;
+
+	public var tex:Texture;
+
+	private var uv:Point = new Point();
+
+	override function renderOrthoTile(x:Float, y:Float, tile:TmxTile, tileset:TmxTileset):Void {
+		if (tileset == null)
+			return;
+		if (tileset.image == null) {
+			renderOrthoTileFromImageColl(x, y, tile, tileset);
+
+			return;
+		}
+		if (tileset.tileOffset != null) {
+			x += tileset.tileOffset.x;
+			y += tileset.tileOffset.y;
+		}
+
+		var scaleX = tile.flippedHorizontally ? -1 : 1;
+		var scaleY = tile.flippedVertically ? -1 : 1;
+		Tools.getTileUVByLidUnsafe(tileset, tile.gid - tileset.firstGID, uv);
+		var h2dTile = Res.loader.load("tiled/" + tileset.image.source).toTile();
+
+		g.beginTileFill(x
+			- uv.x
+			+ (scaleX == 1 ? 0 : map.tileWidth), y
+			- uv.y * scaleY
+			+ map.tileHeight
+			- tileset.tileHeight / (scaleY == 1 ? 1 : 1), scaleX,
+			scaleY, h2dTile);
+
+		g.drawRect(x, y + map.tileHeight - tileset.tileHeight, tileset.tileWidth, tileset.tileHeight);
+		g.endFill();
+	}
+
+	function renderOrthoTileFromImageColl(x:Float, y:Float, tile:TmxTile, tileset:TmxTileset):Void {
+		var h2dTile = Res.loader.load("tiled/" + tileset.tiles[tile.gid - tileset.firstGID].image.source).toTile();
+		var bmp = new Bitmap(h2dTile);
+		var scaleX = tile.flippedHorizontally ? -1 : 1;
+		var scaleY = tile.flippedVertically ? -1 : 1;
+		bmp.scaleX = scaleX;
+		bmp.scaleY = scaleY;
+
+		bmp.x = x + (scaleX == 1 ? 2 : map.tileWidth);
+		bmp.y = y - h2dTile.height + map.tileHeight + (scaleY == 1 ? 0 : h2dTile.height);
+
+		bmp.drawTo(tex);
+		g.drawTile(0, 0, Tile.fromTexture(tex));
+		g.endFill();
+	}
+}
+
+class AxesHelper extends h3d.scene.Graphics {
+	public function new(?parent:h3d.scene.Object, size = 2.0, colorX = 0xEB304D, colorY = 0x7FC309, colorZ = 0x288DF9, lineWidth = 2.0) {
+		super(parent);
+
+		// trace(s3d.camera.pos.x, s3d.camera.pos.y, s3d.camera.pos.z, s3d.camera.pos.w);
+		material.props = h3d.mat.MaterialSetup.current.getDefaults("ui");
+
+		lineShader.width = lineWidth;
+
+		setColor(colorX);
+		lineTo(size, 0, 0);
+
+		setColor(colorY);
+		moveTo(0, 0, 0);
+		lineTo(0, size, 0);
+
+		setColor(colorZ);
+		moveTo(0, 0, 0);
+		lineTo(0, 0, size);
+	}
+}
+
+class GridHelper extends h3d.scene.Graphics {
+	public function new(?parent:Object, size = 10.0, divisions = 10, color1 = 0x444444, color2 = 0x888888, lineWidth = 1.0) {
+		super(parent);
+
+		material.props = h3d.mat.MaterialSetup.current.getDefaults("ui");
+
+		lineShader.width = lineWidth;
+
+		var hsize = size / 2;
+		var csize = size / divisions;
+		var center = divisions / 2;
+		for (i in 0...divisions + 1) {
+			var p = i * csize;
+			setColor((i != 0 && i != divisions && i % center == 0) ? color2 : color1);
+			moveTo(-hsize + p, -hsize, 0);
+			lineTo(-hsize + p, -hsize + size, 0);
+			moveTo(-hsize, -hsize + p, 0);
+			lineTo(-hsize + size, -hsize + p, 0);
+		}
+	}
+}
+
+class PointLightHelper extends h3d.scene.Mesh {
+	public function new(light:h3d.scene.fwd.PointLight, sphereSize = 0.5) {
+		var prim = new h3d.prim.Sphere(sphereSize, 4, 2);
+		prim.addNormals();
+		prim.addUVs();
+		super(prim, light);
+		material.color = light.color;
+		material.mainPass.wireframe = true;
+	}
+}
+
+class InstancedOffsetShader extends hxsl.Shader {
+	static var SRC = {
+		@:import h3d.shader.BaseMesh;
+		@perInstance(2) @input var offset:Vec2;
+		function vertex() {
+			transformedPosition.xy += offset;
+			transformedPosition.xy += float(instanceID & 1) * vec2(0.2, 0.1);
+			transformedPosition.z += float(instanceID) * 0.01;
+			pixelColor.r = float(instanceID) / 16.;
+			pixelColor.g = float(vertexID) / 8.;
+		}
+	};
+}

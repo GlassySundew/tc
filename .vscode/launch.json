@@ -4,14 +4,15 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
     
     {
-            "name": "HashLink",
+            "name": "HL debug",
             "request": "launch",
             "type": "hl",
-            "hxml": "build_hl.hxml",
+            "hxml": "hl.debug.hxml",
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "HeapsHL"
+            "preLaunchTask": "HL debug"
         },
         {
             "type": "chrome",
@@ -19,7 +20,7 @@
              "name": "Launch Chrome against localhost",
             "url": "file://${workspaceFolder}/index.html",
             "webRoot": "${workspaceFolder}",
-            "preLaunchTask": "HeapsJS"
+            "preLaunchTask": "JS release"
             
         }
     ]

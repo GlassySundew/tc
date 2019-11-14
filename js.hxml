@@ -1,0 +1,5 @@
+base.hxml
+-js bin/game.js
+
+-D windowSize=1280x720
+-dce full

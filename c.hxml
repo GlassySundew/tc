@@ -1,0 +1,6 @@
+base.hxml
+
+-D hlc=true
+
+-D hl=true
+-hl out/main.c

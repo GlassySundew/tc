@@ -1,0 +1,60 @@
+{
+	"skipTerminateQuickPick": true,
+	"skipSwitchToOutput": false,
+	"skipErrorMessage": true,
+	"commands": [
+		{
+			"text": "Debug HL",
+			"color": "orange",
+			"commandType":"palette",
+			"command": "workbench.action.tasks.runTask|HL debug",
+			"alignment": "right",
+			"skipTerminateQuickPick": false,
+			"priority": -9
+		},
+		{
+			"text": "Build HL",
+			"color": "orange",
+			"commandType":"palette",
+			"command": "workbench.action.tasks.runTask|HL release",
+			"alignment": "right",
+			"skipTerminateQuickPick": false,
+			"priority": -10
+		},
+		{
+			"text": "Run HL",
+			"color": "orange",
+			"command": "hl bin/game.hl",
+			"alignment": "right",
+			"skipTerminateQuickPick": false,
+			"priority": -11
+		},
+		{
+			"text": "Build JS",
+			"color": "yellow",
+			"commandType":"palette",
+			"command": "workbench.action.tasks.runTask|JS release",
+			"alignment": "right",
+			"skipTerminateQuickPick": false,
+			"priority": -20
+		},
+		{
+			"text": "Run JS",
+			"color": "yellow",
+			"command": "start bin/index.html",
+			"alignment": "right",
+			"skipTerminateQuickPick": false,
+			"priority": -21
+		},
+		{
+			"text": "Kill HL",
+			"color":  "#586284",
+			"skipErrorMessage": true,
+			"skipSwitchToOutput": true,
+			"command": "killall -9 hl",
+			"alignment": "right",
+			"skipTerminateQuickPick": false,
+			"priority": -11.5
+		}
+	]
+}
