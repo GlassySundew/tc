@@ -3,7 +3,7 @@ package en;
 import gasm.core.Engine;
 import h3d.mat.DepthBuffer;
 import h3d.mat.Data.Compare;
-
+import hl.Format.PixelFormat;
 import format.swf.Data.RGBA;
 import hxd.Key;
 import h2d.Tile;
@@ -119,7 +119,7 @@ class Entity {
 	public var curFrame:Float = 0;
 	public var prim:Cube;
 
-	private var rotAngle:Float = -0.1;
+	private var rotAngle:Float = -.00001;
 	private var pos:Vector;
 
 	public var cd:dn.Cooldown;
@@ -154,9 +154,8 @@ class Entity {
 		mat.mainPass.setPassName("alpha");
 		obj = new Mesh(prim, mat, Boot.inst.s3d);
 		obj.material.mainPass.setBlendMode(Alpha);
-
+	
 		obj.material.mainPass.enableLights = false;
-		trace(obj.material.mainPass.depthWrite);
 		obj.material.mainPass.depth(false, LessEqual);
 		obj.rotate(rotAngle, 0, 0);
 		obj.scaleZ = (tex.height / Math.cos(rotAngle)) / tex.height;

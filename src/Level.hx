@@ -47,6 +47,9 @@ class Level extends dn.Process {
 		super(Game.inst);
 		data = map;
 
+		
+
+
 		new AxesHelper(Boot.inst.s3d);
 		new GridHelper(Boot.inst.s3d, 10, 10);
 
@@ -143,7 +146,7 @@ class Level extends dn.Process {
 		// obj.visible = false;
 		// obj.material.shadows = false;
 		obj.material.mainPass.enableLights = false;
-		obj.material.mainPass.depth(false, LessEqual);
+		obj.material.mainPass.depth(false, NotEqual);
 	}
 
 	override function postUpdate() {

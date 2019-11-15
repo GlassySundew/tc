@@ -1,3 +1,5 @@
+import h3d.scene.Scene;
+import h3d.scene.Mesh;
 import h3d.mat.DepthBuffer;
 import h3d.mat.Texture;
 import h3d.scene.CameraController;
@@ -17,6 +19,14 @@ class Game extends Process {
 	public var camera:Camera;
 
 	private var cam:CameraController;
+
+	var virtualScreen:Mesh;
+	var cube:Mesh;
+	var s3dTarget:Scene;
+	var renderTarget:Texture;
+	var virtualCamera:h3d.Camera;
+	var virtualWidth = 128.;
+	var virtualHeight = 96.;
 
 	public var scroller:h2d.Layers;
 	public var level:Level;
@@ -42,7 +52,6 @@ class Game extends Process {
 		Boot.inst.s3d.camera.setFovX(70, Boot.inst.s3d.camera.screenRatio);
 		Boot.inst.s3d.lightSystem.ambientLight.set(0.3, 0.3, 0.3);
 
-
 		camera = new Camera();
 		startLevel("alphamap.tmx");
 	}
@@ -66,7 +75,9 @@ class Game extends Process {
 	}
 
 	public function startLevel(name:String) {
-		engine.clear(0,1);
+		engine.clear(0, 1);
+		// s3d.camera.pos = new Vector(0, -0.0000001, 0);
+		
 		if (level != null) {
 			level.destroy();
 			for (e in Entity.ALL)
@@ -78,15 +89,13 @@ class Game extends Process {
 		r.resolveTSX = getTSX;
 		var data = r.read(Xml.parse(Res.loader.load('tiled/' + name).entry.getText()));
 		level = new Level(data);
-		var pt = level.getEntityPt("player");
-		player = new en.Player(pt.cx, pt.cy);
-
-		camera.target = player;
-		camera.recenter();
-
 		for (e in level.getEntities("rock"))
 			new en.Rock(e.x, e.y);
-
+		var pt = level.getEntityPt("player");
+		player = new en.Player(pt.cx, pt.cy);
+		// Boot.inst.s3d.camera = new h3d.Camera(25, 1, 1.777777778, 1);
+		camera.target = player;
+		camera.recenter();
 		cd.unset("levelDone");
 	}
 

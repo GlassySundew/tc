@@ -1,9 +1,11 @@
+
 class Boot extends hxd.App {
 	public static var inst : Boot;
 
 	// Boot
 	static function main() {
 		new Boot();
+		
 	}
 
 	// Engine ready
@@ -11,6 +13,7 @@ class Boot extends hxd.App {
 		inst = this;
 		new Main(s2d);
 		onResize();
+
 	}
 
 	override function onResize() {

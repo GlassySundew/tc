@@ -8,6 +8,7 @@ class Camera extends dn.Process {
 
 	public var dx:Float;
 	public var dy:Float;
+
 	// public var wid(get, never):Int;
 	// public var hei(get, never):Int;
 
@@ -19,14 +20,14 @@ class Camera extends dn.Process {
 
 	inline function set_x(v:Float) {
 		Boot.inst.s3d.camera.target.x = v;
-		Boot.inst.s3d.camera.pos = Boot.inst.s3d.camera.target.add(new Vector(0, Const.CAM_OFFSET,-30));
+		Boot.inst.s3d.camera.pos = Boot.inst.s3d.camera.target.add(new Vector(0,  Const.CAM_OFFSET, -0.001));
 
 		return x = v;
 	}
 
 	inline function set_y(v:Float) {
 		Boot.inst.s3d.camera.target.z = v;
-		Boot.inst.s3d.camera.pos = Boot.inst.s3d.camera.target.add(new Vector(0, Const.CAM_OFFSET, -30));
+		Boot.inst.s3d.camera.pos = Boot.inst.s3d.camera.target.add(new Vector(0,  Const.CAM_OFFSET, -0.001));
 
 		return y = v;
 	}
@@ -34,7 +35,6 @@ class Camera extends dn.Process {
 	// function get_wid() {
 	// 	return M.ceil(Game.inst.w() / Const.SCALE);
 	// }
-
 	// function get_hei() {
 	// 	return M.ceil(Game.inst.h() / Const.SCALE);
 	// }
@@ -64,29 +64,26 @@ class Camera extends dn.Process {
 	}
 
 	override function update() {
-		if (target != null) {
-			var s = 0.006;
-			var deadZone = 5;
-			var tx = target.footX;
-			var ty = target.footY; //- target.cy * Const.GRID_HEIGHT;
-			var d = M.dist(x, y, tx, ty);
-			if (d >= deadZone) {
-				var desired = new Vector(tx, ty);
-				var smooth = new Vector();
-				smooth.lerp(new Vector(x, y), desired, 0.03 * tmod);
-				x = smooth.x;
-				y = smooth.y;
-				
-			}
-		}
 		super.update();
 	}
 
 	override function postUpdate() {
 		super.postUpdate();
-		
-
 		if (!ui.Console.inst.hasFlag("scroll")) {
+			if (target != null) {
+				var s = 0.006;
+				var deadZone = 5;
+				var tx = target.footX;
+				var ty = target.footY; //- target.cy * Const.GRID_HEIGHT;
+				var d = M.dist(x, y, tx, ty);
+				if (d >= deadZone) {
+					var desired = new Vector(tx, ty);
+					var smooth = new Vector();
+					smooth.lerp(new Vector(x, y), desired, 0.03 * tmod);
+					x = smooth.x;
+					y = smooth.y;
+				}
+			}
 			// var level = Game.inst.level;
 			// var scroller = Game.inst.scroller;
 
@@ -114,8 +111,8 @@ class Camera extends dn.Process {
 
 			// Rounding
 			if (!target.isMoving()) {
-				// x = M.ceil(x);
-				// y = M.ceil(y);
+				x = Std.int(x);
+				y = Std.int(y);
 			}
 		}
 	}
