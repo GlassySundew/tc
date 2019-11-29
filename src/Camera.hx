@@ -1,7 +1,12 @@
+import h3d.col.Bounds;
 import h3d.Vector;
 
 class Camera extends dn.Process {
 	public var target:Null<Entity>;
+	public var s3dCam(get, never):h3d.Camera;
+
+	inline function get_s3dCam()
+		return Boot.inst.s3d.camera;
 
 	public var x(default, set):Float;
 	public var y(default, set):Float;
@@ -18,17 +23,21 @@ class Camera extends dn.Process {
 		dx = dy = 0;
 	}
 
-	inline function set_x(v:Float) {
-		Boot.inst.s3d.camera.target.x = v;
-		Boot.inst.s3d.camera.pos = Boot.inst.s3d.camera.target.add(new Vector(0,  Const.CAM_OFFSET, -0.001));
+	function updateCamera(?x = 0., ?y = 0.) {
+		s3dCam.target.x = (x);
+		s3dCam.target.z = (y);
+	
+		s3dCam.pos = s3dCam.target.add(new Vector(0, -(w() * 1) / (2 * 4 * Math.tan(s3dCam.getFovX() / 2)), -0.01));
+		// s3dCam.pos = s3dCam.target.add(new Vector(0, (h() * 1) / (2 * 32 * Math.tan(s3dCam.getFovX() / 2)), -0.01));
+	}
 
+	inline function set_x(v:Float) {
+		updateCamera(v, y);
 		return x = v;
 	}
 
 	inline function set_y(v:Float) {
-		Boot.inst.s3d.camera.target.z = v;
-		Boot.inst.s3d.camera.pos = Boot.inst.s3d.camera.target.add(new Vector(0,  Const.CAM_OFFSET, -0.001));
-
+		updateCamera(x, v);
 		return y = v;
 	}
 
@@ -69,6 +78,7 @@ class Camera extends dn.Process {
 
 	override function postUpdate() {
 		super.postUpdate();
+		// for (i in 0...9)
 		if (!ui.Console.inst.hasFlag("scroll")) {
 			if (target != null) {
 				var s = 0.006;
@@ -111,8 +121,8 @@ class Camera extends dn.Process {
 
 			// Rounding
 			if (!target.isMoving()) {
-				x = Std.int(x);
-				y = Std.int(y);
+				x = Math.round(x);
+				y = Math.round(y);
 			}
 		}
 	}

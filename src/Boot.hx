@@ -1,19 +1,21 @@
-
 class Boot extends hxd.App {
-	public static var inst : Boot;
+	public static var inst:Boot;
 
 	// Boot
 	static function main() {
 		new Boot();
-		
 	}
 
 	// Engine ready
 	override function init() {
 		inst = this;
 		new Main(s2d);
-		onResize();
 
+		onResize();
+		
+		#if castle
+		new hxd.inspect.Inspector(s3d);
+		#end
 	}
 
 	override function onResize() {
@@ -22,12 +24,13 @@ class Boot extends hxd.App {
 	}
 
 	var speed = 1.0;
+
 	override function update(deltaTime:Float) {
 		super.update(deltaTime);
 		// Bullet time
 		#if debug
-		if( hxd.Key.isPressed(hxd.Key.NUMPAD_SUB) )
-			speed = speed>=1 ? 0.33 : 1;
+		if (hxd.Key.isPressed(hxd.Key.NUMPAD_SUB))
+			speed = speed >= 1 ? 0.33 : 1;
 		#end
 
 		var tmod = hxd.Timer.tmod * speed;
@@ -38,4 +41,3 @@ class Boot extends hxd.App {
 		dn.Process.updateAll(tmod);
 	}
 }
-

@@ -1,25 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.0" orientation="isometric" renderorder="right-up" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#5eafe3" nextlayerid="4" nextobjectid="39">
+<map version="1.2" tiledversion="1.3.1" orientation="isometric" renderorder="right-up" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#5eafe3" nextlayerid="8" nextobjectid="136">
  <tileset firstgid="1" source="test.tsx"/>
+ <tileset firstgid="6" source="colls.tsx"/>
  <layer id="1" name="ground" width="100" height="100">
   <data encoding="base64" compression="zlib">
-   eAHt0YGKgzAQBND2/3+6lTIwSIOKqR7cE+52soldeXk8PAQIECBAgAABAgQIjASe7438jc7oXyOQe+h6zWRTvgn0PSR/O6d3jUDuoOs1k02JwNp+a5331PkCbZ/cU9Lr2vvyXIF2Tu4J6XXtfXmuQDsn94T0uva+fF5gbXt2ff6L/u8vtH1ya6TX9ch+n5W3Bdo5ud9Kr+uR/T4rbwu0c3K/lV7XI/t9Vt4nsLY+u9431ak9An0Xyf1eel17X54r0M7JPSG9rr0vzxVo5+SekF7X3pfnC6ytt9bzv8AvjgT6LpJHZ/V/L5A76Pr7qSaMBPoekkdn9a8RyD0sdXnW60/X/zsE+i6S7/gOMz8CuYOubO4T6HtIvu9rTF4Ecg9L9RAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBD46wIvQe8A0w==
-  </data>
- </layer>
- <layer id="2" name="1" width="100" height="100">
-  <data encoding="base64" compression="zlib">
-   eAHt0DEBAAAAwqD1T+1lC4hAYcCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMDABwacQAAB
+   eAHt0cEJwDAMA8B0/6XbT8F4AhFdIGD/pPM5HgECBAgQIECAAAECBAgQIECAAAECBAi0CTxf4f3bDFL67jvMPSVjU47pv+cmh5Su+wZzT8nYlGP677nJIaXrvsHcUzK25Zg3+Oc2A30JECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQI3CTwAl2VAC4=
   </data>
  </layer>
  <objectgroup id="3" name="entities">
   <object id="19" name="player" x="408" y="408" width="24" height="24"/>
-  <object id="25" name="rock" x="384" y="408" width="24" height="24"/>
-  <object id="29" name="rock" x="408" y="432" width="24" height="24"/>
-  <object id="31" name="rock" x="432" y="408" width="24" height="24"/>
-  <object id="32" name="rock" x="408" y="384" width="24" height="24"/>
-  <object id="33" name="rock" x="384" y="384" width="24" height="24"/>
-  <object id="34" name="rock" x="624" y="624" width="24" height="24"/>
-  <object id="35" name="rock" x="817" y="831" width="24" height="24"/>
-  <object id="36" name="rock" x="528" y="528" width="24" height="24"/>
+  <object id="31" name="rock" x="360" y="384" width="24" height="24"/>
  </objectgroup>
 </map>

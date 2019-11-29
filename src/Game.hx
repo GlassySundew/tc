@@ -1,3 +1,4 @@
+import differ.shapes.Polygon;
 import h3d.scene.Scene;
 import h3d.scene.Mesh;
 import h3d.mat.DepthBuffer;
@@ -20,14 +21,6 @@ class Game extends Process {
 
 	private var cam:CameraController;
 
-	var virtualScreen:Mesh;
-	var cube:Mesh;
-	var s3dTarget:Scene;
-	var renderTarget:Texture;
-	var virtualCamera:h3d.Camera;
-	var virtualWidth = 128.;
-	var virtualHeight = 96.;
-
 	public var scroller:h2d.Layers;
 	public var level:Level;
 
@@ -49,7 +42,7 @@ class Game extends Process {
 		scroller.visible = false;
 
 		root.add(scroller, Const.DP_BG);
-		Boot.inst.s3d.camera.setFovX(70, Boot.inst.s3d.camera.screenRatio);
+		// Boot.inst.s3d.camera.setFovX(60, 1.777777778);
 		Boot.inst.s3d.lightSystem.ambientLight.set(0.3, 0.3, 0.3);
 
 		camera = new Camera();
@@ -77,7 +70,7 @@ class Game extends Process {
 	public function startLevel(name:String) {
 		engine.clear(0, 1);
 		// s3d.camera.pos = new Vector(0, -0.0000001, 0);
-		
+
 		if (level != null) {
 			level.destroy();
 			for (e in Entity.ALL)
@@ -89,10 +82,48 @@ class Game extends Process {
 		r.resolveTSX = getTSX;
 		var data = r.read(Xml.parse(Res.loader.load('tiled/' + name).entry.getText()));
 		level = new Level(data);
+
 		for (e in level.getEntities("rock"))
 			new en.Rock(e.x, e.y);
 		var pt = level.getEntityPt("player");
 		player = new en.Player(pt.cx, pt.cy);
+
+		for (tileset in data.tilesets) { // applying hitboxes from 'colls' tileset
+			var ereg = ~/(^[^.]*)+/; // regexp to take tileset name
+			if (ereg.match(tileset.source) && ereg.matched(1) == 'colls')
+				for (tile in tileset.tiles) {
+					var ereg = ~/\/([a-z0-9_\.-]+)\./; // regexp to take string between last / and . from picture path
+					if (ereg.match(tile.image.source)) {
+						for (ent in Entity.ALL) {
+							var eregClass = ~/\.([a-z0-9]+)+$/gi; // regexp to remove 'en.' prefix
+							if (eregClass.match('$ent'.toLowerCase())
+								&& eregClass.matched(1) == ereg.matched(1)
+								&& tile.objectGroup.objects.length >= 0
+								&& ent.collisions.length == 0) {
+								for (obj in tile.objectGroup.objects) {
+									var params = {
+										x: obj.x + ent.footX,
+										y: obj.y + ent.footY,
+										width: obj.width,
+										height: obj.height
+									};
+									switch (obj.objectType) {
+										case OTEllipse:
+											var shape = new differ.shapes.Circle(0, 0, params.width / 2);
+											shape.scaleY = params.height / params.width;
+
+											ent.collisions.push(shape);
+										case OTRectangle:
+											ent.collisions.push(Polygon.rectangle(params.x, params.y, params.width, params.height));
+										default:
+									}
+								}
+							}
+						}
+					}
+				}
+		}
+
 		// Boot.inst.s3d.camera = new h3d.Camera(25, 1, 1.777777778, 1);
 		camera.target = player;
 		camera.recenter();

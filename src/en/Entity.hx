@@ -1,5 +1,9 @@
 package en;
 
+import h3d.prim.Grid;
+import h3d.prim.Cylinder;
+import differ.shapes.Shape;
+import differ.shapes.Polygon;
 import gasm.core.Engine;
 import h3d.mat.DepthBuffer;
 import h3d.mat.Data.Compare;
@@ -26,6 +30,8 @@ class Entity {
 	// private var anim:String;
 	public static var ALL:Array<Entity> = [];
 	public static var GC:Array<Entity> = [];
+
+	public var collisions:Array<Shape> = [];
 
 	public var game(get, never):Game;
 
@@ -81,10 +87,15 @@ class Entity {
 		return footY - hei * 0.5;
 
 	public var dir(default, set) = 6;
+
 	public var sprScaleX = 1.0;
 	public var sprScaleY = 1.0;
-	public var sprOffX = 0;
-	public var sprOffY = 0;
+
+	public var sprOffX = 0.;
+	public var sprOffY = 0.;
+
+	public var sprOffCollX = 0.;
+	public var sprOffCollY = 0.;
 
 	inline function get_tmod()
 		return Game.inst.tmod;
@@ -94,17 +105,29 @@ class Entity {
 	inline function get_player()
 		return Game.inst.player;
 
-	private var tex:Texture;
+	public var tex:Texture;
 
-	public var footX(get, never):Float;
+	public var footX(get, set):Float;
 
 	inline function get_footX()
-		return (cx + xr) * Const.GRID_WIDTH + sprOffX;
+		return (cx + xr + sprOffX) * Const.GRID_WIDTH;
 
-	public var footY(get, never):Float;
+	inline function set_footX(v:Float) { // небольшой костыль
+		xr = (v / Const.GRID_WIDTH) % 1;
+		cx = Math.floor(v / Const.GRID_WIDTH) - sprOffX;
+		return v;
+	}
+
+	public var footY(get, set):Float;
 
 	inline function get_footY()
-		return (cy + yr - zr) * Const.GRID_WIDTH + sprOffY;
+		return (cy + yr - zr + sprOffY) * Const.GRID_WIDTH;
+
+	inline function set_footY(v:Float) { // аналогично
+		yr = (v / Const.GRID_WIDTH) % 1;
+		cy = Math.floor(v / Const.GRID_WIDTH) - sprOffY;
+		return v;
+	}
 
 	public var colorAdd:h3d.Vector;
 	public var spr:HSprite;
@@ -119,12 +142,16 @@ class Entity {
 	public var curFrame:Float = 0;
 	public var prim:Cube;
 
-	private var rotAngle:Float = -.00001;
+	private var rotAngle:Float = -.0001;
 	private var pos:Vector;
 
 	public var cd:dn.Cooldown;
 
 	var debugLabel:Null<h2d.Text>;
+
+	public var cyli:Cylinder;
+
+	var cylinder:h3d.scene.Mesh;
 
 	public function new(?x:Float = 0, ?z:Float = 0) {
 		uid = Const.NEXT_UNIQ;
@@ -142,28 +169,39 @@ class Entity {
 
 		tex = new Texture(Std.int(spr.tile.width), Std.int(spr.tile.height), [Target]);
 		tex.filter = Nearest;
-
 		prim = new Cube(tex.width, 0, tex.height, true);
 		prim.unindex();
 		prim.addNormals();
 		prim.addUVs();
-
 		var mat = h3d.mat.Material.create(tex);
-
-		mat.mainPass.setBlendMode(Alpha);
-		mat.mainPass.setPassName("alpha");
 		obj = new Mesh(prim, mat, Boot.inst.s3d);
 		obj.material.mainPass.setBlendMode(Alpha);
-	
+		mat.mainPass.setPassName("alpha");
 		obj.material.mainPass.enableLights = false;
-		obj.material.mainPass.depth(false, LessEqual);
+		obj.material.mainPass.depth(false, Less);
 		obj.rotate(rotAngle, 0, 0);
 		obj.scaleZ = (tex.height / Math.cos(rotAngle)) / tex.height;
-		obj.y -= (tex.height >> 1) * obj.scaleZ * Math.sin(rotAngle);
+		obj.y -= ((tex.height) >> 1) * obj.scaleZ * Math.sin(rotAngle);
+
 		var s = obj.material.mainPass.addShader(new h3d.shader.ColorAdd());
 		s.color = colorAdd;
+		cyli = new h3d.prim.Cylinder(12, 1, 1);
+		cyli.addNormals();
+		cylinder = new h3d.scene.Mesh(cyli, Boot.inst.s3d);
+		cylinder.material.color.setColor(0x00ff00);
+		cylinder.material.receiveShadows = false;
+		cylinder.material.mainPass.culling = None;
 
+		cylinder.rotate(Math.PI / 2, 0, 0);
 		setPosCase(x, z);
+	}
+
+	function getAlphaOffset():Int {
+		if (is(Player))
+			return 0;
+		if (is(Rock))
+			return 0;
+		return 0;
 	}
 
 	function blah() {
@@ -239,21 +277,31 @@ class Entity {
 		destroy();
 	}
 
+	function checkCollisions() {
+		collisions[0].x = obj.x + sprOffCollX * Const.GRID_WIDTH;
+		collisions[0].y = obj.z + sprOffCollY * Const.GRID_WIDTH;
+		cylinder.x = collisions[0].x;
+		cylinder.z = collisions[0].y;
+	}
+
 	public function preUpdate() {
 		cd.update(tmod);
 	}
 
 	public function update() {
-		if (spr.anim.getCurrentAnim() != null) {
+		@:privateAccess if (spr.anim.getCurrentAnim() != null) {
 			if (tmpCur != 0 && (spr.anim.getCurrentAnim().curFrameCpt - (tmpDt)) == 0) // ANIM LINK HACK
 				spr.anim.getCurrentAnim().curFrameCpt = tmpCur + spr.anim.getAnimCursor();
 			tmpDt = tmod * spr.anim.getCurrentAnim().speed;
 			tmpCur = spr.anim.getCurrentAnim().curFrameCpt;
-		}
-
+	}
+		var isoCoefficient = 1.2;
 		// x
 		var steps = M.ceil(M.fabs(dxTotal * tmod));
 		var step = dxTotal * tmod / steps;
+
+		step = (dy > 0.0001 || dy < -0.0001) ? step * isoCoefficient : step; // ISO FIX
+
 		while (steps > 0) {
 			xr += step;
 			while (xr > 1) {
@@ -266,6 +314,7 @@ class Entity {
 			}
 			steps--;
 		}
+
 		dx *= Math.pow(frict, tmod);
 		bdx *= Math.pow(bumpFrict, tmod);
 		if (M.fabs(dx) <= 0.0005 * tmod)
@@ -275,7 +324,10 @@ class Entity {
 
 		// y
 		var steps = M.ceil(M.fabs(dyTotal * tmod));
-		var step = dyTotal * tmod / steps;
+		// var step = 0.;
+
+		step = (step > 0.00001 || step < -0.00001) ? (dyTotal * tmod / steps * isoCoefficient * 0.5) : (dyTotal * tmod / steps); // ISO FIX
+
 		while (steps > 0) {
 			yr += step;
 			while (yr > 1) {
@@ -288,6 +340,7 @@ class Entity {
 			}
 			steps--;
 		}
+
 		dy *= Math.pow(frict, tmod);
 		bdy *= Math.pow(bumpFrict, tmod);
 		if (M.fabs(dy) <= 0.0005 * tmod)
@@ -313,9 +366,11 @@ class Entity {
 			debugLabel.y = Std.int(footY + 1);
 		}
 		// curFrame = spr.anim.getCurrentAnim().curFrameCpt;
+		checkCollisions();
+
 		if (!isMoving()) {
-		obj.z = Std.int(obj.z);
-		obj.x = Std.int(obj.x);
+			footX = M.round(M.fabs(footX));
+			footY = M.round(M.fabs(footY));
 		}
 	}
 

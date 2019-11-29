@@ -1,3 +1,4 @@
+import h3d.scene.Mesh;
 import h3d.Vector;
 import h2d.Tile;
 import h2d.Bitmap;
@@ -16,6 +17,8 @@ class Level extends dn.Process {
 
 	inline function get_game()
 		return Game.inst;
+
+	public static var inst:Level;
 
 	// public var fx(get, never):Fx;
 	var layersByName:Map<String, TmxLayer> = new Map();
@@ -42,21 +45,18 @@ class Level extends dn.Process {
 
 	public var cam:CameraController;
 	public var ground:Texture;
+	public var obj:Mesh;
 
 	public function new(map:TmxMap) {
 		super(Game.inst);
+		inst = this;
 		data = map;
-
-		
-
 
 		new AxesHelper(Boot.inst.s3d);
 		new GridHelper(Boot.inst.s3d, 10, 10);
 
 		Boot.inst.engine.backgroundColor = data.backgroundColor;
-		Boot.inst.s3d.camera.setFovX(70, Boot.inst.s3d.camera.screenRatio);
-
-		Boot.inst.s3d.lightSystem.ambientLight.set(0.3, 0.3, 0.3);
+		//Boot.inst.s3d.camera.setFovX(70, Boot.inst.s3d.camera.screenRatio);
 
 		// cam = new h3d.scene.CameraController(Boot.inst.s3d);
 		// cam.loadFromCamera();
@@ -71,7 +71,7 @@ class Level extends dn.Process {
 						var isoX = wid / 2 + cart_to_iso(new Vector(obj.x, obj.y)).x;
 						var isoY = hei - cart_to_iso(new Vector(obj.x, obj.y)).y;
 
-						obj.x = isoX / Const.GRID_WIDTH ;
+						obj.x = isoX / Const.GRID_WIDTH;
 						obj.y = isoY / Const.GRID_WIDTH;
 						if (ol.name == 'entities')
 							entities.push(obj);
@@ -140,7 +140,7 @@ class Level extends dn.Process {
 		prim.addUVs();
 		prim.addNormals();
 
-		var obj = new h3d.scene.Mesh(prim, h3d.mat.Material.create(ground), Boot.inst.s3d);
+		obj = new h3d.scene.Mesh(prim, h3d.mat.Material.create(ground), Boot.inst.s3d);
 		obj.material.mainPass.setBlendMode(Alpha);
 
 		// obj.visible = false;
