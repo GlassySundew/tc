@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>differ - </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <link rel="shortcut icon" href="../../images/favicon.png" />
+
+        <link rel="stylesheet" type="text/css" href="../../css/style.css" media="all">
+        <link rel="stylesheet" type="text/css" href="../../css/code.css" media="all">
+        <link rel="stylesheet" type="text/css" href="../../css/font.css" media="all">
+
+        <link rel="stylesheet" type="text/css" href="../../css/tooltipster.css" media="all">
+        <link rel="stylesheet" type="text/css" href="../../css/tooltipster-shadow.css" media="all">
+
+        <script src="../../js/jquery-2.0.3.min.js"> </script>
+        <script src="../../js/jquery.tooltipster.min.js"> </script>
+
+        <script>
+
+            $(document).ready(function() {
+
+                $('.section').css('display','none');
+                $('.readmore').click(function(e){
+                    var _child = $(this).parent().find('.section').first();
+                    var _opp = 'block';
+                    if( _child.css('display') == 'block' ) {
+                        _opp = 'none';
+                    } else {
+                    }
+                    _child.css('display', _opp);
+                });
+
+                $('div.sample').on('click', function(e){
+                        //get the data tag
+                    var content = $(this).attr('data-content');
+                        //remove clicking handler
+                    $(this).off('click');
+                        //replace the content!
+                    $(this).html('<iframe src="'+content+'" sandbox="allow-same-origin allow-scripts" style="overflow:hidden; scrollbar:none; border: 0; width:645px; height:450px;"></iframe> ')
+                });
+
+                $('.tooltip').each(function(e){
+                    var c = $(this).attr('data-tooltip');
+                    $(this).tooltipster({
+                        content:$('<span>' + c + '</span>'),
+                        interactive:true,
+                    theme:'tooltipster-shadow'
+                    });
+                });
+
+            }); //document.ready
+
+        </script>
+    </head>
+
+    <body>
+        <div class="content">
+            <p><a href="../../api/index.html"><img src="../../images/logo.png" alt="Logo"></a></p>
+<p><hr/>
+<a href="#" id="search_bar" onclick="return;"><div> search API <em>(or start typing anywhere)</em> </div></a></p>
+<hr/>
+
+<script src="../../js/omnibar.js"> </script>
+<link rel="stylesheet" type="text/css" href="../../css/omnibar.css" media="all">
+
+<div id="omnibar"> <a href="#" onclick="return" id="omnibar_close"></a> <input id="omnibar_text" type="text" placeholder="search types..."></input></div>
+<script  id="typelist" data-relpath="../../" data-types="differ.Collision,differ.Results,differ.ResultsIterator,differ.ShapeDrawer,differ._Collision.Constructible,differ.data.RayCollision,differ.data.RayCollisionHelper,differ.data.RayIntersection,differ.data.ShapeCollision,differ.math.Matrix,differ.math.Util,differ.math.Vector,differ.sat.SAT2D,differ.shapes.Circle,differ.shapes.InfiniteState,differ.shapes.Polygon,differ.shapes.Ray,differ.shapes.Shape"></script>
+
+
+<p><h1>Results</h1>
+<small><code>differ.Results</code></small></p>
+<p>A result set container.
+    Items in the container are preallocated, then pulled out and updated.
+    The container will behave like a regular container, where iterating, 
+    and get will only return values from the valid set. Pushing items
+    will increase the valid set.</p>
+<hr/>
+
+<p><code>class</code><br/><span class="meta">
+meta: @:keep, @:generic</span></p>
+<hr/>
+
+
+<p>&nbsp;
+&nbsp;</p>
+<p><h3>Members</h3> <hr/></p>
+<p><h3>Properties</h3> <hr/><span class="member apipage">
+                <a name="length"><a class="lift" href="#length">length</a></a><div class="clear"></div>
+                <code class="signature apipage">length : <a href="http://api.haxe.org/Int.html">Int</a></code><br/></span>
+            <span class="small_desc_flat"></span><span class="member apipage">
+                <a name="total"><a class="lift" href="#total">total</a></a><div class="clear"></div>
+                <code class="signature apipage">total : <a href="http://api.haxe.org/Int.html">Int</a></code><br/></span>
+            <span class="small_desc_flat"></span></p>
+<p><h3>Methods</h3> <hr/><span class="method apipage">
+            <a name="clear"><a class="lift" href="#clear">clear</a></a><div class="clear"></div>
+            <code class="signature apipage">clear() : <a href="../../api/differ/Results.html">differ.Results</a>&lt;<a href="../../api/differ/Results/T.html">differ.Results.T</a>&gt;</code><br/><span class="small_desc_flat">Clear the container, which sets the length to 0. 
+            This keeps the cached items but won’t return them 
+            while iterating or accessing them.
+            Returns <code>this</code> for convience.</span></p>
+<p></span>
+<span class="method apipage">
+            <a name="get"><a class="lift" href="#get">get</a></a><div class="clear"></div>
+            <code class="signature apipage">get(index:<a href="http://api.haxe.org/Int.html">Int</a><span></span>) : <a href="../../api/differ/Results/T.html">differ.Results.T</a></code><br/><span class="small_desc_flat">Get the item at the given index. 
+            If the index is &lt; 0 and &gt; length-1 it returns null;</span></p>
+<p></span>
+<span class="method apipage">
+            <a name="iterator"><a class="lift" href="#iterator">iterator</a></a><div class="clear"></div>
+            <code class="signature apipage">iterator() : <a href="../../api/differ/ResultsIterator.html">differ.ResultsIterator</a>&lt;<a href="../../api/differ/Results/T.html">differ.Results.T</a>&gt;</code><br/><span class="small_desc_flat">Returns an iterator over the valid items in this set.</span></p>
+<p></span>
+<span class="method apipage">
+            <a name="new"><a class="lift" href="#new">new</a></a><div class="clear"></div>
+            <code class="signature apipage">new(size:<a href="http://api.haxe.org/Int.html">Int</a><span></span>) : <a href="http://api.haxe.org/Void.html">Void</a></code><br/><span class="small_desc_flat">Create a new set of results. 
+            Preallocates <code>size</code> items into the list.</span></p>
+<p></span>
+<span class="method apipage">
+            <a name="pull"><a class="lift" href="#pull">pull</a></a><div class="clear"></div>
+            <code class="signature apipage">pull() : <a href="../../api/differ/Results/T.html">differ.Results.T</a></code><br/><span class="small_desc_flat">Grabs the last item from the cache to reuse.
+            If there are no free items, it adds a new one.
+            Typically internal use.</span></p>
+<p></span>
+<span class="method apipage">
+            <a name="push"><a class="lift" href="#push">push</a></a><div class="clear"></div>
+            <code class="signature apipage">push(value:<a href="../../api/differ/Results/T.html">differ.Results.T</a><span></span>) : <a href="http://api.haxe.org/Void.html">Void</a></code><br/><span class="small_desc_flat">Add an item to the container.</span></p>
+<p></span></p>
+<hr/>
+
+<p>&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;</p>
+
+        </div>
+    </body>
+
+</html>
