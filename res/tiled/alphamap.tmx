@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.1" orientation="isometric" renderorder="right-up" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#5eafe3" nextlayerid="8" nextobjectid="136">
+<map version="1.2" tiledversion="1.3.1" orientation="isometric" renderorder="right-up" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#5eafe3" nextlayerid="33" nextobjectid="137">
  <tileset firstgid="1" source="test.tsx"/>
  <tileset firstgid="6" source="colls.tsx"/>
  <layer id="1" name="ground" width="100" height="100">
   <data encoding="base64" compression="zlib">
-   eAHt0cEJwDAMA8B0/6XbT8F4AhFdIGD/pPM5HgECBAgQIECAAAECBAgQIECAAAECBAi0CTxf4f3bDFL67jvMPSVjU47pv+cmh5Su+wZzT8nYlGP677nJIaXrvsHcUzK25Zg3+Oc2A30JECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQI3CTwAl2VAC4=
+   eAHt0VEKwyAMANDu/pfeZASCdcyPxhZ8wtZoJUlfjsMiQIAAAQIECBAgQIAAAQIECBC4SuD1STT6XZVfnv8CzT/WaBZxFnc86wTCOmaS96O4rhOZm0A27/f9O2L1Atl8Nq7vat8KszPI9/bVWvPl2XomXtPVvlVmZpDv7Cu15suzdcStcsT9c01X+1bpvdu+rdF5vPve8F8hMHJvdUbn5lExgXPO3t48zkZ3nMRcfs3jjp7UJECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECTxR4A0OIAIc=
   </data>
  </layer>
  <objectgroup id="3" name="entities">
-  <object id="19" name="player" x="408" y="408" width="24" height="24"/>
-  <object id="31" name="rock" x="360" y="384" width="24" height="24"/>
+  <object id="31" name="rock" x="336" y="384" width="24" height="24"/>
+  <object id="19" name="player" x="432" y="384" width="24" height="24"/>
  </objectgroup>
 </map>

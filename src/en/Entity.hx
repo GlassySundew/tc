@@ -1,30 +1,16 @@
 package en;
 
-import h3d.prim.Grid;
+import en.player.Player;
+import h3d.scene.TileSprite;
 import h3d.prim.Cylinder;
 import differ.shapes.Shape;
 import differ.shapes.Polygon;
-import gasm.core.Engine;
-import h3d.mat.DepthBuffer;
-import h3d.mat.Data.Compare;
-import hl.Format.PixelFormat;
-import format.swf.Data.RGBA;
-import hxd.Key;
-import h2d.Tile;
 import tools.CPoint;
 import dn.heaps.slib.HSprite;
-import h2d.Bitmap;
-import haxe.macro.Context.Message;
 import h3d.mat.Texture;
 import h3d.prim.Cube;
 import h3d.Vector;
-import hxd.res.Model;
-import game.data.ConfigJson;
-import hxd.Timer;
-import hxd.Res;
-import h3d.shader.BaseMesh;
 import h3d.scene.Mesh;
-import h3d.scene.Object;
 
 class Entity {
 	// private var anim:String;
@@ -100,7 +86,7 @@ class Entity {
 	inline function get_tmod()
 		return Game.inst.tmod;
 
-	public var player(get, never):en.Player;
+	public var player(get, never):en.player.Player;
 
 	inline function get_player()
 		return Game.inst.player;
@@ -131,7 +117,7 @@ class Entity {
 
 	public var colorAdd:h3d.Vector;
 	public var spr:HSprite;
-	public var obj:Mesh;
+	public var mesh:TileSprite;
 
 	public var tmpDt:Float;
 	public var tmpCur:Float;
@@ -149,10 +135,6 @@ class Entity {
 
 	var debugLabel:Null<h2d.Text>;
 
-	public var cyli:Cylinder;
-
-	var cylinder:h3d.scene.Mesh;
-
 	public function new(?x:Float = 0, ?z:Float = 0) {
 		uid = Const.NEXT_UNIQ;
 		ALL.push(this);
@@ -166,33 +148,20 @@ class Entity {
 		// spr.setCenterRatio(0.5, 1);
 		spr.colorAdd = colorAdd = new h3d.Vector();
 		spr.visible = false;
+		spr.tile.getTexture().filter = Nearest;
 
-		tex = new Texture(Std.int(spr.tile.width), Std.int(spr.tile.height), [Target]);
-		tex.filter = Nearest;
-		prim = new Cube(tex.width, 0, tex.height, true);
-		prim.unindex();
-		prim.addNormals();
-		prim.addUVs();
-		var mat = h3d.mat.Material.create(tex);
-		obj = new Mesh(prim, mat, Boot.inst.s3d);
-		obj.material.mainPass.setBlendMode(Alpha);
-		mat.mainPass.setPassName("alpha");
-		obj.material.mainPass.enableLights = false;
-		obj.material.mainPass.depth(false, Less);
-		obj.rotate(rotAngle, 0, 0);
-		obj.scaleZ = (tex.height / Math.cos(rotAngle)) / tex.height;
-		obj.y -= ((tex.height) >> 1) * obj.scaleZ * Math.sin(rotAngle);
+		mesh = new TileSprite(spr.tile, Boot.inst.s3d, true);
+		mesh.material.mainPass.setBlendMode(Alpha);
+		mesh.material.mainPass.enableLights = false;
+		mesh.material.mainPass.depth(false, Less);
 
-		var s = obj.material.mainPass.addShader(new h3d.shader.ColorAdd());
+		mesh.rotate(rotAngle, 0, 0);
+		mesh.scaleZ = (spr.tile.height / Math.cos(rotAngle)) / spr.tile.height;
+		mesh.y -= ((spr.tile.height) / 2) * mesh.scaleZ * Math.sin(rotAngle);
+
+		var s = mesh.material.mainPass.addShader(new h3d.shader.ColorAdd());
 		s.color = colorAdd;
-		cyli = new h3d.prim.Cylinder(12, 1, 1);
-		cyli.addNormals();
-		cylinder = new h3d.scene.Mesh(cyli, Boot.inst.s3d);
-		cylinder.material.color.setColor(0x00ff00);
-		cylinder.material.receiveShadows = false;
-		cylinder.material.mainPass.culling = None;
 
-		cylinder.rotate(Math.PI / 2, 0, 0);
 		setPosCase(x, z);
 	}
 
@@ -278,10 +247,8 @@ class Entity {
 	}
 
 	function checkCollisions() {
-		collisions[0].x = obj.x + sprOffCollX * Const.GRID_WIDTH;
-		collisions[0].y = obj.z + sprOffCollY * Const.GRID_WIDTH;
-		cylinder.x = collisions[0].x;
-		cylinder.z = collisions[0].y;
+		collisions[0].x = mesh.x + sprOffCollX * Const.GRID_WIDTH;
+		collisions[0].y = mesh.z + sprOffCollY * Const.GRID_WIDTH;
 	}
 
 	public function preUpdate() {
@@ -350,8 +317,8 @@ class Entity {
 	}
 
 	public function postUpdate() {
-		obj.x = spr.x = footX;
-		obj.z = spr.y = footY;
+		mesh.x = spr.x = footX;
+		mesh.z = spr.y = footY;
 
 		// spr.scaleX = dir * sprScaleX;
 		// spr.scaleY = sprScaleY;
@@ -375,8 +342,7 @@ class Entity {
 	}
 
 	public function frameEnd() {
-		tex.clear(0, 0);
-		new Bitmap(spr.tile).drawTo(tex);
+		mesh.tile = spr.tile;
 		lastFootX = footX;
 		lastFootY = footY;
 	}

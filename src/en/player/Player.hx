@@ -1,21 +1,11 @@
-package en;
+package en.player;
 
 import differ.Collision;
-import hxd.Key;
-import h3d.Vector;
-import h3d.shader.NormalMap;
-import h3d.prim.Cube;
-import h2d.Tile;
-import h2d.Bitmap;
-import h3d.prim.PlanePrim;
-import h3d.mat.Texture;
-import hxd.Res;
-import h3d.scene.Mesh;
-import hxd.Key in K;
-import h2d.Anim;
 
 class Player extends Entity {
 	var ca:dn.heaps.Controller.ControllerAccess;
+
+	var inventory:Inventory;
 
 	public function new(x:Float, z:Float) {
 		spr = new HSprite(Assets.tiles);
@@ -40,8 +30,9 @@ class Player extends Entity {
 
 		super(x, z);
 		sprOffX = -.5;
-		sprOffY = 0;
+		sprOffY = -.5;
 
+		inventory = new Inventory();
 		// sprOffCollY = -.45;
 		// obj.material.mainPass.addShader(new NormalMap(tex));
 	}
@@ -105,6 +96,5 @@ class Player extends Entity {
 		}
 		footX = collisions[0].x;
 		footY = collisions[0].y;
-
 	}
 }

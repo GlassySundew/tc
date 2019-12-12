@@ -24,7 +24,7 @@ class Game extends Process {
 	public var scroller:h2d.Layers;
 	public var level:Level;
 
-	public var player:en.Player;
+	public var player:en.player.Player;
 
 	private var tsx:Map<String, TmxTileset>;
 	private var r:Reader;
@@ -45,6 +45,10 @@ class Game extends Process {
 		// Boot.inst.s3d.camera.setFovX(60, 1.777777778);
 		Boot.inst.s3d.lightSystem.ambientLight.set(0.3, 0.3, 0.3);
 
+		// cam = new h3d.scene.CameraController(Boot.inst.s3d);
+		// cam.loadFromCamera();
+		// Boot.inst.s3d.addChild(cam);
+
 		camera = new Camera();
 		startLevel("alphamap.tmx");
 	}
@@ -64,7 +68,7 @@ class Game extends Process {
 	}
 
 	public function restartLevel() {
-		startLevel(lvlName);
+		// startLevel(lvlName);
 	}
 
 	public function startLevel(name:String) {
@@ -85,8 +89,9 @@ class Game extends Process {
 
 		for (e in level.getEntities("rock"))
 			new en.Rock(e.x, e.y);
+
 		var pt = level.getEntityPt("player");
-		player = new en.Player(pt.cx, pt.cy);
+		player = new en.player.Player(pt.cx, pt.cy);
 
 		for (tileset in data.tilesets) { // applying hitboxes from 'colls' tileset
 			var ereg = ~/(^[^.]*)+/; // regexp to take tileset name
@@ -128,6 +133,7 @@ class Game extends Process {
 		camera.target = player;
 		camera.recenter();
 		cd.unset("levelDone");
+
 	}
 
 	private function getTSX(name:String):TmxTileset {
@@ -185,7 +191,6 @@ class Game extends Process {
 					destroy();
 					#end
 				}
-
 			if (ca.selectPressed())
 				restartLevel();
 		}

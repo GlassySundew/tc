@@ -21,13 +21,19 @@ class Main extends Process {
 
 		inst = this;
 		createRoot(s);
-		
+
 		root.filter = new h2d.filter.ColorMatrix();
 
-		#if debug
-		hxd.Res.initLocal();
-		#else
+		// #if debug
+		// hxd.Res.initLocal();
+		// #else
+		// hxd.Res.initEmbed();
+		// #end
+
+		#if (js || embed_res)
 		hxd.Res.initEmbed();
+		#else
+		hxd.Res.initLocal();
 		#end
 
 		#if debug
@@ -45,12 +51,13 @@ class Main extends Process {
 
 		Lang.init("en");
 		Assets.init();
-		//Data.load(hxd.Res.data.entry.getText());
+		// Data.load(hxd.Res.data.entry.getText());
 
 		new ui.Console(Assets.fontPixel, s);
 
 		controller = new dn.heaps.Controller(s);
 		ca = controller.createAccess("main");
+
 		controller.bind(AXIS_LEFT_X_NEG, Key.LEFT, Key.A);
 		controller.bind(AXIS_LEFT_X_POS, Key.RIGHT, Key.D);
 		controller.bind(AXIS_LEFT_Y_NEG, Key.UP, Key.W);
@@ -58,6 +65,7 @@ class Main extends Process {
 		controller.bind(A, Key.SPACE, Key.F, Key.E);
 		controller.bind(B, Key.ESCAPE, Key.BACKSPACE);
 		controller.bind(SELECT, Key.R);
+		controller.bind(LT, Key.TAB);
 
 		new dn.heaps.GameFocusHelper(Boot.inst.s2d, Assets.fontPixel);
 

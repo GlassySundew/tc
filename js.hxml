@@ -1,5 +1,4 @@
 base.hxml
 -js bin/game.js
+-debug
 
--D windowSize=1280x720
--dce full

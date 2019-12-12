@@ -1,3 +1,5 @@
+import h3d.prim.PlanePrim;
+import h3d.scene.TileSprite;
 import h3d.scene.Mesh;
 import h3d.Vector;
 import h2d.Tile;
@@ -43,7 +45,6 @@ class Level extends dn.Process {
 	public var data:TmxMap;
 	public var entities:Array<TmxObject> = [];
 
-	public var cam:CameraController;
 	public var ground:Texture;
 	public var obj:Mesh;
 
@@ -52,15 +53,11 @@ class Level extends dn.Process {
 		inst = this;
 		data = map;
 
-		new AxesHelper(Boot.inst.s3d);
-		new GridHelper(Boot.inst.s3d, 10, 10);
+		// new AxesHelper(Boot.inst.s3d);
+		// new GridHelper(Boot.inst.s3d, 10, 10);
 
 		Boot.inst.engine.backgroundColor = data.backgroundColor;
-		//Boot.inst.s3d.camera.setFovX(70, Boot.inst.s3d.camera.screenRatio);
-
-		// cam = new h3d.scene.CameraController(Boot.inst.s3d);
-		// cam.loadFromCamera();
-		// Boot.inst.s3d.addChild(cam);
+		// Boot.inst.s3d.camera.setFovX(70, Boot.inst.s3d.camera.screenRatio);
 
 		for (layer in data.layers) {
 			var name:String = 'null';
@@ -110,14 +107,14 @@ class Level extends dn.Process {
 		var a = [];
 		for (e in entities)
 			if (e.name == id)
-				a.push(new CPoint(Std.int(e.x), Std.int(e.y)));
+				a.push(new CPoint((e.x), (e.y)));
 		return a;
 	}
 
 	public function getEntityPt(id:String) {
 		for (e in entities)
 			if (e.name == id)
-				return new CPoint(Std.int(e.x), Std.int(e.y));
+				return new CPoint((e.x), (e.y));
 		return null;
 	}
 
@@ -135,25 +132,22 @@ class Level extends dn.Process {
 			}
 		}
 
-		var prim = new h3d.prim.Cube(ground.width, 0, ground.height);
-		prim.unindex();
-		prim.addUVs();
-		prim.addNormals();
-
-		obj = new h3d.scene.Mesh(prim, h3d.mat.Material.create(ground), Boot.inst.s3d);
+		var prim = new PlanePrim(ground.width, ground.height, -ground.width, -ground.height, Y);
+		obj = new Mesh(prim, h3d.mat.Material.create(ground), Boot.inst.s3d);
 		obj.material.mainPass.setBlendMode(Alpha);
-
+		// obj.material.mainPass.setPassName("alpha");
 		// obj.visible = false;
 		// obj.material.shadows = false;
 		obj.material.mainPass.enableLights = false;
-		obj.material.mainPass.depth(false, NotEqual);
+		obj.material.mainPass.depth(false, LessEqual);
 	}
 
 	override function postUpdate() {
 		super.postUpdate();
 
-		if (invalidated)
+		if (invalidated) {
 			render();
+		}
 	}
 
 	inline function cart_to_iso(vec:Vector):Vector

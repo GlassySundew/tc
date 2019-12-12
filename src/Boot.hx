@@ -13,7 +13,7 @@ class Boot extends hxd.App {
 
 		onResize();
 		
-		#if castle
+		#if (castle && hl)
 		new hxd.inspect.Inspector(s3d);
 		#end
 	}
