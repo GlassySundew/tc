@@ -14,7 +14,8 @@ class Camera extends dn.Process {
 	public var dx:Float;
 	public var dy:Float;
 
-	public var ppu = 2;
+	public static var ppu = 3;
+
 	// public var wid(get, never):Int;
 	// public var hei(get, never):Int;
 
@@ -28,7 +29,8 @@ class Camera extends dn.Process {
 		s3dCam.target.x = (x);
 		s3dCam.target.z = (y);
 
-		s3dCam.pos = s3dCam.target.add(new Vector(0, -(w() * 1) / (2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * (Math.PI / 180))), -0.01));
+		s3dCam.pos = s3dCam.target.add(new Vector(0, -(w() * 1) / (2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * (Math.PI / 180))), -1 / ppu));
+
 		// s3dCam.pos = s3dCam.target.add(new Vector(0, (h() * 1) / (2 * 32 * Math.tan(s3dCam.getFovX() / 2)), -0.01));
 	}
 
@@ -122,8 +124,8 @@ class Camera extends dn.Process {
 
 			// Rounding
 			if (!target.isMoving()) {
-				x = Math.round(x);
-				y = Math.round(y);
+				x = M.round(x);
+				y = M.round(y);
 			}
 		}
 	}

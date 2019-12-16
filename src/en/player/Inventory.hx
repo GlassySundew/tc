@@ -14,15 +14,18 @@ class Inventory extends dn.Process {
 
 		ca = Main.inst.controller.createAccess("inventory");
 
-		base = new h2d.ScaleGrid(hxd.Res.inventory.toTile().center(), 16, 25, Boot.inst.s2d);
-		base.scale(4);
+		base = new h2d.ScaleGrid(hxd.Res.inventory.toTile().center(), 17, 20, Boot.inst.s2d);
+		base.tileBorders = false;
+		
+		new ui.TextLabel(Middle, "Inventory", Assets.fontPixel, h2d.Tile.fromColor(0xFF, 32, 32), Std.int(base.width * 2), base);
+
 		base.visible = !base.visible;
 
-		
+		base.setScale(144*(Math.PI / 180));
 	}
 
 	function recenter() {
-		base.x = (Boot.inst.s2d.width >> 1) - base.width * base.scaleX / 2;
+		base.x = (Boot.inst.s2d.width >> 1) - base.width * base.scaleX / 2;	
 		base.y = (Boot.inst.s2d.height >> 1) - base.height * base.scaleX / 2;
 	}
 

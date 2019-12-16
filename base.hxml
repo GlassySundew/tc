@@ -1,6 +1,7 @@
 -cp src
 -cp .
 
+-lib domkit
 -lib format-tiled
 -lib heeps
 -lib heaps
@@ -9,12 +10,10 @@
 -lib gasm
 -lib structural
 -lib msignal
--lib differ
 -lib deepnightLibs
-
 -cp vendor/differ/src
 
 -dce full
+--times
 
 -main Boot
-

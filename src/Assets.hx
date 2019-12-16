@@ -34,8 +34,9 @@ class Assets {
 		// #end
 		// music.groupId = 1;
 
-		fontPixel = hxd.Res.fonts.Haversham.toFont();
+		fontPixel = hxd.Res.fonts.Haversham_fnt.toFont();
 		fontPixel.resizeTo(16);
+
 		// fontTiny = hxd.Res.fonts.barlow_condensed_medium_regular_9.toFont();
 		// fontSmall = hxd.Res.fonts.barlow_condensed_medium_regular_11.toFont();
 		// fontMedium = hxd.Res.fonts.barlow_condensed_medium_regular_17.toFont();
@@ -43,7 +44,6 @@ class Assets {
 
 		tiles = Atlas.load("tiled/player_move.atlas");
 
-		
 		var action = ["idle_", "walk_"];
 		var direc = ["left", "up", "down", "right", "down_left", "down_right", "up_left", "up_right"];
 		// tilesHero.defineAnim('idle_down_right', "0(1/0.25)");
@@ -51,7 +51,6 @@ class Assets {
 			tiles.generateAnim(action[0] + direc[i], "0(1)");
 		for (i in 0...(direc.length - 1))
 			tiles.generateAnim(action[1] + direc[i], "0-3(1)");
-
 	}
 
 	public static function playMusic() {

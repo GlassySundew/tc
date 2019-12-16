@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.1" orientation="isometric" renderorder="right-up" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#5eafe3" nextlayerid="33" nextobjectid="137">
+<map version="1.2" tiledversion="1.3.1" orientation="isometric" renderorder="right-up" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#5eafe3" nextlayerid="34" nextobjectid="137">
  <tileset firstgid="1" source="test.tsx"/>
- <tileset firstgid="6" source="colls.tsx"/>
+ <tileset firstgid="7" source="colls.tsx"/>
+ <layer id="33" name="1" width="100" height="100">
+  <data encoding="base64" compression="zlib">
+   eAHt0UEOhDAIBVDn/pceuzBpiNNh9Te8JkZpa4DHdVkECBAgQIAAAQIECBAgQOC/wOe+Up/119qzsgJ1Dm9xtqLZ2d78695soWz31f4UZyubme3kX89mCuW6rt6dOFfdvEwd/3pnnlKu42rdiXPVzczUmcF+Z6ZStuvd+/SdrWp2ttMcnrPZQtnuH/Nf72w1su1zWBo1JkSAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECgK/AF+rUAgw==
+  </data>
+ </layer>
  <layer id="1" name="ground" width="100" height="100">
   <data encoding="base64" compression="zlib">
-   eAHt0VEKwyAMANDu/pfeZASCdcyPxhZ8wtZoJUlfjsMiQIAAAQIECBAgQIAAAQIECBC4SuD1STT6XZVfnv8CzT/WaBZxFnc86wTCOmaS96O4rhOZm0A27/f9O2L1Atl8Nq7vat8KszPI9/bVWvPl2XomXtPVvlVmZpDv7Cu15suzdcStcsT9c01X+1bpvdu+rdF5vPve8F8hMHJvdUbn5lExgXPO3t48zkZ3nMRcfs3jjp7UJECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECTxR4A0OIAIc=
+   eAHt07EJQCEMBcBUfw5HczRHcxQjWAm/VuECKax83CMRhgABAgQIECBAgAABAgQIEHhR4IvoueYCgeyhXhBDhE3AfWwgh5/ZRzscwfdLILsoc4EQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAwL/AAH6UAks=
   </data>
  </layer>
  <objectgroup id="3" name="entities">

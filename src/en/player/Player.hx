@@ -1,5 +1,6 @@
 package en.player;
 
+
 import differ.Collision;
 
 class Player extends Entity {

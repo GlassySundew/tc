@@ -4,19 +4,14 @@ import h3d.Vector;
 import hxd.Timer;
 import h2d.Tile;
 import h2d.Text;
-import engine.HXP;
 import hxd.Event;
 import h2d.Bitmap;
 import h2d.Flow;
-import game.comps.GameUI;
-import gasm.heaps.components.HeapsSpriteComponent;
 import hxd.Res;
 import h2d.Object as Sprite;
 import hxd.Key;
-import engine.Music;
-import engine.HScene;
 
-class MenuScene extends HScene {
+class MenuScene  {
 	private var music:Bool;
 	private var s:Sprite;
 

@@ -11,7 +11,7 @@ base.hxml
 
 #-D windowSize=2000x2000
 
--D windowSize=1366x768
+-D windowSize=1280x720
 
 
 #-cmd  hl  game.hl

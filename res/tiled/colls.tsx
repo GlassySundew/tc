@@ -4,7 +4,7 @@
  <tile id="0">
   <image width="46" height="27" source="separated/q/rock.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="11.5454" y="9.09091" width="23" height="9.0341">
+   <object id="1" x="11.5454" y="6.21591" width="23" height="11.9091">
     <ellipse/>
    </object>
   </objectgroup>

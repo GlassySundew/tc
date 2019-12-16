@@ -178,7 +178,7 @@ class Game extends Process {
 			if (!e.destroyed)
 				e.frameEnd();
 		gc();
-
+		
 		if (!ui.Console.inst.isActive() && !ui.Modal.hasAny()) {
 			// Exit
 			if (ca.isKeyboardPressed(Key.X))

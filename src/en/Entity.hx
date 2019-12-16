@@ -1,10 +1,9 @@
 package en;
 
+import differ.shapes.Shape;
 import en.player.Player;
 import h3d.scene.TileSprite;
 import h3d.prim.Cylinder;
-import differ.shapes.Shape;
-import differ.shapes.Polygon;
 import tools.CPoint;
 import dn.heaps.slib.HSprite;
 import h3d.mat.Texture;
@@ -83,6 +82,8 @@ class Entity {
 	public var sprOffCollX = 0.;
 	public var sprOffCollY = 0.;
 
+	public var bottomAlpha = 0;
+
 	inline function get_tmod()
 		return Game.inst.tmod;
 
@@ -128,7 +129,7 @@ class Entity {
 	public var curFrame:Float = 0;
 	public var prim:Cube;
 
-	private var rotAngle:Float = -.0001;
+	private var rotAngle:Float = -.001;
 	private var pos:Vector;
 
 	public var cd:dn.Cooldown;
@@ -150,27 +151,18 @@ class Entity {
 		spr.visible = false;
 		spr.tile.getTexture().filter = Nearest;
 
-		mesh = new TileSprite(spr.tile, Boot.inst.s3d, true);
+		mesh = new TileSprite(spr.tile, false, Boot.inst.s3d, true, Y);
 		mesh.material.mainPass.setBlendMode(Alpha);
 		mesh.material.mainPass.enableLights = false;
-		mesh.material.mainPass.depth(false, Less);
+		mesh.material.mainPass.depth(false, LessEqual);
 
 		mesh.rotate(rotAngle, 0, 0);
-		mesh.scaleZ = (spr.tile.height / Math.cos(rotAngle)) / spr.tile.height;
-		mesh.y -= ((spr.tile.height) / 2) * mesh.scaleZ * Math.sin(rotAngle);
-
+		// mesh.scaleZ = (spr.tile.height / Math.cos(rotAngle)) / spr.tile.height;
+		
 		var s = mesh.material.mainPass.addShader(new h3d.shader.ColorAdd());
 		s.color = colorAdd;
 
 		setPosCase(x, z);
-	}
-
-	function getAlphaOffset():Int {
-		if (is(Player))
-			return 0;
-		if (is(Rock))
-			return 0;
-		return 0;
 	}
 
 	function blah() {
@@ -319,7 +311,8 @@ class Entity {
 	public function postUpdate() {
 		mesh.x = spr.x = footX;
 		mesh.z = spr.y = footY;
-
+		mesh.y = ((spr.tile.height- bottomAlpha) / 2) * mesh.scaleZ * Math.sin(-rotAngle);
+		
 		// spr.scaleX = dir * sprScaleX;
 		// spr.scaleY = sprScaleY;
 		if (!cd.has("colorMaintain")) {
@@ -339,6 +332,7 @@ class Entity {
 			footX = M.round(M.fabs(footX));
 			footY = M.round(M.fabs(footY));
 		}
+
 	}
 
 	public function frameEnd() {
