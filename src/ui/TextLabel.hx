@@ -30,7 +30,7 @@ class TextLabel extends h2d.Flow implements h2d.domkit.Object {
 		return s;
 	}
 
-	public function new(align:h2d.Flow.FlowAlign, text:String, font:Font, tile:h2d.Tile, ?baseWidth:Int, parent) {
+	public function new(align:h2d.Flow.FlowAlign, text:String, font:Font, ?baseWidth:Int, parent) {
 		super(parent);
 		initComponent();
 		

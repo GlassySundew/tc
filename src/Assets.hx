@@ -14,6 +14,7 @@ class Assets {
 	// public static var fontMedium:h2d.Font;
 	// public static var fontLarge:h2d.Font;
 	public static var tiles:SpriteLib;
+	public static var items:SpriteLib;
 
 	static var music:dn.heaps.Sfx;
 
@@ -51,6 +52,8 @@ class Assets {
 			tiles.generateAnim(action[0] + direc[i], "0(1)");
 		for (i in 0...(direc.length - 1))
 			tiles.generateAnim(action[1] + direc[i], "0-3(1)");
+
+		items = Atlas.load("tiled/items.atlas");
 	}
 
 	public static function playMusic() {

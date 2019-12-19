@@ -1,5 +1,8 @@
+import hxd.inspect.Inspector;
+
 class Boot extends hxd.App {
 	public static var inst:Boot;
+	public static var i:Inspector;
 
 	// Boot
 	static function main() {
@@ -12,9 +15,8 @@ class Boot extends hxd.App {
 		new Main(s2d);
 
 		onResize();
-		
 		#if (castle && hl)
-		new hxd.inspect.Inspector(s3d);
+		i = new hxd.inspect.Inspector(s3d);
 		#end
 	}
 

@@ -1,6 +1,7 @@
 -cp src
 -cp .
 
+-lib hide
 -lib domkit
 -lib format-tiled
 -lib heeps

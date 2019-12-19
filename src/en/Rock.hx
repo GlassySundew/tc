@@ -1,12 +1,13 @@
 package en;
 
 class Rock extends Entity {
-	public function new(x:Float, y:Float) {
+	public function new(?x:Float = 0, ?z:Float = 0) {
+		if (spr == null)
 		spr = new HSprite(Assets.tiles);
 
 		spr.set("rock");
 		// super(x - 0.5, y - 5 / 8);
-		super(x, y);
+		super(x, z);
 
 		bottomAlpha = 11;
 

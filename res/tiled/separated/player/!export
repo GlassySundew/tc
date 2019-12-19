@@ -1,0 +1,5 @@
+#!/bin/sh
+
+
+ase -b /home/glassysundew/Documents/ase/anna_run.ase --save-as {tag}_{slice}_{frame0}.png
+echo $dirname

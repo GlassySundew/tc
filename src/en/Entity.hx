@@ -133,6 +133,7 @@ class Entity {
 	private var pos:Vector;
 
 	public var cd:dn.Cooldown;
+	public static var isoCoefficient = 1.2;
 
 	var debugLabel:Null<h2d.Text>;
 
@@ -254,12 +255,12 @@ class Entity {
 			tmpDt = tmod * spr.anim.getCurrentAnim().speed;
 			tmpCur = spr.anim.getCurrentAnim().curFrameCpt;
 	}
-		var isoCoefficient = 1.2;
+		
 		// x
 		var steps = M.ceil(M.fabs(dxTotal * tmod));
 		var step = dxTotal * tmod / steps;
 
-		step = (dy > 0.0001 || dy < -0.0001) ? step * isoCoefficient : step; // ISO FIX
+		step = (M.fabs(dy) > 0.0001 ) ? step * isoCoefficient : step; // ISO FIX
 
 		while (steps > 0) {
 			xr += step;
@@ -285,7 +286,7 @@ class Entity {
 		var steps = M.ceil(M.fabs(dyTotal * tmod));
 		// var step = 0.;
 
-		step = (step > 0.00001 || step < -0.00001) ? (dyTotal * tmod / steps * isoCoefficient * 0.5) : (dyTotal * tmod / steps); // ISO FIX
+		step = (M.fabs(step) > 0.001 ) ? (dyTotal * tmod / steps * isoCoefficient * 0.5) : (dyTotal * tmod / steps); // ISO FIX
 
 		while (steps > 0) {
 			yr += step;

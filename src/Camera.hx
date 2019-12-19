@@ -16,6 +16,8 @@ class Camera extends dn.Process {
 
 	public static var ppu = 3;
 
+	var yMult:Float;
+
 	// public var wid(get, never):Int;
 	// public var hei(get, never):Int;
 
@@ -77,26 +79,33 @@ class Camera extends dn.Process {
 
 	override function update() {
 		super.update();
+		yMult = (M.fabs(target.dx) > 0.001 && M.fabs(target.dy) > 0.001) ? .5 : 1;
+		if (target != null) {
+			var s = 0.006;
+			var deadZone = 5;
+			var tx = target.footX;
+			var ty = target.footY;
+			var d = M.dist(x, y, tx, ty);
+
+			if (d >= deadZone) {
+				var a = Math.atan2(ty - y, tx - x);
+				dx += Math.cos(a) * (d - deadZone) * s * tmod;
+				dy += Math.sin(a) * (d - deadZone) * s * tmod * yMult;
+			}
+		}
+
+		var frict = 0.89;
+		x += dx * tmod;
+		dx *= Math.pow(frict, tmod);
+
+		y += dy * tmod;
+		dy *= Math.pow(frict, tmod);
 	}
 
 	override function postUpdate() {
 		super.postUpdate();
 		// for (i in 0...9)
 		if (!ui.Console.inst.hasFlag("scroll")) {
-			if (target != null) {
-				var s = 0.006;
-				var deadZone = 5;
-				var tx = target.footX;
-				var ty = target.footY; //- target.cy * Const.GRID_HEIGHT;
-				var d = M.dist(x, y, tx, ty);
-				if (d >= deadZone) {
-					var desired = new Vector(tx, ty);
-					var smooth = new Vector();
-					smooth.lerp(new Vector(x, y), desired, 0.03 * tmod);
-					x = smooth.x;
-					y = smooth.y;
-				}
-			}
 			// var level = Game.inst.level;
 			// var scroller = Game.inst.scroller;
 
@@ -123,10 +132,8 @@ class Camera extends dn.Process {
 			// }
 
 			// Rounding
-			if (!target.isMoving()) {
-				x = M.round(x);
-				y = M.round(y);
-			}
+			x = M.round(x);
+			y = M.round(y / (yMult * Entity.isoCoefficient)) * (yMult * Entity.isoCoefficient);
 		}
 	}
 }
