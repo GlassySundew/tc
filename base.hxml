@@ -15,6 +15,5 @@
 -cp vendor/differ/src
 
 -dce full
---times
 
 -main Boot

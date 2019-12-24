@@ -1,3 +1,4 @@
+import differ.shapes.Polygon;
 import h3d.prim.PlanePrim;
 import h3d.scene.TileSprite;
 import h3d.scene.Mesh;
@@ -44,7 +45,7 @@ class Level extends dn.Process {
 
 	public var data:TmxMap;
 	public var entities:Array<TmxObject> = [];
-
+	public var walkable:Polygon;
 	public var ground:Texture;
 	public var obj:Mesh;
 
@@ -65,8 +66,16 @@ class Level extends dn.Process {
 				case LObjectGroup(ol):
 					name = ol.name;
 					for (obj in ol.objects) {
-						var isoX = wid / 2 + cart_to_iso(new Vector(obj.x, obj.y)).x;
-						var isoY = hei - cart_to_iso(new Vector(obj.x, obj.y)).y;
+						switch (obj.objectType) {
+							case OTPolygon(points):
+								if (ol.name == 'hitboxes' && obj.name == 'walkable')
+									setWalkable(obj, points);
+							default:
+						}
+
+						// entities export lies ahead
+						var isoX = cart_to_iso_abs(obj.x, obj.y).x;
+						var isoY = cart_to_iso_abs(obj.x, obj.y).y;
 
 						obj.x = isoX / Const.GRID_WIDTH;
 						obj.y = isoY / Const.GRID_WIDTH;
@@ -142,6 +151,16 @@ class Level extends dn.Process {
 		obj.material.mainPass.depth(false, LessEqual);
 	}
 
+	public function setWalkable(poly:TmxObject, points:Array<TmxPoint>) { // setting walk area as a differ polygon(prob a shitty idea, but idk)
+		var vertices:Array<differ.math.Vector> = [];
+		trace(poly.x, poly.y);
+		for (i in points)
+			vertices.push(new differ.math.Vector(cart_to_iso(i.x, i.y).x, cart_to_iso(i.x, i.y).y));
+		vertices.reverse();
+		walkable = new Polygon(cart_to_iso_abs(poly.x, poly.y).x, cart_to_iso_abs(poly.x, poly.y).y, vertices);
+		walkable.scaleY = -1;
+	}
+
 	override function postUpdate() {
 		super.postUpdate();
 
@@ -150,30 +169,11 @@ class Level extends dn.Process {
 		}
 	}
 
-	inline function cart_to_iso(vec:Vector):Vector
-		return new Vector(vec.x - vec.y, (vec.x + vec.y) / 2);
-}
+	inline function cart_to_iso(x:Float, y:Float):Vector
+		return new Vector((x - y), (x + y) / 2);
 
-class AxesHelper extends h3d.scene.Graphics {
-	public function new(?parent:h3d.scene.Object, size = 2.0, colorX = 0xEB304D, colorY = 0x7FC309, colorZ = 0x288DF9, lineWidth = 2.0) {
-		super(parent);
-
-		// trace(s3d.camera.pos.x, s3d.camera.pos.y, s3d.camera.pos.z, s3d.camera.pos.w);
-		material.props = h3d.mat.MaterialSetup.current.getDefaults("ui");
-
-		lineShader.width = lineWidth;
-
-		setColor(colorX);
-		lineTo(size, 0, 0);
-
-		setColor(colorY);
-		moveTo(0, 0, 0);
-		lineTo(0, size, 0);
-
-		setColor(colorZ);
-		moveTo(0, 0, 0);
-		lineTo(0, 0, size);
-	}
+	inline function cart_to_iso_abs(x:Float, y:Float):Vector
+		return new Vector(wid * .5 + cart_to_iso(x, y).x, hei - cart_to_iso(x, y).y);
 }
 
 class LayerRender extends h2d.Object {
@@ -198,28 +198,30 @@ private class InternalRender extends TileLayerRenderer {
 	override function renderOrthoTile(x:Float, y:Float, tile:TmxTile, tileset:TmxTileset):Void {
 		if (tileset == null)
 			return;
+
+		if (tileset.tileOffset != null) {
+			x += tileset.tileOffset.x;
+			y += tileset.tileOffset.y;
+		}
 		if (tileset.image == null) {
 			renderOrthoTileFromImageColl(x, y, tile, tileset);
 
 			return;
-		}
-		if (tileset.tileOffset != null) {
-			x += tileset.tileOffset.x;
-			y += tileset.tileOffset.y;
 		}
 
 		var scaleX = tile.flippedHorizontally ? -1 : 1;
 		var scaleY = tile.flippedVertically ? -1 : 1;
 		Tools.getTileUVByLidUnsafe(tileset, tile.gid - tileset.firstGID, uv);
 		var h2dTile = Res.loader.load("tiled/" + tileset.image.source).toTile();
-
 		g.beginTileFill(x
 			- uv.x
-			+ (scaleX == 1 ? 0 : map.tileWidth), y
+			+ (scaleX == 1 ? 0 : map.tileWidth)
+			+ layer.offsetX,
+			y
 			- uv.y * scaleY
 			+ map.tileHeight
-			- tileset.tileHeight / (scaleY == 1 ? 1 : 1), scaleX,
-			scaleY, h2dTile);
+			- tileset.tileHeight / (scaleY == 1 ? 1 : 1)
+			+ layer.offsetY, scaleX, scaleY, h2dTile);
 
 		g.drawRect(x, y + map.tileHeight - tileset.tileHeight, tileset.tileWidth, tileset.tileHeight);
 		g.endFill();
@@ -233,8 +235,8 @@ private class InternalRender extends TileLayerRenderer {
 		bmp.scaleX = scaleX;
 		bmp.scaleY = scaleY;
 
-		bmp.x = x + (scaleX == 1 ? 2 : map.tileWidth);
-		bmp.y = y - h2dTile.height + map.tileHeight + (scaleY == 1 ? 0 : h2dTile.height);
+		bmp.x = x + (scaleX == 1 ? 2 : map.tileWidth) + layer.offsetX;
+		bmp.y = y - h2dTile.height + map.tileHeight + (scaleY == 1 ? 0 : h2dTile.height) + layer.offsetY;
 
 		bmp.drawTo(tex);
 		g.drawTile(0, 0, Tile.fromTexture(tex));

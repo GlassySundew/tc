@@ -4,15 +4,15 @@
  <tile id="0">
   <image width="46" height="27" source="separated/q/rock.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="11.5454" y="6.21591" width="23" height="11.9091">
-    <ellipse/>
+   <object id="3" x="22.4545" y="1">
+    <polygon points="0,0 -10.5455,20 13,19.7273"/>
    </object>
   </objectgroup>
  </tile>
  <tile id="2">
   <image width="32" height="32" source="separated/q/player.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="5" x="9" y="25" width="15" height="7">
+   <object id="5" x="8.92935" y="24.2036" width="15" height="11.8182">
     <ellipse/>
    </object>
   </objectgroup>

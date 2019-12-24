@@ -14,7 +14,7 @@ class Rock extends Entity {
 		sprOffY = -.75;
 		sprOffX = -.5;
 
-		sprOffCollY = 0.25;
+		// sprOffCollY = .25;
 		// spr.setCenterRatio(0.5, 0.5);
 	}
 

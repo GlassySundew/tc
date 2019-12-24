@@ -79,27 +79,6 @@ class Camera extends dn.Process {
 
 	override function update() {
 		super.update();
-		yMult = (M.fabs(target.dx) > 0.001 && M.fabs(target.dy) > 0.001) ? .5 : 1;
-		if (target != null) {
-			var s = 0.006;
-			var deadZone = 5;
-			var tx = target.footX;
-			var ty = target.footY;
-			var d = M.dist(x, y, tx, ty);
-
-			if (d >= deadZone) {
-				var a = Math.atan2(ty - y, tx - x);
-				dx += Math.cos(a) * (d - deadZone) * s * tmod;
-				dy += Math.sin(a) * (d - deadZone) * s * tmod * yMult;
-			}
-		}
-
-		var frict = 0.89;
-		x += dx * tmod;
-		dx *= Math.pow(frict, tmod);
-
-		y += dy * tmod;
-		dy *= Math.pow(frict, tmod);
 	}
 
 	override function postUpdate() {
@@ -130,10 +109,31 @@ class Camera extends dn.Process {
 			// 	scroller.x += Math.cos(ftime * 1.16) * 1 * Const.SCALE * shakePower * cd.getRatio("shaking");
 			// 	scroller.y += Math.sin(0.3 + ftime * 1.33) * 1 * Const.SCALE * shakePower * cd.getRatio("shaking");
 			// }
+			
+			yMult = (M.fabs(target.dx) > 0.001 && M.fabs(target.dy) > 0.001) ? .5 : 1;
+			if (target != null) {
+				var s = 0.006;
+				var deadZone = 5;
+				var tx = target.footX;
+				var ty = target.footY;
+				var d = M.dist(x, y, tx, ty);
 
+				if (d >= deadZone) {
+					var a = Math.atan2(ty - y, tx - x);
+					dx += Math.cos(a) * (d - deadZone) * s * tmod;
+					dy += Math.sin(a) * (d - deadZone) * s * tmod;
+				}
+			}
+
+			var frict = 0.89;
+			x += dx * tmod;
+			dx *= Math.pow(frict, tmod);
+
+			y += dy * tmod * yMult;
+			dy *= Math.pow(frict, tmod);
 			// Rounding
 			x = M.round(x);
-			y = M.round(y / (yMult * Entity.isoCoefficient)) * (yMult * Entity.isoCoefficient);
+			y = M.round(y / (yMult == .5 ? Entity.isoCoefficient * yMult : 1)) * (yMult == .5 ? Entity.isoCoefficient * yMult : 1);
 		}
 	}
 }

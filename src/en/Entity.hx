@@ -1,5 +1,6 @@
 package en;
 
+import h3d.prim.Sphere;
 import differ.shapes.Shape;
 import en.player.Player;
 import h3d.scene.TileSprite;
@@ -129,13 +130,15 @@ class Entity {
 	public var curFrame:Float = 0;
 	public var prim:Cube;
 
-	private var rotAngle:Float = -.001;
+	private var rotAngle:Float = -.00001;
 	private var pos:Vector;
 
 	public var cd:dn.Cooldown;
+
 	public static var isoCoefficient = 1.2;
 
 	var debugLabel:Null<h2d.Text>;
+
 
 	public function new(?x:Float = 0, ?z:Float = 0) {
 		uid = Const.NEXT_UNIQ;
@@ -145,6 +148,7 @@ class Entity {
 
 		if (spr == null)
 			spr = new HSprite(Assets.tiles);
+
 
 		game.scroller.add(spr, 10);
 		// spr.setCenterRatio(0.5, 1);
@@ -156,13 +160,11 @@ class Entity {
 		mesh.material.mainPass.setBlendMode(Alpha);
 		mesh.material.mainPass.enableLights = false;
 		mesh.material.mainPass.depth(false, LessEqual);
-
 		mesh.rotate(rotAngle, 0, 0);
 		// mesh.scaleZ = (spr.tile.height / Math.cos(rotAngle)) / spr.tile.height;
-		
+
 		var s = mesh.material.mainPass.addShader(new h3d.shader.ColorAdd());
 		s.color = colorAdd;
-
 		setPosCase(x, z);
 	}
 
@@ -255,12 +257,11 @@ class Entity {
 			tmpDt = tmod * spr.anim.getCurrentAnim().speed;
 			tmpCur = spr.anim.getCurrentAnim().curFrameCpt;
 	}
-		
 		// x
 		var steps = M.ceil(M.fabs(dxTotal * tmod));
 		var step = dxTotal * tmod / steps;
 
-		step = (M.fabs(dy) > 0.0001 ) ? step * isoCoefficient : step; // ISO FIX
+		step = (M.fabs(dy) > 0.0001) ? step * isoCoefficient : step; // ISO FIX
 
 		while (steps > 0) {
 			xr += step;
@@ -286,7 +287,7 @@ class Entity {
 		var steps = M.ceil(M.fabs(dyTotal * tmod));
 		// var step = 0.;
 
-		step = (M.fabs(step) > 0.001 ) ? (dyTotal * tmod / steps * isoCoefficient * 0.5) : (dyTotal * tmod / steps); // ISO FIX
+		step = (M.fabs(step) > 0.001) ? (dyTotal * tmod / steps * isoCoefficient * 0.5) : (dyTotal * tmod / steps); // ISO FIX
 
 		while (steps > 0) {
 			yr += step;
@@ -307,13 +308,15 @@ class Entity {
 			dy = 0;
 		if (M.fabs(bdy) <= 0.0005 * tmod)
 			bdy = 0;
+		
+
 	}
 
 	public function postUpdate() {
 		mesh.x = spr.x = footX;
 		mesh.z = spr.y = footY;
-		mesh.y = ((spr.tile.height- bottomAlpha) / 2) * mesh.scaleZ * Math.sin(-rotAngle);
-		
+		mesh.y = ((spr.tile.height - bottomAlpha) / 2) * mesh.scaleZ * Math.sin(-rotAngle);
+
 		// spr.scaleX = dir * sprScaleX;
 		// spr.scaleY = sprScaleY;
 		if (!cd.has("colorMaintain")) {
@@ -333,7 +336,6 @@ class Entity {
 			footX = M.round(M.fabs(footX));
 			footY = M.round(M.fabs(footY));
 		}
-
 	}
 
 	public function frameEnd() {

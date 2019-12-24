@@ -1,3 +1,4 @@
+import differ.math.Vector;
 import differ.shapes.Polygon;
 import h3d.scene.Scene;
 import h3d.scene.Mesh;
@@ -120,6 +121,11 @@ class Game extends Process {
 											ent.collisions.push(shape);
 										case OTRectangle:
 											ent.collisions.push(Polygon.rectangle(params.x, params.y, params.width, params.height));
+										case OTPolygon(points):
+											var verts:Array<Vector> = [];
+											for (i in points)
+												verts.push(new Vector(i.x, i.y));
+											ent.collisions.push(new Polygon(obj.x, obj.y, verts));
 										default:
 									}
 								}
@@ -133,7 +139,6 @@ class Game extends Process {
 		camera.target = player;
 		camera.recenter();
 		cd.unset("levelDone");
-
 	}
 
 	private function getTSX(name:String):TmxTileset {
@@ -178,7 +183,7 @@ class Game extends Process {
 			if (!e.destroyed)
 				e.frameEnd();
 		gc();
-		
+
 		if (!ui.Console.inst.isActive() && !ui.Modal.hasAny()) {
 			// Exit
 			if (ca.isKeyboardPressed(Key.X))

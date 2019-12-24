@@ -1,6 +1,5 @@
 package en.player;
 
-
 import differ.Collision;
 
 class Player extends Entity {
@@ -30,10 +29,14 @@ class Player extends Entity {
 		}
 
 		super(x, z);
+
+		mesh.originMY = .85;
+
 		sprOffX = -.5;
 		sprOffY = -.5;
 
 		inventory = new Inventory();
+
 		// sprOffCollY = -.45;
 		// obj.material.mainPass.addShader(new NormalMap(tex));
 	}
@@ -87,15 +90,23 @@ class Player extends Entity {
 
 	override function checkCollisions() {
 		super.checkCollisions();
+	
 
-		for (ent in Entity.ALL) {
-			var collideInfo = Collision.shapeWithShape(collisions[0], ent.collisions[0]);
-			if (collideInfo != null) {
-				collisions[0].x += collideInfo.separationX;
-				collisions[0].y += collideInfo.separationY;
-			}
+		// for (ent in Entity.ALL) {
+		// 	var collideInfo = Collision.shapeWithShape(collisions[0], ent.collisions[0]);
+		// 	if (collideInfo != null) {
+		// 		collisions[0].x += collideInfo.separationX;
+		// 		collisions[0].y += collideInfo.separationY;
+		// 	}
+		// }
+
+		var collideInfo = Collision.shapeWithShape(collisions[0], Level.inst.walkable);
+		if (collideInfo != null) {
+			collisions[0].x += collideInfo.separationX;
+			collisions[0].y += collideInfo.separationY;
 		}
-		footX = collisions[0].x;
-		footY = collisions[0].y;
+
+		footX =  collisions[0].x;
+		footY =  collisions[0].y;
 	}
 }

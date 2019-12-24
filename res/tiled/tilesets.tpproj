@@ -74,45 +74,6 @@ scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
 inputFiles=[{path:separated/items/item_iron_ore.png,type:Input,regionName:null}]
 
 
----
-
-name=walls_floor
-filename=
-output=.
-
-alias=false
-alphaThreshold=0
-debug=false
-duplicatePadding=false
-edgePadding=true
-fast=false
-filterMag=Nearest
-filterMin=Nearest
-ignoreBlankImages=false
-maxHeight=2432
-maxWidth=2048
-minHeight=16
-minWidth=16
-paddingX=0
-paddingY=0
-pot=false
-mof=false
-rotation=false
-stripWhitespaceX=false
-stripWhitespaceY=false
-wrapX=ClampToEdge
-wrapY=ClampToEdge
-premultiplyAlpha=false
-grid=false
-square=false
-bleed=false
-limitMemory=false
-useIndexes=false
-
-scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:separated/floor_1.png,type:Input,regionName:null},{path:separated/water_tower.png,type:Input,regionName:null},{path:separated/floor_2.png,type:Input,regionName:null},{path:separated/floor_3.png,type:Input,regionName:null},{path:separated/floor_4.png,type:Input,regionName:null},{path:separated/rock.png,type:Input,regionName:null},{path:separated/rock_2.png,type:Input,regionName:null},{path:separated/solar.png,type:Input,regionName:null},{path:separated/tree.png,type:Input,regionName:null},{path:separated/wall_1.png,type:Input,regionName:null},{path:separated/wall_2.png,type:Input,regionName:null},{path:separated/wall_contour.png,type:Input,regionName:null},{path:separated/wall_corner_1.png,type:Input,regionName:null},{path:separated/wall_corner_2.png,type:Input,regionName:null},{path:separated/wall_ground_1.png,type:Input,regionName:null},{path:separated/wall_ground_2.png,type:Input,regionName:null},{path:separated/wall_precorner.png,type:Input,regionName:null}]
-
-
 -PROJ-
 
 version=4.8.2

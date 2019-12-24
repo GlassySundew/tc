@@ -37,7 +37,7 @@ class Assets {
 
 		fontPixel = hxd.Res.fonts.Haversham_fnt.toFont();
 		fontPixel.resizeTo(16);
-
+		
 		// fontTiny = hxd.Res.fonts.barlow_condensed_medium_regular_9.toFont();
 		// fontSmall = hxd.Res.fonts.barlow_condensed_medium_regular_11.toFont();
 		// fontMedium = hxd.Res.fonts.barlow_condensed_medium_regular_17.toFont();
