@@ -139,7 +139,6 @@ class Entity {
 
 	var debugLabel:Null<h2d.Text>;
 
-
 	public function new(?x:Float = 0, ?z:Float = 0) {
 		uid = Const.NEXT_UNIQ;
 		ALL.push(this);
@@ -149,14 +148,13 @@ class Entity {
 		if (spr == null)
 			spr = new HSprite(Assets.tiles);
 
-
 		game.scroller.add(spr, 10);
 		// spr.setCenterRatio(0.5, 1);
 		spr.colorAdd = colorAdd = new h3d.Vector();
 		spr.visible = false;
 		spr.tile.getTexture().filter = Nearest;
 
-		mesh = new TileSprite(spr.tile, false, Boot.inst.s3d, true, Y);
+		mesh = new TileSprite(spr.tile, true, Boot.inst.s3d, true);
 		mesh.material.mainPass.setBlendMode(Alpha);
 		mesh.material.mainPass.enableLights = false;
 		mesh.material.mainPass.depth(false, LessEqual);
@@ -242,8 +240,8 @@ class Entity {
 	}
 
 	function checkCollisions() {
-		collisions[0].x = mesh.x + sprOffCollX * Const.GRID_WIDTH;
-		collisions[0].y = mesh.z + sprOffCollY * Const.GRID_WIDTH;
+		collisions[0].x = footX + sprOffCollX * Const.GRID_WIDTH;
+		collisions[0].y = footY + sprOffCollY * Const.GRID_WIDTH;
 	}
 
 	public function preUpdate() {
@@ -308,8 +306,6 @@ class Entity {
 			dy = 0;
 		if (M.fabs(bdy) <= 0.0005 * tmod)
 			bdy = 0;
-		
-
 	}
 
 	public function postUpdate() {

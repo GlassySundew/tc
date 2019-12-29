@@ -3,6 +3,8 @@
         "titleBar.inactiveBackground": "#3c4d27",
         "titleBar.activeBackground": "#3f551c",
         "titleBar.activeForeground": "#ffffff"
-    }
+    },
+    "python.formatting.provider": "yapf",
+    "python.pythonPath": "/usr/bin/python2"
 }
   

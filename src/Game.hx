@@ -94,7 +94,8 @@ class Game extends Process {
 		var pt = level.getEntityPt("player");
 		player = new en.player.Player(pt.cx, pt.cy);
 
-		for (tileset in data.tilesets) { // applying hitboxes from 'colls' tileset
+		// parsing collision from 'colls' tileset
+		for (tileset in data.tilesets) {
 			var ereg = ~/(^[^.]*)+/; // regexp to take tileset name
 			if (ereg.match(tileset.source) && ereg.matched(1) == 'colls')
 				for (tile in tileset.tiles) {
@@ -108,10 +109,10 @@ class Game extends Process {
 								&& ent.collisions.length == 0) {
 								for (obj in tile.objectGroup.objects) {
 									var params = {
-										x: obj.x + ent.footX,
-										y: obj.y + ent.footY,
-										width: obj.width,
-										height: obj.height
+										x: M.round(obj.x) + ent.footX,
+										y: M.round(obj.y) + ent.footY,
+										width: M.round(obj.width),
+										height: M.round(obj.height)
 									};
 									switch (obj.objectType) {
 										case OTEllipse:
@@ -128,6 +129,11 @@ class Game extends Process {
 											ent.collisions.push(new Polygon(obj.x, obj.y, verts));
 										default:
 									}
+									//  установление pivot point для фундаментного объекта коллизии
+									// ебучее кривое говнище из жопы, не знаю как сделать нормально
+
+									ent.mesh.originMX = (M.round(obj.x) + M.round(obj.width) / 2 - 2) / ent.mesh.tile.width;
+									ent.mesh.originMY = (M.round(obj.y) + M.round(obj.height) / 2 + 1) / ent.mesh.tile.height;
 								}
 							}
 						}

@@ -45,7 +45,7 @@ class Level extends dn.Process {
 
 	public var data:TmxMap;
 	public var entities:Array<TmxObject> = [];
-	public var walkable:Polygon;
+	public var walkable:Array<Polygon> = [];
 	public var ground:Texture;
 	public var obj:Mesh;
 
@@ -68,8 +68,13 @@ class Level extends dn.Process {
 					for (obj in ol.objects) {
 						switch (obj.objectType) {
 							case OTPolygon(points):
-								if (ol.name == 'hitboxes' && obj.name == 'walkable')
+								chech_poly_clockwise(obj, points);
+								if (ol.name == 'walls')
 									setWalkable(obj, points);
+							case OTRectangle:
+								if (ol.name == 'walls')
+									setWalkable(obj);
+
 							default:
 						}
 
@@ -151,14 +156,22 @@ class Level extends dn.Process {
 		obj.material.mainPass.depth(false, LessEqual);
 	}
 
-	public function setWalkable(poly:TmxObject, points:Array<TmxPoint>) { // setting walk area as a differ polygon(prob a shitty idea, but idk)
+	public function setWalkable(poly:TmxObject, ?points:Array<TmxPoint>) { // setting walk area as a differ polygon(prob a shitty idea, but idk)
 		var vertices:Array<differ.math.Vector> = [];
-		trace(poly.x, poly.y);
-		for (i in points)
-			vertices.push(new differ.math.Vector(cart_to_iso(i.x, i.y).x, cart_to_iso(i.x, i.y).y));
-		vertices.reverse();
-		walkable = new Polygon(cart_to_iso_abs(poly.x, poly.y).x, cart_to_iso_abs(poly.x, poly.y).y, vertices);
-		walkable.scaleY = -1;
+		if (points != null) {
+			for (i in points)
+				vertices.push(new differ.math.Vector(cart_to_iso(i.x, i.y).x, cart_to_iso(i.x, i.y).y));
+			walkable.push(new Polygon(cart_to_iso_abs(poly.x, poly.y).x, cart_to_iso_abs(poly.x, poly.y).y, vertices));
+		} else if (poly.objectType == OTRectangle) {
+			vertices.push(new differ.math.Vector(0, 0));
+			vertices.push(new differ.math.Vector(cart_to_iso(0, poly.height).x, cart_to_iso(0, poly.height).y));
+			vertices.push(new differ.math.Vector(cart_to_iso(poly.width, poly.height).x, cart_to_iso(poly.width, poly.height).y));
+			vertices.push(new differ.math.Vector(cart_to_iso(poly.width, 0).x, cart_to_iso(poly.width, 0).y));
+
+			walkable.push(new Polygon(cart_to_iso_abs(poly.x, poly.y).x, cart_to_iso_abs(poly.x, poly.y).y, vertices));
+		}
+		// vertices.reverse();
+		walkable[walkable.length - 1].scaleY = -1;
 	}
 
 	override function postUpdate() {
@@ -167,6 +180,15 @@ class Level extends dn.Process {
 		if (invalidated) {
 			render();
 		}
+	}
+
+	inline function chech_poly_clockwise(poly:TmxObject, points:Array<TmxPoint>) {
+		var sum = .0;
+		for (i in 0...points.length) {
+			var actualItpp = (i >= points.length - 1) ? 0 : i + 1;
+			sum += (points[actualItpp].x - points[i].x) * (points[actualItpp].y + points[i].y);
+		}
+		sum < 0 ? points.reverse() : 0;
 	}
 
 	inline function cart_to_iso(x:Float, y:Float):Vector
@@ -242,51 +264,4 @@ private class InternalRender extends TileLayerRenderer {
 		g.drawTile(0, 0, Tile.fromTexture(tex));
 		g.endFill();
 	}
-}
-
-class GridHelper extends h3d.scene.Graphics {
-	public function new(?parent:Object, size = 10.0, divisions = 10, color1 = 0x444444, color2 = 0x888888, lineWidth = 1.0) {
-		super(parent);
-
-		material.props = h3d.mat.MaterialSetup.current.getDefaults("ui");
-
-		lineShader.width = lineWidth;
-
-		var hsize = size / 2;
-		var csize = size / divisions;
-		var center = divisions / 2;
-		for (i in 0...divisions + 1) {
-			var p = i * csize;
-			setColor((i != 0 && i != divisions && i % center == 0) ? color2 : color1);
-			moveTo(-hsize + p, -hsize, 0);
-			lineTo(-hsize + p, -hsize + size, 0);
-			moveTo(-hsize, -hsize + p, 0);
-			lineTo(-hsize + size, -hsize + p, 0);
-		}
-	}
-}
-
-class PointLightHelper extends h3d.scene.Mesh {
-	public function new(light:h3d.scene.fwd.PointLight, sphereSize = 0.5) {
-		var prim = new h3d.prim.Sphere(sphereSize, 4, 2);
-		prim.addNormals();
-		prim.addUVs();
-		super(prim, light);
-		material.color = light.color;
-		material.mainPass.wireframe = true;
-	}
-}
-
-class InstancedOffsetShader extends hxsl.Shader {
-	static var SRC = {
-		@:import h3d.shader.BaseMesh;
-		@perInstance(2) @input var offset:Vec2;
-		function vertex() {
-			transformedPosition.xy += offset;
-			transformedPosition.xy += float(instanceID & 1) * vec2(0.2, 0.1);
-			transformedPosition.z += float(instanceID) * 0.01;
-			pixelColor.r = float(instanceID) / 16.;
-			pixelColor.g = float(vertexID) / 8.;
-		}
-	};
 }

@@ -1,5 +1,5 @@
 
-player_move2.png
+player_move.png
 size: 256,256
 format: RGBA8888
 filter: Nearest,Nearest
@@ -34,7 +34,7 @@ idle_left_0
   index: -1
 idle_right_0
   rotate: false
-  xy: 218, 218
+  xy: 34, 184
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -104,14 +104,14 @@ walk_down_left_0
   index: -1
 walk_down_left_1
   rotate: false
-  xy: 0, 189
+  xy: 218, 218
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_down_left_2
   rotate: false
-  xy: 34, 150
+  xy: 0, 155
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -125,7 +125,7 @@ walk_down_left_3
   index: -1
 walk_down_right_0
   rotate: false
-  xy: 102, 48
+  xy: 68, 150
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -146,7 +146,7 @@ walk_down_right_2
   index: -1
 walk_down_right_3
   rotate: false
-  xy: 170, 150
+  xy: 68, 116
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -160,7 +160,7 @@ walk_left_0
   index: -1
 walk_left_1
   rotate: false
-  xy: 68, 116
+  xy: 102, 48
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -188,7 +188,7 @@ walk_right_0
   index: -1
 walk_right_1
   rotate: false
-  xy: 34, 184
+  xy: 34, 150
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -202,7 +202,7 @@ walk_right_2
   index: -1
 walk_right_3
   rotate: false
-  xy: 34, 82
+  xy: 0, 189
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -237,14 +237,14 @@ walk_up_3
   index: -1
 walk_up_left_0
   rotate: false
-  xy: 68, 150
+  xy: 34, 82
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_up_left_1
   rotate: false
-  xy: 0, 155
+  xy: 170, 150
   size: 32, 32
   orig: 32, 32
   offset: 0, 0

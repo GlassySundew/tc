@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.1" orientation="isometric" renderorder="right-up" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#00aaff" nextlayerid="36" nextobjectid="166">
+<map version="1.2" tiledversion="1.3.1" orientation="isometric" renderorder="right-up" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" nextlayerid="36" nextobjectid="218">
  <tileset firstgid="1" source="test.tsx"/>
  <tileset firstgid="7" source="colls.tsx"/>
  <layer id="33" name="1" width="100" height="100" offsetx="0" offsety="7">
   <data encoding="base64" compression="zlib">
-   eAHt0cGOwjAMBFD4/59mLytxgMbOwY2Gh1QJNRPZ8/p4+BEgQIAAAQIECJwm8Pxb6P05bb9f2uf9O1z9/yWTu7pe+X87u2vX9LnfvCvv022m+1XMV5npnVPnrZw756lGk7063qvs5N6Js1a+O+eJTlOddrwrd6b2T5tTsd3JpDlN9dmxrt6Z6pA0p2q7k0tymuqy49y5M9UjaU7Ht5tNcprq0jXu5qd6JM3pGnfySU6TXTrGnexkh6RZHeNuNslpskvXuZqf7JA2q2rcyaUZTffpWFey0/unzqtYrzKpNnf1Wnlfnd+1c/rcK/NPZ+kep/T7ZP//7pQd7UGAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAwDkCL7bXAc4=
+   eAHt0UEKACAIBED7/6erm4jHyMsIgYkgzEYoAgQIECBAgAABAgQIECBAgAABAgQIECBAgACBTmCdYX7djtk/gZzF7dWsgDxm/et1eVSR2b88Zv1dJ0CAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIPBCYAOZPgAV
   </data>
  </layer>
  <layer id="1" name="ground" width="100" height="100">
   <data encoding="base64" compression="zlib">
-   eAHt0yEKAEAIBEDT/f/J9oVrmhzbIgiOWKUIECBAgAABAgQIECBAgAABAgQIECBAgAABAgR+Ai8amaMtEjgh4A9OnNmSwwL+ZhjUOAIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQLLAg2rBAAZ
+   eAHt0DEBAAAAwqD1T+1lC4hAYcCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMDABwacQAAB
   </data>
  </layer>
- <objectgroup id="34" name="hitboxes">
-  <object id="164" name="walkable" x="480" y="240">
-   <polygon points="0,0 120,0 120,120 -48,48"/>
-  </object>
-  <object id="165" x="477.875" y="437.625"/>
+ <objectgroup id="34" name="walls">
+  <object id="208" x="432" y="360" width="96" height="24"/>
+  <object id="215" x="432" y="504" width="96" height="24"/>
+  <object id="216" x="408" y="384" width="24" height="120"/>
+  <object id="217" x="528" y="384" width="24" height="120"/>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="19" name="player" x="408" y="360" width="24" height="24"/>
-  <object id="142" name="thrusters" gid="2" x="504.93" y="539.343" width="24" height="46" rotation="296.244"/>
-  <object id="152" name="rock" x="384" y="456" width="24" height="24"/>
+  <object id="19" name="player" x="480" y="456" width="24" height="24"/>
+  <object id="142" name="thrusters" gid="2" x="504" y="552" width="24" height="46" rotation="296.244"/>
+  <object id="183" name="rock" gid="5" x="480" y="480" width="46" height="27"/>
  </objectgroup>
 </map>

@@ -29,11 +29,10 @@ class Player extends Entity {
 		}
 
 		super(x, z);
-
-		mesh.originMY = .85;
-
+		// mesh.originMX = 15 / 33;
+		// mesh.originMY = 29 / 33;
 		sprOffX = -.5;
-		sprOffY = -.5;
+		sprOffY = -.75;
 
 		inventory = new Inventory();
 
@@ -90,23 +89,23 @@ class Player extends Entity {
 
 	override function checkCollisions() {
 		super.checkCollisions();
-	
 
-		// for (ent in Entity.ALL) {
-		// 	var collideInfo = Collision.shapeWithShape(collisions[0], ent.collisions[0]);
-		// 	if (collideInfo != null) {
-		// 		collisions[0].x += collideInfo.separationX;
-		// 		collisions[0].y += collideInfo.separationY;
-		// 	}
-		// }
-
-		var collideInfo = Collision.shapeWithShape(collisions[0], Level.inst.walkable);
-		if (collideInfo != null) {
-			collisions[0].x += collideInfo.separationX;
-			collisions[0].y += collideInfo.separationY;
+		for (ent in Entity.ALL) {
+			var collideInfo = Collision.shapeWithShape(collisions[0], ent.collisions[0]);
+			if (collideInfo != null) {
+				collisions[0].x += collideInfo.separationX;
+				collisions[0].y += collideInfo.separationY;
+			}
+		}
+		for (poly in Level.inst.walkable) {
+			var collideInfo = Collision.shapeWithShape(collisions[0], poly);
+			if (collideInfo != null) {
+				collisions[0].x += collideInfo.separationX;
+				collisions[0].y += collideInfo.separationY;
+			}
 		}
 
-		footX =  collisions[0].x;
-		footY =  collisions[0].y;
+		footX = collisions[0].x;
+		footY = collisions[0].y;
 	}
 }
