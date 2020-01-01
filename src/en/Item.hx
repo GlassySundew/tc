@@ -34,7 +34,7 @@ class Item extends dn.Process {
 
 		interactive = new Interactive(width, height, spr);
 		interactive.onOver = function(e:hxd.Event) {
-			textLabel = new TextLabel(Left, "Iron Ore", Assets.fontPixel, Const.UI_SCALE );
+			textLabel = new TextLabel(Left, "Iron Ore", Assets.fontPixel, Const.UI_SCALE);
 			textLabel.x = Boot.inst.s2d.mouseX + 10;
 			textLabel.y = Boot.inst.s2d.mouseY + 10;
 		}

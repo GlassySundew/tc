@@ -111,7 +111,7 @@ class SAT2D {
 			// trace(angle);
 
 			// project the circle(again)
-			max2 = circle.transformedRadius - circle.transformedRadius * (1 - circle.scaleY) * angle * .25;
+			max2 = circle.transformedRadius - circle.transformedRadius * (1 - circle.scaleY) * angle * .2;
 			//- circle.transformedRadius * (1 - circle.scaleY) * angle); // max is radius
 			min2 = -max2; // min is negative radius
 

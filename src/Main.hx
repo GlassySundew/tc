@@ -68,7 +68,6 @@ class Main extends Process {
 		controller.bind(LT, Key.TAB);
 
 		new dn.heaps.GameFocusHelper(Boot.inst.s2d, Assets.fontPixel);
-
 		delayer.addF(start, 1);
 	}
 
@@ -81,6 +80,16 @@ class Main extends Process {
 		startGame();
 		#else
 		// new Title();
+		#end
+	}
+
+	var full = false;
+
+	public function toggleFullscreen() {
+		#if hl
+		var s = hxd.Window.getInstance();
+		full = !full;
+		s.displayMode = full ? Fullscreen : Windowed;
 		#end
 	}
 
@@ -107,8 +116,12 @@ class Main extends Process {
 	override function update() {
 		dn.heaps.slib.SpriteLib.TMOD = tmod;
 
+		if (ca.isKeyboardPressed(Key.F11))
+			toggleFullscreen();
+
 		if (ca.isKeyboardPressed(Key.M))
 			Assets.toggleMusicPause();
+
 		super.update();
 	}
 }

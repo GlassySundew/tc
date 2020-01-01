@@ -10,6 +10,7 @@ import hxd.Key;
 import format.tmx.Data;
 import format.tmx.*;
 import hxd.Res;
+import tools.Util.*;
 
 class Game extends Process {
 	public static var inst:Game;
@@ -43,7 +44,6 @@ class Game extends Process {
 		scroller.visible = false;
 
 		root.add(scroller, Const.DP_BG);
-		// Boot.inst.s3d.camera.setFovX(60, 1.777777778);
 		Boot.inst.s3d.lightSystem.ambientLight.set(0.3, 0.3, 0.3);
 
 		// cam = new h3d.scene.CameraController(Boot.inst.s3d);
@@ -74,8 +74,6 @@ class Game extends Process {
 
 	public function startLevel(name:String) {
 		engine.clear(0, 1);
-		// s3d.camera.pos = new Vector(0, -0.0000001, 0);
-
 		if (level != null) {
 			level.destroy();
 			for (e in Entity.ALL)
@@ -89,10 +87,14 @@ class Game extends Process {
 		level = new Level(data);
 
 		for (e in level.getEntities("rock"))
-			new en.Rock(e.x, e.y);
+			new en.Rock(e.x, e.y, e);
 
 		var pt = level.getEntityPt("player");
 		player = new en.player.Player(pt.cx, pt.cy);
+		for (e in level.getEntities("player")) {
+			player.tmxObj = e;
+			break;
+		}
 
 		// parsing collision from 'colls' tileset
 		for (tileset in data.tilesets) {
@@ -118,7 +120,6 @@ class Game extends Process {
 										case OTEllipse:
 											var shape = new differ.shapes.Circle(0, 0, params.width / 2);
 											shape.scaleY = params.height / params.width;
-
 											ent.collisions.push(shape);
 										case OTRectangle:
 											ent.collisions.push(Polygon.rectangle(params.x, params.y, params.width, params.height));
@@ -129,11 +130,14 @@ class Game extends Process {
 											ent.collisions.push(new Polygon(obj.x, obj.y, verts));
 										default:
 									}
-									//  установление pivot point для фундаментного объекта коллизии
+									// установление pivot point для фундаментного объекта коллизии
 									// ебучее кривое говнище из жопы, не знаю как сделать нормально
 
-									ent.mesh.originMX = (M.round(obj.x) + M.round(obj.width) / 2 - 2) / ent.mesh.tile.width;
-									ent.mesh.originMY = (M.round(obj.y) + M.round(obj.height) / 2 + 1) / ent.mesh.tile.height;
+									ent.mesh.originMX = (M.round(obj.x - 1) + M.round((obj.width) / 2)) / ent.spr.tile.width;
+									ent.mesh.originMY = (M.round(obj.y) + M.round((obj.height) / 2)) / ent.spr.tile.height;
+
+									ent.sprOffX += (M.round(obj.x)) + M.round((obj.width) / 2);
+									ent.sprOffY += -(M.round(obj.y)) - M.round((obj.height) / 2);
 								}
 							}
 						}
@@ -145,6 +149,9 @@ class Game extends Process {
 		camera.target = player;
 		camera.recenter();
 		cd.unset("levelDone");
+
+		for (en in Entity.ALL)
+			en.sprOffY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
 	}
 
 	private function getTSX(name:String):TmxTileset {

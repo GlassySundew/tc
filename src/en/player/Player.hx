@@ -1,5 +1,6 @@
 package en.player;
 
+import format.tmx.Data.TmxObject;
 import differ.Collision;
 
 class Player extends Entity {
@@ -7,7 +8,7 @@ class Player extends Entity {
 
 	var inventory:Inventory;
 
-	public function new(x:Float, z:Float) {
+	public function new(x:Float, z:Float, ?tmxObj:TmxObject) {
 		spr = new HSprite(Assets.tiles);
 
 		ca = Main.inst.controller.createAccess("player");
@@ -28,11 +29,10 @@ class Player extends Entity {
 			spr.anim.registerStateAnim("idle_" + direcs[i].dir, direcs[i].prio, (1 / 60 / 0.16), function() return !isMoving() && dir == i);
 		}
 
-		super(x, z);
-		// mesh.originMX = 15 / 33;
-		// mesh.originMY = 29 / 33;
-		sprOffX = -.5;
-		sprOffY = -.75;
+		super(x, z, tmxObj);
+
+		sprOffX += -spr.tile.width * 1.3;
+		sprOffY += spr.tile.height * .55;
 
 		inventory = new Inventory();
 

@@ -14,6 +14,7 @@ import h3d.scene.CameraController;
 import tools.CPoint;
 import format.tmx.*;
 import format.tmx.Data;
+import tools.Util.*;
 
 class Level extends dn.Process {
 	public var game(get, never):Game;
@@ -163,10 +164,10 @@ class Level extends dn.Process {
 				vertices.push(new differ.math.Vector(cart_to_iso(i.x, i.y).x, cart_to_iso(i.x, i.y).y));
 			walkable.push(new Polygon(cart_to_iso_abs(poly.x, poly.y).x, cart_to_iso_abs(poly.x, poly.y).y, vertices));
 		} else if (poly.objectType == OTRectangle) {
-			vertices.push(new differ.math.Vector(0, 0));
-			vertices.push(new differ.math.Vector(cart_to_iso(0, poly.height).x, cart_to_iso(0, poly.height).y));
-			vertices.push(new differ.math.Vector(cart_to_iso(poly.width, poly.height).x, cart_to_iso(poly.width, poly.height).y));
 			vertices.push(new differ.math.Vector(cart_to_iso(poly.width, 0).x, cart_to_iso(poly.width, 0).y));
+			vertices.push(new differ.math.Vector(cart_to_iso(poly.width, poly.height).x, cart_to_iso(poly.width, poly.height).y));
+			vertices.push(new differ.math.Vector(cart_to_iso(0, poly.height).x, cart_to_iso(0, poly.height).y));
+			vertices.push(new differ.math.Vector(0, 0));
 
 			walkable.push(new Polygon(cart_to_iso_abs(poly.x, poly.y).x, cart_to_iso_abs(poly.x, poly.y).y, vertices));
 		}
@@ -181,18 +182,6 @@ class Level extends dn.Process {
 			render();
 		}
 	}
-
-	inline function chech_poly_clockwise(poly:TmxObject, points:Array<TmxPoint>) {
-		var sum = .0;
-		for (i in 0...points.length) {
-			var actualItpp = (i >= points.length - 1) ? 0 : i + 1;
-			sum += (points[actualItpp].x - points[i].x) * (points[actualItpp].y + points[i].y);
-		}
-		sum < 0 ? points.reverse() : 0;
-	}
-
-	inline function cart_to_iso(x:Float, y:Float):Vector
-		return new Vector((x - y), (x + y) / 2);
 
 	inline function cart_to_iso_abs(x:Float, y:Float):Vector
 		return new Vector(wid * .5 + cart_to_iso(x, y).x, hei - cart_to_iso(x, y).y);
@@ -221,16 +210,16 @@ private class InternalRender extends TileLayerRenderer {
 		if (tileset == null)
 			return;
 
-		if (tileset.tileOffset != null) {
-			x += tileset.tileOffset.x;
-			y += tileset.tileOffset.y;
-		}
 		if (tileset.image == null) {
 			renderOrthoTileFromImageColl(x, y, tile, tileset);
 
 			return;
 		}
 
+		if (tileset.tileOffset != null) {
+			x += tileset.tileOffset.x;
+			y += tileset.tileOffset.y;
+		}
 		var scaleX = tile.flippedHorizontally ? -1 : 1;
 		var scaleY = tile.flippedVertically ? -1 : 1;
 		Tools.getTileUVByLidUnsafe(tileset, tile.gid - tileset.firstGID, uv);
@@ -250,16 +239,25 @@ private class InternalRender extends TileLayerRenderer {
 	}
 
 	function renderOrthoTileFromImageColl(x:Float, y:Float, tile:TmxTile, tileset:TmxTileset):Void {
-		var h2dTile = Res.loader.load("tiled/" + tileset.tiles[tile.gid - tileset.firstGID].image.source).toTile();
+		var imageSource;
+		var gid = tile.gid - tileset.firstGID;
+		for (i in 0...tileset.tiles.length)
+			if (tileset.tiles[i].id == gid && gid > i)
+				while (gid > i)
+					gid--;
+		// while (tileset.tiles[gid - tileset.firstGID] == null) // making tiles' ids persistent
+		// 	gid--;
+		imageSource = tileset.tiles[gid];
+		var h2dTile = Res.loader.load("tiled/" + imageSource.image.source).toTile();
 		var bmp = new Bitmap(h2dTile);
 		var scaleX = tile.flippedHorizontally ? -1 : 1;
 		var scaleY = tile.flippedVertically ? -1 : 1;
 		bmp.scaleX = scaleX;
 		bmp.scaleY = scaleY;
 
-		bmp.x = x + (scaleX == 1 ? 2 : map.tileWidth) + layer.offsetX;
-		bmp.y = y - h2dTile.height + map.tileHeight + (scaleY == 1 ? 0 : h2dTile.height) + layer.offsetY;
-
+		bmp.x = x + (scaleX > 0 ? 0 : h2dTile.width);
+		// bmp.y = y - h2dTile.height + map.tileHeight + (scaleY == 1 ? 0 : h2dTile.height) + layer.offsetY;
+		bmp.y = y - h2dTile.height + map.tileHeight + (scaleY > 0 ? 0 : h2dTile.height) - layer.offsetX + layer.offsetY;
 		bmp.drawTo(tex);
 		g.drawTile(0, 0, Tile.fromTexture(tex));
 		g.endFill();

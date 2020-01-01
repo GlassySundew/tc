@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.2" tiledversion="1.3.1" name="colls" tilewidth="46" tileheight="32" tilecount="2" columns="2">
+<tileset version="1.2" tiledversion="1.3.1" name="colls" tilewidth="46" tileheight="46" tilecount="3" columns="2">
  <grid orientation="orthogonal" width="2" height="2"/>
  <tile id="0">
   <image width="46" height="27" source="separated/q/rock.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="4" x="12" y="5" width="22" height="14">
+   <object id="4" x="10" y="7" width="22" height="14">
     <ellipse/>
    </object>
   </objectgroup>
@@ -16,5 +16,8 @@
     <ellipse/>
    </object>
   </objectgroup>
+ </tile>
+ <tile id="3">
+  <image width="46" height="46" source="separated/pcgmw.png"/>
  </tile>
 </tileset>

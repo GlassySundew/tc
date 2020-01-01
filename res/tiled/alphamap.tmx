@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.1" orientation="isometric" renderorder="right-up" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" nextlayerid="36" nextobjectid="218">
- <tileset firstgid="1" source="test.tsx"/>
- <tileset firstgid="7" source="colls.tsx"/>
- <layer id="33" name="1" width="100" height="100" offsetx="0" offsety="7">
+<map version="1.2" tiledversion="1.3.1" orientation="isometric" renderorder="right-up" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" nextlayerid="38" nextobjectid="264">
+ <tileset firstgid="1" source="colls.tsx"/>
+ <tileset firstgid="5" source="alpha.tsx"/>
+ <layer id="33" name="ground" width="100" height="100" offsetx="0" offsety="7">
   <data encoding="base64" compression="zlib">
-   eAHt0UEKACAIBED7/6erm4jHyMsIgYkgzEYoAgQIECBAgAABAgQIECBAgAABAgQIECBAgACBTmCdYX7djtk/gZzF7dWsgDxm/et1eVSR2b88Zv1dJ0CAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIPBCYAOZPgAV
+   eAHt0TkKACAMAEEb/+3TPbBIkcrCNCMIEgRltjWLAAECBAgQIECAAAECBAgQIECAAAECBAgQIEAgE+hrGHd2x+yfQGyxz1atwGowYpPa33g99DhdiNQK3B67hR61KbxOgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBA4FlgAthNA2U=
   </data>
  </layer>
- <layer id="1" name="ground" width="100" height="100">
+ <layer id="36" name="walls" width="100" height="100" offsetx="1" offsety="0">
   <data encoding="base64" compression="zlib">
-   eAHt0DEBAAAAwqD1T+1lC4hAYcCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMDABwacQAAB
+   eAHt1UEKgDAMBMB+QQX1uX16461nTwuZQu6bWWjG8AgQIECAAAECBAgQIECAAAECBAgQIECgo8BdSz/bvB0RgnauLuZRec5trqB83aJ8fVQXs9veqfvqI6sZfWT1Uffbf5VVyaj7PcMiiUOAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBAgQIECAwA+BBeQOBp0=
   </data>
  </layer>
  <objectgroup id="34" name="walls">
-  <object id="208" x="432" y="360" width="96" height="24"/>
-  <object id="215" x="432" y="504" width="96" height="24"/>
-  <object id="216" x="408" y="384" width="24" height="120"/>
-  <object id="217" x="528" y="384" width="24" height="120"/>
+  <object id="242" x="432" y="360" width="96" height="24"/>
+  <object id="243" x="528" y="384" width="24" height="120"/>
+  <object id="244" x="432" y="504" width="96" height="24"/>
+  <object id="245" x="408" y="384" width="24" height="120"/>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="19" name="player" x="480" y="456" width="24" height="24"/>
-  <object id="142" name="thrusters" gid="2" x="504" y="552" width="24" height="46" rotation="296.244"/>
-  <object id="183" name="rock" gid="5" x="480" y="480" width="46" height="27"/>
+  <object id="262" name="player" gid="3" x="480" y="456" width="32" height="32"/>
+  <object id="263" name="rock" gid="1" x="528" y="456" width="46" height="27"/>
  </objectgroup>
 </map>

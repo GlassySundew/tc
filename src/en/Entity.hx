@@ -1,5 +1,6 @@
 package en;
 
+import format.tmx.Data.TmxObject;
 import h3d.prim.Sphere;
 import differ.shapes.Shape;
 import en.player.Player;
@@ -62,6 +63,7 @@ class Entity {
 	public var gravity = 0.02;
 	public var bumpFrict = 0.93;
 
+	public var fromTile = false;
 	public var centerX(get, never):Float;
 
 	inline function get_centerX()
@@ -98,25 +100,26 @@ class Entity {
 	public var footX(get, set):Float;
 
 	inline function get_footX()
-		return (cx + xr + sprOffX) * Const.GRID_WIDTH;
+		return (cx + xr) * Const.GRID_WIDTH + sprOffX;
 
 	inline function set_footX(v:Float) { // небольшой костыль
-		xr = (v / Const.GRID_WIDTH) % 1;
-		cx = Math.floor(v / Const.GRID_WIDTH) - sprOffX;
+		xr = ((v - sprOffX) / Const.GRID_WIDTH) % 1;
+		cx = Math.floor((v - sprOffX) / Const.GRID_WIDTH);
 		return v;
 	}
 
 	public var footY(get, set):Float;
 
 	inline function get_footY()
-		return (cy + yr - zr + sprOffY) * Const.GRID_WIDTH;
+		return (cy + yr - zr) * Const.GRID_WIDTH + sprOffY;
 
 	inline function set_footY(v:Float) { // аналогично
-		yr = (v / Const.GRID_WIDTH) % 1;
-		cy = Math.floor(v / Const.GRID_WIDTH) - sprOffY;
+		yr = ((v - sprOffY) / Const.GRID_WIDTH) % 1;
+		cy = Math.floor((v - sprOffY) / Const.GRID_WIDTH);
 		return v;
 	}
 
+	public var tmxObj:TmxObject;
 	public var colorAdd:h3d.Vector;
 	public var spr:HSprite;
 	public var mesh:TileSprite;
@@ -139,7 +142,7 @@ class Entity {
 
 	var debugLabel:Null<h2d.Text>;
 
-	public function new(?x:Float = 0, ?z:Float = 0) {
+	public function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:TmxObject) {
 		uid = Const.NEXT_UNIQ;
 		ALL.push(this);
 
@@ -147,6 +150,9 @@ class Entity {
 
 		if (spr == null)
 			spr = new HSprite(Assets.tiles);
+
+		if (tmxObj != null)
+			this.tmxObj = tmxObj;
 
 		game.scroller.add(spr, 10);
 		// spr.setCenterRatio(0.5, 1);
@@ -159,15 +165,10 @@ class Entity {
 		mesh.material.mainPass.enableLights = false;
 		mesh.material.mainPass.depth(false, LessEqual);
 		mesh.rotate(rotAngle, 0, 0);
-		// mesh.scaleZ = (spr.tile.height / Math.cos(rotAngle)) / spr.tile.height;
 
 		var s = mesh.material.mainPass.addShader(new h3d.shader.ColorAdd());
 		s.color = colorAdd;
 		setPosCase(x, z);
-	}
-
-	function blah() {
-		trace("blah");
 	}
 
 	public function is<T:Entity>(c:Class<T>)
@@ -240,8 +241,8 @@ class Entity {
 	}
 
 	function checkCollisions() {
-		collisions[0].x = footX + sprOffCollX * Const.GRID_WIDTH;
-		collisions[0].y = footY + sprOffCollY * Const.GRID_WIDTH;
+		collisions[0].x = footX;
+		collisions[0].y = footY;
 	}
 
 	public function preUpdate() {

@@ -4,16 +4,16 @@ import h2d.Object;
 import h2d.Font;
 import h2d.domkit.Style;
 
-@:uiComp("textlabel")
+@:uiComp("textLabel")
 class TextLabel extends h2d.Flow implements h2d.domkit.Object {
 	static var SRC =
-		<textlabel class="textLabel" public id="textLabel">
+		<textLabel class="textLabel" public id="textLabel">
   			<flow class="containerFlow" public id="containerFlow">
     			<flow public id="borderFlow">
     		  		<text public id="labelTxt" />
    				</flow>
  			</flow>
-		</textlabel>
+		</textLabel>
 	
 	public var label(get, set):String;
 	public var font(default, set):Font;

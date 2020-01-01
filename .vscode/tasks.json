@@ -27,7 +27,7 @@
 				"panel": "dedicated",
 				"clear": true
 			},
-			"problemMatcher": ["$haxe"],
+			"problemMatcher": ["$haxe"]
 		},
 		{
 			"label": "JS release",
