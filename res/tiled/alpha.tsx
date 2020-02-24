@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.2" tiledversion="1.3.1" name="alpha" tilewidth="48" tileheight="46" tilecount="10" columns="0">
+<tileset version="1.2" tiledversion="2020.01.22" name="alpha" tilewidth="48" tileheight="31" tilecount="9" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="0">
   <image width="48" height="31" source="separated/floor.png"/>
- </tile>
- <tile id="1">
-  <image width="46" height="46" source="separated/pcgmw.png"/>
  </tile>
  <tile id="12">
   <image width="46" height="24" source="separated/textures/walls/ship_wall_bottom_corner.png"/>

@@ -1,7 +1,7 @@
 {
     "workbench.colorCustomizations": {
-        "titleBar.inactiveBackground": "#3c4d27",
-        "titleBar.activeBackground": "#3f551c",
+        "titleBar.inactiveBackground": "#134e41",
+        "titleBar.activeBackground": "#1a6b59",
         "titleBar.activeForeground": "#ffffff"
     },
     "python.formatting.provider": "yapf",

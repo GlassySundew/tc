@@ -1,5 +1,5 @@
 #!/bin/sh
 
 
-ase -b /home/glassysundew/Documents/ase/items.ase --save-as {slice}.png
+ase -b ../../ase/items.ase --save-as {slice}.png
 echo $dirname

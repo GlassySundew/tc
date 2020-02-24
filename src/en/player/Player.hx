@@ -4,6 +4,8 @@ import format.tmx.Data.TmxObject;
 import differ.Collision;
 
 class Player extends Entity {
+	public static var inst:Player;
+
 	var ca:dn.heaps.Controller.ControllerAccess;
 
 	var inventory:Inventory;
@@ -30,9 +32,9 @@ class Player extends Entity {
 		}
 
 		super(x, z, tmxObj);
+		inst = this;
 
-		sprOffX += -spr.tile.width * 1.3;
-		sprOffY += spr.tile.height * .55;
+		// sprOffY -= 1;
 
 		inventory = new Inventory();
 
@@ -93,19 +95,19 @@ class Player extends Entity {
 		for (ent in Entity.ALL) {
 			var collideInfo = Collision.shapeWithShape(collisions[0], ent.collisions[0]);
 			if (collideInfo != null) {
-				collisions[0].x += collideInfo.separationX;
-				collisions[0].y += collideInfo.separationY;
+				collisions[0].x += (collideInfo.separationX);
+				collisions[0].y += (collideInfo.separationY);
 			}
 		}
 		for (poly in Level.inst.walkable) {
 			var collideInfo = Collision.shapeWithShape(collisions[0], poly);
 			if (collideInfo != null) {
-				collisions[0].x += collideInfo.separationX;
-				collisions[0].y += collideInfo.separationY;
+				collisions[0].x += (collideInfo.separationX);
+				collisions[0].y += (collideInfo.separationY);
 			}
 		}
 
-		footX = collisions[0].x;
-		footY = collisions[0].y;
+		footX = (collisions[0].x);
+		footY = (collisions[0].y);
 	}
 }

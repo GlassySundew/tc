@@ -1,5 +1,10 @@
 package en;
 
+import format.tmx.Data.TmxTilesetTile;
+import format.tmx.Tools;
+import format.tmx.Data.TmxTile;
+import h2d.Tile;
+import h2d.Bitmap;
 import format.tmx.Data.TmxObject;
 import h3d.prim.Sphere;
 import differ.shapes.Shape;
@@ -13,7 +18,7 @@ import h3d.prim.Cube;
 import h3d.Vector;
 import h3d.scene.Mesh;
 
-class Entity {
+@:keepSub class Entity {
 	// private var anim:String;
 	public static var ALL:Array<Entity> = [];
 	public static var GC:Array<Entity> = [];
@@ -82,10 +87,10 @@ class Entity {
 	public var sprOffX = 0.;
 	public var sprOffY = 0.;
 
-	public var sprOffCollX = 0.;
-	public var sprOffCollY = 0.;
+	public var sprOffColY = 0.;
+	public var sprOffColX = 0.;
 
-	public var bottomAlpha = 0;
+	public var bottomAlpha = 0.;
 
 	inline function get_tmod()
 		return Game.inst.tmod;
@@ -95,8 +100,6 @@ class Entity {
 	inline function get_player()
 		return Game.inst.player;
 
-	public var tex:Texture;
-
 	public var footX(get, set):Float;
 
 	inline function get_footX()
@@ -104,8 +107,8 @@ class Entity {
 
 	inline function set_footX(v:Float) { // небольшой костыль
 		xr = ((v - sprOffX) / Const.GRID_WIDTH) % 1;
-		cx = Math.floor((v - sprOffX) / Const.GRID_WIDTH);
-		return v;
+		cx = (Math.floor((v - sprOffX) / Const.GRID_WIDTH));
+		return (v);
 	}
 
 	public var footY(get, set):Float;
@@ -115,9 +118,14 @@ class Entity {
 
 	inline function set_footY(v:Float) { // аналогично
 		yr = ((v - sprOffY) / Const.GRID_WIDTH) % 1;
-		cy = Math.floor((v - sprOffY) / Const.GRID_WIDTH);
-		return v;
+		cy = (Math.floor((v - sprOffY) / Const.GRID_WIDTH));
+		return (v);
 	}
+
+	public var tmxTile(get, never):TmxTilesetTile;
+
+	inline function get_tmxTile()
+		return Tools.getTileByGid(Level.inst.data, tmxObj.objectType.getParameters()[0]);
 
 	public var tmxObj:TmxObject;
 	public var colorAdd:h3d.Vector;
@@ -133,8 +141,10 @@ class Entity {
 	public var curFrame:Float = 0;
 	public var prim:Cube;
 
-	private var rotAngle:Float = -.00001;
+	private var rotAngle:Float = -0.1;
 	private var pos:Vector;
+	private var tex:Texture;
+	var bmp:Bitmap;
 
 	public var cd:dn.Cooldown;
 
@@ -149,25 +159,29 @@ class Entity {
 		cd = new dn.Cooldown(Const.FPS);
 
 		if (spr == null)
-			spr = new HSprite(Assets.tiles);
+			throw "spr hasnt been initialised";
 
 		if (tmxObj != null)
 			this.tmxObj = tmxObj;
 
 		game.scroller.add(spr, 10);
-		// spr.setCenterRatio(0.5, 1);
 		spr.colorAdd = colorAdd = new h3d.Vector();
 		spr.visible = false;
 		spr.tile.getTexture().filter = Nearest;
-
-		mesh = new TileSprite(spr.tile, true, Boot.inst.s3d, true);
+		bmp = new Bitmap(spr.tile);
+		mesh = new TileSprite(spr.tile, Boot.inst.s3d, true);
 		mesh.material.mainPass.setBlendMode(Alpha);
 		mesh.material.mainPass.enableLights = false;
 		mesh.material.mainPass.depth(false, LessEqual);
-		mesh.rotate(rotAngle, 0, 0);
-
+		tex = new Texture(Std.int(spr.tile.width), Std.int(spr.tile.height), [Target]);
+		bmp.drawTo(tex);
+		// spr.setCenterRatio(-spr.tile.width * mesh.originMX, -spr.tile.height * mesh.originMY);
+		mesh.rotate(rotAngle, 0, hxd.Math.degToRad(90));
+		sprOffX -= Const.GRID_WIDTH / 2;
+		sprOffY -= Const.GRID_HEIGHT / 2 - 1;
 		var s = mesh.material.mainPass.addShader(new h3d.shader.ColorAdd());
 		s.color = colorAdd;
+
 		setPosCase(x, z);
 	}
 
@@ -241,8 +255,8 @@ class Entity {
 	}
 
 	function checkCollisions() {
-		collisions[0].x = footX;
-		collisions[0].y = footY;
+		collisions[0].x = footX - sprOffColX;
+		collisions[0].y = footY - sprOffColY;
 	}
 
 	public function preUpdate() {
@@ -310,10 +324,10 @@ class Entity {
 	}
 
 	public function postUpdate() {
-		mesh.x = spr.x = footX;
-		mesh.z = spr.y = footY;
-		mesh.y = ((spr.tile.height - bottomAlpha) / 2) * mesh.scaleZ * Math.sin(-rotAngle);
-
+		mesh.x = footX;
+		mesh.z = footY;
+		mesh.y = (bottomAlpha * .5 * mesh.scaleZ * Math.sin(rotAngle) / (180 / Math.PI));
+		checkCollisions();
 		// spr.scaleX = dir * sprScaleX;
 		// spr.scaleY = sprScaleY;
 		if (!cd.has("colorMaintain")) {
@@ -327,8 +341,6 @@ class Entity {
 			debugLabel.y = Std.int(footY + 1);
 		}
 		// curFrame = spr.anim.getCurrentAnim().curFrameCpt;
-		checkCollisions();
-
 		if (!isMoving()) {
 			footX = M.round(M.fabs(footX));
 			footY = M.round(M.fabs(footY));
@@ -336,7 +348,15 @@ class Entity {
 	}
 
 	public function frameEnd() {
-		mesh.tile = spr.tile;
+		// mesh.tile = spr.tile;
+		tex.clear(0, 0);
+		// spr.drawTo(tex);
+		bmp.tile = spr.tile;
+
+		bmp.drawTo(tex);
+		var tile = Tile.fromTexture(tex);
+		tile.getTexture().filter = Nearest;
+		mesh.tile = tile;
 		lastFootX = footX;
 		lastFootY = footY;
 	}

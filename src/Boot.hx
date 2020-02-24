@@ -2,7 +2,7 @@ import hxd.inspect.Inspector;
 
 class Boot extends hxd.App {
 	public static var inst:Boot;
-	public static var i:Inspector;
+	public var i:Inspector;
 
 	// Boot
 	static function main() {
@@ -13,9 +13,9 @@ class Boot extends hxd.App {
 	override function init() {
 		inst = this;
 		new Main(s2d);
-
+		
 		onResize();
-		#if (castle && hl)
+		#if (castle && hl && debug)
 		i = new hxd.inspect.Inspector(s3d);
 		#end
 	}

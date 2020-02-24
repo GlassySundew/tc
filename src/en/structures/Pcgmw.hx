@@ -1,18 +1,19 @@
-package en;
+package en.structures;
 
 import format.tmx.Data.TmxObject;
 
-class Rock extends Entity {
+class Pcgmw extends Interactive {
 	public function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:TmxObject) {
 		if (spr == null) {
-			spr = new HSprite(Assets.tiles);
-			spr.set("rock");
+			spr = new HSprite(Assets.structures);
+			spr.set("pcgmw");
 		}
 
 		super(x, z, tmxObj);
+		// sprOffX += -spr.tile.width;
+		// sprOffY -= Const.GRID_HEIGHT * .5;
 
-		// sprOffX += 1;
-		sprOffY += 1;
+		bottomAlpha = -1;
 	}
 
 	// override function update() {

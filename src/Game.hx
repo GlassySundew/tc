@@ -1,3 +1,4 @@
+import en.player.Player;
 import differ.math.Vector;
 import differ.shapes.Polygon;
 import h3d.scene.Scene;
@@ -10,7 +11,6 @@ import hxd.Key;
 import format.tmx.Data;
 import format.tmx.*;
 import hxd.Res;
-import tools.Util.*;
 
 class Game extends Process {
 	public static var inst:Game;
@@ -33,6 +33,7 @@ class Game extends Process {
 
 	public function new() {
 		super(Main.inst);
+
 		inst = this;
 		ca = Main.inst.controller.createAccess("game");
 		ca.setLeftDeadZone(0.2);
@@ -85,18 +86,20 @@ class Game extends Process {
 		r.resolveTSX = getTSX;
 		var data = r.read(Xml.parse(Res.loader.load('tiled/' + name).entry.getText()));
 		level = new Level(data);
-
-		for (e in level.getEntities("rock"))
-			new en.Rock(e.x, e.y, e);
-
-		var pt = level.getEntityPt("player");
-		player = new en.player.Player(pt.cx, pt.cy);
-		for (e in level.getEntities("player")) {
-			player.tmxObj = e;
-			break;
+		CompileTime.importPackage("en");
+		CompileTime.getAllClasses("en", Entity);
+		var entNames = (CompileTime.getAllClasses("en"));
+		for (e in level.entities) {
+			for (nam in entNames) {
+				var eregClass = ~/\$([a-z0-9]+)+$/gi;
+				if (eregClass.match('$nam'.toLowerCase()) && eregClass.matched(1) == e.name) {
+					Type.createInstance(nam, [e.x, e.y, e]);
+				}
+			}
 		}
+		player = Player.inst;
 
-		// parsing collision from 'colls' tileset
+		// parsing collision objects from 'colls' tileset
 		for (tileset in data.tilesets) {
 			var ereg = ~/(^[^.]*)+/; // regexp to take tileset name
 			if (ereg.match(tileset.source) && ereg.matched(1) == 'colls')
@@ -116,6 +119,8 @@ class Game extends Process {
 										width: M.round(obj.width),
 										height: M.round(obj.height)
 									};
+									var xCent = 0.;
+									var yCent = 0.;
 									switch (obj.objectType) {
 										case OTEllipse:
 											var shape = new differ.shapes.Circle(0, 0, params.width / 2);
@@ -126,18 +131,25 @@ class Game extends Process {
 										case OTPolygon(points):
 											var verts:Array<Vector> = [];
 											for (i in points)
-												verts.push(new Vector(i.x, i.y));
-											ent.collisions.push(new Polygon(obj.x, obj.y, verts));
+												verts.push(new Vector(M.round(i.x), M.round(i.y)));
+											var yArr = verts.copy();
+											yArr.sort(function(a, b) return (a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0));
+											var xArr = verts.copy();
+											xArr.sort(function(a, b) return (a.x < b.x) ? -1 : ((a.x > b.x) ? 1 : 0));
+											xCent = ((xArr[xArr.length - 1].x + xArr[0].x) * .5);
+											yCent = ((yArr[xArr.length - 1].y + yArr[0].y) * .5);
+											ent.collisions.push(new Polygon(0, 0, verts));
 										default:
 									}
 									// установление pivot point для фундаментного объекта коллизии
 									// ебучее кривое говнище из жопы, не знаю как сделать нормально
 
-									ent.mesh.originMX = (M.round(obj.x - 1) + M.round((obj.width) / 2)) / ent.spr.tile.width;
-									ent.mesh.originMY = (M.round(obj.y) + M.round((obj.height) / 2)) / ent.spr.tile.height;
-
-									ent.sprOffX += (M.round(obj.x)) + M.round((obj.width) / 2);
-									ent.sprOffY += -(M.round(obj.y)) - M.round((obj.height) / 2);
+									ent.mesh.originMX = (M.round(obj.x + xCent) + M.round((obj.width) / 2)) / ent.spr.tile.width;
+									ent.mesh.originMY = (M.round(obj.y + yCent) + M.round((obj.height) / 2)) / ent.spr.tile.height;
+									ent.sprOffColX = xCent;
+									ent.sprOffColY = yCent;
+									// ent.sprOffX -= M.round(xCent);
+									// ent.sprOffY -= M.round(yCent); // хз че не так с ней, не удалять
 								}
 							}
 						}
@@ -150,6 +162,7 @@ class Game extends Process {
 		camera.recenter();
 		cd.unset("levelDone");
 
+		// rect-obj position fix
 		for (en in Entity.ALL)
 			en.sprOffY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
 	}

@@ -85,6 +85,16 @@ class Level extends dn.Process {
 
 						obj.x = isoX / Const.GRID_WIDTH;
 						obj.y = isoY / Const.GRID_WIDTH;
+						if (obj.name == "") {
+							switch (obj.objectType) {
+								case OTTile(gid):
+									var ereg = ~/\/([a-z0-9_\.-]+)\./;
+									if (ereg.match(Tools.getTileByGid(data, gid).image.source))
+										obj.name = ereg.matched(1);
+								default:
+							}
+						}
+
 						if (ol.name == 'entities')
 							entities.push(obj);
 					}
@@ -171,7 +181,6 @@ class Level extends dn.Process {
 
 			walkable.push(new Polygon(cart_to_iso_abs(poly.x, poly.y).x, cart_to_iso_abs(poly.x, poly.y).y, vertices));
 		}
-		// vertices.reverse();
 		walkable[walkable.length - 1].scaleY = -1;
 	}
 

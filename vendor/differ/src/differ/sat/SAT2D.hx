@@ -90,7 +90,7 @@ class SAT2D {
 			var k = (yDot1 - yDot0) / (xDot1 - xDot0);
 			var b = yDot0 - (yDot1 - yDot0) / (xDot1 - xDot0) * xDot0;
 
-			var angle = Math.abs((Math.atan(-1 / k)));
+			var angle = Math.abs((Math.tan(k)));
 			// project the polygon(again? yes, circles vs. polygon require more testing...)
 			min1 = vec_dot(normalAxisX, normalAxisY, verts[0].x, verts[0].y);
 			max1 = min1; // set max and min
@@ -108,10 +108,8 @@ class SAT2D {
 			min1 += offset;
 			max1 += offset;
 
-			// trace(angle);
-
 			// project the circle(again)
-			max2 = circle.transformedRadius - circle.transformedRadius * (1 - circle.scaleY) * angle * .2;
+			max2 = circle.transformedRadius - circle.transformedRadius * (1 - circle.scaleY) * angle;
 			//- circle.transformedRadius * (1 - circle.scaleY) * angle); // max is radius
 			min2 = -max2; // min is negative radius
 

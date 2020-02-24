@@ -51,7 +51,7 @@ class Camera extends dn.Process {
 	// }
 	// function get_hei() {
 	// 	return M.ceil(Game.inst.h() / Const.SCALE);
-	// }
+	// }f
 
 	public function recenter() {
 		if (target != null) {
@@ -59,12 +59,6 @@ class Camera extends dn.Process {
 			y = target.centerY;
 		}
 	}
-
-	public inline function scrollerToGlobalX(v:Float)
-		return v * Const.SCALE + Game.inst.scroller.x;
-
-	public inline function scrollerToGlobalY(v:Float)
-		return v * Const.SCALE + Game.inst.scroller.y;
 
 	var shakePower = 1.0;
 
@@ -110,7 +104,6 @@ class Camera extends dn.Process {
 			// 	scroller.y += Math.sin(0.3 + ftime * 1.33) * 1 * Const.SCALE * shakePower * cd.getRatio("shaking");
 			// }
 
-			yMult = (M.fabs(target.dx) > 0.001 && M.fabs(target.dy) > 0.001) ? .5 : 1;
 			if (target != null) {
 				var s = 0.006;
 				var deadZone = 5;
@@ -133,7 +126,7 @@ class Camera extends dn.Process {
 			dy *= Math.pow(frict, tmod);
 			// Rounding
 			x = M.round(x);
-			y = M.round(y / yMult) * yMult;
+			y = M.round(y);
 		}
 	}
 }

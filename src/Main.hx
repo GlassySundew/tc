@@ -18,7 +18,7 @@ class Main extends Process {
 
 	public function new(s:h2d.Scene) {
 		super();
-
+		
 		inst = this;
 		createRoot(s);
 

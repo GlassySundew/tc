@@ -7,7 +7,7 @@ import h2d.ScaleGrid;
 class Inventory extends dn.Process {
 	public static var inst:Inventory;
 
-	public var items:Array<Item> = [];
+	public var items:Array<Array<Item>> = [[]];
 
 	public var gridWidth = 6;
 	public var gridHeight = 6;
@@ -40,7 +40,7 @@ class Inventory extends dn.Process {
 
 		new ui.TextLabel(Middle, "Inventory", Assets.fontPixel, 1, Std.int(base.tile.width * 2), base);
 
-		items.push(new en.items.Ore(invGridBeginX, invGridBeginY, Iron, base));
+		items[0].push(new en.items.Ore(invGridBeginX, invGridBeginY, Iron, base));
 	}
 
 	function recenter() {

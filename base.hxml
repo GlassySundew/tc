@@ -12,6 +12,8 @@
 -lib structural
 -lib msignal
 -lib deepnightLibs
+-lib compiletime
+
 -cp vendor/differ/src
 
 -dce full
