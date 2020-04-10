@@ -7,11 +7,19 @@
 			"type": "hxml",
 			"file": "hl.debug.hxml",
 			"presentation": {
+				"echo": true,
 				"reveal": "never",
-				"panel": "dedicated",
-				"clear": true
-			},
-			"problemMatcher": ["$haxe"],
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			  },
+			"problemMatcher": [
+				"$haxe-absolute",
+				"$haxe",
+				"$haxe-error",
+				"$haxe-trace"
+			  ],
 			"group": {
 				"kind": "build",
 				"isDefault": true
@@ -27,7 +35,12 @@
 				"panel": "dedicated",
 				"clear": true
 			},
-			"problemMatcher": ["$haxe"]
+			"problemMatcher": [
+				"$haxe-absolute",
+				"$haxe",
+				"$haxe-error",
+				"$haxe-trace"
+			]
 		},
 		{
 			"label": "JS release",

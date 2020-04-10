@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.2" tiledversion="2020.01.22" name="colls" tilewidth="47" tileheight="46" tilecount="6" columns="10">
+<tileset version="1.2" tiledversion="2020.03.18" name="colls" tilewidth="47" tileheight="46" tilecount="6" columns="10">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="0">
   <image width="46" height="27" source="separated/q/rock.png"/>

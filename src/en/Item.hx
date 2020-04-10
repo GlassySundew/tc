@@ -10,6 +10,8 @@ class Item extends dn.Process {
 
 	public var spr:HSprite;
 
+	var displayText:String = "";
+
 	var interactive:h2d.Interactive;
 	var textLabel:TextLabel;
 	var bitmap:Bitmap;
@@ -31,23 +33,40 @@ class Item extends dn.Process {
 			spr = new HSprite(Assets.items, parent);
 
 		spr.tile.getTexture().filter = Nearest;
-
 		interactive = new Interactive(width, height, spr);
+		spr.setCenterRatio(.5, .5);
+
+		interactive.x -= spr.tile.width / 2;
+		interactive.y -= spr.tile.height / 2;
+
 		interactive.onOver = function(e:hxd.Event) {
-			textLabel = new TextLabel(Left, "Iron Ore", Assets.fontPixel, Const.UI_SCALE);
-			textLabel.x = Boot.inst.s2d.mouseX + 10;
-			textLabel.y = Boot.inst.s2d.mouseY + 10;
+			textLabel = new TextLabel(Left, displayText, Assets.fontPixel, Const.UI_SCALE);
 		}
+
 		interactive.onOut = function(e:hxd.Event) {
 			textLabel.dispose();
+		}
+
+		interactive.onPush = function(e:hxd.Event) {
+			textLabel.dispose();
+
+			var tempItem = Game.inst.player.holdItem;
+			Game.inst.player.holdItem = this;
+			if (tempItem != null)
+				tempItem.spr.scale(1 / 2);
+			Game.inst.player.inventory.invGrid.removeItem(this, tempItem);
+			Game.inst.player.inventory.belt.invGrid.removeItem(this, tempItem);
+			Boot.inst.s2d.addChild(this.spr);
 		}
 	}
 
 	override function update() {
 		super.update();
 		if (textLabel != null && textLabel.disposed == false) {
-			textLabel.x = Boot.inst.s2d.mouseX + 20;
-			textLabel.y = Boot.inst.s2d.mouseY + 10;
+			textLabel.x = Boot.inst.s2d.mouseX + 10;
+			textLabel.y = Boot.inst.s2d.mouseY + 5;
 		}
+		spr.x = x;
+		spr.y = y;
 	}
 }

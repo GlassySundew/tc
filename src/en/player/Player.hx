@@ -6,9 +6,22 @@ import differ.Collision;
 class Player extends Entity {
 	public static var inst:Player;
 
-	var ca:dn.heaps.Controller.ControllerAccess;
+	public var inventory:Inventory;
+	public var holdItem(default, set):Item;
 
-	var inventory:Inventory;
+	inline function set_holdItem(v:Item) {
+		if (v == null) {
+			inventory.invGrid.disableGrid();
+		}
+		if (v != null) {
+			inventory.invGrid.enableGrid();
+			v.spr.scaleX = v.spr.scaleY = 2;
+		}
+
+		return holdItem = v;
+	}
+
+	var ca:dn.heaps.Controller.ControllerAccess;
 
 	public function new(x:Float, z:Float, ?tmxObj:TmxObject) {
 		spr = new HSprite(Assets.tiles);
@@ -86,6 +99,10 @@ class Player extends Entity {
 	override function postUpdate() {
 		super.postUpdate();
 
+		if (holdItem != null) {
+			holdItem.x = Boot.inst.s2d.mouseX + 25;
+			holdItem.y = Boot.inst.s2d.mouseY + 25;
+		}
 		// trace(xr, yr, cx, cy, ((footX / Const.GRID_WIDTH) ) % 1, ((footX / Const.GRID_WIDTH) ) - ((footX / Const.GRID_WIDTH) ) % 1 );
 	}
 

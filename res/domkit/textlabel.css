@@ -11,9 +11,11 @@
 .containerFlow {
   margin-top: 15;
   width: 1;
-  background: rgba(0, 0, 0, 0.685);
   padding: 3;
-  align: middle;
+  align: middle middle;
+
+  background: rgba(73, 59, 59, 0.842);
+  background-color: #242a2a;
 }
 /* .borderFlow {
 

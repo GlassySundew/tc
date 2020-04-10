@@ -1,0 +1,41 @@
+container {
+  margin: 20;
+  margin-right: 0;
+}
+
+.beltSlot {
+  min-width: 52;
+  min-height: 52;
+  background: rgba(
+    160,
+    149,
+    149,
+    0.5
+  ); /* this line only sets alpha bcoz of fucking broken domkit */
+  background-color: #626160; /* this line sets color */
+}
+
+/* .containerFlow {
+} */
+.absolute {
+  position: absolute;
+  align: top left;
+}
+
+.hotkeyContainer {
+  position: absolute;
+  align: top left;
+  padding-left: 3;
+}
+
+.beltSlotNumber {
+  color: #8b8ba5;
+}
+/* .tileSlot {
+  margin: 50;
+} */
+.itemContainer {
+  align: middle middle;
+  /* position: absolute; */
+  padding: -20;
+}

@@ -57,7 +57,7 @@ minWidth=16
 paddingX=2
 paddingY=2
 pot=true
-mof=false
+mof=true
 rotation=false
 stripWhitespaceX=false
 stripWhitespaceY=false
@@ -68,10 +68,10 @@ grid=false
 square=false
 bleed=true
 limitMemory=true
-useIndexes=true
+useIndexes=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:separated/items/item_iron_ore.png,type:Input,regionName:null}]
+inputFiles=[{path:separated/items/item_iron_ore.png,type:Input,regionName:null},{path:separated/items/item_gravity_manipulator.png,type:Input,regionName:null}]
 
 
 -PROJ-

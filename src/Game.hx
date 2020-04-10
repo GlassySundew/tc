@@ -1,3 +1,4 @@
+import ui.Hud;
 import en.player.Player;
 import differ.math.Vector;
 import differ.shapes.Polygon;
@@ -31,9 +32,11 @@ class Game extends Process {
 	private var tsx:Map<String, TmxTileset>;
 	private var r:Reader;
 
+	public var hud:Hud;
+	public var fx:Fx;
+
 	public function new() {
 		super(Main.inst);
-
 		inst = this;
 		ca = Main.inst.controller.createAccess("game");
 		ca.setLeftDeadZone(0.2);
@@ -45,13 +48,14 @@ class Game extends Process {
 		scroller.visible = false;
 
 		root.add(scroller, Const.DP_BG);
-		Boot.inst.s3d.lightSystem.ambientLight.set(0.3, 0.3, 0.3);
 
 		// cam = new h3d.scene.CameraController(Boot.inst.s3d);
 		// cam.loadFromCamera();
 		// Boot.inst.s3d.addChild(cam);
 
 		camera = new Camera();
+		hud = new ui.Hud();
+
 		startLevel("alphamap.tmx");
 	}
 

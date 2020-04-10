@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="2020.01.22" orientation="isometric" renderorder="right-up" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" nextlayerid="38" nextobjectid="313">
+<map version="1.2" tiledversion="2020.03.18" orientation="isometric" renderorder="right-up" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#5b5b5b" nextlayerid="38" nextobjectid="313">
  <tileset firstgid="1" source="colls.tsx"/>
  <tileset firstgid="9" source="alpha.tsx"/>
  <layer id="33" name="ground" width="100" height="100" offsetx="0" offsety="7">
@@ -7,19 +7,19 @@
    eAHt0TEKwCAQRUFbb52jRyGFC79II9uMYOEiKPPGsAgQIECAAAECBAgQIECAAAECBAgQIECAAAECBJLAXMO0012z+wKpxZ5ZPQLL/klNen7j1aNH6UKmR+DrsVvo0ZOgvKpH4XAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBD4KfACcLUFxQ==
   </data>
  </layer>
- <layer id="36" name="walls" width="100" height="100" offsetx="1" offsety="0">
+ <layer id="36" name="walls" width="100" height="100">
   <data encoding="base64" compression="zlib">
-   eAHt1rENgDAMBMAsAUjAsBk9ps8Aj3yR3L/vi3gMjwABAgQIECBAgAABAgQIECBAgAABAgQ6Cty19LOZtyNGwM7VxTwqx7mZKyBftwhfH9XF7LZ36r76yGpGH/rIEshKU3eU/yOrklF31AyLJA4BAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgMBPBBaYegiA
+   eAHt07ENACEQA0E3ArV+6VwBRESWfk4iX41F4ggQIECAAAECBAgQIECAAAECBAgQIECAAIEGgT0RK/lur6Hvbw2zgysSsEfRGJNiD3t0CXTV+B/26BJQQ4AAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAg8CpwACV2BHs=
   </data>
  </layer>
- <objectgroup id="34" name="walls">
+ <objectgroup id="34" name="walls" visible="0">
   <object id="245" x="408" y="384" width="24" height="144"/>
   <object id="282" x="432" y="360" width="144" height="24"/>
   <object id="293" x="576" y="384" width="24" height="144"/>
   <object id="304" x="432" y="528" width="144" height="24"/>
  </objectgroup>
- <objectgroup id="3" name="entities">
-  <object id="262" name="player" gid="3" x="456" y="504" width="32" height="32"/>
+ <objectgroup id="3" name="entities" visible="0">
+  <object id="262" name="player" gid="3" x="456" y="408" width="32" height="32"/>
   <object id="263" name="rock" gid="1" x="480" y="480" width="46" height="27"/>
   <object id="310" gid="4" x="480" y="432" width="46" height="46"/>
  </objectgroup>
