@@ -52,8 +52,9 @@ class Belt extends dn.Process {
 
 	public function new() {
 		super();
-		centerFlow = new h2d.Flow(Boot.inst.s2d);
-
+		centerFlow = new h2d.Flow();
+		Main.inst.root.add(centerFlow, Const.DP_UI);
+		Main.inst.root.under(centerFlow);
 		onResize();
 
 		style = new h2d.domkit.Style();

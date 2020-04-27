@@ -5,7 +5,7 @@ import h2d.Font;
 import h2d.domkit.Style;
 
 @:uiComp("textLabel")
-class  TextLabel extends h2d.Flow implements h2d.domkit.Object {
+class TextLabel extends h2d.Flow implements h2d.domkit.Object {
 	static var SRC =
 		<textLabel class="textLabel" public id="textLabel">
   			<flow class="containerFlow" >

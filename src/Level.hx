@@ -1,5 +1,5 @@
-import differ.shapes.Polygon;
 import h3d.prim.PlanePrim;
+import differ.shapes.Polygon;
 import h3d.scene.TileSprite;
 import h3d.scene.Mesh;
 import h3d.Vector;
@@ -59,7 +59,7 @@ class Level extends dn.Process {
 		// new GridHelper(Boot.inst.s3d, 10, 10);
 
 		Boot.inst.engine.backgroundColor = data.backgroundColor;
-		// Boot.inst.s3d.camera.setFovX(70, Boot.inst.s3d.camera.screenRatio);
+		Boot.inst.s3d.camera.setFovX(70, Boot.inst.s3d.camera.screenRatio);
 
 		for (layer in data.layers) {
 			var name:String = 'null';
@@ -69,12 +69,10 @@ class Level extends dn.Process {
 					for (obj in ol.objects) {
 						switch (obj.objectType) {
 							case OTPolygon(points):
-								chech_poly_clockwise(obj, points);
-								if (ol.name == 'walls')
-									setWalkable(obj, points);
+								checkPolyClockwise(points);
+								if (ol.name == 'walls') setWalkable(obj, points);
 							case OTRectangle:
-								if (ol.name == 'walls')
-									setWalkable(obj);
+								if (ol.name == 'walls') setWalkable(obj);
 
 							default:
 						}
@@ -89,8 +87,7 @@ class Level extends dn.Process {
 							switch (obj.objectType) {
 								case OTTile(gid):
 									var ereg = ~/\/([a-z0-9_\.-]+)\./;
-									if (ereg.match(Tools.getTileByGid(data, gid).image.source))
-										obj.name = ereg.matched(1);
+									if (ereg.match(Tools.getTileByGid(data, gid).image.source)) obj.name = ereg.matched(1);
 								default:
 							}
 						}
@@ -156,13 +153,12 @@ class Level extends dn.Process {
 				default:
 			}
 		}
-
 		var prim = new PlanePrim(ground.width, ground.height, -ground.width, -ground.height, Y);
 		obj = new Mesh(prim, h3d.mat.Material.create(ground), Boot.inst.s3d);
 		obj.material.mainPass.setBlendMode(Alpha);
 		// obj.material.mainPass.setPassName("alpha");
 		// obj.visible = false;
-		// obj.material.shadows = false;
+		obj.material.shadows = false;
 		obj.material.mainPass.enableLights = false;
 		obj.material.mainPass.depth(false, LessEqual);
 	}
@@ -242,7 +238,6 @@ private class InternalRender extends TileLayerRenderer {
 			+ map.tileHeight
 			- tileset.tileHeight / (scaleY == 1 ? 1 : 1)
 			+ layer.offsetY, scaleX, scaleY, h2dTile);
-
 		g.drawRect(x, y + map.tileHeight - tileset.tileHeight, tileset.tileWidth, tileset.tileHeight);
 		g.endFill();
 	}
@@ -259,15 +254,30 @@ private class InternalRender extends TileLayerRenderer {
 		imageSource = tileset.tiles[gid];
 		var h2dTile = Res.loader.load("tiled/" + imageSource.image.source).toTile();
 		var bmp = new Bitmap(h2dTile);
-		var scaleX = tile.flippedHorizontally ? -1 : 1;
-		var scaleY = tile.flippedVertically ? -1 : 1;
+		if (tile.flippedDiagonally) {
+			trace(tile.flippedHorizontally, tile.flippedVertically);
+			// h2dTile.setCenterRatio(.5, .5);
+			bmp.rotate(M.toRad(tile.flippedVertically ? -90 : 90));
+		}
+
+		var scaleX = (tile.flippedHorizontally && !tile.flippedDiagonally) ? -1 : 1;
+		var scaleY = (tile.flippedVertically && !tile.flippedDiagonally) ? -1 : 1;
+
 		bmp.scaleX = scaleX;
 		bmp.scaleY = scaleY;
 
-		bmp.x = x + (scaleX > 0 ? 0 : h2dTile.width);
+		bmp.x = x + (scaleX > 0 ? 0 : h2dTile.width) + (tile.flippedDiagonally ? (tile.flippedHorizontally ? h2dTile.height : 0) : 0);
 		// bmp.y = y - h2dTile.height + map.tileHeight + (scaleY == 1 ? 0 : h2dTile.height) + layer.offsetY;
-		bmp.y = y - h2dTile.height + map.tileHeight + (scaleY > 0 ? 0 : h2dTile.height) - layer.offsetX + layer.offsetY;
-		bmp.drawTo(tex);
+		bmp.y = y
+			- h2dTile.height
+			+ map.tileHeight
+			+ (scaleY > 0 ? 0 : h2dTile.height)
+			- layer.offsetX
+			+ layer.offsetY
+			+ (tile.flippedDiagonally ? (tile.flippedVertically ? h2dTile.height : -h2dTile.width + h2dTile.height) : 0);
+		
+		
+			bmp.drawTo(tex);
 		g.drawTile(0, 0, Tile.fromTexture(tex));
 		g.endFill();
 	}

@@ -9,9 +9,10 @@ class Lang {
     public static function init(?lid:String) {
         if( _initDone )
             return;
-        
+
         _initDone = true;
         CUR = lid==null ? DEFAULT : lid;
+
 		t = new GetText();
 		t.readMo( hxd.Res.load("lang/"+CUR+".mo").entry.getBytes() );
     }

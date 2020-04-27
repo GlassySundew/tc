@@ -13,12 +13,12 @@ class Main extends Process {
 	public static var inst:Main;
 	public static var config:ConfigJson;
 
+	public var console:ui.Console;
 	public var controller:dn.heaps.Controller;
 	public var ca:dn.heaps.Controller.ControllerAccess;
 
 	public function new(s:h2d.Scene) {
 		super();
-		
 		inst = this;
 		createRoot(s);
 
@@ -29,11 +29,10 @@ class Main extends Process {
 		// #else
 		// hxd.Res.initEmbed();
 		// #end
-
-		#if (js || embed_res)
-		hxd.Res.initEmbed();
-		#else
+		#if (hl && debug)
 		hxd.Res.initLocal();
+		#else
+		hxd.Res.initEmbed();
 		#end
 
 		#if debug
@@ -49,12 +48,11 @@ class Main extends Process {
 		});
 		#end
 
-		Lang.init("en");
 		Assets.init();
+		Lang.init("en");
 		// Data.load(hxd.Res.data.entry.getText());
 
-		new ui.Console(Assets.fontPixel, s);
-
+		console = new ui.Console(Assets.fontPixel, s);
 		controller = new dn.heaps.Controller(s);
 		ca = controller.createAccess("main");
 
@@ -83,13 +81,10 @@ class Main extends Process {
 		#end
 	}
 
-	var full = false;
-
 	public function toggleFullscreen() {
 		#if hl
 		var s = hxd.Window.getInstance();
-		full = !full;
-		s.displayMode = full ? Fullscreen : Windowed;
+		s.displayMode = s.displayMode == Fullscreen ? Windowed : Fullscreen;
 		#end
 	}
 

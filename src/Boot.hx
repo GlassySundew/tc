@@ -17,12 +17,13 @@ class Boot extends hxd.App {
 	override function init() {
 		inst = this;
 		new Main(s2d);
+
 		renderer = new CustomRenderer();
 		s3d.renderer = renderer;
 		renderer.depthColorMap = hxd.Res.gradients.test.toTexture();
 		renderer.enableFXAA = false;
 		renderer.enableSao = false;
-		
+
 		s3d.lightSystem.ambientLight.set(0.5, 0.5, 0.5);
 		onResize();
 		#if (castle && hl && debug)
@@ -34,7 +35,7 @@ class Boot extends hxd.App {
 		super.onResize();
 		dn.Process.resizeAll();
 	}
-	
+
 	var speed = 1.0;
 
 	override function update(deltaTime:Float) {

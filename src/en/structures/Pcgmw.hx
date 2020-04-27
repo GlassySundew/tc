@@ -22,7 +22,6 @@ class Pcgmw extends Interactive {
 
 	override function postUpdate() {
 		super.postUpdate();
-
 		// mesh.z += 1 / Camera.ppu;
 	}
 }

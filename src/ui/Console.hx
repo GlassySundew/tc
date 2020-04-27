@@ -1,5 +1,6 @@
 package ui;
 
+import h3d.scene.Renderer;
 import h2d.Console.ConsoleArg;
 import dn.Lib;
 
@@ -38,6 +39,24 @@ class Console extends h2d.Console {
 				setFlag(k, false);
 			}
 		});
+		var pp:Bool = true;
+		this.addCommand("pp", [], function(?k:String) {
+			if (pp) {
+				Boot.inst.s3d.renderer = h3d.mat.MaterialSetup.current.createRenderer();
+				pp = false;
+			} else {
+				Boot.inst.renderer = new CustomRenderer();
+				Boot.inst.s3d.renderer = Boot.inst.renderer;
+				Boot.inst.renderer.depthColorMap = hxd.Res.gradients.test.toTexture();
+				Boot.inst.renderer.enableFXAA = false;
+				Boot.inst.renderer.enableSao = false;
+				pp = true;
+			}
+		});
+		this.addCommand("untarget", [], function(k:String) {
+			Game.inst.camera.stopTracking();
+			new h3d.scene.CameraController(Boot.inst.s3d).loadFromCamera();
+		});
 		this.addAlias("+", "set");
 		this.addAlias("-", "unset");
 		#end
@@ -53,4 +72,28 @@ class Console extends h2d.Console {
 	public function hasFlag(k:String)
 		return false;
 	#end
+
+	override function sync(ctx:h2d.RenderContext) {
+		var scene = ctx.scene;
+		if (scene != null) {
+			x = 0;
+			y = scene.height - height;
+			width = scene.width;
+			tf.maxWidth = width;
+			bg.tile.scaleToSize(width, -logTxt.textHeight - 5);
+			// bg.tile.scaleToSize(width, height);
+		}
+		var log = logTxt;
+		if (log.visible) {
+			log.y = bg.y - log.textHeight + logDY;
+			var dt = haxe.Timer.stamp() - lastLogTime;
+			if (dt > 2 && !bg.visible) {
+				log.alpha -= ctx.elapsedTime * 4;
+				if (log.alpha <= 0)
+					log.visible = false;
+			}
+		}
+		// bg.y = logTxt.y;
+		// super.sync(ctx);
+	}
 }

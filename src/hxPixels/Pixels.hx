@@ -457,7 +457,7 @@ abstract Pixels(PixelsData)
     var pixels = new Pixels(image.width, image.height, false);
     pixels.format = PixelFormat.RGBA;
 
-    var u8ClampedArray:js.html.Uint8ClampedArray = image.data;
+    var u8ClampedArray:js.lib.Uint8ClampedArray = image.data;
 
     var u8Array = haxe.io.UInt8Array.fromData(cast u8ClampedArray);
     pixels.bytes = u8Array.view.buffer;
@@ -466,7 +466,7 @@ abstract Pixels(PixelsData)
   }
 
   public function applyToImageData(imageData:js.html.ImageData) {
-    var u8clampedArray = new js.html.Uint8ClampedArray(this.bytes.getData());
+    var u8clampedArray = new js.lib.Uint8ClampedArray(this.bytes.getData());
     imageData.data.set(u8clampedArray);
     return imageData;
   }

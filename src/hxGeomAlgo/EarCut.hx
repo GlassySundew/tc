@@ -149,7 +149,8 @@ class EarCut
         removeNode(p);
         p = end = p.prev;
         if (p == p.next) return null;
-        again = true;
+        again = true; 
+        
 
       } else {
         p = p.next;

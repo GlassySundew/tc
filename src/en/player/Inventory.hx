@@ -19,7 +19,7 @@ class InventoryCell {
 		if (v != null) {
 			// v.spr.scaleX = v.spr.scaleY = 1;
 
-			v.spr.scaleX = v.spr.scaleY = ((inter.parent == Std.downcast(inter.parent, ScaleGrid)) ? 1 : 2);
+			v.spr.scaleX = v.spr.scaleY = ((inter.parent == Std.downcast(inter.parent, ScaleGrid)) ? 1 : 3);
 			inter.addChild(v.spr);
 			v.x = inter.width / 2;
 			v.y = inter.height / 2;

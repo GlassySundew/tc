@@ -19,20 +19,20 @@ class Fx extends dn.Process {
 		pool = new ParticlePool(Assets.tiles.tile, 2048, Const.FPS);
 
 		bgAddSb = new h2d.SpriteBatch(Assets.tiles.tile);
-		game.scroller.add(bgAddSb, Const.DP_FX_BG);
+		game.root.add(bgAddSb, Const.DP_FX_BG);
 		bgAddSb.blendMode = Add;
 		bgAddSb.hasRotationScale = true;
 
 		bgNormalSb = new h2d.SpriteBatch(Assets.tiles.tile);
-		game.scroller.add(bgNormalSb, Const.DP_FX_BG);
+		game.root.add(bgNormalSb, Const.DP_FX_BG);
 		bgNormalSb.hasRotationScale = true;
 
 		topNormalSb = new h2d.SpriteBatch(Assets.tiles.tile);
-		game.scroller.add(topNormalSb, Const.DP_FX_TOP);
+		game.root.add(topNormalSb, Const.DP_FX_TOP);
 		topNormalSb.hasRotationScale = true;
 
 		topAddSb = new h2d.SpriteBatch(Assets.tiles.tile);
-		game.scroller.add(topAddSb, Const.DP_FX_TOP);
+		game.root.add(topAddSb, Const.DP_FX_TOP);
 		topAddSb.blendMode = Add;
 		topAddSb.hasRotationScale = true;
 	}

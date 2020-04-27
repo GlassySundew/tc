@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.2" tiledversion="2020.03.18" name="colls" tilewidth="47" tileheight="46" tilecount="6" columns="10">
+<tileset version="1.2" tiledversion="2020.04.10" name="colls" tilewidth="88" tileheight="49" tilecount="7" columns="10">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="0">
   <image width="46" height="27" source="separated/q/rock.png"/>
@@ -22,9 +22,9 @@
    <property name="highlight" type="color" value="#ffffffff"/>
   </properties>
   <image width="46" height="46" source="separated/structures/pcgmw.png"/>
-  <objectgroup draworder="index" id="44">
-   <object id="57" x="23.375" y="39.875">
-    <polygon points="-0.330122,0.146354 -15.375,-6.88672 -0.376921,-13.8872 14.6361,-6.88611"/>
+  <objectgroup draworder="index" id="3">
+   <object id="113" x="8" y="33">
+    <polygon points="0,0 15.0909,7 29.9091,-0.0909091 15.2727,-7"/>
    </object>
   </objectgroup>
  </tile>
@@ -55,6 +55,14 @@
      <property name="highilightColor" type="color" value=""/>
     </properties>
     <ellipse/>
+   </object>
+  </objectgroup>
+ </tile>
+ <tile id="8">
+  <image width="88" height="49" source="separated/structures/hydroponics.png"/>
+  <objectgroup draworder="index" id="3">
+   <object id="2" x="26.375" y="34.125">
+    <polygon points="0.538043,1.88587 42.5833,-18.8552 59.7944,-9.12083 17.6694,11.8083"/>
    </object>
   </objectgroup>
  </tile>

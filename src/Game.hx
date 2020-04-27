@@ -12,19 +12,17 @@ import hxd.Key;
 import format.tmx.Data;
 import format.tmx.*;
 import hxd.Res;
+import tools.Util.*;
 
 class Game extends Process {
 	public static var inst:Game;
 
 	public var lvlName:String;
-
 	public var ca:dn.heaps.Controller.ControllerAccess;
-
 	public var camera:Camera;
 
 	private var cam:CameraController;
 
-	public var scroller:h2d.Layers;
 	public var level:Level;
 
 	public var player:en.player.Player;
@@ -44,15 +42,6 @@ class Game extends Process {
 
 		createRootInLayers(Main.inst.root, Const.DP_BG);
 
-		scroller = new h2d.Layers();
-		scroller.visible = false;
-
-		root.add(scroller, Const.DP_BG);
-
-		// cam = new h3d.scene.CameraController(Boot.inst.s3d);
-		// cam.loadFromCamera();
-		// Boot.inst.s3d.addChild(cam);
-
 		camera = new Camera();
 		hud = new ui.Hud();
 
@@ -61,16 +50,17 @@ class Game extends Process {
 
 	public function onCdbReload() {}
 
-	public function nextLevel() { /*
-		if (level.data.getStr("nextLevel") != "")
-			startLevel(level.data.getStr("nextLevel"));
-		else {
-			var ogmoProj = new ogmo.Project(hxd.Res.map.ld45, false);
-			if (ogmoProj.getLevelByName("level" + (level.lid + 1)) == null)
-				startLevel("level" + level.lid);
-			else
-				startLevel("level" + (level.lid + 1));
-	}*/
+	public function nextLevel() {
+		/*
+			if (level.data.getStr("nextLevel") != "")
+				startLevel(level.data.getStr("nextLevel"));
+			else {
+				var ogmoProj = new ogmo.Project(hxd.Res.map.ld45, false);
+				if (ogmoProj.getLevelByName("level" + (level.lid + 1)) == null)
+					startLevel("level" + level.lid);
+				else
+					startLevel("level" + (level.lid + 1));
+		}*/
 	}
 
 	public function restartLevel() {
@@ -91,28 +81,32 @@ class Game extends Process {
 		var data = r.read(Xml.parse(Res.loader.load('tiled/' + name).entry.getText()));
 		level = new Level(data);
 		CompileTime.importPackage("en");
-		CompileTime.getAllClasses("en", Entity);
-		var entNames = (CompileTime.getAllClasses("en"));
-		for (e in level.entities) {
-			for (nam in entNames) {
-				var eregClass = ~/\$([a-z0-9]+)+$/gi;
-				if (eregClass.match('$nam'.toLowerCase()) && eregClass.matched(1) == e.name) {
-					Type.createInstance(nam, [e.x, e.y, e]);
-				}
-			}
-		}
-		player = Player.inst;
+		var entNames = (CompileTime.getAllClasses(Entity));
 
+		#if hl
+		var eregClass = ~/\$([a-z0-9]+)+$/gi;
+		#else
+		var eregClass = ~/\.([a-z0-9]+)\n/gi; // регулярка для js, который, нахуй, не работает
+		#end
+
+		for (e in level.entities)
+			for (nam in entNames) {
+				if (eregClass.match('$nam'.toLowerCase()) && eregClass.matched(1) == e.name)
+					Type.createInstance(nam, [e.x, e.y, e]);
+			}
+
+		player = Player.inst;
 		// parsing collision objects from 'colls' tileset
 		for (tileset in data.tilesets) {
 			var ereg = ~/(^[^.]*)+/; // regexp to take tileset name
 			if (ereg.match(tileset.source) && ereg.matched(1) == 'colls')
 				for (tile in tileset.tiles) {
-					var ereg = ~/\/([a-z0-9_\.-]+)\./; // regexp to take string between last / and . from picture path
+					var ereg = ~/\/([a-z0-9]+)\./; // regexp to take string between last / and . from picture path
 					if (ereg.match(tile.image.source)) {
 						for (ent in Entity.ALL) {
 							var eregClass = ~/\.([a-z0-9]+)+$/gi; // regexp to remove 'en.' prefix
-							if (eregClass.match('$ent'.toLowerCase())
+							if (tile.objectGroup != null
+								&& eregClass.match('$ent'.toLowerCase())
 								&& eregClass.matched(1) == ereg.matched(1)
 								&& tile.objectGroup.objects.length >= 0
 								&& ent.collisions.length == 0) {
@@ -134,26 +128,32 @@ class Game extends Process {
 											ent.collisions.push(Polygon.rectangle(params.x, params.y, params.width, params.height));
 										case OTPolygon(points):
 											var verts:Array<Vector> = [];
-											for (i in points)
-												verts.push(new Vector(M.round(i.x), M.round(i.y)));
+											for (i in points) {
+												verts.push(new Vector(M.round(i.x), M.round(-i.y)));
+											}
 											var yArr = verts.copy();
 											yArr.sort(function(a, b) return (a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0));
 											var xArr = verts.copy();
 											xArr.sort(function(a, b) return (a.x < b.x) ? -1 : ((a.x > b.x) ? 1 : 0));
+											checkPolyClockwise(verts);
+
 											xCent = ((xArr[xArr.length - 1].x + xArr[0].x) * .5);
-											yCent = ((yArr[xArr.length - 1].y + yArr[0].y) * .5);
+											yCent = -((yArr[xArr.length - 1].y + yArr[0].y) * .5);
 											ent.collisions.push(new Polygon(0, 0, verts));
 										default:
 									}
 									// установление pivot point для фундаментного объекта коллизии
 									// ебучее кривое говнище из жопы, не знаю как сделать нормально
 
+									// @:privateAccess ent.mesh.plane.setOrigin(-ent.mesh.plane.width * (M.round(obj.x - (xCent)) +
+									// 	M.round((obj.width) / 2)) / ent.spr.tile.width,
+									// 	-ent.mesh.plane.height * (M.round(obj.y - (yCent)) + M.round((obj.height) / 2)) / ent.spr.tile.height);
 									ent.mesh.originMX = (M.round(obj.x + xCent) + M.round((obj.width) / 2)) / ent.spr.tile.width;
 									ent.mesh.originMY = (M.round(obj.y + yCent) + M.round((obj.height) / 2)) / ent.spr.tile.height;
 									ent.sprOffColX = xCent;
-									ent.sprOffColY = yCent;
-									// ent.sprOffX -= M.round(xCent);
-									// ent.sprOffY -= M.round(yCent); // хз че не так с ней, не удалять
+									ent.sprOffColY = -yCent;
+									// ent.sprOffX += M.round(xCent / 2);
+									// ent.sprOffY += M.round(yCent + 1); // хз че не так с ней, не удалять
 								}
 							}
 						}
@@ -168,7 +168,8 @@ class Game extends Process {
 
 		// rect-obj position fix
 		for (en in Entity.ALL)
-			en.sprOffY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
+			if (en.tmxObj != null)
+				en.sprOffY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
 	}
 
 	private function getTSX(name:String):TmxTileset {

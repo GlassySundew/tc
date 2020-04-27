@@ -17,6 +17,7 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 
 	public function new() {
 		super();
+
 		var engine = h3d.Engine.getCurrent();
 		if (!engine.driver.hasFeature(MultipleRenderTargets))
 			throw "engine must have MRT";
@@ -67,18 +68,31 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 		shadow.draw(get("shadow"));
 		all.setContext(ctx);
 
-		all.draw(get("default"));
-
-		// renderPass(shadow,get("shadow"));
+		renderPass(shadow, get("shadow"));
 		var colorTex = allocTarget("color");
 		var depthTex = allocTarget("depth");
 		var normalTex = allocTarget("normal");
-
 		var additiveTex = allocTarget("additive");
+
 		setTargets([colorTex, depthTex, normalTex, additiveTex]);
 		clear(0, 1);
 
 		all.draw(get("default"));
+
+		renderPass(defaultPass, get("alpha"), backToFront);
+
+		// setTarget(colorTex);
+		// draw("alpha");
+		// resetTarget();
+
+		setTarget(additiveTex);
+		clear(0);
+		draw("additive");
+		resetTarget();
+
+		emissive.setContext(ctx);
+		emissive.draw(get("emissive"));
+
 		if (enableSao) {
 			// apply sao
 			var saoTarget = allocTarget("sao", false);
@@ -87,7 +101,7 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 			resetTarget();
 			saoBlur.apply(ctx, saoTarget, allocTarget("saoBlurTmp", false));
 			h3d.pass.Copy.run(saoTarget, colorTex, Multiply);
-		} { // apply fog
+		} { // apply fog\post.apply(colorTex, ctx.time);
 			var fogTarget = allocTarget("fog", false, 1);
 			fog.setGlobals(ctx);
 			setTarget(fogTarget);
@@ -95,23 +109,10 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 			resetTarget();
 			colorTex = fogTarget;
 		}
-		renderPass(defaultPass, get("alpha"), backToFront);
 
-		setTarget(colorTex);
-		draw("alpha");
-		resetTarget();
-
-		setTarget(additiveTex);
-		clear(0);
-		draw("additive");
-
-		resetTarget();
-		emissive.setContext(ctx);
-
-		emissive.draw(get("emissive"));
 		h3d.pass.Copy.run(ctx.textures.allocTarget("emissive", colorTex.width, colorTex.height), colorTex, Add);
-
 		h3d.pass.Copy.run(additiveTex, colorTex, Add);
+
 		if (enableFXAA) {
 			var t = allocTarget("fxaaOut", false, 0);
 			setTarget(t);

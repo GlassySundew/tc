@@ -1,37 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.2" tiledversion="2020.01.22" name="alpha" tilewidth="54" tileheight="31" tilecount="11" columns="0">
+<tileset version="1.2" tiledversion="2020.04.10" name="alpha" tilewidth="125" tileheight="116" tilecount="14" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
- <tile id="0">
-  <image width="48" height="32" source="separated/floor.png"/>
+ <tile id="22">
+  <image width="48" height="30" source="separated/textures/ship/floor.png"/>
  </tile>
- <tile id="12">
-  <image width="46" height="24" source="separated/textures/walls/ship_wall_bottom_corner.png"/>
+ <tile id="23">
+  <image width="46" height="24" source="separated/textures/ship/ship_wall_bottom_corner.png"/>
  </tile>
- <tile id="13">
-  <image width="46" height="24" source="separated/textures/walls/ship_wall_bottom_line.png"/>
+ <tile id="24">
+  <image width="46" height="24" source="separated/textures/ship/ship_wall_bottom_line.png"/>
  </tile>
- <tile id="14">
-  <image width="46" height="24" source="separated/textures/walls/ship_wall_bottom_line_cut.png"/>
+ <tile id="25">
+  <image width="46" height="24" source="separated/textures/ship/ship_wall_bottom_line_cut.png"/>
  </tile>
- <tile id="15">
-  <image width="46" height="24" source="separated/textures/walls/ship_wall_center_line.png"/>
+ <tile id="26">
+  <image width="46" height="24" source="separated/textures/ship/ship_wall_center_line.png"/>
  </tile>
- <tile id="16">
-  <image width="46" height="24" source="separated/textures/walls/ship_wall_center_line_cut.png"/>
+ <tile id="27">
+  <image width="46" height="24" source="separated/textures/ship/ship_wall_center_line_cut.png"/>
  </tile>
- <tile id="17">
-  <image width="46" height="24" source="separated/textures/walls/ship_wall_top_corner.png"/>
+ <tile id="28">
+  <image width="125" height="116" source="separated/textures/ship/ship_wall_door.png"/>
  </tile>
- <tile id="18">
-  <image width="46" height="24" source="separated/textures/walls/ship_wall_top_line.png"/>
+ <tile id="29">
+  <image width="48" height="35" source="separated/textures/ship/ship_wall_tanker.png"/>
  </tile>
- <tile id="19">
-  <image width="46" height="24" source="separated/textures/walls/ship_wall_top_line_cut.png"/>
+ <tile id="30">
+  <image width="46" height="32" source="separated/textures/ship/ship_wall_tanker_mid.png"/>
  </tile>
- <tile id="20">
-  <image width="48" height="28" source="separated/textures/walls/ship_wall_tanker.png"/>
+ <tile id="31">
+  <image width="46" height="24" source="separated/textures/ship/ship_wall_top_corner.png"/>
  </tile>
- <tile id="21">
-  <image width="46" height="26" source="separated/textures/walls/ship_wall_tanker_mid.png"/>
+ <tile id="32">
+  <image width="46" height="24" source="separated/textures/ship/ship_wall_top_line.png"/>
+ </tile>
+ <tile id="33">
+  <image width="46" height="24" source="separated/textures/ship/ship_wall_top_line_cut.png"/>
+ </tile>
+ <tile id="34">
+  <image width="48" height="66" source="separated/textures/ship/ship_room_wall_darken.png"/>
+ </tile>
+ <tile id="35">
+  <image width="48" height="82" source="separated/textures/ship/ship_room_wall_lighten.png"/>
  </tile>
 </tileset>

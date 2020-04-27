@@ -19,7 +19,7 @@
             "type": "chrome",
             "request": "launch",
              "name": "Launch Chrome against localhost",
-            "url": "file://${workspaceFolder}/index.html",
+            "url": "file://${workspaceFolder}/bin/index.html",
             "webRoot": "${workspaceFolder}",
             "preLaunchTask": "JS release"
             

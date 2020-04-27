@@ -1,5 +1,6 @@
 package en.player;
 
+import en.items.GraviTool;
 import format.tmx.Data.TmxObject;
 import differ.Collision;
 
@@ -50,9 +51,14 @@ class Player extends Entity {
 		// sprOffY -= 1;
 
 		inventory = new Inventory();
-
+		// tempI = new FloatingItem(footX, footY - 30, new en.items.Ore(0, 0, Iron));
+		// new FloatingItem(footX + 22, footY - 20, new en.items.GraviTool());
+		// tempI.footX = footX;
+		// tempI.footY = footY - 30;
+		// tempP = new FloatingItem
 		// sprOffCollY = -.45;
 		// obj.material.mainPass.addShader(new NormalMap(tex));
+		bottomAlpha = -1;
 	}
 
 	override function dispose() {
@@ -110,10 +116,12 @@ class Player extends Entity {
 		super.checkCollisions();
 
 		for (ent in Entity.ALL) {
-			var collideInfo = Collision.shapeWithShape(collisions[0], ent.collisions[0]);
-			if (collideInfo != null) {
-				collisions[0].x += (collideInfo.separationX);
-				collisions[0].y += (collideInfo.separationY);
+			if (ent.collisions[0] != null) {
+				var collideInfo = Collision.shapeWithShape(collisions[0], ent.collisions[0]);
+				if (collideInfo != null) {
+					collisions[0].x += (collideInfo.separationX);
+					collisions[0].y += (collideInfo.separationY);
+				}
 			}
 		}
 		for (poly in Level.inst.walkable) {

@@ -18,7 +18,7 @@ import h3d.prim.Cube;
 import h3d.Vector;
 import h3d.scene.Mesh;
 
-@:keepSub class Entity {
+@:keep class Entity {
 	// private var anim:String;
 	public static var ALL:Array<Entity> = [];
 	public static var GC:Array<Entity> = [];
@@ -130,7 +130,7 @@ import h3d.scene.Mesh;
 	public var tmxObj:TmxObject;
 	public var colorAdd:h3d.Vector;
 	public var spr:HSprite;
-	public var mesh:TileSprite;
+	public var mesh:h3d.scene.TileSprite;
 
 	public var tmpDt:Float;
 	public var tmpCur:Float;
@@ -152,7 +152,7 @@ import h3d.scene.Mesh;
 
 	var debugLabel:Null<h2d.Text>;
 
-	public function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:TmxObject) {
+	public function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:Null<TmxObject>) {
 		uid = Const.NEXT_UNIQ;
 		ALL.push(this);
 
@@ -161,27 +161,24 @@ import h3d.scene.Mesh;
 		if (spr == null)
 			throw "spr hasnt been initialised";
 
-		if (tmxObj != null)
-			this.tmxObj = tmxObj;
-
-		game.scroller.add(spr, 10);
+		this.tmxObj = tmxObj;
+		game.root.add(spr, 10);
 		spr.colorAdd = colorAdd = new h3d.Vector();
 		spr.visible = false;
 		spr.tile.getTexture().filter = Nearest;
 		bmp = new Bitmap(spr.tile);
-		mesh = new TileSprite(spr.tile, Boot.inst.s3d, true);
+		mesh = new TileSprite(spr.tile, Boot.inst.s3d,true);
 		mesh.material.mainPass.setBlendMode(Alpha);
 		mesh.material.mainPass.enableLights = false;
-		mesh.material.mainPass.depth(false, LessEqual);
+		mesh.material.mainPass.depth(false, Less);
 		tex = new Texture(Std.int(spr.tile.width), Std.int(spr.tile.height), [Target]);
 		bmp.drawTo(tex);
 		// spr.setCenterRatio(-spr.tile.width * mesh.originMX, -spr.tile.height * mesh.originMY);
-		mesh.rotate(rotAngle, 0, hxd.Math.degToRad(90));
+		// mesh.rotate(0, -rotAngle, 0);
 		sprOffX -= Const.GRID_WIDTH / 2;
 		sprOffY -= Const.GRID_HEIGHT / 2 - 1;
 		var s = mesh.material.mainPass.addShader(new h3d.shader.ColorAdd());
 		s.color = colorAdd;
-
 		setPosCase(x, z);
 	}
 
@@ -255,8 +252,10 @@ import h3d.scene.Mesh;
 	}
 
 	function checkCollisions() {
-		collisions[0].x = footX - sprOffColX;
-		collisions[0].y = footY - sprOffColY;
+		if (collisions[0] != null) {
+			collisions[0].x = footX - sprOffColX;
+			collisions[0].y = footY - sprOffColY;
+		}
 	}
 
 	public function preUpdate() {
@@ -269,7 +268,7 @@ import h3d.scene.Mesh;
 				spr.anim.getCurrentAnim().curFrameCpt = tmpCur + spr.anim.getAnimCursor();
 			tmpDt = tmod * spr.anim.getCurrentAnim().speed;
 			tmpCur = spr.anim.getCurrentAnim().curFrameCpt;
-	}
+		}
 		// x
 		var steps = M.ceil(M.fabs(dxTotal * tmod));
 		var step = dxTotal * tmod / steps;
@@ -324,40 +323,44 @@ import h3d.scene.Mesh;
 	}
 
 	public function postUpdate() {
-		mesh.x = footX;
-		mesh.z = footY;
-		mesh.y = (bottomAlpha * .5 * mesh.scaleZ * Math.sin(rotAngle) / (180 / Math.PI));
-		checkCollisions();
-		// spr.scaleX = dir * sprScaleX;
-		// spr.scaleY = sprScaleY;
-		if (!cd.has("colorMaintain")) {
-			colorAdd.r *= Math.pow(0.6, tmod);
-			colorAdd.g *= Math.pow(0.6, tmod);
-			colorAdd.b *= Math.pow(0.6, tmod);
-		}
 
-		if (debugLabel != null) {
-			debugLabel.x = Std.int(footX - debugLabel.textWidth * 0.5);
-			debugLabel.y = Std.int(footY + 1);
-		}
-		// curFrame = spr.anim.getCurrentAnim().curFrameCpt;
-		if (!isMoving()) {
-			footX = M.round(M.fabs(footX));
-			footY = M.round(M.fabs(footY));
+		if (mesh != null) {
+			mesh.x = footX;
+			mesh.z = footY;
+			mesh.y = (bottomAlpha * .5 * mesh.scaleZ * Math.sin(rotAngle) / (180 / Math.PI));
+			checkCollisions();
+			// spr.scaleX = dir * sprScaleX;
+			// spr.scaleY = sprScaleY;
+			if (!cd.has("colorMaintain")) {
+				colorAdd.r *= Math.pow(0.6, tmod);
+				colorAdd.g *= Math.pow(0.6, tmod);
+				colorAdd.b *= Math.pow(0.6, tmod);
+			}
+
+			if (debugLabel != null) {
+				debugLabel.x = Std.int(footX - debugLabel.textWidth * 0.5);
+				debugLabel.y = Std.int(footY + 1);
+			}
+			// curFrame = spr.anim.getCurrentAnim().curFrameCpt;
+			if (!isMoving()) {
+				footX = M.round(M.fabs(footX));
+				footY = M.round(M.fabs(footY));
+			}
 		}
 	}
 
 	public function frameEnd() {
-		// mesh.tile = spr.tile;
-		tex.clear(0, 0);
-		// spr.drawTo(tex);
-		bmp.tile = spr.tile;
+		if (mesh != null) { // mesh.tile = spr.tile;
+			tex.clear(0, 0);
+			// spr.drawTo(tex);
+			bmp.tile = spr.tile;
 
-		bmp.drawTo(tex);
-		var tile = Tile.fromTexture(tex);
-		tile.getTexture().filter = Nearest;
-		mesh.tile = tile;
-		lastFootX = footX;
-		lastFootY = footY;
+			bmp.drawTo(tex);
+			var tile = Tile.fromTexture(tex);
+			tile.getTexture().filter = Nearest;
+			mesh.tile = tile;
+			lastFootX = footX;
+			lastFootY = footY;
+		}
 	}
 }

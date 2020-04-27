@@ -3,7 +3,7 @@
  * 
  * Based on:
  * 
- * @see http://www.cs.ubc.ca/~snoeyink/demos/convdecomp/VPDemo.html		(Java - by Jack Snoeyink)
+ * @see http://www.cs.  ubc.ca/~snoeyink/demos/convdecomp/VPDemo.html		(Java - by Jack Snoeyink)
  * 
  * @author Jack Snoeyink
  * @author azrafe7

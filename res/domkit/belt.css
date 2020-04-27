@@ -6,13 +6,8 @@ container {
 .beltSlot {
   min-width: 52;
   min-height: 52;
-  background: rgba(
-    160,
-    149,
-    149,
-    0.5
-  ); /* this line only sets alpha bcoz of fucking broken domkit */
-  background-color: #626160; /* this line sets color */
+  background: rgba(87, 85, 85, 0.589); /* this line only sets alpha bcoz of fucking broken domkit */
+  /* background-color: #626160; this line sets color */
 }
 
 /* .containerFlow {

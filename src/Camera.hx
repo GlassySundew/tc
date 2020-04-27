@@ -30,8 +30,7 @@ class Camera extends dn.Process {
 	function updateCamera(?x = 0., ?y = 0.) {
 		s3dCam.target.x = (x);
 		s3dCam.target.z = (y);
-
-		s3dCam.pos = s3dCam.target.add(new Vector(0, -(w() * 1) / (2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * (Math.PI / 180))), -1 / ppu));
+		s3dCam.pos = s3dCam.target.add(new Vector(0, -(w() * 1) / (2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * (Math.PI / 180))), -50 / ppu));
 
 		// s3dCam.pos = s3dCam.target.add(new Vector(0, (h() * 1) / (2 * 32 * Math.tan(s3dCam.getFovX() / 2)), -0.01));
 	}
@@ -44,6 +43,10 @@ class Camera extends dn.Process {
 	inline function set_y(v:Float) {
 		updateCamera(x, v);
 		return y = v;
+	}
+
+	public inline function stopTracking() {
+		target = null;
 	}
 
 	// function get_wid() {
@@ -103,8 +106,8 @@ class Camera extends dn.Process {
 			// 	scroller.x += Math.cos(ftime * 1.16) * 1 * Const.SCALE * shakePower * cd.getRatio("shaking");
 			// 	scroller.y += Math.sin(0.3 + ftime * 1.33) * 1 * Const.SCALE * shakePower * cd.getRatio("shaking");
 			// }
-
 			if (target != null) {
+				yMult = (M.fabs(target.dx) > 0.001 && M.fabs(target.dy) > 0.001) ? .5 : 1;
 				var s = 0.006;
 				var deadZone = 5;
 				var tx = target.footX;
@@ -116,17 +119,17 @@ class Camera extends dn.Process {
 					dx += Math.cos(a) * (d - deadZone) * s * tmod;
 					dy += Math.sin(a) * (d - deadZone) * s * tmod;
 				}
+
+				var frict = 0.89;
+				x += dx * tmod;
+				dx *= Math.pow(frict, tmod);
+
+				y += dy * tmod;
+				dy *= Math.pow(frict, tmod);
+				// Rounding
+				x = M.round(x);
+				y = M.round(y / yMult) * yMult;
 			}
-
-			var frict = 0.89;
-			x += dx * tmod;
-			dx *= Math.pow(frict, tmod);
-
-			y += dy * tmod;
-			dy *= Math.pow(frict, tmod);
-			// Rounding
-			x = M.round(x);
-			y = M.round(y);
 		}
 	}
 }
