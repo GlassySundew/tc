@@ -1,5 +1,6 @@
 package en.player;
 
+import h3d.Vector;
 import en.player.Inventory.InventoryGrid;
 import h2d.Flow;
 import h2d.Object;
@@ -8,47 +9,40 @@ import h2d.domkit.Style;
 
 @:uiComp("container")
 class BeltCont extends h2d.Flow implements h2d.domkit.Object {
-	static var SRC = 
+	static var SRC =
 		<container>
-		    <flow>
 		      <flow class="beltSlot" public id="beltSlot">
 				<flow class="itemContainer" public id="itemContainer" />
 				<flow class="absolute" public id="absolute"/>
-		        <flow class="hotkeyContainer">
+		        <flow class="hotkeyContainer" >
 		          <text
-		            class="beltSlotNumber"
+					class="beltSlotNumber"
+					public id="beltSlotNumber"
 		            text={Std.string(slotNumber)}
 		            font={font}
 		          />
 		        </flow>
 		      </flow>
-			</flow>
 		</container>;
-		// public var item(default, set):Item;
-		// inline function set_item(v:Item) {
-		// 	trace(item);
-		// 	if (v != null) {
-		// 		v.spr.scaleX = v.spr.scaleY = 3;
-		// 		this.itemContainer.addChild(v.spr);
-		// 	} else if (item != null) {
-		// 		trace(this.itemContainer, item);
-		// 		this.itemContainer.removeChild(item.spr);
-		// 	}
-		// 	return item = v;
-		// }
 		public function new(?font:Font, ?slotNumber:Int, ?parent) {
 			super(parent);
-
 			initComponent();
-			// initComponent();
 		}
 }
-
 class Belt extends dn.Process {
+	var player(get, null):Player;
+
+	inline function get_player()
+		return Player.inst;
+
 	var centerFlow:Flow;
 	var style:Style;
+
 	public var invGrid:InventoryGrid;
+
 	public static var beltSlots:Array<BeltCont> = [];
+
+	public var selectedCell:BeltCont;
 
 	public function new() {
 		super();
@@ -63,25 +57,36 @@ class Belt extends dn.Process {
 			beltSlots.push(new BeltCont(Assets.fontPixel, i, centerFlow));
 			style.addObject(beltSlots[i - 1]);
 		}
-		
+
 		invGrid = new InventoryGrid(0, 0, beltSlots[0].beltSlot.minWidth, beltSlots[0].beltSlot.minHeight, beltSlots.length, 1, 20, 0, Boot.inst.s2d);
 		invGrid.enableGrid();
-		for(i in 0...beltSlots.length){
+		for (i in 0...beltSlots.length) {
 			beltSlots[i].absolute.addChild(invGrid.interGrid[i][0].inter);
 		}
-		var iten = new en.items.GraviTool(0, 0);
 		
-		invGrid.interGrid[1][0].item = iten;
+		var iten = new en.items.GraviTool();
+		invGrid.interGrid[2][0].item = iten;
 	}
 
-	// public function removeItem(item:Item) {
-	// 	var n:Null<Int> = null;
-	// 	for (slot in beltSlots) {
-	// 		if (slot.getChildIndex(item.spr) != n) {
-	// 			slot.item = null;
-	// 		}
-	// 	}
-	// }
+	public function selectCell(number:Int = 1) {
+		if (player.cursorItem == null) {
+			deselectCells();
+			var cell = beltSlots[number - 1];
+			cell.beltSlot.backgroundTile = h2d.Tile.fromColor(0x6bace6, 1, 1, .58);
+			cell.beltSlotNumber.color = Color.intToVector(0xbabac8);
+			cell.paddingBottom = 10;
+
+			// if (player.holdItem == null)
+			// 	player.holdItem = cell.
+		}
+	}
+
+	public function deselectCells() {
+		for (i in beltSlots) {
+			style.addObject(i);
+			i.paddingBottom = 0;
+		}
+	}
 
 	override function onResize() {
 		centerFlow.minWidth = Boot.inst.s2d.width;

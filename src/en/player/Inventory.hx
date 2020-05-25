@@ -33,21 +33,22 @@ class InventoryCell {
 		// inter.visible = false;
 		inter.cursor = Default;
 		inter.onPush = function(e:Event) {
-			if (Game.inst.player.holdItem != null && item == null) {
-				item = Game.inst.player.holdItem;
-
-				Game.inst.player.holdItem = null;
+			if (Game.inst.player.cursorItem != null && item == null) {
+				item = Game.inst.player.cursorItem;
+				Game.inst.player.cursorItem = null;
 			}
 		}
 	}
 }
 
 class InventoryGrid {
+	public static var ALL:Array<InventoryGrid> = [];
+
 	public var interGrid:Array<Array<InventoryCell>>;
 
 	public function new(x:Int, y:Int, width:Int, height:Int, horCells:Int, verCells:Int, xGap:Int, yGap:Int, ?parent:h2d.Object) {
+		ALL.push(this);
 		interGrid = [for (i in 0...verCells) []];
-
 		for (j in 0...horCells) {
 			interGrid[j] = [];
 			for (i in 0...verCells) {
@@ -58,6 +59,17 @@ class InventoryGrid {
 				interGrid[j].push(tempInter);
 			}
 		}
+	}
+
+	public function dispose() {
+		ALL.remove(this);
+
+		for(i in interGrid)
+			for (j in i) {
+				j.inter.remove();
+				
+			}
+
 	}
 
 	public function disableGrid() {

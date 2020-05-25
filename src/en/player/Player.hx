@@ -1,5 +1,7 @@
 package en.player;
 
+import en.objs.IsoTileSpr;
+import hxd.Key;
 import en.items.GraviTool;
 import format.tmx.Data.TmxObject;
 import differ.Collision;
@@ -8,18 +10,26 @@ class Player extends Entity {
 	public static var inst:Player;
 
 	public var inventory:Inventory;
+
 	public var holdItem(default, set):Item;
 
 	inline function set_holdItem(v:Item) {
+		return holdItem = v;
+	}
+
+	public var cursorItem(default, set):Item;
+
+	inline function set_cursorItem(v:Item) {
 		if (v == null) {
 			inventory.invGrid.disableGrid();
+			
 		}
 		if (v != null) {
+			holdItem = v;
 			inventory.invGrid.enableGrid();
 			v.spr.scaleX = v.spr.scaleY = 2;
 		}
-
-		return holdItem = v;
+		return cursorItem = v;
 	}
 
 	var ca:dn.heaps.Controller.ControllerAccess;
@@ -46,10 +56,18 @@ class Player extends Entity {
 		}
 
 		super(x, z, tmxObj);
+		// var mesh = Std.downcast(mesh,IsoTileSpr);
 		inst = this;
-
+		mesh.isLong = true;
+		mesh.verts = {
+			right: {x: 0, z: -0},
+			down: {x: -0, z: -0},
+			left: {x: -0, z: 0},
+			up: {x: 0, z: 0}
+		};
+		mesh.renewDebugPts();
 		// sprOffY -= 1;
-
+		// mesh.material.texture.depthBuffer = new DepthBuffer(7, 13);
 		inventory = new Inventory();
 		// tempI = new FloatingItem(footX, footY - 30, new en.items.Ore(0, 0, Iron));
 		// new FloatingItem(footX + 22, footY - 20, new en.items.GraviTool());
@@ -68,7 +86,10 @@ class Player extends Entity {
 
 	override public function update() {
 		super.update();
-
+		// temp ? {mesh.material.mainPass.depth(false, Less); temp = false;} : {
+		// 	mesh.material.mainPass.depth(true, LessEqual);
+		// 	temp = true;
+		// };
 		var leftDist = M.dist(0, 0, ca.lxValue(), ca.lyValue());
 		var leftPushed = leftDist >= 0.3;
 		var leftAng = Math.atan2(ca.lyValue(), ca.lxValue());
@@ -105,16 +126,15 @@ class Player extends Entity {
 	override function postUpdate() {
 		super.postUpdate();
 
-		if (holdItem != null) {
-			holdItem.x = Boot.inst.s2d.mouseX + 25;
-			holdItem.y = Boot.inst.s2d.mouseY + 25;
+		if (cursorItem != null) {
+			cursorItem.x = Boot.inst.s2d.mouseX + 25;
+			cursorItem.y = Boot.inst.s2d.mouseY + 25;
 		}
-		// trace(xr, yr, cx, cy, ((footX / Const.GRID_WIDTH) ) % 1, ((footX / Const.GRID_WIDTH) ) - ((footX / Const.GRID_WIDTH) ) % 1 );
 	}
 
 	override function checkCollisions() {
 		super.checkCollisions();
-
+		checkBeltInputs();
 		for (ent in Entity.ALL) {
 			if (ent.collisions[0] != null) {
 				var collideInfo = Collision.shapeWithShape(collisions[0], ent.collisions[0]);
@@ -134,5 +154,19 @@ class Player extends Entity {
 
 		footX = (collisions[0].x);
 		footY = (collisions[0].y);
+	}
+
+	function checkBeltInputs() {
+		if (Key.isPressed(Key.NUMBER_1))
+			inventory.belt.selectCell(1);
+
+		if (Key.isPressed(Key.NUMBER_2))
+			inventory.belt.selectCell(2);
+
+		if (Key.isPressed(Key.NUMBER_3))
+			inventory.belt.selectCell(3);
+
+		if (Key.isPressed(Key.NUMBER_4))
+			inventory.belt.selectCell(4);
 	}
 }

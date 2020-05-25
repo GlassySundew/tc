@@ -6,287 +6,280 @@ filter: Nearest,Nearest
 repeat: none
 idle_down_0
   rotate: false
-  xy: 102, 150
+  xy: 34, 34
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 idle_down_left_0
   rotate: false
-  xy: 102, 116
+  xy: 68, 170
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 idle_down_right_0
   rotate: false
-  xy: 204, 116
+  xy: 204, 136
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 idle_left_0
   rotate: false
-  xy: 0, 53
+  xy: 34, 170
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 idle_right_0
   rotate: false
-  xy: 218, 218
+  xy: 68, 136
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 idle_up_0
   rotate: false
-  xy: 68, 184
+  xy: 34, 68
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 idle_up_left_0
   rotate: false
-  xy: 136, 82
+  xy: 204, 204
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 idle_up_right_0
   rotate: false
-  xy: 170, 116
+  xy: 136, 68
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-rock
-  rotate: false
-  xy: 0, 223
-  size: 46, 27
-  orig: 46, 27
-  offset: 0, 0
-  index: -1
 walk_down_0
   rotate: false
-  xy: 82, 218
+  xy: 34, 136
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_down_1
   rotate: false
-  xy: 116, 218
+  xy: 34, 0
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_down_2
   rotate: false
-  xy: 150, 218
+  xy: 102, 204
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_down_3
   rotate: false
-  xy: 184, 218
+  xy: 0, 68
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_down_left_0
   rotate: false
-  xy: 170, 48
+  xy: 102, 0
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_down_left_1
   rotate: false
-  xy: 0, 189
+  xy: 0, 204
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_down_left_2
   rotate: false
-  xy: 0, 155
+  xy: 136, 204
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_down_left_3
   rotate: false
-  xy: 0, 121
+  xy: 34, 204
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_down_right_0
   rotate: false
-  xy: 170, 184
+  xy: 204, 170
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_down_right_1
   rotate: false
-  xy: 68, 48
+  xy: 68, 34
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_down_right_2
   rotate: false
-  xy: 102, 82
+  xy: 102, 68
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_down_right_3
   rotate: false
-  xy: 34, 82
+  xy: 136, 102
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_left_0
   rotate: false
-  xy: 170, 150
+  xy: 170, 136
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_left_1
   rotate: false
-  xy: 204, 184
+  xy: 170, 204
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_left_2
   rotate: false
-  xy: 204, 150
+  xy: 68, 0
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_left_3
   rotate: false
-  xy: 0, 87
+  xy: 102, 34
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_right_0
   rotate: false
-  xy: 34, 150
+  xy: 0, 34
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_right_1
   rotate: false
-  xy: 34, 184
+  xy: 102, 170
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_right_2
   rotate: false
-  xy: 68, 150
+  xy: 102, 136
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_right_3
   rotate: false
-  xy: 102, 184
+  xy: 136, 170
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_up_0
   rotate: false
-  xy: 136, 150
+  xy: 34, 102
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_up_1
   rotate: false
-  xy: 102, 48
+  xy: 0, 136
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_up_2
   rotate: false
-  xy: 136, 184
+  xy: 68, 68
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_up_3
   rotate: false
-  xy: 0, 19
+  xy: 68, 204
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_up_left_0
   rotate: false
-  xy: 34, 116
+  xy: 68, 102
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_up_left_1
   rotate: false
-  xy: 136, 116
+  xy: 0, 170
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_up_left_2
   rotate: false
-  xy: 48, 218
+  xy: 0, 102
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_up_left_3
   rotate: false
-  xy: 68, 116
+  xy: 0, 0
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_up_right_0
   rotate: false
-  xy: 170, 82
+  xy: 170, 102
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_up_right_1
   rotate: false
-  xy: 34, 48
+  xy: 102, 102
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_up_right_2
   rotate: false
-  xy: 68, 82
+  xy: 136, 136
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 walk_up_right_3
   rotate: false
-  xy: 136, 48
+  xy: 170, 170
   size: 32, 32
   orig: 32, 32
   offset: 0, 0

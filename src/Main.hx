@@ -109,7 +109,7 @@ class Main extends Process {
 	}
 
 	override function update() {
-		dn.heaps.slib.SpriteLib.TMOD = tmod;
+		// dn.heaps.slib.SpriteLib.TMOD = tmod;
 
 		if (ca.isKeyboardPressed(Key.F11))
 			toggleFullscreen();

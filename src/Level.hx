@@ -1,6 +1,5 @@
-import h3d.prim.PlanePrim;
+import ch3.prim.PlanePrim;
 import differ.shapes.Polygon;
-import h3d.scene.TileSprite;
 import h3d.scene.Mesh;
 import h3d.Vector;
 import h2d.Tile;
@@ -78,8 +77,8 @@ class Level extends dn.Process {
 						}
 
 						// entities export lies ahead
-						var isoX = cart_to_iso_abs(obj.x, obj.y).x;
-						var isoY = cart_to_iso_abs(obj.x, obj.y).y;
+						var isoX = cartToIso_abs(obj.x, obj.y).x;
+						var isoY = cartToIso_abs(obj.x, obj.y).y;
 
 						obj.x = isoX / Const.GRID_WIDTH;
 						obj.y = isoY / Const.GRID_WIDTH;
@@ -167,15 +166,15 @@ class Level extends dn.Process {
 		var vertices:Array<differ.math.Vector> = [];
 		if (points != null) {
 			for (i in points)
-				vertices.push(new differ.math.Vector(cart_to_iso(i.x, i.y).x, cart_to_iso(i.x, i.y).y));
-			walkable.push(new Polygon(cart_to_iso_abs(poly.x, poly.y).x, cart_to_iso_abs(poly.x, poly.y).y, vertices));
+				vertices.push(new differ.math.Vector(cartToIso(i.x, i.y).x, cartToIso(i.x, i.y).y));
+			walkable.push(new Polygon(cartToIso_abs(poly.x, poly.y).x, cartToIso_abs(poly.x, poly.y).y, vertices));
 		} else if (poly.objectType == OTRectangle) {
-			vertices.push(new differ.math.Vector(cart_to_iso(poly.width, 0).x, cart_to_iso(poly.width, 0).y));
-			vertices.push(new differ.math.Vector(cart_to_iso(poly.width, poly.height).x, cart_to_iso(poly.width, poly.height).y));
-			vertices.push(new differ.math.Vector(cart_to_iso(0, poly.height).x, cart_to_iso(0, poly.height).y));
+			vertices.push(new differ.math.Vector(cartToIso(poly.width, 0).x, cartToIso(poly.width, 0).y));
+			vertices.push(new differ.math.Vector(cartToIso(poly.width, poly.height).x, cartToIso(poly.width, poly.height).y));
+			vertices.push(new differ.math.Vector(cartToIso(0, poly.height).x, cartToIso(0, poly.height).y));
 			vertices.push(new differ.math.Vector(0, 0));
 
-			walkable.push(new Polygon(cart_to_iso_abs(poly.x, poly.y).x, cart_to_iso_abs(poly.x, poly.y).y, vertices));
+			walkable.push(new Polygon(cartToIso_abs(poly.x, poly.y).x, cartToIso_abs(poly.x, poly.y).y, vertices));
 		}
 		walkable[walkable.length - 1].scaleY = -1;
 	}
@@ -188,8 +187,8 @@ class Level extends dn.Process {
 		}
 	}
 
-	inline function cart_to_iso_abs(x:Float, y:Float):Vector
-		return new Vector(wid * .5 + cart_to_iso(x, y).x, hei - cart_to_iso(x, y).y);
+	public inline function cartToIso_abs(x:Float, y:Float):Vector
+		return new Vector(wid * .5 + cartToIso(x, y).x, hei - cartToIso(x, y).y);
 }
 
 class LayerRender extends h2d.Object {
@@ -275,9 +274,8 @@ private class InternalRender extends TileLayerRenderer {
 			- layer.offsetX
 			+ layer.offsetY
 			+ (tile.flippedDiagonally ? (tile.flippedVertically ? h2dTile.height : -h2dTile.width + h2dTile.height) : 0);
-		
-		
-			bmp.drawTo(tex);
+
+		bmp.drawTo(tex);
 		g.drawTile(0, 0, Tile.fromTexture(tex));
 		g.endFill();
 	}

@@ -1,8 +1,8 @@
 package en;
 
+import en.objs.IsoTileSpr;
 import h3d.mat.Material;
 import h2d.Tile;
-import h3d.scene.TileSprite;
 import hxGeomAlgo.HxPoint;
 import h3d.col.Point;
 import h2d.Bitmap;
@@ -18,11 +18,11 @@ import format.tmx.Data.TmxObject;
 class FloatingItem extends Interactive {
 	var item:Item;
 	var polyMesh:Mesh;
-	var shadowMesh:TileSprite;
+	var shadowMesh:IsoTileSpr;
 	var shadowTex:Texture;
 
 	var baseRotation = Math.random() * M.toRad(360);
-	var baseWave = Math.random()* 9999;
+	var baseWave = Math.random() * 9999;
 
 	public function new(?x:Float = 0, ?z:Float = 0, item:Item, ?tmxObj:TmxObject) {
 		if (spr == null)
@@ -113,7 +113,7 @@ class FloatingItem extends Interactive {
 		var shadowSpr = new HSprite(Assets.items);
 
 		shadowSpr.set("shadow");
-		shadowMesh = new TileSprite(shadowSpr.tile, Boot.inst.s3d);
+		shadowMesh = new IsoTileSpr(shadowSpr.tile, Boot.inst.s3d);
 		shadowMesh.material.mainPass.setBlendMode(Alpha);
 		shadowMesh.material.mainPass.enableLights = false;
 		shadowMesh.material.mainPass.depth(false, Less);
@@ -143,7 +143,7 @@ class FloatingItem extends Interactive {
 		shadowMesh.z = footY;
 		shadowMesh.y = 0;
 		polyMesh.x = footX;
-		polyMesh.z = footY + 4 * Math.sin((Game.inst.ftime + baseWave ) / 34);
+		polyMesh.z = footY + 4 * Math.sin((Game.inst.ftime + baseWave) / 34);
 		polyMesh.y = (bottomAlpha * .5 * polyMesh.scaleZ * Math.sin(rotAngle) / (180 / Math.PI)) + 1;
 		polyMesh.rotate(0, 0, 0.016);
 	}

@@ -1,5 +1,6 @@
 package en.structures;
 
+import en.objs.IsoTileSpr;
 import format.tmx.Data.TmxObject;
 
 class Pcgmw extends Interactive {
@@ -10,6 +11,7 @@ class Pcgmw extends Interactive {
 		}
 
 		super(x, z, tmxObj);
+		
 		// sprOffX += -spr.tile.width;
 		// sprOffY -= Const.GRID_HEIGHT * .5;
 

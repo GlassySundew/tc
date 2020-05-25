@@ -1,5 +1,9 @@
 package en;
 
+import ch3.scene.TileSprite;
+import en.objs.IsoTileSpr;
+import h3d.Matrix;
+import hxd.Key;
 import format.tmx.Data.TmxTilesetTile;
 import format.tmx.Tools;
 import format.tmx.Data.TmxTile;
@@ -9,7 +13,6 @@ import format.tmx.Data.TmxObject;
 import h3d.prim.Sphere;
 import differ.shapes.Shape;
 import en.player.Player;
-import h3d.scene.TileSprite;
 import h3d.prim.Cylinder;
 import tools.CPoint;
 import dn.heaps.slib.HSprite;
@@ -108,7 +111,7 @@ import h3d.scene.Mesh;
 	inline function set_footX(v:Float) { // небольшой костыль
 		xr = ((v - sprOffX) / Const.GRID_WIDTH) % 1;
 		cx = (Math.floor((v - sprOffX) / Const.GRID_WIDTH));
-		return (v);
+		return v;
 	}
 
 	public var footY(get, set):Float;
@@ -119,7 +122,7 @@ import h3d.scene.Mesh;
 	inline function set_footY(v:Float) { // аналогично
 		yr = ((v - sprOffY) / Const.GRID_WIDTH) % 1;
 		cy = (Math.floor((v - sprOffY) / Const.GRID_WIDTH));
-		return (v);
+		return v;
 	}
 
 	public var tmxTile(get, never):TmxTilesetTile;
@@ -130,7 +133,7 @@ import h3d.scene.Mesh;
 	public var tmxObj:TmxObject;
 	public var colorAdd:h3d.Vector;
 	public var spr:HSprite;
-	public var mesh:h3d.scene.TileSprite;
+	public var mesh:IsoTileSpr;
 
 	public var tmpDt:Float;
 	public var tmpCur:Float;
@@ -142,7 +145,6 @@ import h3d.scene.Mesh;
 	public var prim:Cube;
 
 	private var rotAngle:Float = -0.1;
-	private var pos:Vector;
 	private var tex:Texture;
 	var bmp:Bitmap;
 
@@ -167,16 +169,16 @@ import h3d.scene.Mesh;
 		spr.visible = false;
 		spr.tile.getTexture().filter = Nearest;
 		bmp = new Bitmap(spr.tile);
-		mesh = new TileSprite(spr.tile, Boot.inst.s3d,true);
+		mesh = new IsoTileSpr(spr.tile, false, Boot.inst.s3d);
 		mesh.material.mainPass.setBlendMode(Alpha);
 		mesh.material.mainPass.enableLights = false;
+
 		mesh.material.mainPass.depth(false, Less);
 		tex = new Texture(Std.int(spr.tile.width), Std.int(spr.tile.height), [Target]);
 		bmp.drawTo(tex);
 		// spr.setCenterRatio(-spr.tile.width * mesh.originMX, -spr.tile.height * mesh.originMY);
-		// mesh.rotate(0, -rotAngle, 0);
-		sprOffX -= Const.GRID_WIDTH / 2;
-		sprOffY -= Const.GRID_HEIGHT / 2 - 1;
+		mesh.rotate(0, 0, M.toRad(90));
+		// sprOffY -= Const.GRID_HEIGHT / 2;
 		var s = mesh.material.mainPass.addShader(new h3d.shader.ColorAdd());
 		s.color = colorAdd;
 		setPosCase(x, z);
@@ -243,8 +245,6 @@ import h3d.scene.Mesh;
 		this.yr = yr;
 		lastFootX = footX;
 		lastFootY = footY;
-
-		pos = new Vector(x, 0, y);
 	}
 
 	public function kill(by:Null<Entity>) {
@@ -323,11 +323,11 @@ import h3d.scene.Mesh;
 	}
 
 	public function postUpdate() {
-
 		if (mesh != null) {
 			mesh.x = footX;
 			mesh.z = footY;
 			mesh.y = (bottomAlpha * .5 * mesh.scaleZ * Math.sin(rotAngle) / (180 / Math.PI));
+
 			checkCollisions();
 			// spr.scaleX = dir * sprScaleX;
 			// spr.scaleY = sprScaleY;
@@ -350,15 +350,21 @@ import h3d.scene.Mesh;
 	}
 
 	public function frameEnd() {
-		if (mesh != null) { // mesh.tile = spr.tile;
+		if (mesh != null) { 
+			// даже я в ахуе от своего говнокода
 			tex.clear(0, 0);
-			// spr.drawTo(tex);
 			bmp.tile = spr.tile;
-
+			bmp.tile.setCenterRatio(-spr.pivot.centerFactorX, -spr.pivot.centerFactorY);
 			bmp.drawTo(tex);
+			bmp.x = -spr.pivot.centerFactorX * spr.tile.width;
+			bmp.y = -spr.pivot.centerFactorY * spr.tile.height;
+			// spr.drawTo(tex);
 			var tile = Tile.fromTexture(tex);
 			tile.getTexture().filter = Nearest;
+			tile.setCenterRatio(spr.pivot.centerFactorX, spr.pivot.centerFactorY);
 			mesh.tile = tile;
+			// if (spr.filter != null)
+			// 	@:privateAccess spr.drawFilters(Boot.inst.s2d.renderer);
 			lastFootX = footX;
 			lastFootY = footY;
 		}

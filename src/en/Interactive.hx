@@ -1,5 +1,8 @@
 package en;
 
+import h3d.shader.Blur;
+import h2d.Tile;
+import h2d.Bitmap;
 import hxGeomAlgo.IsoContours;
 import hxGeomAlgo.PolyTools.Tri;
 import hxGeomAlgo.HxPoint;
@@ -58,15 +61,19 @@ class Interactive extends Entity {
 		interact.rotate(-0.1, hxd.Math.degToRad(180), hxd.Math.degToRad(180));
 		var highlightColor:String;
 		// if (tmxObj != null)
-			highlightColor = tmxTile.properties.get("highlight");
+		highlightColor = tmxTile.properties.get("highlight");
+		filter = new h2d.filter.Glow(Color.hexToInt(highlightColor == null ? "ffffffff" : highlightColor), 1.2, 4, .8, 1.5, true);
 		interact.onOver = function(e:hxd.Event) {
-			filter = new h2d.filter.Glow(Color.hexToInt(highlightColor == null ? "ffffffff" : highlightColor), 1.2, 4, .8, 1.5, true);
 			bmp.filter = filter;
+			filter.enable = true;
+			// var bmp = new Bitmap(spr.tile);
+			// spr.filter = filter;
+			// spr.tile.switchTexture(Tile.fromTexture(bmp.tile.getTexture()));
 		};
 
 		interact.onMove = interact.onCheck = function(e:hxd.Event) {};
 		interact.onOut = function(e:hxd.Event) {
-			bmp.filter = null;
+			filter.enable = false;
 		};
 		interact.onClick = function(e:hxd.Event) {};
 	}
@@ -74,8 +81,7 @@ class Interactive extends Entity {
 	override function postUpdate() {
 		super.postUpdate();
 		if (mesh != null)
-			interact.setPosition(mesh.x - spr.tile.width * mesh.originMX, mesh.y, mesh.z + spr.tile.height * mesh.originMY);
-
+			interact.setPosition(mesh.x - spr.tile.width * spr.pivot.centerFactorX, mesh.y, mesh.z + spr.tile.height * spr.pivot.centerFactorY);
 		// deactivate interactive if inventory is opened
 		interact.visible = !player.inventory.base.visible;
 	}

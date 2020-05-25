@@ -1,4 +1,4 @@
-import dn.heaps.slib.assets.Atlas;
+import dn.heaps.assets.Atlas;
 import haxe.macro.ExprTools;
 import haxe.macro.Expr.ExprDef;
 import dn.heaps.slib.*;

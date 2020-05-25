@@ -1,5 +1,6 @@
 package en;
 
+import en.player.Player;
 import ui.TextLabel;
 import h2d.Bitmap;
 import h2d.Object;
@@ -12,7 +13,8 @@ class Item extends dn.Process {
 
 	var displayText:String = "";
 
-	var interactive:h2d.Interactive;
+	public var interactive:h2d.Interactive;
+
 	var textLabel:TextLabel;
 	var bitmap:Bitmap;
 
@@ -48,15 +50,23 @@ class Item extends dn.Process {
 		}
 
 		interactive.onPush = function(e:hxd.Event) {
-			textLabel.dispose();
-
-			var tempItem = Game.inst.player.holdItem;
-			Game.inst.player.holdItem = this;
-			if (tempItem != null)
-				tempItem.spr.scale(1 / 2);
-			Game.inst.player.inventory.invGrid.removeItem(this, tempItem);
-			Game.inst.player.inventory.belt.invGrid.removeItem(this, tempItem);
-			Boot.inst.s2d.addChild(this.spr);
+			if (Player.inst.inventory.base.visible) {
+				textLabel.dispose();
+				Player.inst.inventory.belt.deselectCells();
+				var swapItem = Game.inst.player.cursorItem;
+				Game.inst.player.cursorItem = this;
+				if (swapItem != null)
+					swapItem.spr.scale(1 / 2);
+				Game.inst.player.inventory.invGrid.removeItem(this, swapItem);
+				Game.inst.player.inventory.belt.invGrid.removeItem(this, swapItem);
+				Boot.inst.s2d.addChild(this.spr);
+			} else {
+				for (i in 0...Player.inst.inventory.belt.invGrid.interGrid.length) {
+					if (Player.inst.inventory.belt.invGrid.interGrid[i][0].item == this) {
+						Player.inst.inventory.belt.selectCell(i + 1);
+					}
+				}
+			}
 		}
 	}
 

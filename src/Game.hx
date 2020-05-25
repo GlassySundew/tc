@@ -1,10 +1,11 @@
+import h3d.pass.PassList;
 import ui.Hud;
 import en.player.Player;
 import differ.math.Vector;
+import differ.shapes.Circle;
 import differ.shapes.Polygon;
 import h3d.scene.Scene;
 import h3d.scene.Mesh;
-import h3d.mat.DepthBuffer;
 import h3d.mat.Texture;
 import h3d.scene.CameraController;
 import dn.Process;
@@ -12,7 +13,6 @@ import hxd.Key;
 import format.tmx.Data;
 import format.tmx.*;
 import hxd.Res;
-import tools.Util.*;
 
 class Game extends Process {
 	public static var inst:Game;
@@ -96,6 +96,10 @@ class Game extends Process {
 			}
 
 		player = Player.inst;
+		// putting player inst to the last position of entities array as a depth sorting fix
+		// Entity.ALL.remove(player);
+		// Entity.ALL.insert(0, player);
+
 		// parsing collision objects from 'colls' tileset
 		for (tileset in data.tilesets) {
 			var ereg = ~/(^[^.]*)+/; // regexp to take tileset name
@@ -119,9 +123,11 @@ class Game extends Process {
 									};
 									var xCent = 0.;
 									var yCent = 0.;
+
+									var shape:Circle = null;
 									switch (obj.objectType) {
 										case OTEllipse:
-											var shape = new differ.shapes.Circle(0, 0, params.width / 2);
+											shape = new differ.shapes.Circle(0, 0, params.width / 2);
 											shape.scaleY = params.height / params.width;
 											ent.collisions.push(shape);
 										case OTRectangle:
@@ -129,7 +135,7 @@ class Game extends Process {
 										case OTPolygon(points):
 											var verts:Array<Vector> = [];
 											for (i in points) {
-												verts.push(new Vector(M.round(i.x), M.round(-i.y)));
+												verts.push(new Vector((i.x), (-i.y)));
 											}
 											var yArr = verts.copy();
 											yArr.sort(function(a, b) return (a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0));
@@ -138,22 +144,21 @@ class Game extends Process {
 											checkPolyClockwise(verts);
 
 											xCent = ((xArr[xArr.length - 1].x + xArr[0].x) * .5);
-											yCent = -((yArr[xArr.length - 1].y + yArr[0].y) * .5);
-											ent.collisions.push(new Polygon(0, 0, verts));
+											yCent = -((yArr[yArr.length - 1].y + yArr[0].y) * .5);
+											var poly = new Polygon(0, 0, verts);
+											poly.rotation = obj.rotation;
+											ent.collisions.push(poly);
 										default:
 									}
-									// установление pivot point для фундаментного объекта коллизии
-									// ебучее кривое говнище из жопы, не знаю как сделать нормально
 
-									// @:privateAccess ent.mesh.plane.setOrigin(-ent.mesh.plane.width * (M.round(obj.x - (xCent)) +
-									// 	M.round((obj.width) / 2)) / ent.spr.tile.width,
-									// 	-ent.mesh.plane.height * (M.round(obj.y - (yCent)) + M.round((obj.height) / 2)) / ent.spr.tile.height);
-									ent.mesh.originMX = (M.round(obj.x + xCent) + M.round((obj.width) / 2)) / ent.spr.tile.width;
-									ent.mesh.originMY = (M.round(obj.y + yCent) + M.round((obj.height) / 2)) / ent.spr.tile.height;
+									ent.spr.setCenterRatio((M.round(obj.x + xCent) + M.round((obj.width) / 2)) / ent.spr.tile.width,
+										(M.round(obj.y + yCent) + M.round((obj.height) / 2)) / ent.spr.tile.height);
+
 									ent.sprOffColX = xCent;
 									ent.sprOffColY = -yCent;
-									// ent.sprOffX += M.round(xCent / 2);
-									// ent.sprOffY += M.round(yCent + 1); // хз че не так с ней, не удалять
+
+									ent.footX += M.round((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width) - Const.GRID_WIDTH / 2;
+									ent.footY -= (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height + Const.GRID_HEIGHT;
 								}
 							}
 						}
@@ -167,9 +172,9 @@ class Game extends Process {
 		cd.unset("levelDone");
 
 		// rect-obj position fix
-		for (en in Entity.ALL)
-			if (en.tmxObj != null)
-				en.sprOffY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
+		// for (en in Entity.ALL)
+		// 	if (en.tmxObj != null)
+		// 		en.sprOffY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
 	}
 
 	private function getTSX(name:String):TmxTileset {
