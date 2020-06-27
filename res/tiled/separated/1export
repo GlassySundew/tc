@@ -4,4 +4,6 @@
 ase -b ../ase/items.ase --save-as items/{slice}.png
 ase -b ../ase/anna_run.ase --save-as player/{tag}_{slice}_{frame0}.png
 ase -b ../ase/structures.ase --save-as structures/{slice}.png
+ase -b ../ase/ui.ase --save-as ui/{slice}.png
+
 echo $dirname

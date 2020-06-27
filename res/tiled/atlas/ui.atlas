@@ -1,0 +1,55 @@
+
+ui.png
+size: 155,128
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+health_scale
+  rotate: false
+  xy: 142, 72
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+health_sign
+  rotate: false
+  xy: 121, 108
+  size: 34, 20
+  orig: 34, 20
+  offset: 0, 0
+  index: -1
+inventory
+  rotate: false
+  xy: 0, 0
+  size: 119, 128
+  orig: 119, 128
+  offset: 0, 0
+  index: -1
+keyboard_icon0
+  rotate: false
+  xy: 121, 44
+  size: 19, 19
+  orig: 19, 19
+  offset: 0, 0
+  index: -1
+keyboard_icon1
+  rotate: false
+  xy: 121, 65
+  size: 19, 19
+  orig: 19, 19
+  offset: 0, 0
+  index: -1
+oxygen_scale
+  rotate: false
+  xy: 121, 30
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+oxygen_sign
+  rotate: false
+  xy: 121, 86
+  size: 34, 20
+  orig: 34, 20
+  offset: 0, 0
+  index: -1

@@ -1,3 +1,4 @@
+import hxd.System;
 import h3d.pass.PassList;
 import ui.Hud;
 import en.player.Player;
@@ -68,6 +69,11 @@ class Game extends Process {
 	}
 
 	public function startLevel(name:String) {
+		// little hack to prevent z-fight
+		var temp = new h3d.scene.CameraController(Boot.inst.s3d);
+		temp.loadFromCamera();
+		temp.remove();
+
 		engine.clear(0, 1);
 		if (level != null) {
 			level.destroy();
@@ -78,13 +84,13 @@ class Game extends Process {
 		tsx = new Map();
 		r = new Reader();
 		r.resolveTSX = getTSX;
-		var data = r.read(Xml.parse(Res.loader.load('tiled/' + name).entry.getText()));
+		var data = r.read(Xml.parse(Res.loader.load(Const.LEVELS_PATH + name).entry.getText()));
 		level = new Level(data);
 		CompileTime.importPackage("en");
 		var entNames = (CompileTime.getAllClasses(Entity));
 
 		#if hl
-		var eregClass = ~/\$([a-z0-9]+)+$/gi;
+		var eregClass = ~/\$([a-z_0-9]+)+$/gi;
 		#else
 		var eregClass = ~/\.([a-z0-9]+)\n/gi; // регулярка для js, который, нахуй, не работает
 		#end
@@ -105,10 +111,10 @@ class Game extends Process {
 			var ereg = ~/(^[^.]*)+/; // regexp to take tileset name
 			if (ereg.match(tileset.source) && ereg.matched(1) == 'colls')
 				for (tile in tileset.tiles) {
-					var ereg = ~/\/([a-z0-9]+)\./; // regexp to take string between last / and . from picture path
+					var ereg = ~/\/([a-z_0-9]+)\./; // regexp to take string between last / and . from picture path
 					if (ereg.match(tile.image.source)) {
 						for (ent in Entity.ALL) {
-							var eregClass = ~/\.([a-z0-9]+)+$/gi; // regexp to remove 'en.' prefix
+							var eregClass = ~/\.([a-z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
 							if (tile.objectGroup != null
 								&& eregClass.match('$ent'.toLowerCase())
 								&& eregClass.matched(1) == ereg.matched(1)
@@ -153,6 +159,7 @@ class Game extends Process {
 
 									ent.spr.setCenterRatio((M.round(obj.x + xCent) + M.round((obj.width) / 2)) / ent.spr.tile.width,
 										(M.round(obj.y + yCent) + M.round((obj.height) / 2)) / ent.spr.tile.height);
+									(try cast(ent, Interactive).rebuildInteract() catch (e:Dynamic) 0);
 
 									ent.sprOffColX = xCent;
 									ent.sprOffColY = -yCent;
@@ -170,18 +177,18 @@ class Game extends Process {
 		camera.target = player;
 		camera.recenter();
 		cd.unset("levelDone");
-
+		// System.openURL("https://pornreactor.cc");
 		// rect-obj position fix
-		// for (en in Entity.ALL)
-		// 	if (en.tmxObj != null)
-		// 		en.sprOffY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
+		for (en in Entity.ALL)
+			if (en.tmxObj != null)
+				en.footY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
 	}
 
 	private function getTSX(name:String):TmxTileset {
 		var cached:TmxTileset = tsx.get(name);
 		if (cached != null)
 			return cached;
-		cached = r.readTSX(Xml.parse(Res.loader.load('tiled/' + name).entry.getText()));
+		cached = r.readTSX(Xml.parse(Res.loader.load(Const.LEVELS_PATH + name).entry.getText()));
 		tsx.set(name, cached);
 		return cached;
 	}

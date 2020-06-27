@@ -10,12 +10,32 @@ import h2d.Tile;
 import ch3.scene.TileSprite;
 
 class IsoTileSpr extends TileSprite {
-	public var verts = {
-		right: {x: 1., z: -1.},
-		down: {x: -1., z: -1.},
-		left: {x: -1., z: 1.},
-		up: {x: 1., z: 1.}
-	};
+	public var isoWidth(default, set):Int;
+
+	inline function set_isoWidth(v:Int)
+		return isoWidth = isLong ? v : throw "set isLong before setting iso width/height";
+
+	public var isoHeight(default, set):Int;
+
+	inline function set_isoHeight(v:Int)
+		return isoHeight = isLong ? v : throw "set isLong before setting iso width/height";
+
+	public var verts(get, null):Dynamic;
+
+	inline function get_verts() {
+		return if (!isLong) {
+			right: {x: 0., z: -0.},
+			down: {x: -0., z: -0.},
+			left: {x: -0., z: 0.},
+			up: {x: 0., z: 0.}
+		} else {
+			right: {x: 10 * isoWidth, z: -10 * isoHeight},
+			down: {x: -10 * isoWidth, z: -10 * isoHeight},
+			left: {x: -10 * isoWidth, z: 10 * isoHeight},
+			up: {x: 10 * isoWidth, z: 10 * isoHeight}
+		};
+	}
+
 	public var isLong:Bool = false;
 
 	public var polyPrim:Polygon;
@@ -30,7 +50,7 @@ class IsoTileSpr extends TileSprite {
 		// pts.push(new Point(verts.down.x, 0, verts.down.z));
 		// pts.push(new Point(verts.left.x, 0, verts.left.z));
 		// pts.push(new Point(verts.up.x, 0, verts.up.z));
-		#if debug
+		#if (debug && dispDepthBoxes)
 		renewDebugPts();
 
 		var idx = new IndexBuffer();
@@ -64,28 +84,6 @@ class IsoTileSpr extends TileSprite {
 			polyPrim.points = pts;
 	}
 
-	public function initLongObjVerts(x = 1, y = 1) {
-		verts = {
-			right: {x: 1., z: -1.},
-			down: {x: -1., z: -1.},
-			left: {x: -1., z: 1.},
-			up: {x: 1., z: 1.}
-		};
-	}
-
-	public function getCartBounds() {
-		return {
-			xMin: x + screenToIsoX(verts.left.x, verts.left.z),
-			xMax: x + screenToIsoX(verts.right.x, verts.right.z),
-			zMin: z + screenToIsoY(verts.down.x, verts.down.z),
-			zMax: z + screenToIsoY(verts.up.x, verts.up.z),
-			// xMax: (M.fmin(x + verts.down.x, x + verts.left.x)),
-			// xMin: (M.fmax(x + verts.up.x, x + verts.right.x)),
-			// zMin: (M.fmin(z + verts.down.z, z + verts.right.z)),
-			// zMax: (M.fmax(z + verts.up.z, z + verts.left.z)),
-		}
-	}
-
 	public function getIsoBounds() {
 		var verts1 = getIsoVerts();
 		return {
@@ -105,10 +103,10 @@ class IsoTileSpr extends TileSprite {
 
 	function getIsoVerts() {
 		return {
-			right: cartToIso(verts.right.x,  verts.right.z),
-			down: cartToIso( verts.down.x,  verts.down.z),
-			left: cartToIso(verts.left.x,  verts.left.z),
-			up: cartToIso( verts.up.x,  verts.up.z),
+			right: cartToIso(verts.right.x, verts.right.z),
+			down: cartToIso(verts.down.x, verts.down.z),
+			left: cartToIso(verts.left.x, verts.left.z),
+			up: cartToIso(verts.up.x, verts.up.z),
 		};
 	}
 }

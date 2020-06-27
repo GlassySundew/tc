@@ -1,5 +1,10 @@
 package en;
 
+import en.player.Player;
+import h3d.scene.Object;
+import h3d.Vector;
+import shader.PolyDedepther;
+import h3d.mat.Pass;
 import en.objs.IsoTileSpr;
 import h3d.mat.Material;
 import h2d.Tile;
@@ -20,23 +25,29 @@ class FloatingItem extends Interactive {
 	var polyMesh:Mesh;
 	var shadowMesh:IsoTileSpr;
 	var shadowTex:Texture;
-
+	var deDepth:PolyDedepther;
 	var baseRotation = Math.random() * M.toRad(360);
-	var baseWave = Math.random() * 9999;
+	var startWave = Math.random() * 9999;
+	var rotCont:Object;
 
 	public function new(?x:Float = 0, ?z:Float = 0, item:Item, ?tmxObj:TmxObject) {
 		if (spr == null)
-			spr = item.spr;
-		spr.setCenterRatio(0, 0);
-		this.item = item;
-		spr.tile.getTexture().filter = Nearest;
+			spr = new HSprite(item.spr.lib, item.spr.groupName);
+
 		super(x, z, tmxObj);
+
+		this.item = item;
+		spr.setCenterRatio(0, 0);
+		spr.tile.getTexture().filter = Nearest;
+
+		mesh.remove();
 		mesh = null;
+
 		footX = x;
 		footY = z;
 		var revPts = translatedPoints.copy();
 		for (i in revPts)
-			translatedPoints.push(new Point(i.x, i.y - 1.5, i.z));
+			translatedPoints.push(new Point(i.x, i.y + 1.5, i.z));
 
 		var revTri = polygonized.copy();
 		revTri.reverse();
@@ -68,6 +79,7 @@ class FloatingItem extends Interactive {
 			for (i in temp)
 				idx.push(i);
 		}
+		// the last frame element
 		idx.push(findVertexNumberInArray(points[0], translatedPoints));
 		idx.push(findVertexNumberInArray(points[points.length - 1], translatedPoints) + Std.int(translatedPoints.length / 2));
 		idx.push(findVertexNumberInArray(points[points.length - 1], translatedPoints));
@@ -79,7 +91,6 @@ class FloatingItem extends Interactive {
 		// UVs gen
 		polyPrim.unindex();
 		polyPrim.uvs = [];
-
 		for (i in 0...(translatedPoints.length >> 1))
 			polyPrim.uvs.push(new UV((translatedPoints[i].x) / (16), (translatedPoints[i].z) / (16))); // 16 это ширина и высота тайла соответственно
 		var i = translatedPoints.length - 1;
@@ -96,38 +107,48 @@ class FloatingItem extends Interactive {
 		bmp = new Bitmap(spr.tile);
 		bmp.drawTo(tex);
 		tex.filter = Nearest;
+
 		polyPrim.addNormals();
 		polyPrim.addTangents();
 
 		polyMesh = new Mesh(polyPrim, Material.create(tex), Boot.inst.s3d);
-		polyMesh.material.mainPass.depth(true, Less);
+		polyMesh.material.mainPass.depth(true, LessEqual);
+		polyMesh.material.mainPass.culling = Front;
 		polyMesh.material.shadows = false;
 		polyMesh.material.mainPass.enableLights = false;
 
+		deDepth = polyMesh.material.mainPass.addShader(new shader.PolyDedepther(z));
+		deDepth.xRotAngle = -rotAngle;
 		var meshSize = polyMesh.getBounds().getSize();
 
-		polyPrim.translate(-.5 * meshSize.x - 1, 0, -meshSize.z - 10);
-		polyMesh.scale(2 / 3);
-		polyMesh.setRotationAxis(1, 0, 0, -rotAngle);
-		polyMesh.rotate(M.toRad(180) + rotAngle, 0, baseRotation);
-		var shadowSpr = new HSprite(Assets.items);
+		polyPrim.translate(-.5 * meshSize.x - 1, -.5 * meshSize.y, -.5 * meshSize.z);
 
+		polyMesh.scale(2 / 3);
+		// polyMesh.setRotationAxis(1, 0, 0, rotAngle);
+		// polyMesh.setDirection(new Vector(1, 0, 0, 1));
+		polyMesh.rotate(M.toRad(180), 0, baseRotation);
+		// polyMesh.y = 1;
+
+		var shadowSpr = new HSprite(Assets.items);
 		shadowSpr.set("shadow");
+		shadowSpr.setCenterRatio();
 		shadowMesh = new IsoTileSpr(shadowSpr.tile, Boot.inst.s3d);
-		shadowMesh.material.mainPass.setBlendMode(Alpha);
 		shadowMesh.material.mainPass.enableLights = false;
 		shadowMesh.material.mainPass.depth(false, Less);
 		shadowMesh.scale(0.6);
 		shadowMesh.scaleZ = (0.4);
 
 		shadowTex = new Texture(Std.int(shadowSpr.tile.width), Std.int(shadowSpr.tile.height), [Target]);
-		new Bitmap(shadowSpr.tile).drawTo(shadowTex);
-		bottomAlpha = -2;
+		var shadowBmp = new Bitmap(shadowSpr.tile);
+		shadowBmp.drawTo(shadowTex);
+
+		var shape = new differ.shapes.Circle(0, 0, 4);
+		collisions.push(shape);
 	}
 
+	// public static function
 	override function update() {
 		super.update();
-
 		//
 		// var tile = Tile.fromTexture(shadowTex);
 		// shadowMesh.tile = tile;
@@ -135,29 +156,42 @@ class FloatingItem extends Interactive {
 
 	override function postUpdate() {
 		super.postUpdate();
-
+		checkCollisions();
 		// polyMesh.material.texture.clear(0, 0);
 		// bmp.tile = spr.tile;
 		// bmp.drawTo(polyMesh.material.texture);
+
 		shadowMesh.x = footX;
 		shadowMesh.z = footY;
 		shadowMesh.y = 0;
 		polyMesh.x = footX;
-		polyMesh.z = footY + 4 * Math.sin((Game.inst.ftime + baseWave) / 34);
-		polyMesh.y = (bottomAlpha * .5 * polyMesh.scaleZ * Math.sin(rotAngle) / (180 / Math.PI)) + 1;
-		polyMesh.rotate(0, 0, 0.016);
+		polyMesh.z = footY + 4 * Math.sin((Game.inst.ftime + startWave) / 34) + 10;
+
+		// polyMesh.y = 0.01;
+
+		polyMesh.rotate(0, 0, 0.016 * tmod);
+		deDepth.objZ = (polyMesh.z - footY) * Math.sin(-rotAngle);
+
+		bumpAwayFrom(Player.inst, distCase(Player.inst) < .75 ? -.001 * tmod : 0);
+
+		if (player != null && distCase(player) < .2) {
+			player.inventory.invGrid.giveItem(item);
+			dispose();
+		}
+	}
+
+	override function checkCollisions() {
+		super.checkCollisions();
+		checkCollsAgainstAll();
 	}
 
 	public override function frameEnd() {
-		bmp.tile = spr.tile;
-		bmp.drawTo(tex);
+		super.frameEnd();
+		
 	}
 
 	function filterArray(array:Array<HxPoint>) {
 		var i = 0;
-
-		// array.remove(array[array.length - 1]);
-		// array.remove(array[array.length - 1]);
 		do {
 			if ((((array[i].x == array[i + 1].x) && (array[i + 1].x == array[i + 2].x))
 				|| ((array[i].y == array[i + 1].y) && (array[i + 1].y == array[i + 2].y)))) {
@@ -173,5 +207,11 @@ class FloatingItem extends Interactive {
 				array.remove(array[array.length - 1]);
 			i++;
 		} while (i <= array.length - 3);
+	}
+
+	override function dispose() {
+		polyMesh.remove();
+		shadowMesh.remove();
+		super.dispose();
 	}
 }

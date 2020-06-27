@@ -11,7 +11,6 @@ class Emerald extends Interactive {
 		super(x, z, tmxObj);
 		// sprOffX += -spr.tile.width;
 		// sprOffY -= Const.GRID_HEIGHT * .5;
-		bottomAlpha = -1;
 	}
 
 	// override function update() {

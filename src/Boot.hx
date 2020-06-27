@@ -4,7 +4,7 @@ import hxd.inspect.Inspector;
 class Boot extends hxd.App {
 	public static var inst:Boot;
 
-	public var i:Inspector;
+	public var inspector:Inspector;
 
 	public var renderer:CustomRenderer;
 
@@ -27,7 +27,7 @@ class Boot extends hxd.App {
 		s3d.lightSystem.ambientLight.set(0.5, 0.5, 0.5);
 		onResize();
 		#if (castle && hl && debug)
-		i = new hxd.inspect.Inspector(s3d);
+		inspector = new hxd.inspect.Inspector(s3d);
 		#end
 	}
 

@@ -16,25 +16,25 @@ class Fx extends dn.Process {
 	public function new() {
 		super(Game.inst);
 
-		pool = new ParticlePool(Assets.tiles.tile, 2048, Const.FPS);
+		// pool = new ParticlePool(Assets.tiles.tile, 2048, Const.FPS);
 
-		bgAddSb = new h2d.SpriteBatch(Assets.tiles.tile);
-		game.root.add(bgAddSb, Const.DP_FX_BG);
-		bgAddSb.blendMode = Add;
-		bgAddSb.hasRotationScale = true;
+		// bgAddSb = new h2d.SpriteBatch(Assets.tiles.tile);
+		// game.root.add(bgAddSb, Const.DP_FX_BG);
+		// bgAddSb.blendMode = Add;
+		// bgAddSb.hasRotationScale = true;
 
-		bgNormalSb = new h2d.SpriteBatch(Assets.tiles.tile);
-		game.root.add(bgNormalSb, Const.DP_FX_BG);
-		bgNormalSb.hasRotationScale = true;
+		// bgNormalSb = new h2d.SpriteBatch(Assets.tiles.tile);
+		// game.root.add(bgNormalSb, Const.DP_FX_BG);
+		// bgNormalSb.hasRotationScale = true;
 
-		topNormalSb = new h2d.SpriteBatch(Assets.tiles.tile);
-		game.root.add(topNormalSb, Const.DP_FX_TOP);
-		topNormalSb.hasRotationScale = true;
+		// topNormalSb = new h2d.SpriteBatch(Assets.tiles.tile);
+		// game.root.add(topNormalSb, Const.DP_FX_TOP);
+		// topNormalSb.hasRotationScale = true;
 
-		topAddSb = new h2d.SpriteBatch(Assets.tiles.tile);
-		game.root.add(topAddSb, Const.DP_FX_TOP);
-		topAddSb.blendMode = Add;
-		topAddSb.hasRotationScale = true;
+		// topAddSb = new h2d.SpriteBatch(Assets.tiles.tile);
+		// game.root.add(topAddSb, Const.DP_FX_TOP);
+		// topAddSb.blendMode = Add;
+		// topAddSb.hasRotationScale = true;
 	}
 
 	override public function onDispose() {

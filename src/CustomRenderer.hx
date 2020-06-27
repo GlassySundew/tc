@@ -1,3 +1,4 @@
+import h3d.scene.Mesh;
 import h3d.Vector;
 import hrt.prefab.l3d.MeshGenerator.MeshPart;
 import en.objs.IsoTileSpr;
@@ -19,6 +20,7 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 	public var fxaa:h3d.pass.FXAA;
 	public var post:pass.PostProcessing;
 	public var depthColorMap(default, set):h3d.mat.Texture;
+	public var acceptedMeshes:Array<Dynamic> = [];
 
 	public static var inst:CustomRenderer;
 
@@ -36,7 +38,6 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 			Value("output.color"),
 			PackFloat(Value("output.depth")),
 			PackNormal(Value("output.normal"))
-
 		]);
 
 		allPasses.push(all);
@@ -56,6 +57,9 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 
 		// emissive.blur.sigma = 2;
 		post = new pass.PostProcessing();
+
+		frontToBack = depthSort.bind(true);
+		backToFront = depthSort.bind(false);
 	}
 
 	function set_depthColorMap(v:h3d.mat.Texture) {
@@ -69,9 +73,15 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 		return super.renderPass(p, passes, sort);
 	}
 
+	function sortIsoPoly(passes:PassList) {
+		passes.sort(function(o1, o2) {
+			return -1;
+		});
+	}
+
 	override function render() {
 		if (has("depth"))
-			renderPass(depth, get("depth"));
+			renderPass(depth, get("depth"), backToFront);
 
 		ctx.setGlobalID(depthColorMapId, depthColorMap);
 
@@ -92,7 +102,7 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 		renderPass(defaultPass, get("alpha"), backToFront);
 		// setTarget(colorTex);
 		// draw("alpha");
-		// resetTarget();
+		resetTarget();
 
 		setTarget(additiveTex);
 		clear(0);
@@ -110,7 +120,9 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 			resetTarget();
 			saoBlur.apply(ctx, saoTarget, allocTarget("saoBlurTmp", false));
 			h3d.pass.Copy.run(saoTarget, colorTex, Multiply);
-		} { // apply fog\post.apply(colorTex, ctx.time);
+		}
+		{ // apply fog\
+			post.apply(colorTex, ctx.time);
 			var fogTarget = allocTarget("fog", false, 1);
 			fog.setGlobals(ctx);
 			setTarget(fogTarget);
@@ -139,42 +151,42 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 
 	public override function depthSort(frontToBack:Bool, passes:PassList) {
 		var cam = ctx.camera.m;
-
 		@:privateAccess for (p in passes) {
 			var z = p.obj.absPos._41 * cam._13 + p.obj.absPos._42 * cam._23 + p.obj.absPos._43 * cam._33 + cam._43;
 			var w = p.obj.absPos._41 * cam._14 + p.obj.absPos._42 * cam._24 + p.obj.absPos._43 * cam._34 + cam._44;
-			p.depth = z / w;
+			p.depth = p.obj.z / w;
 		}
 
 		if (frontToBack)
 			passes.sort(function(p1, p2) return p1.pass.layer == p2.pass.layer ? (p1.depth > p2.depth ? 1 : -1) : p1.pass.layer - p2.pass.layer);
 		else {
-			passes.sort(function(p1, p2) {
-				return p1.pass.layer == p2.pass.layer ? (try getFrontPassIso(p1, p2) catch (e:Dynamic) (p1.depth > p2.depth) ? -1 : 1) : p1.pass.layer
-					- p2.pass.layer;
-			});
+		passes.sort(function(p1, p2) {
+			// trace(p1.pass.layer, p2.pass.layer);
+			return p1.pass.layer == p2.pass.layer ? (try getFrontPassIso(p1, p2) catch (e:Dynamic) (p1.depth > p2.depth) ? -1 : 1) : p1.pass.layer
+				- p2.pass.layer;
+		});
 		}
 	}
 
 	function getFrontPassIso(p1:PassObject, p2:PassObject):Int {
 		var a = cast(p1.obj, IsoTileSpr).getIsoBounds();
 		var b = cast(p2.obj, IsoTileSpr).getIsoBounds();
-
 		return if (a.xMax - a.xMin == 0 || a.zMax - a.zMin == 0) // check if player
 		{
 			comparePointAndLine({x: p1.obj.x, y: p1.obj.y, z: p1.obj.z}, {pt1: {x: b.xMin, y: 0, z: b.zMin}, pt2: {x: b.xMax, y: 0, z: b.zMax}});
 		} else if (b.xMax - b.xMin == 0 || b.zMax - b.zMin == 0) {
-			comparePointAndLine({x: p2.obj.x, y: p2.obj.y, z: p2.obj.z}, {pt1: {x: a.xMin, y: 0, z: a.zMin}, pt2: {x: a.xMax, y: 0, z: a.zMax}});
-		} else 1;
+			-comparePointAndLine({x: p2.obj.x, y: p2.obj.y, z: p2.obj.z}, {pt1: {x: a.xMin, y: 0, z: a.zMin}, pt2: {x: a.xMax, y: 0, z: a.zMax}});
+		} else {
+			-Std.int(compareLineAndLine({pt1: {x: b.xMin, y: 0, z: b.zMin}, pt2: {x: b.xMax, y: 0, z: b.zMax}},
+				{pt1: {x: a.xMin, y: 0, z: a.zMin}, pt2: {x: a.xMax, y: 0, z: a.zMax}}));
+		}
 	}
 
 	function comparePointAndLine(pt:Point, line:Line):Int {
 		if (pt.z > line.pt1.z && pt.z > line.pt2.z) {
-			trace("hgiher");
-			return 1;
-		} else if (pt.z < line.pt1.z && pt.z < line.pt2.z) {
-			trace("less");
 			return -1;
+		} else if (pt.z < line.pt1.z && pt.z < line.pt2.z) {
+			return 1;
 		} else {
 			var slope = (line.pt2.z - line.pt1.z) / (line.pt2.x - line.pt1.x);
 			var intercept = line.pt1.z - (slope * line.pt1.x);
@@ -183,7 +195,30 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 	}
 
 	function compareLineAndLine(line1:Line, line2:Line) {
+		var comp1 = comparePointAndLine(line1.pt1, line2);
+		var comp2 = comparePointAndLine(line1.pt2, line2);
+		var oneVStwo = comp1 == comp2 ? comp1 : Math.NEGATIVE_INFINITY;
 
+		var comp3 = comparePointAndLine(line2.pt1, line1);
+		var comp4 = comparePointAndLine(line2.pt2, line1);
+		var twoVSone = comp3 == comp4 ? -comp3 : Math.NEGATIVE_INFINITY;
 
+		if (oneVStwo != Math.NEGATIVE_INFINITY && twoVSone != Math.NEGATIVE_INFINITY) {
+			if (oneVStwo == twoVSone) {
+				return oneVStwo;
+			}
+			return compareLineCenters(line1, line2);
+		} else if (oneVStwo != Math.NEGATIVE_INFINITY)
+			return oneVStwo;
+		else if (twoVSone != Math.NEGATIVE_INFINITY)
+			return twoVSone;
+		else
+			return compareLineCenters(line1, line2);
 	}
+
+	function compareLineCenters(line1:Line, line2:Line)
+		return centerHeight(line1) > centerHeight(line2) ? -1 : 1;
+
+	function centerHeight(line:Line)
+		return (line.pt1.y + line.pt2.y) / 2;
 }

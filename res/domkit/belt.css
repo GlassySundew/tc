@@ -6,15 +6,11 @@ container {
 .beltSlot {
   min-width: 52;
   min-height: 52;
-  background: rgba(87, 85, 85, 0.589);
+  background: rgba(87, 85, 85, 0.588);
 }
 
 /* .containerFlow {
 } */
-.absolute {
-  position: absolute;
-  box-align: top left;
-}
 
 .hotkeyContainer {
   position: absolute;
@@ -23,14 +19,15 @@ container {
 }
 
 .beltSlotNumber {
-  color: #8b8ba5;
-  
+
+  color: rgb(139, 139, 165);
 }
 /* .tileSlot {
   margin: 50;
 } */
 .itemContainer {
-  box-align: middle middle;
+  align: middle middle;
+  /* position: absolute; */
   /* position: absolute; */
   padding: -20;
 }

@@ -1,5 +1,7 @@
-package en.player;
+package ui;
 
+import en.player.Inventory;
+import en.player.Player;
 import h3d.Vector;
 import en.player.Inventory.InventoryGrid;
 import h2d.Flow;
@@ -11,25 +13,25 @@ import h2d.domkit.Style;
 class BeltCont extends h2d.Flow implements h2d.domkit.Object {
 	static var SRC =
 		<container>
-		      <flow class="beltSlot" public id="beltSlot">
-				<flow class="itemContainer" public id="itemContainer" />
-				<flow class="absolute" public id="absolute"/>
-		        <flow class="hotkeyContainer" >
-		          <text
-					class="beltSlotNumber"
-					public id="beltSlotNumber"
-		            text={Std.string(slotNumber)}
-		            font={font}
-		          />
-		        </flow>
-		      </flow>
+			<flow class = "beltSlot" public id = "beltSlot">
+			<flow class = "itemContainer" public id = "itemContainer" />
+			<flow class = "hotkeyContainer">
+				<text class = "beltSlotNumber"
+				public id = "beltSlotNumber"
+				text = {Std.string(slotNumber)}
+				font = {font}
+				/>
+			</flow>
+			</flow>
 		</container>;
+	 
 		public function new(?font:Font, ?slotNumber:Int, ?parent) {
 			super(parent);
 			initComponent();
 		}
 }
-class Belt extends dn.Process {
+@:allow(en.player.Inventory)
+class Belt {
 	var player(get, null):Player;
 
 	inline function get_player()
@@ -45,12 +47,10 @@ class Belt extends dn.Process {
 	public var selectedCell:BeltCont;
 
 	public function new() {
-		super();
 		centerFlow = new h2d.Flow();
 		Main.inst.root.add(centerFlow, Const.DP_UI);
 		Main.inst.root.under(centerFlow);
-		onResize();
-
+		
 		style = new h2d.domkit.Style();
 		style.load(hxd.Res.domkit.belt);
 		for (i in 1...5) {
@@ -58,10 +58,10 @@ class Belt extends dn.Process {
 			style.addObject(beltSlots[i - 1]);
 		}
 
-		invGrid = new InventoryGrid(0, 0, beltSlots[0].beltSlot.minWidth, beltSlots[0].beltSlot.minHeight, beltSlots.length, 1, 20, 0, Boot.inst.s2d);
+		invGrid = new InventoryGrid(0, 0, beltSlots[0].beltSlot.minWidth, beltSlots[0].beltSlot.minHeight, beltSlots.length, 1, 0, 0, Boot.inst.s2d);
 		invGrid.enableGrid();
 		for (i in 0...beltSlots.length) {
-			beltSlots[i].absolute.addChild(invGrid.interGrid[i][0].inter);
+			beltSlots[i].itemContainer.addChild(invGrid.interGrid[i][0].inter);
 		}
 		
 		var iten = new en.items.GraviTool();
@@ -88,11 +88,5 @@ class Belt extends dn.Process {
 		}
 	}
 
-	override function onResize() {
-		centerFlow.minWidth = Boot.inst.s2d.width;
-		centerFlow.minHeight = Boot.inst.s2d.height;
-
-		// centerFlow.x = Boot.inst.s2d.width / 2;
-		// centerFlow.y = Boot.inst.s2d.height - 100;
-	}
+	
 }

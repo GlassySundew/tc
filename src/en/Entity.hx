@@ -1,5 +1,6 @@
 package en;
 
+import differ.Collision;
 import ch3.scene.TileSprite;
 import en.objs.IsoTileSpr;
 import h3d.Matrix;
@@ -70,8 +71,8 @@ import h3d.scene.Mesh;
 	public var frict = 0.62;
 	public var gravity = 0.02;
 	public var bumpFrict = 0.93;
+	public var bumpReduction = 0.;
 
-	public var fromTile = false;
 	public var centerX(get, never):Float;
 
 	inline function get_centerX()
@@ -84,16 +85,10 @@ import h3d.scene.Mesh;
 
 	public var dir(default, set) = 6;
 
-	public var sprScaleX = 1.0;
-	public var sprScaleY = 1.0;
-
 	public var sprOffX = 0.;
 	public var sprOffY = 0.;
-
 	public var sprOffColY = 0.;
 	public var sprOffColX = 0.;
-
-	public var bottomAlpha = 0.;
 
 	inline function get_tmod()
 		return Game.inst.tmod;
@@ -144,11 +139,12 @@ import h3d.scene.Mesh;
 	public var curFrame:Float = 0;
 	public var prim:Cube;
 
-	private var rotAngle:Float = -0.1;
+	private var rotAngle:Float = -0.01;
 	private var tex:Texture;
 	var bmp:Bitmap;
 
 	public var cd:dn.Cooldown;
+	public var tw:Tweenie;
 
 	public static var isoCoefficient = 1.2;
 
@@ -159,6 +155,7 @@ import h3d.scene.Mesh;
 		ALL.push(this);
 
 		cd = new dn.Cooldown(Const.FPS);
+		tw = new Tweenie(Const.FPS);
 
 		if (spr == null)
 			throw "spr hasnt been initialised";
@@ -170,22 +167,31 @@ import h3d.scene.Mesh;
 		spr.tile.getTexture().filter = Nearest;
 		bmp = new Bitmap(spr.tile);
 		mesh = new IsoTileSpr(spr.tile, false, Boot.inst.s3d);
-		mesh.material.mainPass.setBlendMode(Alpha);
-		mesh.material.mainPass.enableLights = false;
-
-		mesh.material.mainPass.depth(false, Less);
+		mesh.material.mainPass.setBlendMode(AlphaAdd);
 		tex = new Texture(Std.int(spr.tile.width), Std.int(spr.tile.height), [Target]);
 		bmp.drawTo(tex);
-		// spr.setCenterRatio(-spr.tile.width * mesh.originMX, -spr.tile.height * mesh.originMY);
-		mesh.rotate(0, 0, M.toRad(90));
-		// sprOffY -= Const.GRID_HEIGHT / 2;
+		mesh.rotate(0, -rotAngle, M.toRad(90));
 		var s = mesh.material.mainPass.addShader(new h3d.shader.ColorAdd());
 		s.color = colorAdd;
+		mesh.material.mainPass.enableLights = false;
+		mesh.material.mainPass.depth(false, Less);
+		// TODO semi-transparent overlapping
+		// var s = new h3d.mat.Stencil();
+		// s.setFunc(LessEqual, 0);
+		// s.setOp(Keep, DecrementWrap, Keep);
+		// mesh.material.mainPass.stencil = s;
+
 		setPosCase(x, z);
 	}
 
 	public function is<T:Entity>(c:Class<T>)
 		return Std.is(this, c);
+
+	public function as<T:Entity>(c:Class<T>):T
+		return Std.downcast(this, c);
+
+	public inline function angTo(e:Entity)
+		return Math.atan2(e.footY - footY, e.footX - footX);
 
 	public function blink(?c = 0xffffff) {
 		colorAdd.setColor(c);
@@ -213,6 +219,39 @@ import h3d.scene.Mesh;
 		return dir = v == 0 ? 0 : v == 1 ? 1 : v == 2 ? 2 : v == 3 ? 3 : v == 4 ? 4 : v == 5 ? 5 : v == 6 ? 6 : v == 7 ? 7 : dir;
 	}
 
+	public inline function bumpAwayFrom(e:Entity, spd:Float, ?spdZ = 0., ?ignoreReduction = false) {
+		var a = e.angTo(this);
+		bump(Math.cos(a) * spd, Math.sin(a) * spd, spdZ, ignoreReduction);
+	}
+
+	public function bump(x:Float, y:Float, z:Float, ?ignoreReduction = false) {
+		var f = ignoreReduction ? 1.0 : 1 - bumpReduction;
+		bdx += x * f;
+		bdy += y * f;
+		dz += z * f;
+	}
+
+	public function cancelVelocities() {
+		dx = bdx = 0;
+		dy = bdy = 0;
+	}
+
+	public inline function distCase(e:Entity) {
+		return M.dist(cx + xr, cy + yr, e.cx + e.xr, e.cy + e.yr);
+	}
+
+	public inline function distPx(e:Entity) {
+		return M.dist(footX, footY, e.footX, e.footY);
+	}
+
+	public inline function distCaseFree(tcx:Int, tcy:Int, ?txr = 0.5, ?tyr = 0.5) {
+		return M.dist(cx + xr, cy + yr, tcx + txr, tcy + tyr);
+	}
+
+	public inline function distPxFree(x:Float, y:Float) {
+		return M.dist(footX, footY, x, y);
+	}
+
 	public function makePoint()
 		return new CPoint(cx, cy, xr, yr);
 
@@ -225,16 +264,21 @@ import h3d.scene.Mesh;
 
 	public function dispose() {
 		ALL.remove(this);
-
+		trace("disposed");
 		spr.remove();
-		spr = null;
 
 		if (debugLabel != null) {
 			debugLabel.remove();
 			debugLabel = null;
 		}
-
+		mesh.remove();
 		cd.destroy();
+		bmp.remove();
+		
+
+		bmp = null;
+		spr = null;
+		mesh = null;
 		cd = null;
 	}
 
@@ -258,11 +302,37 @@ import h3d.scene.Mesh;
 		}
 	}
 
+	public function checkCollsAgainstAll() {
+		var collideInfo = null;
+		for (ent in Entity.ALL) {
+			if (ent.collisions[0] != null && !ent.is(FloatingItem)) {
+				collideInfo = Collision.shapeWithShape(collisions[0], ent.collisions[0]);
+				if (collideInfo != null) {
+					collisions[0].x += (collideInfo.separationX);
+					collisions[0].y += (collideInfo.separationY);
+				}
+			}
+		}
+		for (poly in Level.inst.walkable) {
+			collideInfo = Collision.shapeWithShape(collisions[0], poly);
+			if (collideInfo != null) {
+				collisions[0].x += (collideInfo.separationX);
+				collisions[0].y += (collideInfo.separationY);
+			}
+		}
+
+		footX = (collisions[0].x);
+		footY = (collisions[0].y);
+		return collideInfo;
+	}
+
 	public function preUpdate() {
 		cd.update(tmod);
 	}
 
 	public function update() {
+		tw.update();
+		spr.anim.setGlobalSpeed(tmod);
 		@:privateAccess if (spr.anim.getCurrentAnim() != null) {
 			if (tmpCur != 0 && (spr.anim.getCurrentAnim().curFrameCpt - (tmpDt)) == 0) // ANIM LINK HACK
 				spr.anim.getCurrentAnim().curFrameCpt = tmpCur + spr.anim.getAnimCursor();
@@ -326,7 +396,6 @@ import h3d.scene.Mesh;
 		if (mesh != null) {
 			mesh.x = footX;
 			mesh.z = footY;
-			mesh.y = (bottomAlpha * .5 * mesh.scaleZ * Math.sin(rotAngle) / (180 / Math.PI));
 
 			checkCollisions();
 			// spr.scaleX = dir * sprScaleX;
@@ -350,7 +419,7 @@ import h3d.scene.Mesh;
 	}
 
 	public function frameEnd() {
-		if (mesh != null) { 
+		if (mesh != null) {
 			// даже я в ахуе от своего говнокода
 			tex.clear(0, 0);
 			bmp.tile = spr.tile;

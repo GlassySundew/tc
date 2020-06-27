@@ -1,3 +1,4 @@
+import h3d.mat.Material;
 import ch3.prim.PlanePrim;
 import differ.shapes.Polygon;
 import h3d.scene.Mesh;
@@ -144,17 +145,20 @@ class Level extends dn.Process {
 
 		ground = new h3d.mat.Texture(data.width * data.tileWidth, data.height * data.tileHeight, [Target]);
 		ground.filter = Nearest;
+		var prim = new PlanePrim(ground.width, ground.height, -ground.width, -ground.height, Y);
 
+		obj = new Mesh(prim, Material.create(ground), Boot.inst.s3d);
+		obj.material.mainPass.setBlendMode(AlphaAdd);
 		for (e in data.layers) {
 			switch (e) {
 				case LTileLayer(layer):
-					new LayerRender(data, layer).render.g.drawTo(ground);
+					obj.material.texture.flags.set(WasCleared);
+					new LayerRender(data, layer).render.g.drawTo(obj.material.texture);
+					obj.material.texture.flags.set(WasCleared);
 				default:
 			}
 		}
-		var prim = new PlanePrim(ground.width, ground.height, -ground.width, -ground.height, Y);
-		obj = new Mesh(prim, h3d.mat.Material.create(ground), Boot.inst.s3d);
-		obj.material.mainPass.setBlendMode(Alpha);
+
 		// obj.material.mainPass.setPassName("alpha");
 		// obj.visible = false;
 		obj.material.shadows = false;
@@ -162,7 +166,7 @@ class Level extends dn.Process {
 		obj.material.mainPass.depth(false, LessEqual);
 	}
 
-	public function setWalkable(poly:TmxObject, ?points:Array<TmxPoint>) { // setting walk area as a differ polygon(prob a shitty idea, but idk)
+	public function setWalkable(poly:TmxObject, ?points:Array<TmxPoint>) { // setting obstacles as a differ polygon
 		var vertices:Array<differ.math.Vector> = [];
 		if (points != null) {
 			for (i in points)
@@ -198,7 +202,8 @@ class LayerRender extends h2d.Object {
 		super();
 		render = new InternalRender(map, layer);
 		render.g = new h2d.Graphics();
-		render.tex = new Texture(map.tileWidth * map.width, map.tileHeight * map.height, [Target]);
+		render.g.blendMode = Alpha;
+		render.tex = new Texture(map.tileWidth * map.width, map.tileHeight * map.height, [Target, WasCleared]);
 		render.render();
 	}
 }
@@ -227,7 +232,7 @@ private class InternalRender extends TileLayerRenderer {
 		var scaleX = tile.flippedHorizontally ? -1 : 1;
 		var scaleY = tile.flippedVertically ? -1 : 1;
 		Tools.getTileUVByLidUnsafe(tileset, tile.gid - tileset.firstGID, uv);
-		var h2dTile = Res.loader.load("tiled/" + tileset.image.source).toTile();
+		var h2dTile = Res.loader.load(Const.LEVELS_PATH + tileset.image.source).toTile();
 		g.beginTileFill(x
 			- uv.x
 			+ (scaleX == 1 ? 0 : map.tileWidth)
@@ -251,7 +256,7 @@ private class InternalRender extends TileLayerRenderer {
 		// while (tileset.tiles[gid - tileset.firstGID] == null) // making tiles' ids persistent
 		// 	gid--;
 		imageSource = tileset.tiles[gid];
-		var h2dTile = Res.loader.load("tiled/" + imageSource.image.source).toTile();
+		var h2dTile = Res.loader.load(Const.LEVELS_PATH + imageSource.image.source).toTile();
 		var bmp = new Bitmap(h2dTile);
 		if (tile.flippedDiagonally) {
 			trace(tile.flippedHorizontally, tile.flippedVertically);

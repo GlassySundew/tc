@@ -14,6 +14,7 @@ class PostProcessingShader extends h3d.shader.ScreenShader {
 		@param var crtPower:Float;
 		@param var tsize:Vec2;
 		@param var h:Float;
+		@param var opacity:Float;
 		function curve(uv:Vec2):Vec2 {
 			uv = (uv - 0.5) * 2.0;
 			uv *= 1.1;
@@ -63,7 +64,6 @@ class PostProcessingShader extends h3d.shader.ScreenShader {
 			}
 
 			color = saturate(color + flashColor * flashPower);
-
 			if (uv.x < 0.0 || uv.x > 1.0)
 				color *= 0.0;
 			if (uv.y < 0.0 || uv.y > 1.0)

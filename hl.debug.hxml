@@ -1,5 +1,4 @@
 -debug
 hl.hxml
--D hl-profile
--D dump=pretty
--D hl-ver=1.11.0
+# -D hl-profile
+# -D dump=pretty

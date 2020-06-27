@@ -1,0 +1,5 @@
+#!/bin/sh
+
+
+ase -b ../../ase/ui.ase --save-as {slice}.png
+echo $dirname

@@ -38,7 +38,6 @@ class TextLabel extends h2d.Flow implements h2d.domkit.Object {
 
 		// width = baseWidth;
 		textLabel.textLabel.minWidth = baseWidth;
-
 		// TODO: Make rounded corners border
 		// textLabel.borderFlow.backgroundTile = h2d.Tile.fromColor(0xFFFFFF, 500, 32);
 		// textLabel.borderFlow.minWidth = textLabel.containerFlow.minWidth;

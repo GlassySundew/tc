@@ -17,7 +17,7 @@ class Const {
 	static inline function get_NEXT_UNIQ()
 		return _uniq++;
 
-	public static var INFINITE = 999999;
+	public static var INFINITE = 1. / 0.;
 
 	static var _inc = 0;
 	public static var DP_BG = _inc++;
@@ -27,4 +27,6 @@ class Const {
 	public static var DP_FX_TOP = _inc++;
 	public static var DP_UI = _inc++;
 	public static var DP_MASK = _inc++;
+	public static var LEVELS_PATH = "tiled/levels/";
+	public static var ATLAS_PATH = "tiled/atlas/";
 }

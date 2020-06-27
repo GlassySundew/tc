@@ -1,5 +1,7 @@
 package en.player;
 
+import en.items.GraviTool;
+import ui.Belt;
 import hxd.Event;
 import h2d.Tile;
 import h3d.mat.Texture;
@@ -18,7 +20,7 @@ class InventoryCell {
 	inline function set_item(v:Item) {
 		if (v != null) {
 			// v.spr.scaleX = v.spr.scaleY = 1;
-
+			v.spr.setCenterRatio();
 			v.spr.scaleX = v.spr.scaleY = ((inter.parent == Std.downcast(inter.parent, ScaleGrid)) ? 1 : 3);
 			inter.addChild(v.spr);
 			v.x = inter.width / 2;
@@ -44,6 +46,11 @@ class InventoryCell {
 class InventoryGrid {
 	public static var ALL:Array<InventoryGrid> = [];
 
+	var player(get, never):Player;
+
+	inline function get_player()
+		return Player.inst;
+
 	public var interGrid:Array<Array<InventoryCell>>;
 
 	public function new(x:Int, y:Int, width:Int, height:Int, horCells:Int, verCells:Int, xGap:Int, yGap:Int, ?parent:h2d.Object) {
@@ -64,12 +71,10 @@ class InventoryGrid {
 	public function dispose() {
 		ALL.remove(this);
 
-		for(i in interGrid)
+		for (i in interGrid)
 			for (j in i) {
 				j.inter.remove();
-				
 			}
-
 	}
 
 	public function disableGrid() {
@@ -87,12 +92,28 @@ class InventoryGrid {
 			}
 	}
 
+	public function getFreeSlot():InventoryCell {
+		for (i in 0...interGrid.length)
+			for (j in 0...interGrid[i].length)
+				if (interGrid[j][i].item == null)
+					return interGrid[j][i];
+		for (i in player.inventory.belt.invGrid.interGrid)
+			for (j in i)
+				if (j.item == null)
+					return j;
+		return null;
+	}
+
+	public function giveItem(item:Item) {
+		var slot = getFreeSlot();
+		slot.item = item;
+	}
+
 	public function removeItem(item:Item, ?to:Null<Item>) {
-		var n:Null<Int> = null;
 		for (i in interGrid) {
 			for (j in i) {
-				if (j.inter.getChildIndex(item.spr) != -1) {
-					j.inter.removeChild(item.spr);
+				if (j.item == item) {
+					j.item.spr.remove();
 					j.item = to;
 				}
 			}
@@ -118,8 +139,9 @@ class Inventory extends dn.Process {
 		ca = Main.inst.controller.createAccess("inventory");
 
 		// parsing pure red color (0x0ffff0000) as a top left point of grid start
-		var bitmap = new Bitmap(hxd.Res.inventory.toTile().center());
-		var bmpTex = bitmap.tile.getTexture().capturePixels();
+		var sprInv = new HSprite(Assets.ui);
+		sprInv.set("inventory");
+		var bmpTex = sprInv.tile.getTexture().capturePixels();
 
 		var loopBreak = false;
 		for (i in 0...bmpTex.height) {
@@ -129,14 +151,14 @@ class Inventory extends dn.Process {
 					invGrid0y = i;
 					// replacing red point with a background pixel from j-1, i-1
 					bmpTex.setPixel(j, i, bmpTex.getPixel(j - 1, i - 1));
-					bitmap.tile.switchTexture(Tile.fromTexture(Texture.fromPixels(bmpTex)));
+					sprInv.tile.switchTexture(Tile.fromTexture(Texture.fromPixels(bmpTex)));
 					loopBreak = true;
 					break;
 				}
 			loopBreak ? break:0;
 		}
 
-		base = new h2d.ScaleGrid(bitmap.tile, 0, 0, Boot.inst.s2d);
+		base = new h2d.ScaleGrid(sprInv.tile, 0, 0, Boot.inst.s2d);
 		base.visible = !base.visible;
 		base.setScale(Const.UI_SCALE);
 		new ui.TextLabel(Middle, "Inventory", Assets.fontPixel, 1, Std.int(base.tile.width * 2), base);
@@ -144,7 +166,9 @@ class Inventory extends dn.Process {
 		belt = new Belt();
 
 		invGrid = new InventoryGrid(invGrid0x, invGrid0y, 20, 20, 4, 4, 4, 4, base);
-		invGrid.interGrid[1][3].item = (new en.items.Ore(0, 0, Iron, base));
+		// invGrid.giveItem(new en.items.GraviTool(0, 0));
+
+		onResize();
 	}
 
 	function recenter() {
@@ -152,18 +176,30 @@ class Inventory extends dn.Process {
 		base.y = (Boot.inst.s2d.height >> 1) - base.height * base.scaleY / 2;
 	}
 
+	public function toggleVisible() {
+		base.visible = !base.visible;
+		recenter();
+	}
+
 	override function update() {
 		super.update();
-		if (ca.isPressed(LT)) {
-			base.visible = !base.visible;
-			recenter();
-		}
 	}
 
 	override function postUpdate() {
 		super.postUpdate();
+		// for (i in 0...invGrid.interGrid.length)
+		// 	for (j in 0...invGrid.interGrid[i].length)
+		// 		if (invGrid.interGrid[i][j] == invGrid.getFreeSlot())
+		// 			trace(i, j);
+
 		// for (i in invGrid.interGrid)
 		// 	for (j in i)
 		// 		j.inter.visible = (Game.inst.player.holdItem != null);
+	}
+
+	override function onResize() {
+		super.onResize();
+		belt.centerFlow.minWidth = Boot.inst.s2d.width;
+		belt.centerFlow.minHeight = Boot.inst.s2d.height;
 	}
 }

@@ -1,45 +1,41 @@
 package en.structures.hydroponics;
 
+import hxd.Event;
+import en.items.Plant;
 import en.objs.IsoTileSpr;
-import h3d.col.Bounds;
 import h3d.Vector;
-import h3d.Matrix;
 import format.tmx.Data.TmxObject;
+import hxd.Key in K;
 
 class Hydroponics extends Interactive {
-	var m:Matrix;
+	public var plantContainer:Plant;
 
 	public function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:TmxObject) {
 		if (spr == null) {
 			spr = new HSprite(Assets.structures);
-			spr.set("hydroponics");
+			spr.anim.registerStateAnim("hydroponics0", 0, 1, function() return plantContainer == null);
+			spr.anim.registerStateAnim("hydroponics1", 0, 1, function() return plantContainer != null);
 		}
 		super(x, z, tmxObj);
-		// sprOffX += 12;
-		// sprOffY += 4;
+		interactable = true;
 		mesh.isLong = true;
-
-		mesh.verts = {
-			right: {x: 17, z: -7},
-			down: {x: -17, z: -7},
-			left: {x: -17, z: 7},
-			up: {x: 17, z: 7}
-		};
-
+		mesh.isoWidth = 2;
+		mesh.isoHeight = 1;
 		mesh.renewDebugPts();
-		bottomAlpha = -25;
-		
+		plantContainer = new Plant(0, 0); // зачем а главное нахуя
+		interact.onTextInput = function(e:Event) {
+			if (K.isPressed(K.E))
+				dropGrownPlant();
+		}
 	}
 
-	// override function update() {
-	// 	super.update();
-	// }
+	function dropGrownPlant() {
+		if (plantContainer != null) {
+			interactable = false;
+			trace(plantContainer);
 
-	override function postUpdate() {
-		super.postUpdate();
-
-		// var up = Boot.inst.s3d.camera.up;
-		// var vec = Boot.inst.s3d.camera.pos.sub(Boot.inst.s3d.camera.target);
-		// @:privateAccess mesh.qRot.initRotateMatrix(Matrix.lookAtX(vec, up));
+			new FloatingItem(mesh.x + 1, mesh.z - 1, plantContainer).bumpAwayFrom(this, .05);
+			plantContainer = null;
+		}
 	}
 }

@@ -33,11 +33,9 @@ class Item extends dn.Process {
 
 		if (spr == null)
 			spr = new HSprite(Assets.items, parent);
-
+		// Game.inst.root.add(spr, 1);
 		spr.tile.getTexture().filter = Nearest;
 		interactive = new Interactive(width, height, spr);
-		spr.setCenterRatio(.5, .5);
-
 		interactive.x -= spr.tile.width / 2;
 		interactive.y -= spr.tile.height / 2;
 
@@ -68,6 +66,12 @@ class Item extends dn.Process {
 				}
 			}
 		}
+	}
+
+	public function dispose() {
+		destroy();
+		spr.remove();
+		interactive.remove();
 	}
 
 	override function update() {

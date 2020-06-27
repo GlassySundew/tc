@@ -13,9 +13,10 @@ class Assets {
 	// public static var fontSmall:h2d.Font;
 	// public static var fontMedium:h2d.Font;
 	// public static var fontLarge:h2d.Font;
-	public static var tiles:SpriteLib;
+	public static var player:SpriteLib;
 	public static var items:SpriteLib;
 	public static var structures:SpriteLib;
+	public static var ui:SpriteLib;
 
 	static var music:dn.heaps.Sfx;
 
@@ -36,7 +37,7 @@ class Assets {
 		// #end
 		// music.groupId = 1;
 
-		fontPixel = hxd.Res.fonts.Haversham_fnt.toFont();
+		fontPixel = hxd.Res.fonts.Haversham_2_0.toFont();
 		fontPixel.resizeTo(16);
 
 		// fontTiny = hxd.Res.fonts.barlow_condensed_medium_regular_9.toFont();
@@ -44,17 +45,24 @@ class Assets {
 		// fontMedium = hxd.Res.fonts.barlow_condensed_medium_regular_17.toFont();
 		// fontLarge = hxd.Res.fonts.barlow_cxntondensed_medium_regular_32.toFont();
 
-		tiles = Atlas.load("tiled/player_move.atlas");
-		items = Atlas.load("tiled/items.atlas");
-		structures = Atlas.load("tiled/structures.atlas");
+		player = Atlas.load(Const.ATLAS_PATH + "player.atlas");
+		items = Atlas.load(Const.ATLAS_PATH + "items.atlas");
+		structures = Atlas.load(Const.ATLAS_PATH + "structures.atlas");
+		ui = Atlas.load(Const.ATLAS_PATH + "ui.atlas");
 
 		var action = ["idle_", "walk_"];
 		var direc = ["left", "up", "down", "right", "down_left", "down_right", "up_left", "up_right"];
-		// tilesHero.defineAnim('idle_down_right', "0(1/0.25)");
+		// playerHero.defineAnim('idle_down_right', "0(1/0.25)");
 		for (i in 0...(direc.length - 1))
-			tiles.generateAnim(action[0] + direc[i], "0(1)");
+			player.generateAnim(action[0] + direc[i], "0(1)");
 		for (i in 0...(direc.length - 1))
-			tiles.generateAnim(action[1] + direc[i], "0-3(1)");
+			player.generateAnim(action[1] + direc[i], "0-3(1)");
+
+		structures.defineAnim("hydroponics", "0-1");
+		
+		ui.defineAnim("keyboard_icon", "0-1");
+
+
 	}
 
 	public static function playMusic() {
