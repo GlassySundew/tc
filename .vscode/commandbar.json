@@ -42,7 +42,7 @@
 			"color":  "#586284",
 			"skipErrorMessage": true,
 			"skipSwitchToOutput": true,
-			"command": "killall -9 hl",
+			"command": "pkill hl",
 			"alignment": "right",
 			"skipTerminateQuickPick": false,
 			"priority": -11.5

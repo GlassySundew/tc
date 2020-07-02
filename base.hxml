@@ -1,15 +1,15 @@
 -cp src
 -cp .
 
--lib hide
+# -lib hide
 -lib domkit
 -lib format-tiled
 -lib heeps
 -lib heaps
 -lib castle
 -lib hxbit
--lib gasm
--lib structural
+# -lib gasm
+# -lib structural
 -lib msignal
 -lib deepnightLibs
 -lib compiletime

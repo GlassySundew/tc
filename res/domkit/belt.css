@@ -1,33 +1,26 @@
-container {
-  margin: 20;
-  margin-right: 0;
+beltCont {
+  margin-left: 10;
+  margin-bottom: 10;
 }
 
 .beltSlot {
-  min-width: 52;
-  min-height: 52;
-  background: rgba(87, 85, 85, 0.588);
-}
+  min-width: 26;
+  min-height: 26;
+  scale: 0.5;
 
-/* .containerFlow {
-} */
+  background: rgba(95, 95, 95, 0.602);
+}
 
 .hotkeyContainer {
   position: absolute;
-  box-align: top left;
-  padding-left: 3;
+  align: top left;
+  padding-left: 8;
 }
 
 .beltSlotNumber {
-
-  color: rgb(139, 139, 165);
+  color: rgba(180, 175, 175, 0.863);
 }
-/* .tileSlot {
-  margin: 50;
-} */
+
 .itemContainer {
-  align: middle middle;
-  /* position: absolute; */
-  /* position: absolute; */
-  padding: -20;
+  scale: 2;
 }

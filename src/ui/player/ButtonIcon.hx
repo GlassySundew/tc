@@ -1,4 +1,4 @@
-package ui;
+package ui.player;
 
 import dn.Process;
 import h2d.Tile;
@@ -16,32 +16,33 @@ class ButtonIconCont extends h2d.Flow implements h2d.domkit.Object {
 					</flow>
 				</bitmap>
 		</cont>;
-		public function new(?tile:Tile, ?parent) {
-			super(parent);
-			initComponent();
-		}
+	public function new(?tile:Tile, ?parent) {
+		super(parent);
+		initComponent();
+	}
 }
 
-class ButtonIcon {
+class ButtonIcon extends Object {
 	public var container:ButtonIconCont;
 	public var buttonSpr:HSprite;
 
 	public var centerFlow:Flow;
-	var style:Style;
-	var p:Object;
 
-	public function new(x = 0., y = 0., p:Object) {
-		this.p = p;
-		centerFlow = new h2d.Flow(p);
+	var style:Style;
+
+	public function new(x = 0., y = 0., ?p:Object) {
+		super(p);
+		this.x = x;
+		this.y = y;
+		centerFlow = new h2d.Flow(this);
+		centerFlow.setScale(1 / Const.SCALE);
 		Main.inst.root.add(centerFlow, Const.DP_UI);
-		// Main.inst.root.under(centerFlow);
-		buttonSpr = new HSprite(Assets.ui, p);
-		buttonSpr = Assets.ui.h_getAndPlay("keyboard_icon");
-		Game.inst.root.add(buttonSpr, 10);
+
+		buttonSpr = Assets.ui.h_getAndPlay("keyboard_icon", 99999, false, this);
 		buttonSpr.anim.setSpeed(0.025);
+
+		Game.inst.root.add(this, Const.DP_UI);
 		container = new ButtonIconCont(centerFlow);
-		// container.icon.alpha = 0.;
-		// 	container.icon.alpha = 1;
 		buttonSpr.visible = false;
 		buttonSpr.setCenterRatio();
 		style = new h2d.domkit.Style();
@@ -49,7 +50,6 @@ class ButtonIcon {
 		style.load(hxd.Res.domkit.buttonIcon);
 		container.activateTextFlow.x -= container.activateText.textWidth / 2 - 1;
 		container.activateTextFlow.y -= container.activateText.textHeight / 2 + 2;
-		// container.activateTextFlow.y -= ;
 		buttonSpr.onFrameChange = function() {
 			container.activateTextFlow.paddingTop = if (buttonSpr.frame == 1) 3; else 0;
 		};

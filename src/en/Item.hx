@@ -1,14 +1,14 @@
 package en;
 
+import h2d.Scene;
+import h2d.RenderContext;
 import en.player.Player;
 import ui.TextLabel;
 import h2d.Bitmap;
 import h2d.Object;
 import h2d.Interactive;
 
-class Item extends dn.Process {
-	public static var ALL:Array<Item> = [];
-
+class Item extends Object {
 	public var spr:HSprite;
 
 	var displayText:String = "";
@@ -18,29 +18,18 @@ class Item extends dn.Process {
 	var textLabel:TextLabel;
 	var bitmap:Bitmap;
 
-	public var x:Float;
-	public var y:Float;
-
-	var width = 16;
-	var height = 16;
-
 	public function new(?x:Float = 0, ?y:Float = 0, ?parent:Object) {
-		super(Main.inst);
-		ALL.push(this);
-
-		this.x = spr.x = x;
-		this.y = spr.y = y;
+		super(parent);
 
 		if (spr == null)
-			spr = new HSprite(Assets.items, parent);
-		// Game.inst.root.add(spr, 1);
+			spr = new HSprite(Assets.items, this);
+
 		spr.tile.getTexture().filter = Nearest;
-		interactive = new Interactive(width, height, spr);
-		interactive.x -= spr.tile.width / 2;
-		interactive.y -= spr.tile.height / 2;
+		spr.setCenterRatio();
+		interactive = new Interactive(spr.tile.width, spr.tile.height, spr);
 
 		interactive.onOver = function(e:hxd.Event) {
-			textLabel = new TextLabel(Left, displayText, Assets.fontPixel, Const.UI_SCALE);
+			textLabel = new TextLabel(displayText, Assets.fontPixel, Boot.inst.s2d);
 		}
 
 		interactive.onOut = function(e:hxd.Event) {
@@ -53,11 +42,11 @@ class Item extends dn.Process {
 				Player.inst.inventory.belt.deselectCells();
 				var swapItem = Game.inst.player.cursorItem;
 				Game.inst.player.cursorItem = this;
-				if (swapItem != null)
-					swapItem.spr.scale(1 / 2);
+				// if (swapItem != null)
+				// 	swapItem.spr.scale(1 / 2);
 				Game.inst.player.inventory.invGrid.removeItem(this, swapItem);
 				Game.inst.player.inventory.belt.invGrid.removeItem(this, swapItem);
-				Boot.inst.s2d.addChild(this.spr);
+				Boot.inst.s2d.addChild(this);
 			} else {
 				for (i in 0...Player.inst.inventory.belt.invGrid.interGrid.length) {
 					if (Player.inst.inventory.belt.invGrid.interGrid[i][0].item == this) {
@@ -69,18 +58,22 @@ class Item extends dn.Process {
 	}
 
 	public function dispose() {
-		destroy();
 		spr.remove();
 		interactive.remove();
 	}
 
-	override function update() {
-		super.update();
-		if (textLabel != null && textLabel.disposed == false) {
+	override function sync(ctx:RenderContext) {
+		super.sync(ctx);
+		if (textLabel != null) {
 			textLabel.x = Boot.inst.s2d.mouseX + 10;
-			textLabel.y = Boot.inst.s2d.mouseY + 5;
+			textLabel.y = Boot.inst.s2d.mouseY + 10;
 		}
-		spr.x = x;
-		spr.y = y;
+		interactive.width = spr.tile.width;
+		interactive.height = spr.tile.height;
+
+		interactive.x = -spr.tile.width / 2;
+		interactive.y = -spr.tile.height / 2;
+
+		setScale(Std.is(parent, Scene) ? 2 : 1);
 	}
 }

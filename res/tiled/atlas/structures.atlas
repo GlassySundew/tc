@@ -1,61 +1,54 @@
 
 structures.png
-size: 189,154
+size: 142,157
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 amethyst
   rotate: false
-  xy: 142, 67
+  xy: 92, 0
   size: 46, 35
   orig: 46, 35
   offset: 0, 0
   index: -1
 emerald
   rotate: false
-  xy: 142, 30
+  xy: 92, 37
   size: 47, 35
   orig: 47, 35
   offset: 0, 0
   index: -1
-hydroponics
-  rotate: false
-  xy: 0, 0
-  size: 90, 50
-  orig: 90, 50
-  offset: 0, 0
-  index: -1
 hydroponics0
   rotate: false
-  xy: 0, 52
+  xy: 0, 55
   size: 90, 50
   orig: 90, 50
   offset: 0, 0
   index: -1
 hydroponics1
   rotate: false
-  xy: 94, 104
+  xy: 0, 3
   size: 90, 50
   orig: 90, 50
   offset: 0, 0
   index: -1
 iron
   rotate: false
-  xy: 92, 19
+  xy: 94, 74
   size: 47, 35
   orig: 47, 35
   offset: 0, 0
   index: -1
 pcgmw
   rotate: false
-  xy: 92, 56
+  xy: 94, 111
   size: 48, 46
   orig: 48, 46
   offset: 0, 0
   index: -1
 sleeping_pod
   rotate: false
-  xy: 0, 104
+  xy: 0, 107
   size: 92, 50
   orig: 92, 50
   offset: 0, 0

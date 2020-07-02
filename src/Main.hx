@@ -6,12 +6,10 @@ import dn.M;
 import dn.Process;
 import hxd.Key;
 import hxd.Res;
-import game.data.ConfigJson;
 
 @:publicFields
 class Main extends Process {
 	public static var inst:Main;
-	public static var config:ConfigJson;
 
 	public var console:ui.Console;
 	public var controller:dn.heaps.Controller;
@@ -22,13 +20,8 @@ class Main extends Process {
 		inst = this;
 		createRoot(s);
 
-		root.filter = new h2d.filter.ColorMatrix();
+		// root.filter = new h2d.filter.ColorMatrix();
 
-		// #if debug
-		// hxd.Res.initLocal();
-		// #else
-		// hxd.Res.initEmbed();
-		// #end
 		#if (hl && debug)
 		hxd.Res.initLocal();
 		#else
@@ -65,7 +58,7 @@ class Main extends Process {
 		controller.bind(SELECT, Key.R);
 		controller.bind(LT, Key.TAB);
 
-		new dn.heaps.GameFocusHelper(Boot.inst.s2d, Assets.fontPixel);
+		@:privateAccess new dn.heaps.GameFocusHelper(Boot.inst.s2d, Assets.fontPixel);
 		delayer.addF(start, 1);
 	}
 
@@ -106,11 +99,12 @@ class Main extends Process {
 		else if (Const.AUTO_SCALE_TARGET_HEI > 0)
 			Const.SCALE = M.floor(h() / Const.AUTO_SCALE_TARGET_HEI);
 		root.setScale(Const.SCALE);
+
+		// Boot.inst.s2d.scaleMode = Zoom(Const.SCALE);
 	}
 
 	override function update() {
 		// dn.heaps.slib.SpriteLib.TMOD = tmod;
-
 		if (ca.isKeyboardPressed(Key.F11))
 			toggleFullscreen();
 

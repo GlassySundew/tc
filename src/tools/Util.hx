@@ -28,7 +28,14 @@ class Util {
 	inline static function screenToIsoY(globalX:Float, globalY:Float) {
 		return globalY - globalX / 2;
 	}
+
 	inline static function screenToIso(globalX:Float, globalY:Float) {
-		return new Vector(screenToIsoX(globalX,	globalY), screenToIsoY(globalX, globalY));
+		return new Vector(screenToIsoX(globalX, globalY), screenToIsoY(globalX, globalY));
 	}
+
+	inline static function getS2dScaledWid()
+		return (Boot.inst.s2d.width / Const.SCALE);
+
+	inline static function getS2dScaledHei()
+		return (Boot.inst.s2d.height / Const.SCALE);
 }

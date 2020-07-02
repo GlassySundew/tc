@@ -1,5 +1,8 @@
 package en.player;
 
+import hxd.Window;
+import ui.player.PlayerUI;
+import ui.player.Inventory;
 import en.objs.IsoTileSpr;
 import hxd.Key;
 import en.items.GraviTool;
@@ -9,7 +12,11 @@ import differ.Collision;
 class Player extends Entity {
 	public static var inst:Player;
 
-	public var inventory:Inventory;
+	public var ui:PlayerUI;
+	public var inventory(get, never):Inventory;
+
+	inline function get_inventory()
+		return ui.inventory;
 
 	public var holdItem(default, set):Item;
 
@@ -26,7 +33,6 @@ class Player extends Entity {
 		if (v != null) {
 			holdItem = v;
 			inventory.invGrid.enableGrid();
-			v.spr.scaleX = v.spr.scaleY = 2;
 		}
 		return cursorItem = v;
 	}
@@ -48,7 +54,7 @@ class Player extends Entity {
 			{dir: "down", prio: 0},
 			{dir: "down_right", prio: 1}
 		];
-		
+
 		for (i in 0...8) {
 			spr.anim.registerStateAnim("walk_" + direcs[i].dir, direcs[i].prio, (1 / 60 / 0.16) * tmod, function() return isMoving() && dir == i);
 			spr.anim.registerStateAnim("idle_" + direcs[i].dir, direcs[i].prio, (1 / 60 / 0.16) * tmod, function() return !isMoving() && dir == i);
@@ -60,7 +66,8 @@ class Player extends Entity {
 		mesh.isoWidth = mesh.isoHeight = 0;
 
 		mesh.renewDebugPts();
-		inventory = new Inventory();
+
+		ui = new PlayerUI(game.root);
 	}
 
 	override function dispose() {
@@ -112,8 +119,11 @@ class Player extends Entity {
 		// }
 
 		if (cursorItem != null) {
-			cursorItem.x = Boot.inst.s2d.mouseX + 25;
-			cursorItem.y = Boot.inst.s2d.mouseY + 25;
+			// cursorItem.x = Window.getInstance().mouseX /Const.SCALE;
+			// cursorItem.y = Window.getInstance().mouseY /Const.SCALE;
+
+			cursorItem.x = Boot.inst.s2d.mouseX + 10 * cursorItem.scaleX;
+			cursorItem.y = Boot.inst.s2d.mouseY + 10 * cursorItem.scaleX;
 		}
 	}
 

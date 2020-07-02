@@ -264,7 +264,6 @@ import h3d.scene.Mesh;
 
 	public function dispose() {
 		ALL.remove(this);
-		trace("disposed");
 		spr.remove();
 
 		if (debugLabel != null) {

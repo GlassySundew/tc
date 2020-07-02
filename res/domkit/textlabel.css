@@ -4,18 +4,17 @@
   /* padding: 10px; /* Поля вокруг текста */
   /* border: 4px solid black; /* Параметры границы */
   /* Цвет фона */
-  scale: 0.5;
 }
 /* text { */
 /* } */
 .containerFlow {
-  margin-top: 15;
-  width: 1;
+  /* margin-top: 15; */
+  /* width: 1; */
   padding: 3;
   align: middle middle;
-
-  background: rgba(44, 40, 40, 0.842);
-  /* background-color: #242a2a; */
+  /* position: absolute; */
+  background: rgba(46, 46, 46, 0.513);
+  
 }
 /* .borderFlow {
 

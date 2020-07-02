@@ -1,6 +1,5 @@
 import h3d.scene.Mesh;
 import h3d.Vector;
-import hrt.prefab.l3d.MeshGenerator.MeshPart;
 import en.objs.IsoTileSpr;
 import h3d.pass.PassObject;
 import h3d.pass.PassList;

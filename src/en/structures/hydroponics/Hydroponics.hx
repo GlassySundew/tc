@@ -25,15 +25,13 @@ class Hydroponics extends Interactive {
 		plantContainer = new Plant(0, 0); // зачем а главное нахуя
 		interact.onTextInput = function(e:Event) {
 			if (K.isPressed(K.E))
-				dropGrownPlant();
+				inline dropGrownPlant();
 		}
 	}
 
 	function dropGrownPlant() {
 		if (plantContainer != null) {
 			interactable = false;
-			trace(plantContainer);
-
 			new FloatingItem(mesh.x + 1, mesh.z - 1, plantContainer).bumpAwayFrom(this, .05);
 			plantContainer = null;
 		}

@@ -1,9 +1,9 @@
 package en;
 
+import ui.player.ButtonIcon;
 import hxd.Key;
 import hxd.Event;
 import h2d.Object;
-import ui.ButtonIcon;
 import hxGeomAlgo.PolyTools.Tri;
 import hxGeomAlgo.HxPoint;
 import h3d.prim.Polygon;
@@ -108,16 +108,17 @@ class Interactive extends Entity {
 
 	function updateKeyIcon() {
 		if (!cd.has("keyboardIconInit") && cd.has("interacted")) {
-			var pos = Boot.inst.s3d.camera.project(mesh.x, 0, mesh.z, Boot.inst.engine.width, Boot.inst.engine.height);
+			var pos = Boot.inst.s3d.camera.project(mesh.x, 0, mesh.z, getS2dScaledWid(), getS2dScaledHei());
 			cd.unset("interacted");
-			buttonIcon = new ButtonIcon(pos.x, pos.y, iconParent);
+			buttonIcon = new ButtonIcon(pos.x, pos.y);
 			tw.createS(buttonIcon.container.icon.alpha, 0 > 1, TEaseIn, .4);
 		}
 		if (buttonIcon != null) {
-			var pos = Boot.inst.s3d.camera.project(mesh.x, 0, mesh.z, Boot.inst.engine.width, Boot.inst.engine.height);
+			var pos = Boot.inst.s3d.camera.project(mesh.x, 0, mesh.z, getS2dScaledWid(), getS2dScaledHei());
 
 			buttonIcon.centerFlow.x = pos.x - 1;
-			buttonIcon.centerFlow.y = pos.y - 100;
+			buttonIcon.centerFlow.y = pos.y - 100 / Const.SCALE;
+			
 			buttonIcon.container.icon.tile = buttonIcon.buttonSpr.tile;
 			// buttonIcon.container.icon.scaleX = buttonIcon.container.icon.scaleY = 2;
 		}

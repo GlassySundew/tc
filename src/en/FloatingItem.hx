@@ -172,7 +172,7 @@ class FloatingItem extends Interactive {
 		polyMesh.rotate(0, 0, 0.016 * tmod);
 		deDepth.objZ = (polyMesh.z - footY) * Math.sin(-rotAngle);
 
-		bumpAwayFrom(Player.inst, distCase(Player.inst) < .75 ? -.001 * tmod : 0);
+		bumpAwayFrom(Player.inst, distCase(Player.inst) < .75 ? -.0015 * tmod : 0);
 
 		if (player != null && distCase(player) < .2) {
 			player.inventory.invGrid.giveItem(item);

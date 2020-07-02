@@ -24,6 +24,9 @@ class Boot extends hxd.App {
 		renderer.enableFXAA = false;
 		renderer.enableSao = false;
 
+		// s2d.scaleMode = AutoZoom(640, 360, true);
+		// s2d.scaleMode = LetterBox(640, 360, true, Center, Center);
+
 		s3d.lightSystem.ambientLight.set(0.5, 0.5, 0.5);
 		onResize();
 		#if (castle && hl && debug)

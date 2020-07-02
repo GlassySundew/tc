@@ -37,8 +37,11 @@ class Assets {
 		// #end
 		// music.groupId = 1;
 
-		fontPixel = hxd.Res.fonts.Haversham_2_0.toFont();
+		fontPixel = hxd.Res.fonts.huiversham.toFont();
 		fontPixel.resizeTo(16);
+		// fontPixel.resizeTo(fontPixel.size >>1);
+		// fontPixel
+		// fontPixel.resizeTo(8);
 
 		// fontTiny = hxd.Res.fonts.barlow_condensed_medium_regular_9.toFont();
 		// fontSmall = hxd.Res.fonts.barlow_condensed_medium_regular_11.toFont();
@@ -59,10 +62,8 @@ class Assets {
 			player.generateAnim(action[1] + direc[i], "0-3(1)");
 
 		structures.defineAnim("hydroponics", "0-1");
-		
+
 		ui.defineAnim("keyboard_icon", "0-1");
-
-
 	}
 
 	public static function playMusic() {
