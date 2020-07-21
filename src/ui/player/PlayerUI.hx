@@ -21,7 +21,7 @@ class PlayerUI extends Layers {
 		this.add(inventory, 3);
 		var leftTop = new SideCont(Top, Left);
 		this.add(leftTop, 2);
-		new StatView(Health, leftTop);
+		// new StatView(Health, leftTop);
 
 		var style = new h2d.domkit.Style();
 		style.load(hxd.Res.domkit.side);
@@ -36,14 +36,9 @@ class PlayerUI extends Layers {
 @:uiComp("sideCont")
 class SideCont extends h2d.Flow implements h2d.domkit.Object {
 	static var SRC = <sideCont content-halign = '${hor}' content-valign = '${vert}'> </sideCont>;
+	
 	public function new(vert:FlowAlign, hor:FlowAlign, ?parent) {
 		super(parent);
 		initComponent();
-	}
-
-	override function sync(ctx:RenderContext) {
-		super.sync(ctx);
-		// this.minWidth = (Boot.inst.s2d.width );
-		// this.minHeight = (Boot.inst.s2d.height);
 	}
 }

@@ -1,6 +1,14 @@
 base.hxml
 
--D hlc=true
+-lib hlsdl
 
+-D pak=true
+-D hlc=true
+-debug
 -D hl=true
 -hl out/main.c
+
+-D windowSize=1280x720
+
+-D windowTitle=Total Condemn
+-cmd haxe -hl hxd.fmt.pak.Build.hl -lib heaps -main hxd.fmt.pak.Build && hl hxd.fmt.pak.Build.hl

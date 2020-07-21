@@ -22,7 +22,7 @@ class Hydroponics extends Interactive {
 		mesh.isoWidth = 2;
 		mesh.isoHeight = 1;
 		mesh.renewDebugPts();
-		plantContainer = new Plant(0, 0); // зачем а главное нахуя
+		plantContainer = new Plant(0, 0); 
 		interact.onTextInput = function(e:Event) {
 			if (K.isPressed(K.E))
 				inline dropGrownPlant();

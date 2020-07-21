@@ -1,5 +1,6 @@
 package ui.player;
 
+import en.items.Scepter;
 import en.player.Player;
 import h2d.RenderContext;
 import h2d.Object;
@@ -68,7 +69,7 @@ class Inventory extends Object {
 
 		belt = new Belt(this);
 		invGrid = new InventoryGrid(invGrid0x, invGrid0y, 20, 20, 4, 4, 4, 4, base);
-		invGrid.giveItem(new en.items.GraviTool(0, 0));
+		// invGrid.giveItem(new en.items.Scepter(0, 0));
 		// items[0].push(new en.items.Ore(invGrid0x, invGrid0y, Iron, base));
 	}
 

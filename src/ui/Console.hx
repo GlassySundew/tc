@@ -1,5 +1,7 @@
 package ui;
 
+import en.player.Player;
+import net.Connect;
 import h3d.scene.Renderer;
 import h2d.Console.ConsoleArg;
 import dn.Lib;
@@ -13,7 +15,15 @@ class Console extends h2d.Console {
 
 	public function new(f:h2d.Font, p:h2d.Object) {
 		super(f, p);
-
+		logTxt = new h2d.HtmlText(f, this);
+		logTxt.x = 2;
+		logTxt.dropShadow = {
+			dx: 0,
+			dy: 1,
+			color: 0,
+			alpha: 0.5
+		};
+		logTxt.visible = false;
 		// scale(2); // TODO smarter scaling for 4k screens
 
 		// Settings
@@ -53,10 +63,16 @@ class Console extends h2d.Console {
 				pp = true;
 			}
 		});
-		this.addCommand("untarget", [], function(k:String) {
+
+		this.addCommand("untarget", [], function(?k:String) {
 			Game.inst.camera.stopTracking();
 			new h3d.scene.CameraController(Boot.inst.s3d).loadFromCamera();
 		});
+
+		this.addCommand("connect", [], function(?k:String) {
+			(new Connect());
+		});
+
 		this.addAlias("+", "set");
 		this.addAlias("-", "unset");
 		#end
@@ -80,8 +96,7 @@ class Console extends h2d.Console {
 			y = scene.height - height;
 			width = scene.width;
 			tf.maxWidth = width;
-			bg.tile.scaleToSize(width, -logTxt.textHeight - 5);
-			// bg.tile.scaleToSize(width, height);
+			bg.tile.scaleToSize(width, -logTxt.textHeight);
 		}
 		var log = logTxt;
 		if (log.visible) {
@@ -93,6 +108,13 @@ class Console extends h2d.Console {
 					log.visible = false;
 			}
 		}
+
+		if (bg.visible) {
+			if (Player.inst != null && !Player.inst.isLocked())
+				Player.inst.lock();
+		} else if (Player.inst != null && Player.inst.isLocked())
+			Player.inst.unlock();
+
 		// bg.y = logTxt.y;
 		// super.sync(ctx);
 	}

@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="2020.05.27" orientation="isometric" renderorder="right-down" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#000000" nextlayerid="40" nextobjectid="655">
+<map version="1.4" tiledversion="2020.06.25" orientation="isometric" renderorder="right-down" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" nextlayerid="44" nextobjectid="660">
  <tileset firstgid="1" source="alpha.tsx"/>
- <tileset firstgid="37" source="colls.tsx"/>
- <layer id="33" name="ground" width="100" height="100" offsetx="-10" offsety="4">
+ <tileset firstgid="40" source="colls.tsx"/>
+ <tileset firstgid="53" source="env.tsx"/>
+ <layer id="33" name="ground" width="100" height="100" offsetx="-5" offsety="6">
   <data encoding="base64" compression="zlib">
-   eAHt0TEKACAMA8D+wv//VF1LRzHLFRwMhcKlyhAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECEwC64T9TXuyPwK9i/s3OQF95Oyny/qYVHKZPnL2LhMgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBB4JbABwUECQA==
+   eAHt0TEKACAMA8D+xv//UF1LRzHLFRwMhcKlyhAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECEwC64T9TXuyPwK9i/s3OQF95Oyny/qYVHKZPnL2LhMgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBB4JbABgfkD0A==
   </data>
  </layer>
- <layer id="36" name="walls" width="100" height="100">
+ <layer id="36" name="wallsAgri" width="100" height="100" visible="0" offsetx="-10" offsety="-1">
+  <data encoding="base64" compression="zlib">
+   eAHt0wEJADAMA8Gomc5JX1WMUK4KngtNHAECBAgQIECAAAECBAgQIECAAAECBAgQINAqcJLb2qaLwE+B+QVXJGCPojEmxR726BJQQ4AAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQGCHwAP93wE/
+  </data>
+ </layer>
+ <layer id="42" name="walls" width="100" height="100">
   <data encoding="base64" compression="zlib">
    eAHt07ENACEQA0FXAq1+6VxMSGTp5yTy1VgkjgABAgQIECBAgAABAgQIECBAgAABAgQIEGgQ2BOxku9+DW1/bJgdXJGAPYrGmBR72KNLoKvG/+jaQw0BAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgACBV4EDjOgDzA==
   </data>
@@ -19,8 +25,8 @@
   <object id="304" x="432" y="504" width="144" height="24"/>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="631" gid="39" x="470" y="446" width="32" height="32"/>
-  <object id="651" gid="47" x="550" y="432" width="92" height="50"/>
-  <object id="652" gid="46" x="457.5" y="504.5" width="90" height="50"/>
+  <object id="658" gid="49" x="457.5" y="504.5" width="90" height="50"/>
+  <object id="659" gid="52" x="526" y="462" width="56" height="77"/>
+  <object id="631" gid="42" x="470" y="446" width="32" height="32"/>
  </objectgroup>
 </map>

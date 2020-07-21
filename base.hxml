@@ -9,14 +9,16 @@
 -lib castle
 -lib hxbit
 # -lib gasm
-# -lib structural
+-lib structural
 -lib msignal
 -lib deepnightLibs
 -lib compiletime
+-lib colyseus
+-lib random 
 
 -cp vendor/differ/src
 
 -dce full
---macro keep("h2d.Object")
+
 -main Boot
   

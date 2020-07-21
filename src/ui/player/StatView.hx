@@ -2,7 +2,7 @@ package ui.player;
 
 import h2d.Mask;
 import h2d.Object;
-import ui.player.PlayerState.StatName;
+import en.player.PlayerState.StatName;
 
 class StatView extends Object {
 	var stat:StatName;

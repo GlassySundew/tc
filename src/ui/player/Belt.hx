@@ -66,8 +66,8 @@ class Belt extends Object {
 			beltSlots[i].itemContainer.addChild(invGrid.interGrid[i][0].inter);
 		}
 
-		var iten = new en.items.GraviTool();
-		invGrid.interGrid[2][0].item = iten;
+		// var iten = new en.items.GraviTool();
+		// invGrid.interGrid[2][0].item = iten;
 		deselectCells();
 	}
 

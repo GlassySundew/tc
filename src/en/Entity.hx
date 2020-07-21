@@ -1,5 +1,6 @@
 package en;
 
+import differ.shapes.Circle;
 import differ.Collision;
 import ch3.scene.TileSprite;
 import en.objs.IsoTileSpr;
@@ -27,7 +28,10 @@ import h3d.scene.Mesh;
 	public static var ALL:Array<Entity> = [];
 	public static var GC:Array<Entity> = [];
 
-	public var collisions:Array<Shape> = [];
+	/**
+		Map of multiple shapes, 1st vector is a center of polygon Shape, 2nd polygon is a position of a poly
+	**/
+	public var collisions = new Map<Shape, {cent:Vector, offset:Vector}>();
 
 	public var game(get, never):Game;
 
@@ -38,9 +42,6 @@ import h3d.scene.Mesh;
 
 	inline function get_level()
 		return Game.inst.level;
-
-	public var hei:Int = 32;
-	public var wid:Int = 32;
 
 	public var destroyed(default, null) = false;
 	public var tmod(get, never):Float;
@@ -81,14 +82,9 @@ import h3d.scene.Mesh;
 	public var centerY(get, never):Float;
 
 	inline function get_centerY()
-		return footY - hei * 0.5;
+		return footY - 32 * 0.5;
 
 	public var dir(default, set) = 6;
-
-	public var sprOffX = 0.;
-	public var sprOffY = 0.;
-	public var sprOffColY = 0.;
-	public var sprOffColX = 0.;
 
 	inline function get_tmod()
 		return Game.inst.tmod;
@@ -101,22 +97,22 @@ import h3d.scene.Mesh;
 	public var footX(get, set):Float;
 
 	inline function get_footX()
-		return (cx + xr) * Const.GRID_WIDTH + sprOffX;
+		return (cx + xr) * Const.GRID_WIDTH;
 
 	inline function set_footX(v:Float) { // небольшой костыль
-		xr = ((v - sprOffX) / Const.GRID_WIDTH) % 1;
-		cx = (Math.floor((v - sprOffX) / Const.GRID_WIDTH));
+		xr = ((v) / Const.GRID_WIDTH) % 1;
+		cx = (Math.floor((v) / Const.GRID_WIDTH));
 		return v;
 	}
 
 	public var footY(get, set):Float;
 
 	inline function get_footY()
-		return (cy + yr - zr) * Const.GRID_WIDTH + sprOffY;
+		return (cy + yr - zr) * Const.GRID_WIDTH;
 
 	inline function set_footY(v:Float) { // аналогично
-		yr = ((v - sprOffY) / Const.GRID_WIDTH) % 1;
-		cy = (Math.floor((v - sprOffY) / Const.GRID_WIDTH));
+		yr = ((v) / Const.GRID_WIDTH) % 1;
+		cy = (Math.floor((v) / Const.GRID_WIDTH));
 		return v;
 	}
 
@@ -153,7 +149,6 @@ import h3d.scene.Mesh;
 	public function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:Null<TmxObject>) {
 		uid = Const.NEXT_UNIQ;
 		ALL.push(this);
-
 		cd = new dn.Cooldown(Const.FPS);
 		tw = new Tweenie(Const.FPS);
 
@@ -168,7 +163,9 @@ import h3d.scene.Mesh;
 		bmp = new Bitmap(spr.tile);
 		mesh = new IsoTileSpr(spr.tile, false, Boot.inst.s3d);
 		mesh.material.mainPass.setBlendMode(AlphaAdd);
-		tex = new Texture(Std.int(spr.tile.width), Std.int(spr.tile.height), [Target]);
+
+		tex = new Texture(Std.int(spr.tile.width), Std.int(spr.tile.height), [Target, WasCleared]);
+
 		bmp.drawTo(tex);
 		mesh.rotate(0, -rotAngle, M.toRad(90));
 		var s = mesh.material.mainPass.addShader(new h3d.shader.ColorAdd());
@@ -181,11 +178,22 @@ import h3d.scene.Mesh;
 		// s.setOp(Keep, DecrementWrap, Keep);
 		// mesh.material.mainPass.stencil = s;
 
+		if (tmxObj != null) {
+			if (tmxObj.flippedVertically) {
+				spr.tile.flipY();
+				// mesh.scaleX = -1;
+				// mesh.scaleZ = -1;
+				// mesh.scaleY = -1;
+				// mesh.rotate(M.toRad(180), 0, 0);
+				// x -= this.tmxObj.width / Const.GRID_WIDTH;
+			}
+		}
+
 		setPosCase(x, z);
 	}
 
-	public function is<T:Entity>(c:Class<T>)
-		return Std.is(this, c);
+	public function isOfType<T:Entity>(c:Class<T>)
+		return Std.isOfType(this, c);
 
 	public function as<T:Entity>(c:Class<T>):T
 		return Std.downcast(this, c);
@@ -210,6 +218,12 @@ import h3d.scene.Mesh;
 
 	public function isLocked()
 		return cd.has("lock");
+
+	public function lock()
+		cd.setS("lock", 1 / 0);
+
+	public function unlock()
+		cd.unset("lock");
 
 	inline function set_dir(v) {
 		if (dir != v) {
@@ -273,7 +287,6 @@ import h3d.scene.Mesh;
 		mesh.remove();
 		cd.destroy();
 		bmp.remove();
-		
 
 		bmp = null;
 		spr = null;
@@ -295,34 +308,67 @@ import h3d.scene.Mesh;
 	}
 
 	function checkCollisions() {
-		if (collisions[0] != null) {
-			collisions[0].x = footX - sprOffColX;
-			collisions[0].y = footY - sprOffColY;
+		// if (collisions.length > 0)
+		for (collObj in collisions.keys()) {
+			collObj.x = footX
+				- collisions.get(collObj).cent.x
+				- (Std.isOfType(collObj, differ.shapes.Polygon) ? spr.pivot.centerFactorX * spr.tile.width
+					- collisions.get(collObj).offset.x
+					- collisions.get(collObj).cent.x : 0);
+			collObj.y = footY
+				- collisions.get(collObj).cent.y
+				+ (Std.isOfType(collObj, differ.shapes.Polygon) ? spr.pivot.centerFactorY * spr.tile.height
+					+ collisions.get(collObj).offset.y
+					+ collisions.get(collObj).cent.y : 0);
+			// trace(collObj.x, collObj.y);
+			trace(this, collObj.name, collisions.get(collObj).cent.x, /*Std.int(collisions.get(collObj).cent.x), Std.int(collisions.get(collObj).cent.y),*/
+				spr.pivot.centerFactorX * spr.tile.width
+				- collisions.get(collObj).offset.x
+				- collisions.get(collObj).cent.x,
+				spr.pivot.centerFactorY * spr.tile.height
+				+ collisions.get(collObj).offset.y
+				+ collisions.get(collObj).cent.y,
+				collisions.get(collObj).offset.x, collisions.get(collObj).offset.y);
 		}
 	}
 
 	public function checkCollsAgainstAll() {
-		var collideInfo = null;
+		// if (collisions.length > 0) {
 		for (ent in Entity.ALL) {
-			if (ent.collisions[0] != null && !ent.is(FloatingItem)) {
-				collideInfo = Collision.shapeWithShape(collisions[0], ent.collisions[0]);
-				if (collideInfo != null) {
-					collisions[0].x += (collideInfo.separationX);
-					collisions[0].y += (collideInfo.separationY);
+			if (!(ent.isOfType(FloatingItem) && ent == this)) {
+				for (collObj in collisions.keys()) {
+					for (entCollObj in ent.collisions.keys()) {
+						var collideInfo = Collision.shapeWithShape(collObj, entCollObj);
+						if (collideInfo != null) {
+							collObj.x += (collideInfo.separationX);
+							collObj.y += (collideInfo.separationY);
+
+							footX += (collideInfo.separationX);
+							footY += (collideInfo.separationY);
+						}
+					}
 				}
 			}
 		}
+		// var collideInfo = null;
 		for (poly in Level.inst.walkable) {
-			collideInfo = Collision.shapeWithShape(collisions[0], poly);
-			if (collideInfo != null) {
-				collisions[0].x += (collideInfo.separationX);
-				collisions[0].y += (collideInfo.separationY);
+			for (collObj in collisions.keys()) {
+				var collideInfo = Collision.shapeWithShape(collObj, poly);
+				if (collideInfo != null) {
+					collObj.x += (collideInfo.separationX);
+					collObj.y += (collideInfo.separationY);
+
+					footX += (collideInfo.separationX);
+					footY += (collideInfo.separationY);
+				}
 			}
 		}
 
-		footX = (collisions[0].x);
-		footY = (collisions[0].y);
-		return collideInfo;
+		// footX = (collisions[0].x);
+		// footY = (collisions[0].y);
+
+		// }
+		// return collideInfo;
 	}
 
 	public function preUpdate() {
@@ -395,8 +441,8 @@ import h3d.scene.Mesh;
 		if (mesh != null) {
 			mesh.x = footX;
 			mesh.z = footY;
-
 			checkCollisions();
+
 			// spr.scaleX = dir * sprScaleX;
 			// spr.scaleY = sprScaleY;
 			if (!cd.has("colorMaintain")) {

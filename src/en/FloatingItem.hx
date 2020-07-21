@@ -143,7 +143,7 @@ class FloatingItem extends Interactive {
 		shadowBmp.drawTo(shadowTex);
 
 		var shape = new differ.shapes.Circle(0, 0, 4);
-		collisions.push(shape);
+		collisions.set(shape, {cent: new Vector(), offset: new Vector()});
 	}
 
 	// public static function
@@ -187,7 +187,6 @@ class FloatingItem extends Interactive {
 
 	public override function frameEnd() {
 		super.frameEnd();
-		
 	}
 
 	function filterArray(array:Array<HxPoint>) {

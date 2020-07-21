@@ -1,19 +1,8 @@
 base.hxml
 
 -lib hlsdl
-
-
-
-
-#-hl out/main.c
-#-js game.js
 -hl bin/game.hl
-
-#-D windowSize=2000x2000
 
 -D windowSize=1280x720
 
 -D windowTitle=Total Condemn
-
-#-cmd  hl  game.hl
-#-cmd hl game.hl--debug 6112 --debug-wait game.hl

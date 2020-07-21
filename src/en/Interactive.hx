@@ -42,7 +42,6 @@ class Interactive extends Entity {
 
 	public function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:TmxObject) {
 		super(x, z, tmxObj);
-
 		var pixels = Pixels.fromBytes(tex.capturePixels().bytes, Std.int(spr.tile.width), Std.int(spr.tile.height));
 		points = new MarchingSquares(pixels).march();
 		polygonized = (EarCut.triangulate(points));
@@ -118,7 +117,7 @@ class Interactive extends Entity {
 
 			buttonIcon.centerFlow.x = pos.x - 1;
 			buttonIcon.centerFlow.y = pos.y - 100 / Const.SCALE;
-			
+
 			buttonIcon.container.icon.tile = buttonIcon.buttonSpr.tile;
 			// buttonIcon.container.icon.scaleX = buttonIcon.container.icon.scaleY = 2;
 		}

@@ -1,3 +1,4 @@
+import hxd.Res;
 import hxd.snd.Manager;
 import hxd.inspect.Inspector;
 

@@ -1,11 +1,22 @@
 package ui;
 
 class Hud extends dn.Process {
-	public var game(get,never) : Game; inline function get_game() return Game.inst;
-	public var fx(get,never) : Fx; inline function get_fx() return Game.inst.fx;
-	public var level(get,never) : Level; inline function get_level() return Game.inst.level;
+	public var game(get, never):Game;
 
-	var flow : h2d.Flow;
+	inline function get_game()
+		return Game.inst;
+
+	public var fx(get, never):Fx;
+
+	inline function get_fx()
+		return Game.inst.fx;
+
+	public var level(get, never):Level;
+
+	inline function get_level()
+		return Game.inst.level;
+
+	var flow:h2d.Flow;
 	var invalidated = true;
 
 	public function new() {
@@ -24,7 +35,8 @@ class Hud extends dn.Process {
 		super.onDispose();
 	}
 
-	public inline function invalidate() invalidated = true;
+	public inline function invalidate()
+		invalidated = true;
 
 	function render() {
 		flow.removeChildren();
@@ -35,7 +47,7 @@ class Hud extends dn.Process {
 	override function postUpdate() {
 		super.postUpdate();
 
-		if( invalidated ) {
+		if (invalidated) {
 			invalidated = false;
 			render();
 		}

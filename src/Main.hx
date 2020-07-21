@@ -1,6 +1,12 @@
-package;
+package ;
 
 // import game.comps.GameUI;
+import hxd.fmt.pak.FileSystem;
+import h3d.mat.Texture;
+import h2d.Bitmap;
+import hxd.Cursor.CustomCursor;
+import hxd.BitmapData;
+import hxd.Pixels;
 import hxd.Key;
 import dn.M;
 import dn.Process;
@@ -22,7 +28,9 @@ class Main extends Process {
 
 		// root.filter = new h2d.filter.ColorMatrix();
 
-		#if (hl && debug)
+		#if (hl && pak)
+		hxd.Res.initPak();
+		#elseif (hl && debug)
 		hxd.Res.initLocal();
 		#else
 		hxd.Res.initEmbed();
@@ -32,7 +40,7 @@ class Main extends Process {
 		hxd.res.Resource.LIVE_UPDATE = true;
 		hxd.Res.data.watch(function() {
 			delayer.cancelById("cdb");
-
+			//
 			delayer.addS("cdb", function() {
 				Data.load(hxd.Res.data.entry.getBytes().toString());
 				if (Game.inst != null)
@@ -42,6 +50,7 @@ class Main extends Process {
 		#end
 
 		Assets.init();
+		Cursors.init();
 		Lang.init("en");
 		// Data.load(hxd.Res.data.entry.getText());
 
@@ -58,8 +67,9 @@ class Main extends Process {
 		controller.bind(SELECT, Key.R);
 		controller.bind(LT, Key.TAB);
 
-		@:privateAccess new dn.heaps.GameFocusHelper(Boot.inst.s2d, Assets.fontPixel);
+		// @:privateAccess new dn.heaps.GameFocusHelper(Boot.inst.s2d, Assets.fontPixel);
 		delayer.addF(start, 1);
+
 	}
 
 	function start() {

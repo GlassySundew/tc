@@ -4,6 +4,41 @@ size: 155,128
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+cursor0
+  rotate: false
+  xy: 121, 26
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+cursor1
+  rotate: false
+  xy: 139, 26
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+cursor2
+  rotate: false
+  xy: 121, 8
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+health_caret
+  rotate: false
+  xy: 142, 58
+  size: 3, 12
+  orig: 3, 12
+  offset: 0, 0
+  index: -1
+health_line
+  rotate: false
+  xy: 142, 44
+  size: 1, 12
+  orig: 1, 12
+  offset: 0, 0
+  index: -1
 health_scale
   rotate: false
   xy: 142, 72
@@ -41,7 +76,7 @@ keyboard_icon1
   index: -1
 oxygen_scale
   rotate: false
-  xy: 121, 30
+  xy: 139, 12
   size: 12, 12
   orig: 12, 12
   offset: 0, 0

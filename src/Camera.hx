@@ -25,23 +25,28 @@ class Camera extends dn.Process {
 		super(Game.inst);
 		x = y = 0;
 		dx = dy = 0;
+
+		// little hack to prevent z-fight
+		var temp = new h3d.scene.CameraController(Boot.inst.s3d);
+		temp.loadFromCamera();
+		temp.remove();
 	}
 
 	function updateCamera(?x = 0., ?y = 0.) {
 		s3dCam.target.x = (x);
 		s3dCam.target.z = (y);
-		s3dCam.pos = s3dCam.target.add(new Vector(0, -(w() * 1) / (2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * (Math.PI / 180))) , -3 / ppu));
-
+		s3dCam.pos = s3dCam.target.add(new Vector(0, -(w() * 1) / (2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * (Math.PI / 180))), -3 / ppu));
 		// s3dCam.pos = s3dCam.target.add(new Vector(0, (h() * 1) / (2 * 32 * Math.tan(s3dCam.getFovX() / 2)), -0.01));
 	}
 
 	inline function set_x(v:Float) {
-		updateCamera(v, y);
+		// updateCamera(M.round(v), M.round(y / yMult) * yMult);
 		return x = v;
 	}
 
 	inline function set_y(v:Float) {
-		updateCamera(x, v);
+		updateCamera(M.round(x), M.round(v));
+		// updateCamera(M.round(x), M.round(v / yMult) * yMult);
 		return y = v;
 	}
 
@@ -76,6 +81,7 @@ class Camera extends dn.Process {
 
 	override function update() {
 		super.update();
+		// updateCamera(M.round(x), M.round(y / yMult) * yMult);
 	}
 
 	override function postUpdate() {
@@ -87,7 +93,7 @@ class Camera extends dn.Process {
 
 			// // Update scroller
 			// if (wid < level.wid * Const.GRID_WIDTH)
-			// 	scroller.x = -x + wid * 0.5;
+			// 	scroller.x = -x + wid * 0.5;p
 			// else
 			// 	scroller.x = wid * 0.5 - level.wid * 0.5 * Const.GRID_WIDTH;
 			// if (hei < level.hei * Const.GRID_HEIGHT)
@@ -113,23 +119,23 @@ class Camera extends dn.Process {
 				var tx = target.footX;
 				var ty = target.footY;
 				var d = M.dist(x, y, tx, ty);
-
 				if (d >= deadZone) {
 					var a = Math.atan2(ty - y, tx - x);
 					dx += Math.cos(a) * (d - deadZone) * s * tmod;
 					dy += Math.sin(a) * (d - deadZone) * s * tmod;
 				}
 
-				var frict = 0.89;
-				x += dx * tmod;
+				var frict = 0.9;
+				x += (dx * tmod);
 				dx *= Math.pow(frict, tmod);
 
 				y += dy * tmod;
 				dy *= Math.pow(frict, tmod);
-				// Rounding
-				x = M.round(x);
-				y = M.round(y / yMult) * yMult;
 			}
+			// Rounding
+
+			// x = M.round(x);
+			// y = M.round(y / yMult) * yMult;
 		}
 	}
 }

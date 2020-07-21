@@ -1,5 +1,6 @@
 package en.player;
 
+import net.Connect;
 import hxd.Window;
 import ui.player.PlayerUI;
 import ui.player.Inventory;
@@ -61,22 +62,26 @@ class Player extends Entity {
 		}
 
 		super(x, z, tmxObj);
-		inst = this;
 		mesh.isLong = true;
 		mesh.isoWidth = mesh.isoHeight = 0;
 
 		mesh.renewDebugPts();
 
-		ui = new PlayerUI(game.root);
+		if (inst == null) {
+			ui = new PlayerUI(game.root);
+			inst = this;
+		}
 	}
 
 	override function dispose() {
 		super.dispose();
+		inst = null;
 		ca.dispose();
 	}
 
 	override public function update() {
 		super.update();
+
 		var leftDist = M.dist(0, 0, ca.lxValue(), ca.lyValue());
 		var leftPushed = leftDist >= 0.3;
 		var leftAng = Math.atan2(ca.lyValue(), ca.lxValue());
@@ -107,29 +112,32 @@ class Player extends Entity {
 				dx *= Math.pow(0.6, tmod);
 				dy *= Math.pow(0.6, tmod);
 			}
+			sendPosToServer();
 		}
+	}
+
+	public function sendPosToServer() {
+		if (Connect.inst != null && Connect.inst.room != null)
+			Connect.inst.room.send("setPos", {x: footX, y: footY});
 	}
 
 	override function postUpdate() {
 		super.postUpdate();
 		checkBeltInputs();
-		// trace("player");
 		// if (Key.isPressed(Key.E)) {
 		// 	new FloatingItem(mesh.x, mesh.z, new GraviTool());
 		// }
 
 		if (cursorItem != null) {
-			// cursorItem.x = Window.getInstance().mouseX /Const.SCALE;
-			// cursorItem.y = Window.getInstance().mouseY /Const.SCALE;
-
-			cursorItem.x = Boot.inst.s2d.mouseX + 10 * cursorItem.scaleX;
-			cursorItem.y = Boot.inst.s2d.mouseY + 10 * cursorItem.scaleX;
+			cursorItem.x = Boot.inst.s2d.mouseX + 15 * cursorItem.scaleX;
+			cursorItem.y = Boot.inst.s2d.mouseY + 15 * cursorItem.scaleX;
 		}
 	}
 
 	override function checkCollisions() {
+		if (!isLocked())
+			checkCollsAgainstAll();
 		super.checkCollisions();
-		checkCollsAgainstAll();
 	}
 
 	function checkBeltInputs() {

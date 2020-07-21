@@ -143,7 +143,7 @@ class Level extends dn.Process {
 	public function render() {
 		invalidated = false;
 
-		ground = new h3d.mat.Texture(data.width * data.tileWidth, data.height * data.tileHeight, [Target]);
+		ground = new h3d.mat.Texture(data.width * data.tileWidth, data.height * data.tileHeight, [Target, WasCleared]);
 		ground.filter = Nearest;
 		var prim = new PlanePrim(ground.width, ground.height, -ground.width, -ground.height, Y);
 
@@ -152,9 +152,11 @@ class Level extends dn.Process {
 		for (e in data.layers) {
 			switch (e) {
 				case LTileLayer(layer):
-					obj.material.texture.flags.set(WasCleared);
-					new LayerRender(data, layer).render.g.drawTo(obj.material.texture);
-					obj.material.texture.flags.set(WasCleared);
+					if (layer.visible) {
+						obj.material.texture.flags.set(WasCleared);
+						new LayerRender(data, layer).render.g.drawTo(obj.material.texture);
+						obj.material.texture.flags.set(WasCleared);
+					}
 				default:
 			}
 		}

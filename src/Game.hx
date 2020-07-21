@@ -1,3 +1,6 @@
+import dn.Rand;
+import en.player.WebPlayer;
+import net.Connect;
 import hxd.System;
 import h3d.pass.PassList;
 import ui.Hud;
@@ -26,6 +29,8 @@ class Game extends Process {
 
 	public var level:Level;
 
+	var tmxMap:TmxMap;
+
 	public var player:en.player.Player;
 
 	private var tsx:Map<String, TmxTileset>;
@@ -44,7 +49,7 @@ class Game extends Process {
 		createRootInLayers(Main.inst.root, Const.DP_BG);
 
 		camera = new Camera();
-		hud = new ui.Hud();
+		// hud = new ui.Hud();
 
 		startLevel("alphamap.tmx");
 	}
@@ -69,10 +74,7 @@ class Game extends Process {
 	}
 
 	public function startLevel(name:String) {
-		// little hack to prevent z-fight
-		var temp = new h3d.scene.CameraController(Boot.inst.s3d);
-		temp.loadFromCamera();
-		temp.remove();
+		// temp = null;
 
 		engine.clear(0, 1);
 		if (level != null) {
@@ -81,11 +83,13 @@ class Game extends Process {
 				e.destroy();
 			gc();
 		}
+
 		tsx = new Map();
 		r = new Reader();
 		r.resolveTSX = getTSX;
-		var data = r.read(Xml.parse(Res.loader.load(Const.LEVELS_PATH + name).entry.getText()));
-		level = new Level(data);
+		tmxMap = r.read(Xml.parse(Res.loader.load(Const.LEVELS_PATH + name).entry.getText()));
+		level = new Level(tmxMap);
+
 		CompileTime.importPackage("en");
 		var entNames = (CompileTime.getAllClasses(Entity));
 
@@ -102,24 +106,43 @@ class Game extends Process {
 			}
 
 		player = Player.inst;
-		// putting player inst to the last position of entities array as a depth sorting fix
-		// Entity.ALL.remove(player);
-		// Entity.ALL.insert(0, player);
+
+		// putting player inst to the last position of entities array as a depth sorting fix (хуйня ебаная на самом деле, но существует трудновоспроизводимый баг с
+		// сортировкой, когда 2 объекта начаинают неправильно рисоваться при неопределенном положении в списке объектов в Tiled, если они расположены на соседних линиях в изометрии)
+
+		applyTmxObjOnEnt();
+
+		camera.target = player;
+		camera.recenter();
+		cd.unset("levelDone");
+		// System.openURL("https://pornreactor.cc");
+
+		// rect-obj position fix
+		for (en in Entity.ALL)
+			if (en.tmxObj != null)
+				en.footY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
+
+		// new Connect();
+	}
+
+	public function applyTmxObjOnEnt(?ent:Null<Entity>) {
+		// если ent не определён, то на все Entity из массива ALL будут добавлены TmxObject из тайлсета с названием colls
 
 		// parsing collision objects from 'colls' tileset
-		for (tileset in data.tilesets) {
+		for (tileset in tmxMap.tilesets) {
 			var ereg = ~/(^[^.]*)+/; // regexp to take tileset name
 			if (ereg.match(tileset.source) && ereg.matched(1) == 'colls')
 				for (tile in tileset.tiles) {
 					var ereg = ~/\/([a-z_0-9]+)\./; // regexp to take string between last / and . from picture path
 					if (ereg.match(tile.image.source)) {
-						for (ent in Entity.ALL) {
+						var ents = ent != null ? [ent] : Entity.ALL;
+						for (ent in ents) {
 							var eregClass = ~/\.([a-z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
 							if (tile.objectGroup != null
 								&& eregClass.match('$ent'.toLowerCase())
 								&& eregClass.matched(1) == ereg.matched(1)
-								&& tile.objectGroup.objects.length >= 0
-								&& ent.collisions.length == 0) {
+								&& tile.objectGroup.objects.length > 0 /*&& ent.collisions.length == 0*/) {
+								var centerSet = false;
 								for (obj in tile.objectGroup.objects) {
 									var params = {
 										x: M.round(obj.x) + ent.footX,
@@ -130,14 +153,14 @@ class Game extends Process {
 									var xCent = 0.;
 									var yCent = 0.;
 
-									var shape:Circle = null;
 									switch (obj.objectType) {
 										case OTEllipse:
-											shape = new differ.shapes.Circle(0, 0, params.width / 2);
+											var shape = new differ.shapes.Circle(0, 0, params.width / 2);
 											shape.scaleY = params.height / params.width;
-											ent.collisions.push(shape);
+											ent.collisions.set(shape, {cent: new h3d.Vector(), offset: new h3d.Vector()});
 										case OTRectangle:
-											ent.collisions.push(Polygon.rectangle(params.x, params.y, params.width, params.height));
+											ent.collisions.set(Polygon.rectangle(params.x, params.y, params.width, params.height),
+												{cent: new h3d.Vector(), offset: new h3d.Vector()});
 										case OTPolygon(points):
 											var verts:Array<Vector> = [];
 											for (i in points) {
@@ -149,39 +172,38 @@ class Game extends Process {
 											xArr.sort(function(a, b) return (a.x < b.x) ? -1 : ((a.x > b.x) ? 1 : 0));
 											checkPolyClockwise(verts);
 
-											xCent = ((xArr[xArr.length - 1].x + xArr[0].x) * .5);
-											yCent = -((yArr[yArr.length - 1].y + yArr[0].y) * .5);
-											var poly = new Polygon(0, 0, verts);
-											poly.rotation = obj.rotation;
-											ent.collisions.push(poly);
+											xCent = M.round((xArr[xArr.length - 1].x + xArr[0].x) * .5);
+											yCent = -M.round((yArr[yArr.length - 1].y + yArr[0].y) * .5);
+											var poly = new Polygon(xCent, -yCent, verts);
+											poly.rotation = -obj.rotation;
+											poly.name = Random.string(5);
+											trace(ent, poly.name, xCent, -yCent, obj.x, obj.y);
+											ent.collisions.set(poly, {cent: new h3d.Vector(xCent, -yCent), offset: new h3d.Vector(obj.x, -obj.y)});
 										default:
 									}
 
-									ent.spr.setCenterRatio((M.round(obj.x + xCent) + M.round((obj.width) / 2)) / ent.spr.tile.width,
-										(M.round(obj.y + yCent) + M.round((obj.height) / 2)) / ent.spr.tile.height);
-									(try cast(ent, Interactive).rebuildInteract() catch (e:Dynamic) 0);
+									if (!centerSet) {
+										ent.spr.setCenterRatio((M.round(obj.x + xCent) + M.round((obj.width) / 2)) / ent.spr.tile.width,
+											(M.round(obj.y + yCent) + M.round((obj.height) / 2)) / ent.spr.tile.height);
 
-									ent.sprOffColX = xCent;
-									ent.sprOffColY = -yCent;
+										ent.footX += M.round((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width) - Const.GRID_WIDTH / 2;
+										ent.footY -= (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height + Const.GRID_HEIGHT;
 
-									ent.footX += M.round((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width) - Const.GRID_WIDTH / 2;
-									ent.footY -= (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height + Const.GRID_HEIGHT;
+										centerSet = true;
+									}
+									try
+										cast(ent, Interactive).rebuildInteract()
+									catch (e:Dynamic)
+										0;
+
+									// ent.sprOffColX = xCent;
+									// ent.sprOffColY = -yCent;
 								}
 							}
 						}
 					}
 				}
 		}
-
-		// Boot.inst.s3d.camera = new h3d.Camera(25, 1, 1.777777778, 1);
-		camera.target = player;
-		camera.recenter();
-		cd.unset("levelDone");
-		// System.openURL("https://pornreactor.cc");
-		// rect-obj position fix
-		for (en in Entity.ALL)
-			if (en.tmxObj != null)
-				en.footY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
 	}
 
 	private function getTSX(name:String):TmxTileset {
@@ -212,6 +234,7 @@ class Game extends Process {
 
 	override function update() {
 		super.update();
+
 		// Updates
 		for (e in Entity.ALL)
 			if (!e.destroyed)

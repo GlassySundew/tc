@@ -1,0 +1,2 @@
+#!/bin/sh
+npx schema-codegen Schema.ts --haxe --output hui

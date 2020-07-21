@@ -65,8 +65,8 @@ class Item extends Object {
 	override function sync(ctx:RenderContext) {
 		super.sync(ctx);
 		if (textLabel != null) {
-			textLabel.x = Boot.inst.s2d.mouseX + 10;
-			textLabel.y = Boot.inst.s2d.mouseY + 10;
+			textLabel.x = Boot.inst.s2d.mouseX + 20;
+			textLabel.y = Boot.inst.s2d.mouseY + 20;
 		}
 		interactive.width = spr.tile.width;
 		interactive.height = spr.tile.height;
@@ -74,6 +74,6 @@ class Item extends Object {
 		interactive.x = -spr.tile.width / 2;
 		interactive.y = -spr.tile.height / 2;
 
-		setScale(Std.is(parent, Scene) ? 2 : 1);
+		setScale(Std.isOfType(parent, Scene) ? 2 : 1);
 	}
 }
