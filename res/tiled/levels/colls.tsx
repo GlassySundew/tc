@@ -76,12 +76,9 @@
  </tile>
  <tile id="12">
   <image width="56" height="77" source="../separated/structures/door.png"/>
-  <objectgroup draworder="index" id="4">
-   <object id="40" x="42" y="53">
-    <polygon points="0,0 -23,12 -15,16 8,4"/>
-   </object>
-   <object id="1" x="34.8941" y="14.8657" rotation="106.309">
-    <polygon points="0,0 56,45 48,49 -7,4"/>
+  <objectgroup draworder="index" id="3">
+   <object id="3" x="11" y="60">
+    <polygon points="0,0 24,-12 30,-9 6,3"/>
    </object>
   </objectgroup>
  </tile>

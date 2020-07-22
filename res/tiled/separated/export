@@ -1,0 +1,23 @@
+#!/bin/sh
+
+cd env
+./export
+cd ..
+
+cd items
+./export
+cd ..
+
+cd player
+./export
+cd ..
+
+cd structures
+./export
+cd ..
+
+cd ui
+./export
+cd ..
+
+echo $dirname

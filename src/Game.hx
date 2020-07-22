@@ -157,7 +157,12 @@ class Game extends Process {
 										case OTEllipse:
 											var shape = new differ.shapes.Circle(0, 0, params.width / 2);
 											shape.scaleY = params.height / params.width;
-											ent.collisions.set(shape, {cent: new h3d.Vector(), offset: new h3d.Vector()});
+											trace(obj.width, obj.height);
+											xCent = M.round(obj.width / 2);
+											yCent = M.round(obj.height / 2);
+
+											ent.collisions.set(shape,
+												{cent: new h3d.Vector(xCent, yCent), offset: new h3d.Vector(obj.x + xCent, -obj.y - yCent)});
 										case OTRectangle:
 											ent.collisions.set(Polygon.rectangle(params.x, params.y, params.width, params.height),
 												{cent: new h3d.Vector(), offset: new h3d.Vector()});
@@ -174,17 +179,16 @@ class Game extends Process {
 
 											xCent = M.round((xArr[xArr.length - 1].x + xArr[0].x) * .5);
 											yCent = -M.round((yArr[yArr.length - 1].y + yArr[0].y) * .5);
-											var poly = new Polygon(xCent, -yCent, verts);
+											var poly = new Polygon(0, 0, verts);
 											poly.rotation = -obj.rotation;
 											poly.name = Random.string(5);
-											trace(ent, poly.name, xCent, -yCent, obj.x, obj.y);
 											ent.collisions.set(poly, {cent: new h3d.Vector(xCent, -yCent), offset: new h3d.Vector(obj.x, -obj.y)});
+											trace(obj.width, obj.height);
 										default:
 									}
 
 									if (!centerSet) {
-										ent.spr.setCenterRatio((M.round(obj.x + xCent) + M.round((obj.width) / 2)) / ent.spr.tile.width,
-											(M.round(obj.y + yCent) + M.round((obj.height) / 2)) / ent.spr.tile.height);
+										ent.spr.setCenterRatio((M.round(obj.x + xCent)) / ent.spr.tile.width, (M.round(obj.y + yCent)) / ent.spr.tile.height);
 
 										ent.footX += M.round((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width) - Const.GRID_WIDTH / 2;
 										ent.footY -= (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height + Const.GRID_HEIGHT;
@@ -195,9 +199,6 @@ class Game extends Process {
 										cast(ent, Interactive).rebuildInteract()
 									catch (e:Dynamic)
 										0;
-
-									// ent.sprOffColX = xCent;
-									// ent.sprOffColY = -yCent;
 								}
 							}
 						}

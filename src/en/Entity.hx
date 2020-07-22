@@ -308,32 +308,18 @@ import h3d.scene.Mesh;
 	}
 
 	function checkCollisions() {
-		// if (collisions.length > 0)
 		for (collObj in collisions.keys()) {
+			trace(this, collisions.get(collObj).cent.x, collisions.get(collObj).cent.y);
 			collObj.x = footX
 				- collisions.get(collObj).cent.x
-				- (Std.isOfType(collObj, differ.shapes.Polygon) ? spr.pivot.centerFactorX * spr.tile.width
-					- collisions.get(collObj).offset.x
-					- collisions.get(collObj).cent.x : 0);
+				- (spr.pivot.centerFactorX * spr.tile.width - collisions.get(collObj).offset.x - collisions.get(collObj).cent.x);
 			collObj.y = footY
 				- collisions.get(collObj).cent.y
-				+ (Std.isOfType(collObj, differ.shapes.Polygon) ? spr.pivot.centerFactorY * spr.tile.height
-					+ collisions.get(collObj).offset.y
-					+ collisions.get(collObj).cent.y : 0);
-			// trace(collObj.x, collObj.y);
-			trace(this, collObj.name, collisions.get(collObj).cent.x, /*Std.int(collisions.get(collObj).cent.x), Std.int(collisions.get(collObj).cent.y),*/
-				spr.pivot.centerFactorX * spr.tile.width
-				- collisions.get(collObj).offset.x
-				- collisions.get(collObj).cent.x,
-				spr.pivot.centerFactorY * spr.tile.height
-				+ collisions.get(collObj).offset.y
-				+ collisions.get(collObj).cent.y,
-				collisions.get(collObj).offset.x, collisions.get(collObj).offset.y);
+				+ (spr.pivot.centerFactorY * spr.tile.height + collisions.get(collObj).offset.y + collisions.get(collObj).cent.y);
 		}
 	}
 
 	public function checkCollsAgainstAll() {
-		// if (collisions.length > 0) {
 		for (ent in Entity.ALL) {
 			if (!(ent.isOfType(FloatingItem) && ent == this)) {
 				for (collObj in collisions.keys()) {
@@ -350,7 +336,6 @@ import h3d.scene.Mesh;
 				}
 			}
 		}
-		// var collideInfo = null;
 		for (poly in Level.inst.walkable) {
 			for (collObj in collisions.keys()) {
 				var collideInfo = Collision.shapeWithShape(collObj, poly);
@@ -363,12 +348,8 @@ import h3d.scene.Mesh;
 				}
 			}
 		}
-
 		// footX = (collisions[0].x);
 		// footY = (collisions[0].y);
-
-		// }
-		// return collideInfo;
 	}
 
 	public function preUpdate() {
