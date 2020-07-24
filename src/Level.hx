@@ -1,3 +1,4 @@
+import h3d.prim.Grid;
 import h3d.mat.Material;
 import ch3.prim.PlanePrim;
 import differ.shapes.Polygon;
@@ -76,11 +77,10 @@ class Level extends dn.Process {
 
 							default:
 						}
-
+						// все объекты в распаршенных слоях уже с конвертированными координатами
 						// entities export lies ahead
-						var isoX = cartToIso_abs(obj.x, obj.y).x;
-						var isoY = cartToIso_abs(obj.x, obj.y).y;
-
+						var isoX = cartToIsoLocal(obj.x, obj.y).x;
+						var isoY = cartToIsoLocal(obj.x, obj.y).y;
 						obj.x = isoX / Const.GRID_WIDTH;
 						obj.y = isoY / Const.GRID_WIDTH;
 						if (obj.name == "") {
@@ -103,13 +103,13 @@ class Level extends dn.Process {
 		}
 	}
 
-	// function get_lid() {
-	// 	// var reg = ~/[A-Z\-_.]*([0-9]+)/gi;
-	// 	// if (!reg.match(Game.inst.lvlName))
-	// 	// 	return -1;
-	// 	// else
-	// 	// 	return Std.parseInt(reg.matched(1));
-	// }
+	function get_lid() {
+		var reg = ~/[A-Z\-_.]*([0-9]+)/gi;
+		if (!reg.match(Game.inst.lvlName))
+			return -1;
+		else
+			return Std.parseInt(reg.matched(1));
+	}
 
 	override function onDispose() {
 		super.onDispose();
@@ -153,9 +153,26 @@ class Level extends dn.Process {
 			switch (e) {
 				case LTileLayer(layer):
 					if (layer.visible) {
-						obj.material.texture.flags.set(WasCleared);
 						new LayerRender(data, layer).render.g.drawTo(obj.material.texture);
-						obj.material.texture.flags.set(WasCleared);
+					}
+				default:
+			}
+		}
+
+		var imageLayer = layersByName.get("image");
+		if (imageLayer != null) {
+			switch (imageLayer) {
+				case LObjectGroup(ol):
+					for (obj in ol.objects) {
+						switch (obj.objectType) {
+							case OTTile(gid):
+								var bmp = new Bitmap(getTileFromSeparatedTsx(gid, Tools.getTilesetByGid(data, gid)));
+								bmp.scaleX = obj.flippedVertically ? 1:-1;
+								bmp.x = obj.x * Const.GRID_WIDTH - obj.width / 2;
+								bmp.y = hei - obj.y * Const.GRID_WIDTH - obj.height;
+								bmp.drawTo(this.obj.material.texture);
+							default:
+						}
 					}
 				default:
 			}
@@ -173,14 +190,14 @@ class Level extends dn.Process {
 		if (points != null) {
 			for (i in points)
 				vertices.push(new differ.math.Vector(cartToIso(i.x, i.y).x, cartToIso(i.x, i.y).y));
-			walkable.push(new Polygon(cartToIso_abs(poly.x, poly.y).x, cartToIso_abs(poly.x, poly.y).y, vertices));
+			walkable.push(new Polygon(cartToIsoLocal(poly.x, poly.y).x, cartToIsoLocal(poly.x, poly.y).y, vertices));
 		} else if (poly.objectType == OTRectangle) {
 			vertices.push(new differ.math.Vector(cartToIso(poly.width, 0).x, cartToIso(poly.width, 0).y));
 			vertices.push(new differ.math.Vector(cartToIso(poly.width, poly.height).x, cartToIso(poly.width, poly.height).y));
 			vertices.push(new differ.math.Vector(cartToIso(0, poly.height).x, cartToIso(0, poly.height).y));
 			vertices.push(new differ.math.Vector(0, 0));
 
-			walkable.push(new Polygon(cartToIso_abs(poly.x, poly.y).x, cartToIso_abs(poly.x, poly.y).y, vertices));
+			walkable.push(new Polygon(cartToIsoLocal(poly.x, poly.y).x, cartToIsoLocal(poly.x, poly.y).y, vertices));
 		}
 		walkable[walkable.length - 1].scaleY = -1;
 	}
@@ -193,7 +210,7 @@ class Level extends dn.Process {
 		}
 	}
 
-	public inline function cartToIso_abs(x:Float, y:Float):Vector
+	public inline function cartToIsoLocal(x:Float, y:Float):Vector
 		return new Vector(wid * .5 + cartToIso(x, y).x, hei - cartToIso(x, y).y);
 }
 
@@ -205,7 +222,7 @@ class LayerRender extends h2d.Object {
 		render = new InternalRender(map, layer);
 		render.g = new h2d.Graphics();
 		render.g.blendMode = Alpha;
-		render.tex = new Texture(map.tileWidth * map.width, map.tileHeight * map.height, [Target, WasCleared]);
+		render.tex = new Texture(map.tileWidth * map.width, map.tileHeight * map.height, [Target]);
 		render.render();
 	}
 }
@@ -249,19 +266,21 @@ private class InternalRender extends TileLayerRenderer {
 	}
 
 	function renderOrthoTileFromImageColl(x:Float, y:Float, tile:TmxTile, tileset:TmxTileset):Void {
-		var imageSource;
-		var gid = tile.gid - tileset.firstGID;
-		for (i in 0...tileset.tiles.length)
-			if (tileset.tiles[i].id == gid && gid > i)
-				while (gid > i)
-					gid--;
-		// while (tileset.tiles[gid - tileset.firstGID] == null) // making tiles' ids persistent
-		// 	gid--;
-		imageSource = tileset.tiles[gid];
-		var h2dTile = Res.loader.load(Const.LEVELS_PATH + imageSource.image.source).toTile();
+		// var imageSource;
+		// var gid = tile.gid - tileset.firstGID;
+		// // fix for offseting ids to right order
+		// for (i in 0...tileset.tiles.length)
+		// 	if (tileset.tiles[i].id == gid && gid > i)
+		// 		while (gid > i)
+		// 			gid--;
+		// // while (tileset.tiles[gid - tileset.firstGID] == null) // making tiles' ids persistent
+		// // 	gid--;
+		// imageSource = tileset.tiles[gid];
+		// var h2dTile = Res.loader.load(Const.LEVELS_PATH + imageSource.image.source).toTile();
+
+		var h2dTile = getTileFromSeparatedTsx(tile.gid, tileset);
 		var bmp = new Bitmap(h2dTile);
 		if (tile.flippedDiagonally) {
-			trace(tile.flippedHorizontally, tile.flippedVertically);
 			// h2dTile.setCenterRatio(.5, .5);
 			bmp.rotate(M.toRad(tile.flippedVertically ? -90 : 90));
 		}

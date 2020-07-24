@@ -1,5 +1,10 @@
 package tools;
 
+import hxd.Res;
+import format.tmx.Data.TmxTileset;
+import h2d.Tile;
+import format.tmx.Tools;
+import format.tmx.Data.TmxMap;
 import hxd.BitmapData;
 import h2d.Bitmap;
 import h3d.Vector;
@@ -38,4 +43,15 @@ class Util {
 
 	inline static function getS2dScaledHei()
 		return (Boot.inst.s2d.height / Const.SCALE);
+
+	inline static function getTileFromSeparatedTsx(gid:Int, tileset:TmxTileset):Tile {
+		var fixedGId = gid - tileset.firstGID;
+		for (i in 0...tileset.tiles.length)
+			if (tileset.tiles[i].id == fixedGId && fixedGId > i)
+				while (fixedGId > i)
+					fixedGId--;
+		var imageSource = tileset.tiles[fixedGId];
+		
+		return Res.loader.load(Const.LEVELS_PATH + imageSource.image.source).toTile();
+	}
 }

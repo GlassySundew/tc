@@ -1,5 +1,6 @@
 package net;
 
+import ui.Console;
 import h3d.mat.Texture;
 import en.player.WebPlayer;
 import io.colyseus.serializer.schema.Schema;
@@ -22,25 +23,24 @@ class Connect {
 
 	public function new() {
 		inst = this;
-
 		// this.client = new Client('ws://0.0.0.0:8080');
 		this.client = new Client("wss://testgovno.herokuapp.com");
-		// haxe.Timer.delay(function() {
-		// 	this.client.getAvailableRooms("my_room", function(err, rooms) {
-		// 		if (err != null) {
-		// 			trace("ERROR! " + err);
-		// 			return;
-		// 		}
+		haxe.Timer.delay(function() {
+			this.client.getAvailableRooms("my_room", function(err, rooms) {
+				if (err != null) {
+					trace("ERROR! " + err);
+					return;
+				}
 
-		// 		for (room in rooms) {
-		// 			trace("RoomAvailable:");
-		// 			trace("roomId: " + room.roomId);
-		// 			trace("clients: " + room.clients);
-		// 			trace("maxClients: " + room.maxClients);
-		// 			trace("metadata: " + room.metadata);
-		// 		}
-		// 	});
-		// }, 3000);
+				for (room in rooms) {
+					trace("RoomAvailable:");
+					trace("roomId: " + room.roomId);
+					trace("clients: " + room.clients);
+					trace("maxClients: " + room.maxClients);
+					trace("metadata: " + room.metadata);
+				}
+			});
+		}, 3000);
 
 		this.client.joinOrCreate("my_room", [], State, function(err, room) {
 			if (err != null) {
@@ -50,7 +50,9 @@ class Connect {
 			}
 			this.room = room;
 			playerI.sendPosToServer();
-			trace("hui");
+
+			this.room.onJoin += function() Console.inst.log('CONNECTION TO ${this.client.endpoint} SUCCESSFULL', 0x5d9047);
+
 			this.room.state.players.onAdd = function(player, key) {
 				// добавляем всех игроков, которые сейчас на сервере
 				if (this.room.sessionId != key /*&& playerI.netId != null*/) {

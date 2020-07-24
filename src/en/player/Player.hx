@@ -75,7 +75,7 @@ class Player extends Entity {
 
 	override function dispose() {
 		super.dispose();
-		inst = null;
+	
 		ca.dispose();
 	}
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.2" tiledversion="2020.05.27" name="alpha" tilewidth="125" tileheight="116" tilecount="16" columns="0">
+<tileset version="1.4" tiledversion="2020.06.25" name="alpha" tilewidth="264" tileheight="167" tilecount="17" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="23">
   <image width="46" height="24" source="separated/env/ship/ship_wall_bottom_corner.png"/>
@@ -41,12 +41,15 @@
   <image width="48" height="82" source="separated/env/ship/ship_room_wall_lighten.png"/>
  </tile>
  <tile id="36">
-  <image width="88" height="109" source="separated/env/agro_wall_mid.png"/>
+  <image width="118" height="109" source="separated/env/agro_wall_mid.png"/>
  </tile>
  <tile id="37">
-  <image width="46" height="106" source="separated/env/agro_wall.png"/>
+  <image width="68" height="106" source="separated/env/agro_wall.png"/>
  </tile>
  <tile id="38">
-  <image width="58" height="35" source="separated/env/floor.png"/>
+  <image width="58" height="37" source="separated/env/floor.png"/>
+ </tile>
+ <tile id="39">
+  <image width="264" height="167" source="../separated/env/bridge.png"/>
  </tile>
 </tileset>

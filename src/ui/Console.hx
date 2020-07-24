@@ -32,8 +32,8 @@ class Console extends h2d.Console {
 		h2d.Console.HIDE_LOG_TIMEOUT = 30;
 		#end
 		// Lib.redirectTracesToH2dConsole(this);
-
 		// Debug flags
+
 		#if debug
 		flags = new Map();
 		this.addCommand("set", [{name: "k", t: AString}], function(k:String) {
@@ -89,6 +89,12 @@ class Console extends h2d.Console {
 		return false;
 	#end
 
+	override function show() {
+		super.show();
+		logTxt.visible = true;
+		logTxt.alpha = 1;
+	}
+
 	override function sync(ctx:h2d.RenderContext) {
 		var scene = ctx.scene;
 		if (scene != null) {
@@ -96,11 +102,13 @@ class Console extends h2d.Console {
 			y = scene.height - height;
 			width = scene.width;
 			tf.maxWidth = width;
+
 			bg.tile.scaleToSize(width, -logTxt.textHeight);
+			bg.tile.dy = logTxt.font.lineHeight;
 		}
 		var log = logTxt;
 		if (log.visible) {
-			log.y = bg.y - log.textHeight + logDY;
+			log.y = bg.y - log.textHeight + logDY + log.font.lineHeight;
 			var dt = haxe.Timer.stamp() - lastLogTime;
 			if (dt > 2 && !bg.visible) {
 				log.alpha -= ctx.elapsedTime * 4;
@@ -114,7 +122,6 @@ class Console extends h2d.Console {
 				Player.inst.lock();
 		} else if (Player.inst != null && Player.inst.isLocked())
 			Player.inst.unlock();
-
 		// bg.y = logTxt.y;
 		// super.sync(ctx);
 	}

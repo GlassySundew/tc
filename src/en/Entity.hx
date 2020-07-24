@@ -309,7 +309,6 @@ import h3d.scene.Mesh;
 
 	function checkCollisions() {
 		for (collObj in collisions.keys()) {
-			trace(this, collisions.get(collObj).cent.x, collisions.get(collObj).cent.y);
 			collObj.x = footX
 				- collisions.get(collObj).cent.x
 				- (spr.pivot.centerFactorX * spr.tile.width - collisions.get(collObj).offset.x - collisions.get(collObj).cent.x);

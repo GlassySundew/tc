@@ -17,6 +17,7 @@ import hxd.Key;
 import format.tmx.Data;
 import format.tmx.*;
 import hxd.Res;
+import tools.Util.*;
 
 class Game extends Process {
 	public static var inst:Game;
@@ -157,7 +158,6 @@ class Game extends Process {
 										case OTEllipse:
 											var shape = new differ.shapes.Circle(0, 0, params.width / 2);
 											shape.scaleY = params.height / params.width;
-											trace(obj.width, obj.height);
 											xCent = M.round(obj.width / 2);
 											yCent = M.round(obj.height / 2);
 
@@ -181,9 +181,7 @@ class Game extends Process {
 											yCent = -M.round((yArr[yArr.length - 1].y + yArr[0].y) * .5);
 											var poly = new Polygon(0, 0, verts);
 											poly.rotation = -obj.rotation;
-											poly.name = Random.string(5);
 											ent.collisions.set(poly, {cent: new h3d.Vector(xCent, -yCent), offset: new h3d.Vector(obj.x, -obj.y)});
-											trace(obj.width, obj.height);
 										default:
 									}
 
@@ -235,7 +233,7 @@ class Game extends Process {
 
 	override function update() {
 		super.update();
-
+		
 		// Updates
 		for (e in Entity.ALL)
 			if (!e.destroyed)
