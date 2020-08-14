@@ -75,8 +75,9 @@ class Player extends Entity {
 
 	override function dispose() {
 		super.dispose();
-	
-		ca.dispose();
+		inst = null;
+		ui.remove();
+		ui = null;
 	}
 
 	override public function update() {
@@ -123,7 +124,8 @@ class Player extends Entity {
 
 	override function postUpdate() {
 		super.postUpdate();
-		checkBeltInputs();
+		if (this == inst && !isLocked() && ui != null)
+			checkBeltInputs();
 		// if (Key.isPressed(Key.E)) {
 		// 	new FloatingItem(mesh.x, mesh.z, new GraviTool());
 		// }

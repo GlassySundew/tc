@@ -17,6 +17,9 @@ import format.tmx.*;
 import format.tmx.Data;
 import tools.Util.*;
 
+/**
+	Level parses tmx entities maps, renders tile layers into mesh
+**/
 class Level extends dn.Process {
 	public var game(get, never):Game;
 
@@ -26,7 +29,6 @@ class Level extends dn.Process {
 	public static var inst:Level;
 
 	// public var fx(get, never):Fx;
-	var layersByName:Map<String, TmxLayer> = new Map();
 
 	public inline function getLayerByName(id:String)
 		return layersByName.get(id);
@@ -51,6 +53,8 @@ class Level extends dn.Process {
 	public var ground:Texture;
 	public var obj:Mesh;
 
+	var layersByName:Map<String, TmxLayer> = new Map();
+
 	public function new(map:TmxMap) {
 		super(Game.inst);
 		inst = this;
@@ -70,8 +74,8 @@ class Level extends dn.Process {
 					for (obj in ol.objects) {
 						switch (obj.objectType) {
 							case OTPolygon(points):
-								checkPolyClockwise(points);
-								if (ol.name == 'walls') setWalkable(obj, points);
+								var pts = checkPolyClockwise(points);
+								if (ol.name == 'walls') setWalkable(obj, pts);
 							case OTRectangle:
 								if (ol.name == 'walls') setWalkable(obj);
 
@@ -81,8 +85,13 @@ class Level extends dn.Process {
 						// entities export lies ahead
 						var isoX = cartToIsoLocal(obj.x, obj.y).x;
 						var isoY = cartToIsoLocal(obj.x, obj.y).y;
+
+						if (obj.flippedVertically)
+							isoY -= obj.height;
+
 						obj.x = isoX / Const.GRID_WIDTH;
 						obj.y = isoY / Const.GRID_WIDTH;
+
 						if (obj.name == "") {
 							switch (obj.objectType) {
 								case OTTile(gid):
@@ -113,8 +122,17 @@ class Level extends dn.Process {
 
 	override function onDispose() {
 		super.onDispose();
+		obj.remove();
+		obj.primitive.dispose();
+		ground.dispose();
 
+		for (i in walkable)
+			i.destroy();
+		walkable = null;
 		data = null;
+		obj = null;
+		entities = null;
+		layersByName = null;
 	}
 
 	public function getEntities(id:String) {
@@ -141,6 +159,8 @@ class Level extends dn.Process {
 	}
 
 	public function render() {
+		var layerRenderer:LayerRender;
+
 		invalidated = false;
 
 		ground = new h3d.mat.Texture(data.width * data.tileWidth, data.height * data.tileHeight, [Target, WasCleared]);
@@ -153,7 +173,8 @@ class Level extends dn.Process {
 			switch (e) {
 				case LTileLayer(layer):
 					if (layer.visible) {
-						new LayerRender(data, layer).render.g.drawTo(obj.material.texture);
+						layerRenderer = new LayerRender(data, layer);
+						layerRenderer.render.g.drawTo(obj.material.texture);
 					}
 				default:
 			}
@@ -167,9 +188,9 @@ class Level extends dn.Process {
 						switch (obj.objectType) {
 							case OTTile(gid):
 								var bmp = new Bitmap(getTileFromSeparatedTsx(gid, Tools.getTilesetByGid(data, gid)));
-								bmp.scaleX = obj.flippedVertically ? 1:-1;
-								bmp.x = obj.x * Const.GRID_WIDTH - obj.width / 2;
-								bmp.y = hei - obj.y * Const.GRID_WIDTH - obj.height;
+								bmp.scaleX = obj.flippedVertically ? -1 : 1;
+								bmp.x = obj.x * Const.GRID_WIDTH - obj.width / 2 * bmp.scaleX;
+								bmp.y = hei - obj.y * Const.GRID_WIDTH - obj.height * (bmp.scaleX < 0 ? 0 : 1);
 								bmp.drawTo(this.obj.material.texture);
 							default:
 						}
@@ -178,16 +199,15 @@ class Level extends dn.Process {
 			}
 		}
 
-		// obj.material.mainPass.setPassName("alpha");
-		// obj.visible = false;
 		obj.material.shadows = false;
 		obj.material.mainPass.enableLights = false;
 		obj.material.mainPass.depth(false, LessEqual);
 	}
 
-	public function setWalkable(poly:TmxObject, ?points:Array<TmxPoint>) { // setting obstacles as a differ polygon
+	public function setWalkable(poly:TmxObject, ?points:Array<Dynamic>) { // setting obstacles as a differ polygon
 		var vertices:Array<differ.math.Vector> = [];
 		if (points != null) {
+			points.reverse();
 			for (i in points)
 				vertices.push(new differ.math.Vector(cartToIso(i.x, i.y).x, cartToIso(i.x, i.y).y));
 			walkable.push(new Polygon(cartToIsoLocal(poly.x, poly.y).x, cartToIsoLocal(poly.x, poly.y).y, vertices));
@@ -266,24 +286,10 @@ private class InternalRender extends TileLayerRenderer {
 	}
 
 	function renderOrthoTileFromImageColl(x:Float, y:Float, tile:TmxTile, tileset:TmxTileset):Void {
-		// var imageSource;
-		// var gid = tile.gid - tileset.firstGID;
-		// // fix for offseting ids to right order
-		// for (i in 0...tileset.tiles.length)
-		// 	if (tileset.tiles[i].id == gid && gid > i)
-		// 		while (gid > i)
-		// 			gid--;
-		// // while (tileset.tiles[gid - tileset.firstGID] == null) // making tiles' ids persistent
-		// // 	gid--;
-		// imageSource = tileset.tiles[gid];
-		// var h2dTile = Res.loader.load(Const.LEVELS_PATH + imageSource.image.source).toTile();
-
 		var h2dTile = getTileFromSeparatedTsx(tile.gid, tileset);
 		var bmp = new Bitmap(h2dTile);
-		if (tile.flippedDiagonally) {
-			// h2dTile.setCenterRatio(.5, .5);
+		if (tile.flippedDiagonally)
 			bmp.rotate(M.toRad(tile.flippedVertically ? -90 : 90));
-		}
 
 		var scaleX = (tile.flippedHorizontally && !tile.flippedDiagonally) ? -1 : 1;
 		var scaleY = (tile.flippedVertically && !tile.flippedDiagonally) ? -1 : 1;
@@ -292,7 +298,6 @@ private class InternalRender extends TileLayerRenderer {
 		bmp.scaleY = scaleY;
 
 		bmp.x = x + (scaleX > 0 ? 0 : h2dTile.width) + (tile.flippedDiagonally ? (tile.flippedHorizontally ? h2dTile.height : 0) : 0);
-		// bmp.y = y - h2dTile.height + map.tileHeight + (scaleY == 1 ? 0 : h2dTile.height) + layer.offsetY;
 		bmp.y = y
 			- h2dTile.height
 			+ map.tileHeight

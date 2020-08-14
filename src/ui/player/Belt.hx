@@ -25,13 +25,11 @@ class BeltCont extends h2d.Flow implements h2d.domkit.Object {
 				</flow>
 			</flow>
 		</beltCont>;
-
 	public function new(?font:Font, ?slotNumber:Int, ?parent) {
 		super(parent);
 		initComponent();
 	}
 }
-
 class Belt extends Object {
 	var player(get, null):Player;
 
@@ -43,7 +41,7 @@ class Belt extends Object {
 
 	public var invGrid:InventoryGrid;
 
-	public static var beltSlots:Array<BeltCont> = [];
+	public var beltSlots:Array<BeltCont> = [];
 
 	public var selectedCell:BeltCont;
 
@@ -95,5 +93,13 @@ class Belt extends Object {
 		centerFlow.minWidth = Std.int(getS2dScaledWid());
 		centerFlow.minHeight = Std.int(getS2dScaledHei());
 		super.sync(ctx);
+	}
+
+	override function onRemove() {
+		super.onRemove();
+		for (i in beltSlots) {
+			i.remove();
+			style.removeObject(i);
+		}
 	}
 }

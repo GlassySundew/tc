@@ -14,7 +14,7 @@
             "hxml": "hl.debug.hxml",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "HL debug",
-            // "profileSamples" : 10000
+            "profileSamples" : 10000
         },
         {
             "type": "chrome",

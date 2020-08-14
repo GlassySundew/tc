@@ -75,8 +75,6 @@ class Game extends Process {
 	}
 
 	public function startLevel(name:String) {
-		// temp = null;
-
 		engine.clear(0, 1);
 		if (level != null) {
 			level.destroy();
@@ -90,9 +88,10 @@ class Game extends Process {
 		r.resolveTSX = getTSX;
 		tmxMap = r.read(Xml.parse(Res.loader.load(Const.LEVELS_PATH + name).entry.getText()));
 		level = new Level(tmxMap);
-
+		// level.walkable =
+		// Entity spawning
 		CompileTime.importPackage("en");
-		var entNames = (CompileTime.getAllClasses(Entity));
+		var entClasses = (CompileTime.getAllClasses(Entity));
 
 		#if hl
 		var eregClass = ~/\$([a-z_0-9]+)+$/gi;
@@ -100,11 +99,35 @@ class Game extends Process {
 		var eregClass = ~/\.([a-z0-9]+)\n/gi; // регулярка для js, который, нахуй, не работает
 		#end
 
-		for (e in level.entities)
-			for (nam in entNames) {
-				if (eregClass.match('$nam'.toLowerCase()) && eregClass.matched(1) == e.name)
-					Type.createInstance(nam, [e.x, e.y, e]);
+		/**
+			Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity if not found
+		**/
+		function searchAndSpawnEnt(e:TmxObject) {
+			for (eClass in entClasses) {
+				if (eregClass.match('$eClass'.toLowerCase()) && eregClass.matched(1) == e.name) {
+					Type.createInstance(eClass, [e.x, e.y, e]);
+					return;
+				}
 			}
+			switch (e.objectType) {
+				case OTTile(gid):
+					var source = Tools.getTileByGid(tmxMap, gid).image.source;
+					var ereg = ~/\/([a-z_0-9]+)\./;
+					if (ereg.match(source))
+						new SpriteEntity(e.x, e.y, ereg.matched(1), e);
+				default:
+			}
+		}
+
+		for (e in level.entities)
+			searchAndSpawnEnt(e);
+		// for (nam in entClasses) {
+		// 	if (eregClass.match('$nam'.toLowerCase()) && eregClass.matched(1) == e.name) {
+		// 		trace("created" + e.name);
+		// 		Type.createInstance(nam, [e.x, e.y, e]);
+		// 		break;
+		// 	}
+		// }
 
 		player = Player.inst;
 
@@ -115,15 +138,13 @@ class Game extends Process {
 
 		camera.target = player;
 		camera.recenter();
-		cd.unset("levelDone");
 		// System.openURL("https://pornreactor.cc");
 
 		// rect-obj position fix
-		for (en in Entity.ALL)
-			if (en.tmxObj != null)
-				en.footY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
 
-		// new Connect();
+		// for (en in Entity.ALL)
+		// 	if (en.tmxObj != null)
+		// 		en.footY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
 	}
 
 	public function applyTmxObjOnEnt(?ent:Null<Entity>) {
@@ -134,15 +155,14 @@ class Game extends Process {
 			var ereg = ~/(^[^.]*)+/; // regexp to take tileset name
 			if (ereg.match(tileset.source) && ereg.matched(1) == 'colls')
 				for (tile in tileset.tiles) {
-					var ereg = ~/\/([a-z_0-9]+)\./; // regexp to take string between last / and . from picture path
+					var ereg = ~/\/([a-z_0-9]+)\./; // regexp to take picture name between last / and . from picture path
 					if (ereg.match(tile.image.source)) {
 						var ents = ent != null ? [ent] : Entity.ALL;
 						for (ent in ents) {
 							var eregClass = ~/\.([a-z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
-							if (tile.objectGroup != null
-								&& eregClass.match('$ent'.toLowerCase())
-								&& eregClass.matched(1) == ereg.matched(1)
-								&& tile.objectGroup.objects.length > 0 /*&& ent.collisions.length == 0*/) {
+							if ((tile.objectGroup != null && eregClass.match('$ent'.toLowerCase()))
+								&& ((eregClass.matched(1) == ereg.matched(1)
+								&& tile.objectGroup.objects.length > 0) || (Std.is(ent, SpriteEntity) && ) ) /*&& ent.collisions.length == 0*/) {
 								var centerSet = false;
 								for (obj in tile.objectGroup.objects) {
 									var params = {
@@ -167,38 +187,50 @@ class Game extends Process {
 											ent.collisions.set(Polygon.rectangle(params.x, params.y, params.width, params.height),
 												{cent: new h3d.Vector(), offset: new h3d.Vector()});
 										case OTPolygon(points):
+											var pts = checkPolyClockwise(points);
+
 											var verts:Array<Vector> = [];
-											for (i in points) {
+											for (i in pts) {
 												verts.push(new Vector((i.x), (-i.y)));
 											}
 											var yArr = verts.copy();
 											yArr.sort(function(a, b) return (a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0));
 											var xArr = verts.copy();
 											xArr.sort(function(a, b) return (a.x < b.x) ? -1 : ((a.x > b.x) ? 1 : 0));
-											checkPolyClockwise(verts);
 
 											xCent = M.round((xArr[xArr.length - 1].x + xArr[0].x) * .5);
 											yCent = -M.round((yArr[yArr.length - 1].y + yArr[0].y) * .5);
 											var poly = new Polygon(0, 0, verts);
 											poly.rotation = -obj.rotation;
-											ent.collisions.set(poly, {cent: new h3d.Vector(xCent, -yCent), offset: new h3d.Vector(obj.x, -obj.y)});
+
+											// vertical flipping
+											if (ent.tmxObj.flippedVertically)
+												poly.scaleX = -1;
+
+											var xOffset = ent.tmxObj.flippedVertically ? ent.spr.tile.width - obj.x : obj.x;
+											var yOffset = -obj.y;
+											ent.collisions.set(poly, {cent: new h3d.Vector(xCent, -yCent), offset: new h3d.Vector(xOffset, yOffset)});
 										default:
 									}
 
 									if (!centerSet) {
-										ent.spr.setCenterRatio((M.round(obj.x + xCent)) / ent.spr.tile.width, (M.round(obj.y + yCent)) / ent.spr.tile.height);
+										var pivotX = (obj.x + xCent) / ent.spr.tile.width;
+										var pivotY = (obj.y + yCent) / ent.spr.tile.height;
+										ent.spr.setCenterRatio(ent.tmxObj.flippedVertically ? 1 - pivotX : pivotX, pivotY);
 
 										ent.footX += M.round((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width) - Const.GRID_WIDTH / 2;
 										ent.footY -= (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height + Const.GRID_HEIGHT;
 
 										centerSet = true;
 									}
-									try
-										cast(ent, Interactive).rebuildInteract()
-									catch (e:Dynamic)
-										0;
 								}
+								try
+									cast(ent, Interactive).rebuildInteract()
+								catch (e:Dynamic) {}
 							}
+
+							if (ent.tmxObj.flippedVertically && ent.mesh.isLong)
+								ent.mesh.flipX();
 						}
 					}
 				}
@@ -233,7 +265,7 @@ class Game extends Process {
 
 	override function update() {
 		super.update();
-		
+
 		// Updates
 		for (e in Entity.ALL)
 			if (!e.destroyed)

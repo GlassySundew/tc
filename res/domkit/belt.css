@@ -1,12 +1,13 @@
 beltCont {
   margin-left: 10;
   margin-bottom: 10;
+  scale: 0.5;
 }
 
 .beltSlot {
-  min-width: 26;
-  min-height: 26;
-  scale: 0.5;
+  min-width: 52;
+  min-height: 52;
+
 
   background: #494e55;
 }
@@ -15,6 +16,7 @@ beltCont {
   position: absolute;
   align: top left;
   padding-left: 8;
+
 }
 
 .beltSlotNumber {
@@ -22,5 +24,8 @@ beltCont {
 }
 
 .itemContainer {
-  scale: 2;
+  position: absolute;
+  align: middle middle;
+
+  scale:2;
 }

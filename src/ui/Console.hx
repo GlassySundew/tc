@@ -1,5 +1,6 @@
 package ui;
 
+import h2d.Console.ConsoleArgDesc;
 import en.player.Player;
 import net.Connect;
 import h3d.scene.Renderer;
@@ -69,6 +70,10 @@ class Console extends h2d.Console {
 			new h3d.scene.CameraController(Boot.inst.s3d).loadFromCamera();
 		});
 
+		this.addCommand("loadlvl", [{name: "k", t: AString}], function(?k:String) {
+			Game.inst.startLevel(k + ".tmx");
+		});
+
 		this.addCommand("connect", [], function(?k:String) {
 			(new Connect());
 		});
@@ -81,13 +86,198 @@ class Console extends h2d.Console {
 	#if debug
 	public function setFlag(k:String, v)
 		return flags.set(k, v);
-
+ 
 	public function hasFlag(k:String)
 		return flags.get(k) == true;
 	#else
 	public function hasFlag(k:String)
 		return false;
 	#end
+ 
+	override public function addAlias(name, command) {
+		aliases.set("/" + name, command);
+	}
+
+	override function addCommand(name:String, ?help:String, args:Array<ConsoleArgDesc>, callb:Dynamic) {
+		commands.set("/" + name, {help: help == null ? "" : help, args: args, callb: callb});
+	}
+
+	// override function runCommand(commandLine:String) {
+	// 	handleCommand(commandLine.split("/")[0]);
+	// }
+	override function handleCommand(command:String) {
+		command = StringTools.trim(command);
+		// if( command.charCodeAt(0) == "/".code ) command = command.substr(1);
+		if (command == "") {
+			hide();
+			return;
+		}
+		logs.push(command);
+		logIndex = -1;
+
+		var errorColor = 0xC00000;
+
+		var args = [];
+		var c = '';
+		var i = 0;
+
+		function readString(endChar:String) {
+			var string = '';
+
+			while (i < command.length) {
+				c = command.charAt(++i);
+				if (c == endChar) {
+					++i;
+					return string;
+				}
+				string += c;
+			}
+
+			return null;
+		}
+
+		inline function skipSpace() {
+			c = command.charAt(i);
+			while (c == ' ' || c == '\t') {
+				c = command.charAt(++i);
+			}
+			--i;
+		}
+
+		var last = '';
+		while (i < command.length) {
+			c = command.charAt(i);
+
+			switch (c) {
+				case ' ' | '\t':
+					skipSpace();
+
+					args.push(last);
+					last = '';
+				case "'" | '"':
+					var string = readString(c);
+					if (string == null) {
+						log('Bad formated string', errorColor);
+						return;
+					}
+
+					args.push(string);
+					last = '';
+
+					skipSpace();
+				default:
+					last += c;
+			}
+
+			++i;
+		}
+		args.push(last);
+
+		var cmdName = args[0];
+		if (aliases.exists(cmdName))
+			cmdName = aliases.get(cmdName);
+		var cmd = commands.get(cmdName);
+		if (cmd == null) {
+			log('Unknown command "${cmdName}"', errorColor);
+			return;
+		}
+		var vargs = new Array<Dynamic>();
+		for (i in 0...cmd.args.length) {
+			var a = cmd.args[i];
+			var v = args[i + 1];
+			if (v == null) {
+				if (a.opt) {
+					vargs.push(null);
+					continue;
+				}
+				log('Missing argument ${a.name}', errorColor);
+				return;
+			}
+			switch (a.t) {
+				case AInt:
+					var i = Std.parseInt(v);
+					if (i == null) {
+						log('$v should be Int for argument ${a.name}', errorColor);
+						return;
+					}
+					vargs.push(i);
+				case AFloat:
+					var f = Std.parseFloat(v);
+					if (Math.isNaN(f)) {
+						log('$v should be Float for argument ${a.name}', errorColor);
+						return;
+					}
+					vargs.push(f);
+				case ABool:
+					switch (v) {
+						case "true", "1": vargs.push(true);
+						case "false", "0": vargs.push(false);
+						default:
+							log('$v should be Bool for argument ${a.name}', errorColor);
+							return;
+					}
+				case AString:
+					// if we take a single string, let's pass the whole args (allows spaces)
+					vargs.push(cmd.args.length == 1 ? StringTools.trim(command.substr(args[0].length)) : v);
+				case AEnum(values):
+					var found = false;
+					for (v2 in values)
+						if (v == v2) {
+							found = true;
+							vargs.push(v2);
+						}
+					if (!found) {
+						log('$v should be [${values.join("|")}] for argument ${a.name}', errorColor);
+						return;
+					}
+			}
+		}
+		try {
+			Reflect.callMethod(null, cmd.callb, vargs);
+		} catch (e:String) {
+			log('ERROR $e', errorColor);
+		}
+	}
+
+	override function showHelp(?command:String) {
+		var all;
+		if (command == null) {
+			all = Lambda.array({iterator: function() return commands.keys()});
+			all.sort(Reflect.compare);
+			all.remove("/help");
+			all.push("/help");
+		} else {
+			if (aliases.exists(command)) 
+				command = aliases.get(command);
+			if (!commands.exists(command))
+				throw 'Command not found "$command"';
+			all = [command];
+		}
+		for (cmdName in all) {
+			var c = commands.get(cmdName);
+			var str = cmdName;
+			for (a in aliases.keys())
+				if (aliases.get(a) == cmdName)
+					str += "|" + a;
+			for (a in c.args) {
+				var astr = a.name;
+				switch (a.t) {
+					case AInt, AFloat:
+						astr += ":" + a.t.getName().substr(1);
+					case AString:
+					// nothing
+					case AEnum(values):
+						astr += "=" + values.join("|");
+					case ABool:
+						astr += "=0|1";
+				}
+				str += " " + (a.opt ? "[" + astr + "]" : astr);
+			}
+			if (c.help != "")
+				str += " : " + c.help;
+			log(str);
+		}
+	}
 
 	override function show() {
 		super.show();
@@ -118,11 +308,9 @@ class Console extends h2d.Console {
 		}
 
 		if (bg.visible) {
-			if (Player.inst != null && !Player.inst.isLocked())
+			if (Player.inst != null && Player.inst.isAlive() && !Player.inst.isLocked())
 				Player.inst.lock();
-		} else if (Player.inst != null && Player.inst.isLocked())
+		} else if (Player.inst != null && Player.inst.isAlive() && Player.inst.isLocked())
 			Player.inst.unlock();
-		// bg.y = logTxt.y;
-		// super.sync(ctx);
 	}
 }

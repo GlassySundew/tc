@@ -25,7 +25,7 @@ class Hydroponics extends Interactive {
 		plantContainer = new Plant(0, 0); 
 		interact.onTextInput = function(e:Event) {
 			if (K.isPressed(K.E))
-				inline dropGrownPlant();
+				dropGrownPlant();
 		}
 	}
 

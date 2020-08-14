@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.4" tiledversion="2020.06.25" orientation="isometric" renderorder="right-down" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" nextlayerid="50" nextobjectid="721">
+ <tileset firstgid="1" source="alpha.tsx"/>
+ <tileset firstgid="43" source="colls.tsx"/>
+ <tileset firstgid="60" source="env.tsx"/>
+ <layer id="33" name="ground" width="100" height="100" offsetx="-5" offsety="6">
+  <data encoding="base64" compression="zlib">
+   eAHt08EJACEMBEC7sf8OxUcgD/WXgDAHohhhYZYbw0eAAAECBAgQIECAAAECBAgQIECAAAECBAgQIPASmK+hWavA7iJWa7Cwo0B04R858rRf6qOd/BqYu4jz9bFBuUB0kPfyUAEECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQLfCyym8AMN
+  </data>
+ </layer>
+ <layer id="36" name="wallsAgri" width="100" height="100" visible="0" offsetx="-10" offsety="-1">
+  <data encoding="base64" compression="zlib">
+   eAHt0wEJADAMA8Gomc5JX1WMUK4KngtNHAECBAgQIECAAAECBAgQIECAAAECBAgQINAqcJLb2qaLwE+B+QVXJGCPojEmxR726BJQQ4AAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQGCHwAP93wE/
+  </data>
+ </layer>
+ <layer id="42" name="walls" width="100" height="100">
+  <data encoding="base64" compression="zlib">
+   eAHt0DEBAAAAwqD1T+1lC4hAYcCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMCAAQMGDBgwYMDABwacQAAB
+  </data>
+ </layer>
+ <objectgroup id="47" name="image">
+  <object id="677" gid="41" x="547" y="509" width="206" height="118"/>
+  <object id="715" gid="42" x="490" y="466" width="246" height="87"/>
+ </objectgroup>
+ <objectgroup id="34" name="walls">
+  <object id="692" x="552" y="480">
+   <polygon points="0.5,1.5 -23.5,-72.5 0.5,-72.5 24,0"/>
+  </object>
+  <object id="696" x="456" y="408">
+   <polygon points="0,0 -24,72 -48,72 -24,-24"/>
+  </object>
+  <object id="697" x="432" y="480">
+   <polygon points="0,0 0,48 -24,48 -24,0"/>
+  </object>
+  <object id="698" x="408" y="528" width="168" height="24"/>
+  <object id="699" x="552" y="480" width="24" height="48"/>
+  <object id="702" x="528.5" y="359.5">
+   <polygon points="0,0 -26.5,12.5 1.5,48.5 24,48"/>
+  </object>
+  <object id="710" x="456" y="408">
+   <polygon points="0,0 24.5,-36.5 4.5,-60.5 -24,-24"/>
+  </object>
+  <object id="712" x="502" y="372">
+   <polygon points="0,0 -21.5,-0.5 -41.5,-24.5 26.5,-12.5"/>
+  </object>
+ </objectgroup>
+ <objectgroup id="3" name="entities">
+  <object id="631" gid="45" x="470" y="446" width="32" height="32"/>
+  <object id="713" gid="52" x="505.5" y="504.5" width="90" height="50"/>
+  <object id="716" gid="56" x="581.5" y="490.5" width="114" height="134"/>
+  <object id="718" gid="58" x="489" y="399" width="104" height="44"/>
+  <object id="719" gid="57" x="528.5" y="409.5" width="60" height="50"/>
+  <object id="720" gid="59" x="500" y="412" width="33" height="45"/>
+ </objectgroup>
+</map>

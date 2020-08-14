@@ -59,4 +59,8 @@ class ButtonIcon extends Object {
 		buttonSpr.remove();
 		centerFlow.remove();
 	}
+	override function onRemove() {
+		super.onRemove();
+		dispose();
+	}
 }

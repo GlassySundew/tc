@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="2020.06.25" orientation="isometric" renderorder="right-down" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" nextlayerid="49" nextobjectid="672">
+<map version="1.4" tiledversion="2020.06.25" orientation="isometric" renderorder="right-down" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" nextlayerid="49" nextobjectid="701">
  <tileset firstgid="1" source="alpha.tsx"/>
- <tileset firstgid="41" source="colls.tsx"/>
- <tileset firstgid="54" source="env.tsx"/>
+ <tileset firstgid="43" source="colls.tsx"/>
+ <tileset firstgid="60" source="env.tsx"/>
  <layer id="33" name="ground" width="100" height="100" offsetx="-5" offsety="6">
   <data encoding="base64" compression="zlib">
    eAHt0TEKACAMA8D+xv//UF1LRzHLFRwMhcKlyhAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECEwC64T9TXuyPwK9i/s3OQF95Oyny/qYVHKZPnL2LhMgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBB4JbABgfkD0A==
@@ -18,9 +18,7 @@
    eAHt07ENACEQA0FXAq1+6VxMSGTp5yTy1VgkjgABAgQIECBAgAABAgQIECBAgAABAgQIEGgQ2BOxku9+DW1/bJgdXJGAPYrGmBR72KNLoKvG/+jaQw0BAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgAABAgQIECBAgACBV4EDjOgDzA==
   </data>
  </layer>
- <objectgroup id="47" name="image">
-  <object id="671" gid="1073741864" x="379.5" y="168.5" width="264" height="167" rotation="180"/>
- </objectgroup>
+ <objectgroup id="47" name="image"/>
  <objectgroup id="34" name="walls">
   <object id="245" x="408" y="384" width="24" height="144"/>
   <object id="282" x="408" y="360" width="168" height="24"/>
@@ -28,7 +26,7 @@
   <object id="304" x="432" y="504" width="144" height="24"/>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="658" gid="50" x="457.5" y="504.5" width="90" height="50"/>
-  <object id="631" gid="43" x="470" y="446" width="32" height="32"/>
+  <object id="631" name="player" gid="45" x="543.5" y="470.5" width="32" height="32"/>
+  <object id="700" gid="56" x="406.5" y="429.5" width="114" height="134"/>
  </objectgroup>
 </map>

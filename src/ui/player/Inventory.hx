@@ -25,6 +25,7 @@ class Inventory extends Object {
 	// public var items:Array<Array<Item>> = [[]];
 	public var invGrid:InventoryGrid;
 
+	var sprInv:HSprite;
 	var invGrid0x = 0;
 	var invGrid0y = 0;
 
@@ -38,7 +39,7 @@ class Inventory extends Object {
 		ca = Main.inst.controller.createAccess("inventory");
 
 		// parsing pure red color (0x0ffff0000) as a top left point of grid start
-		var sprInv = new HSprite(Assets.ui);
+		sprInv = new HSprite(Assets.ui);
 		sprInv.set("inventory");
 		var bmpTex = sprInv.tile.getTexture().capturePixels();
 
@@ -48,7 +49,7 @@ class Inventory extends Object {
 				if (bmpTex.getPixel(j, i) == 0xffff0000) {
 					invGrid0x = j;
 					invGrid0y = i;
-					
+
 					// replacing red point with a background pixel from j-1, i-1
 					bmpTex.setPixel(j, i, bmpTex.getPixel(j - 1, i - 1));
 					sprInv.tile.switchTexture(Tile.fromTexture(Texture.fromPixels(bmpTex)));
@@ -65,7 +66,7 @@ class Inventory extends Object {
 		textLabel.minWidth = Std.int(base.tile.width * Const.SCALE);
 		textLabel.scale(.5);
 		// textLabel.horizontalAlign = Middle;
-		textLabel.paddingTop = 6 + textLabel.outerHeight >> 1 ; // пиздец
+		textLabel.paddingTop = 6 + textLabel.outerHeight >> 1; // пиздец
 
 		belt = new Belt(this);
 		invGrid = new InventoryGrid(invGrid0x, invGrid0y, 20, 20, 4, 4, 4, 4, base);
@@ -74,12 +75,19 @@ class Inventory extends Object {
 	}
 
 	function recenter() {
-		base.x = Std.int((getS2dScaledWid() - base.tile.width) / 2 );
+		base.x = Std.int((getS2dScaledWid() - base.tile.width) / 2);
 		base.y = Std.int((getS2dScaledHei() - base.tile.height) / 2);
 	}
 
 	public function toggleVisible() {
 		base.visible = !base.visible;
 		recenter();
+	}
+
+	override function onRemove() {
+		super.onRemove();
+		base.remove();
+		base.tile.dispose();
+		sprInv.remove();
 	}
 }

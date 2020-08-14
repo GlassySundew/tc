@@ -39,6 +39,8 @@ class Cursors {
 		bmpMap.set(Button, cursors.copy());
 		cursors = [];
 
+		var defalutCur = new CustomCursor(bmpMap.get(Default), 0, 0, 0);
+		var handCur = new CustomCursor(bmpMap.get(Button), 0, 6, 2);
 		hxd.System.setCursor = function(cur:hxd.Cursor) {
 			if (cur == Default) {
 				// // Pressed (idk how to set)
@@ -48,9 +50,9 @@ class Cursors {
 				// sprCursor.drawTo(tex);
 				// var pixels = tex.capturePixels();
 				// cursors.push(uploadPixels(pixels, new BitmapData(Std.int(sprCursor.tile.width * cursorScale), Std.int(sprCursor.tile.height * cursorScale))));
-				hxd.System.setNativeCursor(Custom(new CustomCursor(bmpMap.get(Default), 0, 0, 0)));
+				hxd.System.setNativeCursor(Custom(defalutCur));
 			} else if (cur == Button) {
-				hxd.System.setNativeCursor(Custom(new CustomCursor(bmpMap.get(Button), 0, 6, 2)));
+				hxd.System.setNativeCursor(Custom(handCur));
 			} else if (cur == Hide) {} else {
 				hxd.System.setNativeCursor(cur);
 			}

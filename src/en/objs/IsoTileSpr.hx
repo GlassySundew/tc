@@ -10,14 +10,14 @@ import h2d.Tile;
 import ch3.scene.TileSprite;
 
 class IsoTileSpr extends TileSprite {
-	public var isoWidth(default, set):Int;
+	public var isoWidth(default, set):Float;
 
-	inline function set_isoWidth(v:Int)
+	inline function set_isoWidth(v:Float)
 		return isoWidth = isLong ? v : throw "set isLong before setting iso width/height";
 
-	public var isoHeight(default, set):Int;
+	public var isoHeight(default, set):Float;
 
-	inline function set_isoHeight(v:Int)
+	inline function set_isoHeight(v:Float)
 		return isoHeight = isLong ? v : throw "set isLong before setting iso width/height";
 
 	public var verts(get, null):Dynamic;
@@ -46,11 +46,12 @@ class IsoTileSpr extends TileSprite {
 	public function new(tile:Tile, ppu:Float = 1, faceCamera:Bool = true, ?parent:Object) {
 		super(tile, ppu, faceCamera, parent);
 
-		// pts.push(new Point(verts.right.x, 0, verts.right.z));
-		// pts.push(new Point(verts.down.x, 0, verts.down.z));
-		// pts.push(new Point(verts.left.x, 0, verts.left.z));
-		// pts.push(new Point(verts.up.x, 0, verts.up.z));
 		#if (debug && dispDepthBoxes)
+		pts.push(new Point(verts.right.x, 0, verts.right.z));
+		pts.push(new Point(verts.down.x, 0, verts.down.z));
+		pts.push(new Point(verts.left.x, 0, verts.left.z));
+		pts.push(new Point(verts.up.x, 0, verts.up.z));
+
 		renewDebugPts();
 
 		var idx = new IndexBuffer();
@@ -92,12 +93,6 @@ class IsoTileSpr extends TileSprite {
 
 			zMin: z + Std.int((verts1.left.y)),
 			zMax: z + Std.int((verts1.right.y)),
-
-			// xMin: Std.int((verts1.left.x)),
-			// xMax: Std.int((verts1.right.x)),
-
-			// zMin: Std.int((verts1.down.y)),
-			// zMax: Std.int((verts1.up.y)),
 		}
 	}
 
@@ -108,5 +103,12 @@ class IsoTileSpr extends TileSprite {
 			left: cartToIso(verts.left.x, verts.left.z),
 			up: cartToIso(verts.up.x, verts.up.z),
 		};
+	}
+
+	public function flipX() {
+		var temp = isoWidth;
+		isoWidth = isoHeight;
+		isoHeight = temp;
+		renewDebugPts();
 	}
 }

@@ -41,17 +41,18 @@ class Connect {
 				}
 			});
 		}, 3000);
-
 		this.client.joinOrCreate("my_room", [], State, function(err, room) {
 			if (err != null) {
 				haxe.Timer.delay(function() {
 					trace("NETWORK ERROR: " + err);
-				}, 0);
+				}, 0); 
 			}
 			this.room = room;
-			playerI.sendPosToServer();
 
-			this.room.onJoin += function() Console.inst.log('CONNECTION TO ${this.client.endpoint} SUCCESSFULL', 0x5d9047);
+			this.room.onJoin += function() {
+				Console.inst.log('CONNECTION TO ${this.client.endpoint} SUCCESSFULL', 0x5d9047);
+				playerI.sendPosToServer();
+			};
 
 			this.room.state.players.onAdd = function(player, key) {
 				// добавляем всех игроков, которые сейчас на сервере

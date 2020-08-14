@@ -210,6 +210,8 @@ class FloatingItem extends Interactive {
 
 	override function dispose() {
 		polyMesh.remove();
+		shadowTex.dispose();
+		
 		shadowMesh.remove();
 		super.dispose();
 	}

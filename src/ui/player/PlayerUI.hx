@@ -12,14 +12,15 @@ import h2d.domkit.Style;
 
 class PlayerUI extends Layers {
 	public var inventory:Inventory;
+	var leftTop:SideCont;
 
 	public function new(parent:Layers) {
 		super();
 
 		parent.add(this, Const.DP_UI);
-		inventory = new Inventory();
+		inventory = new Inventory(this);
 		this.add(inventory, 3);
-		var leftTop = new SideCont(Top, Left);
+		leftTop = new SideCont(Top, Left, this);
 		this.add(leftTop, 2);
 		// new StatView(Health, leftTop);
 
@@ -30,6 +31,9 @@ class PlayerUI extends Layers {
 
 	override function sync(ctx:RenderContext) {
 		super.sync(ctx);
+	}
+	override function onRemove() {
+		super.onRemove();
 	}
 }
 

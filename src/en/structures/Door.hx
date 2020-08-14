@@ -1,6 +1,5 @@
 package en.structures;
 
-
 import en.objs.IsoTileSpr;
 import format.tmx.Data.TmxObject;
 
@@ -13,9 +12,11 @@ class Door extends Interactive {
 		super(x, z, tmxObj);
 		interactable = true;
 
+		mesh.isLong = true;
+		mesh.isoWidth = 1.3;
+		mesh.isoHeight = 0.4;
+		mesh.renewDebugPts();
 	}
-
-
 
 	override function postUpdate() {
 		super.postUpdate();

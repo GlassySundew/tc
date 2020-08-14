@@ -61,6 +61,9 @@ class Interactive extends Entity {
 		interact = new h3d.scene.Interactive(polyPrim.getCollider(), mesh);
 		interact.rotate(-0.01, hxd.Math.degToRad(180), hxd.Math.degToRad(90));
 
+		if (tmxObj != null && tmxObj.flippedVertically)
+			interact.scaleX = -1;
+
 		var highlightColor = (try tmxTile.properties.get("highlight") catch (e:Dynamic) "ffffffff");
 		if (highlightColor == null)
 			highlightColor = "ffffffff";
@@ -83,7 +86,8 @@ class Interactive extends Entity {
 	}
 
 	public function rebuildInteract() {
-		polyPrim.translate(-spr.tile.width * spr.pivot.centerFactorX, 0, -spr.tile.height * spr.pivot.centerFactorY);
+		var facX = tmxObj.flippedVertically ? 1 - spr.pivot.centerFactorX : spr.pivot.centerFactorX;
+		polyPrim.translate(-spr.tile.width * facX, 0, -spr.tile.height * spr.pivot.centerFactorY);
 		interact.shape = polyPrim.getCollider();
 	}
 
@@ -129,5 +133,15 @@ class Interactive extends Entity {
 				return pts;
 		}
 		throw "Not part of this array";
+	}
+
+	override function dispose() {
+		super.dispose();
+		
+		interact.remove();
+		buttonIcon.remove();
+		filter = null;
+		polyPrim.dispose();
+
 	}
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.4" tiledversion="2020.06.25" name="colls" tilewidth="92" tileheight="77" tilecount="9" columns="10">
+<tileset version="1.4" tiledversion="2020.06.25" name="colls" tilewidth="114" tileheight="134" tilecount="13" columns="10">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="2">
   <image width="32" height="32" source="../separated/q/player.png"/>
@@ -79,6 +79,41 @@
   <objectgroup draworder="index" id="3">
    <object id="3" x="11" y="60">
     <polygon points="0,0 24,-12 30,-9 6,3"/>
+   </object>
+  </objectgroup>
+ </tile>
+ <tile id="13">
+  <image width="114" height="134" source="../separated/structures/bridge_wall.png"/>
+  <objectgroup draworder="index" id="3">
+   <object id="4" name="center" x="14" y="130">
+    <point/>
+   </object>
+  </objectgroup>
+ </tile>
+ <tile id="14">
+  <image width="60" height="50" source="../separated/structures/bridge_table_2.png"/>
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="8" y="37">
+    <polygon points="0,0 27,14 39,-24"/>
+   </object>
+  </objectgroup>
+ </tile>
+ <tile id="15">
+  <image width="104" height="44" source="../separated/structures/bridge_table_1.png"/>
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="33" y="43">
+    <polygon points="0,0 -24,-12 25,-13"/>
+   </object>
+   <object id="2" x="58" y="30">
+    <polygon points="0,0 14,8 43,-6"/>
+   </object>
+  </objectgroup>
+ </tile>
+ <tile id="16">
+  <image width="33" height="45" source="../separated/structures/bridge_chair.png"/>
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="11" y="32" width="12" height="7">
+    <ellipse/>
    </object>
   </objectgroup>
  </tile>

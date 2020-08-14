@@ -15,12 +15,14 @@ import format.tmx.Data.TmxObject;
 @:expose
 class Util {
 	inline static function checkPolyClockwise(points:Array<Dynamic>) {
+		var pts = points.copy();
 		var sum = .0;
-		for (i in 0...points.length) {
-			var actualItpp = (i >= points.length - 1) ? 0 : i + 1;
-			sum += (points[actualItpp].x - points[i].x) * (points[actualItpp].y + points[i].y);
+		for (i in 0...pts.length) {
+			var actualItpp = (i >= pts.length - 1) ? 0 : i + 1;
+			sum += (pts[actualItpp].x - pts[i].x) * (pts[actualItpp].y + pts[i].y);
 		}
-		sum < 0 ? 0 : points.reverse();
+		sum < 0 ? 0 : pts.reverse();
+		return pts;
 	}
 
 	inline static function cartToIso(x:Float, y:Float):Vector
@@ -51,7 +53,7 @@ class Util {
 				while (fixedGId > i)
 					fixedGId--;
 		var imageSource = tileset.tiles[fixedGId];
-		
+
 		return Res.loader.load(Const.LEVELS_PATH + imageSource.image.source).toTile();
 	}
 }

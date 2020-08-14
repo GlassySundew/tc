@@ -1,4 +1,6 @@
 -debug
 hl.hxml
-# -D hl-profile
-# -D dump=pretty
+-D dispDepthBoxes
+
+
+-D hl-ver=1.13.0

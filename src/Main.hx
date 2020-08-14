@@ -38,15 +38,15 @@ class Main extends Process {
 
 		#if debug
 		hxd.res.Resource.LIVE_UPDATE = true;
-		hxd.Res.data.watch(function() {
-			delayer.cancelById("cdb");
-			//
-			delayer.addS("cdb", function() {
-				Data.load(hxd.Res.data.entry.getBytes().toString());
-				if (Game.inst != null)
-					Game.inst.onCdbReload();
-			}, 0.2);
-		});
+		// hxd.Res.data.watch(function() {
+		// 	delayer.cancelById("cdb");
+		// 	//
+		// 	delayer.addS("cdb", function() {
+		// 		Data.load(hxd.Res.data.entry.getBytes().toString());
+		// 		if (Game.inst != null)
+		// 			Game.inst.onCdbReload();
+		// 	}, 0.2);
+		// });
 		#end
 
 		Assets.init();

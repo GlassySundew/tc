@@ -164,7 +164,7 @@ import h3d.scene.Mesh;
 		mesh = new IsoTileSpr(spr.tile, false, Boot.inst.s3d);
 		mesh.material.mainPass.setBlendMode(AlphaAdd);
 
-		tex = new Texture(Std.int(spr.tile.width), Std.int(spr.tile.height), [Target, WasCleared]);
+		tex = new Texture(Std.int(spr.tile.width), Std.int(spr.tile.height), [Target]);
 
 		bmp.drawTo(tex);
 		mesh.rotate(0, -rotAngle, M.toRad(90));
@@ -172,22 +172,12 @@ import h3d.scene.Mesh;
 		s.color = colorAdd;
 		mesh.material.mainPass.enableLights = false;
 		mesh.material.mainPass.depth(false, Less);
+
 		// TODO semi-transparent overlapping
 		// var s = new h3d.mat.Stencil();
 		// s.setFunc(LessEqual, 0);
 		// s.setOp(Keep, DecrementWrap, Keep);
 		// mesh.material.mainPass.stencil = s;
-
-		if (tmxObj != null) {
-			if (tmxObj.flippedVertically) {
-				spr.tile.flipY();
-				// mesh.scaleX = -1;
-				// mesh.scaleZ = -1;
-				// mesh.scaleY = -1;
-				// mesh.rotate(M.toRad(180), 0, 0);
-				// x -= this.tmxObj.width / Const.GRID_WIDTH;
-			}
-		}
 
 		setPosCase(x, z);
 	}
@@ -284,14 +274,24 @@ import h3d.scene.Mesh;
 			debugLabel.remove();
 			debugLabel = null;
 		}
-		mesh.remove();
+		if (mesh != null) {
+			mesh.tile.dispose();
+			mesh.primitive.dispose();
+			mesh.remove();
+		}
 		cd.destroy();
 		bmp.remove();
+		bmp.tile.dispose();
+		tex.dispose();
+		tw.destroy();
 
+		for (i in collisions.keys())
+			i.destroy();
+
+		collisions = null;
 		bmp = null;
 		spr = null;
 		mesh = null;
-		cd = null;
 	}
 
 	public function setPosCase(x, y, ?xr = 0.5, ?yr = 0.5) {
@@ -320,7 +320,7 @@ import h3d.scene.Mesh;
 
 	public function checkCollsAgainstAll() {
 		for (ent in Entity.ALL) {
-			if (!(ent.isOfType(FloatingItem) && ent == this)) {
+			if (!ent.isOfType(FloatingItem) && ent != this) {
 				for (collObj in collisions.keys()) {
 					for (entCollObj in ent.collisions.keys()) {
 						var collideInfo = Collision.shapeWithShape(collObj, entCollObj);
@@ -445,10 +445,15 @@ import h3d.scene.Mesh;
 
 	public function frameEnd() {
 		if (mesh != null) {
-			// даже я в ахуе от своего говнокода
 			tex.clear(0, 0);
 			bmp.tile = spr.tile;
+
+			if (tmxObj != null)
+				if (tmxObj.flippedVertically)
+					spr.tile.flipX();
+
 			bmp.tile.setCenterRatio(-spr.pivot.centerFactorX, -spr.pivot.centerFactorY);
+
 			bmp.drawTo(tex);
 			bmp.x = -spr.pivot.centerFactorX * spr.tile.width;
 			bmp.y = -spr.pivot.centerFactorY * spr.tile.height;
