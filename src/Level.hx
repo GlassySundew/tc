@@ -75,6 +75,7 @@ class Level extends dn.Process {
 						switch (obj.objectType) {
 							case OTPolygon(points):
 								var pts = checkPolyClockwise(points);
+								pts.reverse();
 								if (ol.name == 'walls') setWalkable(obj, pts);
 							case OTRectangle:
 								if (ol.name == 'walls') setWalkable(obj);

@@ -85,7 +85,7 @@
  <tile id="13">
   <image width="114" height="134" source="../separated/structures/bridge_wall.png"/>
   <objectgroup draworder="index" id="3">
-   <object id="4" name="center" x="14" y="130">
+   <object id="7" name="center" x="15" y="130">
     <point/>
    </object>
   </objectgroup>
@@ -94,18 +94,21 @@
   <image width="60" height="50" source="../separated/structures/bridge_table_2.png"/>
   <objectgroup draworder="index" id="2">
    <object id="1" x="8" y="37">
-    <polygon points="0,0 27,14 39,-24"/>
+    <polygon points="0,0 27,14 42,-22"/>
+   </object>
+   <object id="2" name="center" x="8" y="37">
+    <point/>
    </object>
   </objectgroup>
  </tile>
  <tile id="15">
   <image width="104" height="44" source="../separated/structures/bridge_table_1.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="33" y="43">
-    <polygon points="0,0 -24,-12 25,-13"/>
+   <object id="3" x="103" y="24">
+    <polygon points="5,3 -22,-14 -45,-4 -45,6 -24,18"/>
    </object>
-   <object id="2" x="58" y="30">
-    <polygon points="0,0 14,8 43,-6"/>
+   <object id="5" x="59" y="31">
+    <polygon points="0,0 0,-17 -53,-11 -48,1 -25,12"/>
    </object>
   </objectgroup>
  </tile>

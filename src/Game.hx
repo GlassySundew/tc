@@ -75,6 +75,8 @@ class Game extends Process {
 	}
 
 	public function startLevel(name:String) {
+		cd.setF("lvlNotReady", 1 / 0);
+
 		engine.clear(0, 1);
 		if (level != null) {
 			level.destroy();
@@ -99,9 +101,11 @@ class Game extends Process {
 		var eregClass = ~/\.([a-z0-9]+)\n/gi; // регулярка для js, который, нахуй, не работает
 		#end
 
+
 		/**
 			Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity if not found
 		**/
+
 		function searchAndSpawnEnt(e:TmxObject) {
 			for (eClass in entClasses) {
 				if (eregClass.match('$eClass'.toLowerCase()) && eregClass.matched(1) == e.name) {
@@ -121,17 +125,10 @@ class Game extends Process {
 
 		for (e in level.entities)
 			searchAndSpawnEnt(e);
-		// for (nam in entClasses) {
-		// 	if (eregClass.match('$nam'.toLowerCase()) && eregClass.matched(1) == e.name) {
-		// 		trace("created" + e.name);
-		// 		Type.createInstance(nam, [e.x, e.y, e]);
-		// 		break;
-		// 	}
-		// }
 
 		player = Player.inst;
 
-		// putting player inst to the last position of entities array as a depth sorting fix (хуйня ебаная на самом деле, но существует трудновоспроизводимый баг с
+		// putting player inst to the last position of entities array as a depth sorting fix (существует трудновоспроизводимый баг с
 		// сортировкой, когда 2 объекта начаинают неправильно рисоваться при неопределенном положении в списке объектов в Tiled, если они расположены на соседних линиях в изометрии)
 
 		applyTmxObjOnEnt();
@@ -145,6 +142,7 @@ class Game extends Process {
 		// for (en in Entity.ALL)
 		// 	if (en.tmxObj != null)
 		// 		en.footY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
+		cd.unset("lvlNotReady");
 	}
 
 	public function applyTmxObjOnEnt(?ent:Null<Entity>) {
@@ -160,9 +158,11 @@ class Game extends Process {
 						var ents = ent != null ? [ent] : Entity.ALL;
 						for (ent in ents) {
 							var eregClass = ~/\.([a-z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
+
 							if ((tile.objectGroup != null && eregClass.match('$ent'.toLowerCase()))
 								&& ((eregClass.matched(1) == ereg.matched(1)
-								&& tile.objectGroup.objects.length > 0) || (Std.is(ent, SpriteEntity) && ) ) /*&& ent.collisions.length == 0*/) {
+									&& tile.objectGroup.objects.length > 0
+									|| (Std.is(ent, SpriteEntity) && ereg.matched(1) == ent.spr.groupName))) /*&& ent.collisions.length == 0*/) {
 								var centerSet = false;
 								for (obj in tile.objectGroup.objects) {
 									var params = {
@@ -173,7 +173,19 @@ class Game extends Process {
 									};
 									var xCent = 0.;
 									var yCent = 0.;
+									function unsetCenter() {
+										ent.footX -= M.round((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width) - Const.GRID_WIDTH / 2;
+										ent.footY += (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height + Const.GRID_HEIGHT;
+									}
 
+									function setCenter() {
+										var pivotX = (obj.x + xCent) / ent.spr.tile.width;
+										var pivotY = (obj.y + yCent) / ent.spr.tile.height;
+										ent.spr.setCenterRatio(ent.tmxObj.flippedVertically ? 1 - pivotX : pivotX, pivotY);
+
+										ent.footX += M.round((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width) - Const.GRID_WIDTH / 2;
+										ent.footY -= (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height + Const.GRID_HEIGHT;
+									}
 									switch (obj.objectType) {
 										case OTEllipse:
 											var shape = new differ.shapes.Circle(0, 0, params.width / 2);
@@ -184,6 +196,13 @@ class Game extends Process {
 											ent.collisions.set(shape,
 												{cent: new h3d.Vector(xCent, yCent), offset: new h3d.Vector(obj.x + xCent, -obj.y - yCent)});
 										case OTRectangle:
+											// Точка парсится как OTReacangle, точка с названием center будет обозначать центр
+											if (obj.name == "center") {
+												if (centerSet)
+													unsetCenter();
+												setCenter();
+												centerSet = true;
+											}
 											ent.collisions.set(Polygon.rectangle(params.x, params.y, params.width, params.height),
 												{cent: new h3d.Vector(), offset: new h3d.Vector()});
 										case OTPolygon(points):
@@ -214,13 +233,7 @@ class Game extends Process {
 									}
 
 									if (!centerSet) {
-										var pivotX = (obj.x + xCent) / ent.spr.tile.width;
-										var pivotY = (obj.y + yCent) / ent.spr.tile.height;
-										ent.spr.setCenterRatio(ent.tmxObj.flippedVertically ? 1 - pivotX : pivotX, pivotY);
-
-										ent.footX += M.round((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width) - Const.GRID_WIDTH / 2;
-										ent.footY -= (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height + Const.GRID_HEIGHT;
-
+										setCenter();
 										centerSet = true;
 									}
 								}

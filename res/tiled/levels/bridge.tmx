@@ -45,8 +45,8 @@
   </object>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="631" gid="45" x="470" y="446" width="32" height="32"/>
   <object id="713" gid="52" x="505.5" y="504.5" width="90" height="50"/>
+  <object id="631" gid="45" x="470" y="446" width="32" height="32"/>
   <object id="716" gid="56" x="581.5" y="490.5" width="114" height="134"/>
   <object id="718" gid="58" x="489" y="399" width="104" height="44"/>
   <object id="719" gid="57" x="528.5" y="409.5" width="60" height="50"/>

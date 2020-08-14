@@ -137,7 +137,7 @@ class Player extends Entity {
 	}
 
 	override function checkCollisions() {
-		if (!isLocked())
+		if (!isLocked() && game.cd.has("lvlNotReady"))
 			checkCollsAgainstAll();
 		super.checkCollisions();
 	}

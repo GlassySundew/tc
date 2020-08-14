@@ -21,7 +21,7 @@ class Util {
 			var actualItpp = (i >= pts.length - 1) ? 0 : i + 1;
 			sum += (pts[actualItpp].x - pts[i].x) * (pts[actualItpp].y + pts[i].y);
 		}
-		sum < 0 ? 0 : pts.reverse();
+		sum < 0 ? pts.reverse() : {};
 		return pts;
 	}
 
