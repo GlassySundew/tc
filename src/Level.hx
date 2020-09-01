@@ -1,3 +1,5 @@
+import h3d.col.Bounds;
+import en.player.Player;
 import h3d.prim.Grid;
 import h3d.mat.Material;
 import ch3.prim.PlanePrim;
@@ -54,6 +56,9 @@ class Level extends dn.Process {
 	public var obj:Mesh;
 
 	var layersByName:Map<String, TmxLayer> = new Map();
+
+	public var cursX:Float;
+	public var cursY:Float;
 
 	public function new(map:TmxMap) {
 		super(Game.inst);
@@ -203,6 +208,17 @@ class Level extends dn.Process {
 		obj.material.shadows = false;
 		obj.material.mainPass.enableLights = false;
 		obj.material.mainPass.depth(false, LessEqual);
+
+		var bounds = new Bounds();
+		bounds.addPoint(new Point(0, 0, 0));
+		bounds.addPoint(new Point(ground.width, 0, ground.height));
+
+		var interactive = new h3d.scene.Interactive(bounds, obj);
+		interactive.cursor = Default;
+		interactive.onMove = function(e:hxd.Event) {
+			cursX = e.relX;
+			cursY = e.relZ;
+		}
 	}
 
 	public function setWalkable(poly:TmxObject, ?points:Array<Dynamic>) { // setting obstacles as a differ polygon

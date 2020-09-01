@@ -35,7 +35,6 @@ class FloatingItem extends Interactive {
 			spr = new HSprite(item.spr.lib, item.spr.groupName);
 
 		super(x, z, tmxObj);
-
 		this.item = item;
 		spr.setCenterRatio(0, 0);
 		spr.tile.getTexture().filter = Nearest;
@@ -171,12 +170,12 @@ class FloatingItem extends Interactive {
 
 		polyMesh.rotate(0, 0, 0.016 * tmod);
 		deDepth.objZ = (polyMesh.z - footY) * Math.sin(-rotAngle);
+		
+		if (!isLocked())
+			bumpAwayFrom(Player.inst, distPx(Player.inst) < 20 ? -.0015 * tmod : 0);
 
-		bumpAwayFrom(Player.inst, distCase(Player.inst) < .75 ? -.0015 * tmod : 0);
-
-		if (player != null && distCase(player) < .2) {
-			player.inventory.invGrid.giveItem(item);
-			dispose();
+		if (player != null && distPx(player) < 10 && !isLocked()) {
+			player.inventory.invGrid.giveItem(item) != null ? dispose() : {};
 		}
 	}
 
@@ -211,7 +210,7 @@ class FloatingItem extends Interactive {
 	override function dispose() {
 		polyMesh.remove();
 		shadowTex.dispose();
-		
+
 		shadowMesh.remove();
 		super.dispose();
 	}

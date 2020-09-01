@@ -25,7 +25,6 @@ class Camera extends dn.Process {
 		super(Game.inst);
 		x = y = 0;
 		dx = dy = 0;
-
 		// little hack to prevent z-fight
 		var temp = new h3d.scene.CameraController(Boot.inst.s3d);
 		temp.loadFromCamera();

@@ -61,7 +61,7 @@ class Belt extends Object {
 		invGrid = new InventoryGrid(0, 0, beltSlots[0].beltSlot.outerWidth, beltSlots[0].beltSlot.outerHeight, beltSlots.length, 1, 0, 0, this);
 		invGrid.enableGrid();
 		for (i in 0...beltSlots.length) {
-			beltSlots[i].itemContainer.addChild(invGrid.interGrid[i][0].inter);
+			beltSlots[i].itemContainer.addChild(invGrid.interGrid[0][i].inter);
 		}
 
 		// var iten = new en.items.GraviTool();
@@ -70,15 +70,16 @@ class Belt extends Object {
 	}
 
 	public function selectCell(number:Int = 1) {
-		if (player.cursorItem == null) {
+		if (player.holdItem == null) {
 			deselectCells();
 			var cell = beltSlots[number - 1];
 			cell.beltSlot.backgroundTile = h2d.Tile.fromColor(0x6bace6, 1, 1, .58);
 			cell.beltSlotNumber.color = Color.intToVector(0xbabac8);
 			cell.paddingBottom = 10;
-
-			// if (player.holdItem == null)
-			// 	player.holdItem = cell.
+			
+			if (player.holdItem == null && !player.inventory.base.visible){
+				player.holdItem = invGrid.interGrid[0][number-1].item;
+			}
 		}
 	}
 

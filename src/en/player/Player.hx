@@ -22,20 +22,13 @@ class Player extends Entity {
 	public var holdItem(default, set):Item;
 
 	inline function set_holdItem(v:Item) {
-		return holdItem = v;
-	}
-
-	public var cursorItem(default, set):Item;
-
-	inline function set_cursorItem(v:Item) {
 		if (v == null) {
 			inventory.invGrid.disableGrid();
 		}
 		if (v != null) {
-			holdItem = v;
-			inventory.invGrid.enableGrid();
+			// inventory.invGrid.enableGrid();
 		}
-		return cursorItem = v;
+		return holdItem = v;
 	}
 
 	var ca:dn.heaps.Controller.ControllerAccess;
@@ -130,14 +123,14 @@ class Player extends Entity {
 		// 	new FloatingItem(mesh.x, mesh.z, new GraviTool());
 		// }
 
-		if (cursorItem != null) {
-			cursorItem.x = Boot.inst.s2d.mouseX + 15 * cursorItem.scaleX;
-			cursorItem.y = Boot.inst.s2d.mouseY + 15 * cursorItem.scaleX;
+		if (holdItem != null && holdItem.isInCursor()) {
+			holdItem.x = Boot.inst.s2d.mouseX + 15 * holdItem.scaleX;
+			holdItem.y = Boot.inst.s2d.mouseY + 15 * holdItem.scaleX;
 		}
 	}
 
 	override function checkCollisions() {
-		if (!isLocked() && game.cd.has("lvlNotReady"))
+		if (!isLocked())
 			checkCollsAgainstAll();
 		super.checkCollisions();
 	}
@@ -158,5 +151,10 @@ class Player extends Entity {
 
 		if (Key.isPressed(Key.NUMBER_4))
 			inventory.belt.selectCell(4);
+
+		if (Key.isPressed(Key.Q)) {
+			if (holdItem != null)
+				holdItem = dropItem(holdItem, this.angToPxFree(level.cursX, level.cursY), 0.05);
+		}
 	}
 }

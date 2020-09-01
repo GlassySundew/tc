@@ -1,4 +1,4 @@
-package ;
+package;
 
 // import game.comps.GameUI;
 import hxd.fmt.pak.FileSystem;
@@ -52,6 +52,8 @@ class Main extends Process {
 		Assets.init();
 		Cursors.init();
 		Lang.init("en");
+
+		Data.load(hxd.Res.data.entry.getText());
 		// Data.load(hxd.Res.data.entry.getText());
 
 		console = new ui.Console(Assets.fontPixel, s);
@@ -69,7 +71,8 @@ class Main extends Process {
 
 		// @:privateAccess new dn.heaps.GameFocusHelper(Boot.inst.s2d, Assets.fontPixel);
 		delayer.addF(start, 1);
-
+		
+		// start();
 	}
 
 	function start() {

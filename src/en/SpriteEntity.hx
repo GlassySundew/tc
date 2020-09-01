@@ -2,7 +2,7 @@ package en;
 
 import format.tmx.Data.TmxObject;
 
-class SpriteEntity extends Entity {
+class SpriteEntity extends Interactive {
 	public function new(?x:Float = 0, ?z:Float = 0, sprite:String, ?tmxObj:TmxObject) {
 		if (spr == null) {
 			spr = new HSprite(Assets.structures);
@@ -10,5 +10,7 @@ class SpriteEntity extends Entity {
 		}
 
 		super(x, z, tmxObj);
+		if (tmxObj.properties.exists("interactable"))
+			interactable = tmxObj.properties.getBool("interactable");
 	}
 }

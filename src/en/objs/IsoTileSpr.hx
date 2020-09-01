@@ -22,6 +22,9 @@ class IsoTileSpr extends TileSprite {
 
 	public var verts(get, null):Dynamic;
 
+	public var xOff = 0.;
+	public var yOff = 0.;
+
 	inline function get_verts() {
 		return if (!isLong) {
 			right: {x: 0., z: -0.},
@@ -77,22 +80,22 @@ class IsoTileSpr extends TileSprite {
 
 	public function renewDebugPts() {
 		pts = [];
-		pts.push(new Point(getIsoVerts().right.x, 0, getIsoVerts().right.y));
-		pts.push(new Point(getIsoVerts().down.x, 0, getIsoVerts().down.y));
-		pts.push(new Point(getIsoVerts().left.x, 0, getIsoVerts().left.y));
-		pts.push(new Point(getIsoVerts().up.x, 0, getIsoVerts().up.y));
+		pts.push(new Point(getIsoVerts().right.x+ xOff, 0, getIsoVerts().right.y + yOff));
+		pts.push(new Point(getIsoVerts().down.x+ xOff, 0, getIsoVerts().down.y + yOff));
+		pts.push(new Point(getIsoVerts().left.x+ xOff, 0, getIsoVerts().left.y + yOff));
+		pts.push(new Point(getIsoVerts().up.x+ xOff, 0, getIsoVerts().up.y + yOff));
 		if (polyPrim != null)
 			polyPrim.points = pts;
 	}
 
 	public function getIsoBounds() {
-		var verts1 = getIsoVerts();
+		var cartVerts = getIsoVerts();
 		return {
-			xMin: x + Std.int((verts1.left.x)),
-			xMax: x + Std.int((verts1.right.x)),
+			xMin: x + Std.int((cartVerts.left.x + xOff)),
+			xMax: x + Std.int((cartVerts.right.x + xOff)),
 
-			zMin: z + Std.int((verts1.left.y)),
-			zMax: z + Std.int((verts1.right.y)),
+			zMin: z + Std.int((cartVerts.left.y + yOff)),
+			zMax: z + Std.int((cartVerts.right.y + yOff)),
 		}
 	}
 

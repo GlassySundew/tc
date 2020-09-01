@@ -1,5 +1,6 @@
 package ui;
 
+import haxe.Constraints.Function;
 import h3d.scene.Object;
 import h2d.ScaleGrid;
 import hxd.Event;
@@ -22,64 +23,57 @@ class InventoryCell extends h2d.Object {
 		return item = v;
 	}
 
-	public function new(width:Int, height:Int, ?parent:h2d.Object) {
+	public function new(?width:Int = 0, ?height:Int = 0, ?parent:h2d.Object) {
 		super(parent);
 		inter = new h2d.Interactive(width, height, this);
 		// inter.visible = false;
 		inter.cursor = Default;
 		inter.onPush = function(e:Event) {
-			if (Game.inst.player.cursorItem != null && item == null) {
-				item = Game.inst.player.cursorItem;
-				Game.inst.player.cursorItem = null;
+			if (Game.inst.player.holdItem != null && item == null) {
+				item = Game.inst.player.holdItem;
+				Game.inst.player.holdItem = null;
 			}
 		}
 	}
+
+	public override function onRemove() {
+		super.onRemove();
+	}
 }
 
-class InventoryGrid extends h2d.Object {
-	public static var ALL:Array<InventoryGrid> = [];
-
+class CellGrid2D {
 	var player(get, never):Player;
 
 	inline function get_player()
 		return Player.inst;
 
-	public var interGrid:Array<Array<InventoryCell>>;
+	public var itemCout(get, never):Int;
 
-	public function new(x:Int, y:Int, width:Int, height:Int, horCells:Int, verCells:Int, xGap:Int, yGap:Int, ?parent:h2d.Object) {
-		super(parent);
-		ALL.push(this);
-		interGrid = [for (i in 0...verCells) []];
-		for (j in 0...horCells) {
-			interGrid[j] = [];
-			for (i in 0...verCells) {
-				var tempInter = new InventoryCell(width, height, this);
-				tempInter.inter.x = x + j * width + j * xGap;
-				tempInter.inter.y = y + i * height + i * yGap;
-
-				interGrid[j].push(tempInter);
-			}
-		}
+	function get_itemCout() {
+		var cout = 0;
+		for (i in grid)
+			for (j in i)
+				if (j.item != null)
+					cout++;
+		return cout;
 	}
 
-	public function dispose() {
-		ALL.remove(this);
+	public var grid:Array<Array<InventoryCell>>;
 
-		for (i in interGrid)
-			for (j in i) {
-				j.inter.remove();
-			}
-	}
+	public function new(width:Int, height:Int, ?cellWidth:Int = 0, ?cellHeight:Int = 0, ?parent:h2d.Object)
+		grid = [
+			for (_ in 0...height) [for (_ in 0...width) new InventoryCell(cellWidth, cellHeight, parent)]
+		];
 
 	public function disableGrid() {
-		for (i in interGrid)
+		for (i in grid)
 			for (j in i) {
 				j.inter.cursor = Default;
 			}
 	}
 
 	public function enableGrid() {
-		for (i in interGrid)
+		for (i in grid)
 			for (j in i) {
 				if (j.item == null)
 					j.inter.cursor = Button;
@@ -87,10 +81,10 @@ class InventoryGrid extends h2d.Object {
 	}
 
 	public function getFreeSlot():InventoryCell {
-		for (i in 0...interGrid.length)
-			for (j in 0...interGrid[i].length)
-				if (interGrid[j][i].item == null)
-					return interGrid[j][i];
+		for (i in grid)
+			for (j in i)
+				if (j.item == null)
+					return j;
 		for (i in player.inventory.belt.invGrid.interGrid)
 			for (j in i)
 				if (j.item == null)
@@ -100,17 +94,63 @@ class InventoryGrid extends h2d.Object {
 
 	public function giveItem(item:Item) {
 		var slot = getFreeSlot();
-		slot.item = item;
+		if (slot != null)
+			slot.item = item;
+		return slot;
 	}
 
-	public function removeItem(item:Item, ?to:Null<Item>) {
-		for (i in interGrid) {
+	public function removeItem(item:Item, ?to:Item = null):Item {
+		for (i in grid) {
 			for (j in i) {
 				if (j.item == item) {
 					j.item.remove();
 					j.item = to;
+					return j.item;
 				}
 			}
 		}
+		return null;
+	}
+
+	@:allow(Interactive) function dispose() {}
+}
+
+/**	h2d.Interactive формочки для инвентарной сетки **/
+class InventoryGrid extends h2d.Object {
+	public var interGrid:Array<Array<InventoryCell>>;
+	public var cellGrid:CellGrid2D;
+	public var disableGrid:Void->Void;
+	public var enableGrid:Void->Void;
+	public var getFreeSlot:Void->InventoryCell;
+	public var giveItem:Item->InventoryCell;
+	public var removeItem:Item->Item->Item;
+
+	public function new(x:Int, y:Int, width:Int, height:Int, horCellsAmount:Int, verCellsAmount:Int, xGap:Int, yGap:Int, ?parent:h2d.Object) {
+		super(parent);
+		cellGrid = new CellGrid2D(horCellsAmount, verCellsAmount, width, height, this);
+		interGrid = cellGrid.grid;
+
+		disableGrid = cellGrid.disableGrid.bind();
+		enableGrid = cellGrid.enableGrid.bind();
+		getFreeSlot = cellGrid.getFreeSlot.bind();
+		giveItem = cellGrid.giveItem.bind();
+		removeItem = (item:Item, ?to:Item = null) -> {
+			cellGrid.removeItem(item, to);
+		};
+
+		for (j in 0...interGrid.length) {
+			for (i in 0...interGrid[j].length) {
+				var tempInter = interGrid[j][i];
+				tempInter.inter.x = x + i * (width + xGap);
+				tempInter.inter.y = y + j * (height + yGap);
+			}
+		}
+	}
+
+	public function dispose() {
+		for (i in interGrid)
+			for (j in i) {
+				j.inter.remove();
+			}
 	}
 }

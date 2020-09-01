@@ -55,7 +55,7 @@ class Connect {
 			};
 
 			this.room.state.players.onAdd = function(player, key) {
-				// добавляем всех игроков, которые сейчас на сервере
+				// добавляем всех игроков, которые сейчас на сервере 
 				if (this.room.sessionId != key /*&& playerI.netId != null*/) {
 					haxe.Timer.delay(function() {
 						trace("PLAYER ADDED AT: ", key, "SESSION : " + room.sessionId);

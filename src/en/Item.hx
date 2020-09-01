@@ -9,14 +9,19 @@ import h2d.Object;
 import h2d.Interactive;
 
 class Item extends Object {
+	public var ent:Entity;
 	public var spr:HSprite;
-
-	var displayText:String = "";
-
 	public var interactive:h2d.Interactive;
 
+	var displayText:String = "";
 	var textLabel:TextLabel;
 	var bitmap:Bitmap;
+
+	inline public function isInSlot():Bool
+		return Std.is(parent, h2d.Interactive);
+
+	inline public function isInCursor():Bool
+		return Std.is(parent, Scene);
 
 	public function new(?x:Float = 0, ?y:Float = 0, ?parent:Object) {
 		super(parent);
@@ -37,20 +42,25 @@ class Item extends Object {
 		}
 
 		interactive.onPush = function(e:hxd.Event) {
+			// Picking up the item into the player's holdItem (cursor)
 			if (Player.inst.inventory.base.visible) {
 				textLabel.dispose();
 				Player.inst.inventory.belt.deselectCells();
-				var swapItem = Game.inst.player.cursorItem;
-				Game.inst.player.cursorItem = this;
-				// if (swapItem != null)
-				// 	swapItem.spr.scale(1 / 2);
-				Game.inst.player.inventory.invGrid.removeItem(this, swapItem);
-				Game.inst.player.inventory.belt.invGrid.removeItem(this, swapItem);
+				var swapItem = Game.inst.player.holdItem;
+				Game.inst.player.holdItem = this;
+				if (Game.inst.player.inventory.invGrid.removeItem(this, swapItem) == null)
+					Game.inst.player.inventory.belt.invGrid.removeItem(this, swapItem);
 				Boot.inst.s2d.addChild(this);
+				scaleX = scaleY = 2;
 			} else {
-				for (i in 0...Player.inst.inventory.belt.invGrid.interGrid.length) {
-					if (Player.inst.inventory.belt.invGrid.interGrid[i][0].item == this) {
-						Player.inst.inventory.belt.selectCell(i + 1);
+				var beltGrid = Player.inst.inventory.belt.invGrid.interGrid;
+				// Selecting item in the belt if inventory is hidden
+				for (i in beltGrid) {
+					var cout = 0;
+					for (j in i) {
+						if (j.item == this)
+							Player.inst.inventory.belt.selectCell(cout + 1);
+						cout++;
 					}
 				}
 			}
@@ -60,6 +70,7 @@ class Item extends Object {
 	public function dispose() {
 		spr.remove();
 		interactive.remove();
+		trace("disposed");
 	}
 
 	override function sync(ctx:RenderContext) {
@@ -73,7 +84,5 @@ class Item extends Object {
 
 		interactive.x = -spr.tile.width / 2;
 		interactive.y = -spr.tile.height / 2;
-
-		setScale(Std.isOfType(parent, Scene) ? 2 : 1);
 	}
 }

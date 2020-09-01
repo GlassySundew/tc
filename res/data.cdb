@@ -1,0 +1,73 @@
+{
+	"sheets": [
+		{
+			"name": "structures",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "id",
+					"scope": null
+				},
+				{
+					"typeStr": "4",
+					"name": "isoWidth"
+				},
+				{
+					"typeStr": "4",
+					"name": "isoHeight"
+				},
+				{
+					"typeStr": "4",
+					"name": "use_range"
+				}
+			],
+			"lines": [
+				{
+					"id": "Door",
+					"use_range": 15,
+					"isoWidth": 0,
+					"isoHeight": 0
+				},
+				{
+					"id": "Back_Door",
+					"use_range": 15,
+					"isoWidth": 0,
+					"isoHeight": 0
+				},
+				{
+					"id": "Hydroponics",
+					"use_range": 40,
+					"isoWidth": 0,
+					"isoHeight": 0
+				},
+				{
+					"id": "",
+					"use_range": 0,
+					"isoWidth": 0,
+					"isoHeight": 0
+				}
+			],
+			"props": {},
+			"separators": []
+		},
+		{
+			"name": "items",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "id",
+					"scope": null
+				}
+			],
+			"lines": [
+				{
+					"id": ""
+				}
+			],
+			"separators": [],
+			"props": {}
+		}
+	],
+	"customTypes": [],
+	"compress": false
+}

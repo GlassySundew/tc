@@ -30,6 +30,7 @@ class Boot extends hxd.App {
 
 		s3d.lightSystem.ambientLight.set(0.5, 0.5, 0.5);
 		onResize();
+
 		#if (castle && hl && debug)
 		inspector = new hxd.inspect.Inspector(s3d);
 		#end

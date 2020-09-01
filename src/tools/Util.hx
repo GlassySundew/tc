@@ -14,6 +14,8 @@ import format.tmx.Data.TmxObject;
 @:publicFields
 @:expose
 class Util {
+	static var eregClass = ~/\.([a-z_0-9]+)+$/gi;
+
 	inline static function checkPolyClockwise(points:Array<Dynamic>) {
 		var pts = points.copy();
 		var sum = .0;

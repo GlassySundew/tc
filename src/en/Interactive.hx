@@ -1,5 +1,8 @@
 package en;
 
+import ui.InventoryGrid;
+import haxe.io.Error;
+import ui.EventInteractive;
 import ui.player.ButtonIcon;
 import hxd.Key;
 import hxd.Event;
@@ -21,13 +24,30 @@ import hxGeomAlgo.EarCut;
 	An interactive entity
 **/
 class Interactive extends Entity {
-	public var interact:h3d.scene.Interactive;
-
-	var interactable(default, set):Bool = false;
+	public var interact:EventInteractive;
+	public var interactable(default, set):Bool = false;
 
 	inline function set_interactable(v:Bool) {
-		v ? 1 : {turnOffHighlight(); buttonIcon != null ? buttonIcon.dispose() : 1;};
+		if (!v) {
+			turnOffHighlight();
+			if (buttonIcon != null)
+				buttonIcon.dispose();
+			interact.cursor = Default;
+		}
 		return interactable = v;
+	}
+
+	public var useRange(get, never):Float;
+
+	inline function get_useRange() {
+		eregClass.match('$this');
+		var range:Null<Float> = Const.DEF_USE_RANGE;
+		try {
+			range = Data.structures.resolve(eregClass.matched(1)).use_range;
+		} catch (Dynamic) {
+			interactable = false;
+		}
+		return range;
 	}
 
 	var highlightingColor:String;
@@ -39,6 +59,8 @@ class Interactive extends Entity {
 	var polygonized:Array<Tri>;
 	var points:Array<HxPoint>;
 	var iconParent:Object;
+
+	var inv = new CellGrid2D(4, 4);
 
 	public function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:TmxObject) {
 		super(x, z, tmxObj);
@@ -58,7 +80,7 @@ class Interactive extends Entity {
 		}
 
 		polyPrim = new Polygon(translatedPoints, idx);
-		interact = new h3d.scene.Interactive(polyPrim.getCollider(), mesh);
+		interact = new EventInteractive(polyPrim.getCollider(), mesh);
 		interact.rotate(-0.01, hxd.Math.degToRad(180), hxd.Math.degToRad(90));
 
 		if (tmxObj != null && tmxObj.flippedVertically)
@@ -69,26 +91,48 @@ class Interactive extends Entity {
 			highlightColor = "ffffffff";
 
 		filter = new h2d.filter.Glow(Color.hexToInt(highlightingColor != null ? highlightingColor : highlightColor), 1.2, 4, 1, 1.5, true);
-		interact.onOver = function(e:hxd.Event) {
-			if (interactable) {
-				bmp.filter = filter;
-				filter.enable = true;
-				cd.setS("keyboardIconInit", .4);
-				cd.setS("interacted", Const.INFINITE);
-			}
-		};
 
-		interact.onMove = interact.onCheck = function(e:hxd.Event) {};
-		interact.onOut = function(e:hxd.Event) turnOffHighlight();
-		interact.onTextInput = function(e:Event) {
-			// trace(Key.isPressed(Key.E));
+		function activateInteractive() {
+			if (interactable && isInPlayerRange()) {
+				turnOnHighlight();
+				return true;
+			} else
+				return false;
 		}
+		interact.onPushEvent.add(event -> {});
+		interact.onOverEvent.add((_) -> activateInteractive());
+
+		interact.onOutEvent.add((e:hxd.Event) -> {
+			turnOffHighlight();
+		});
+
+		// trace('$this');
+		var eregClass = ~/\.([a-z_0-9]+)+$/gi;
+		eregClass.match('$this');
 	}
+
+	inline function isInPlayerRange()
+		return distPx(player) <= useRange;
 
 	public function rebuildInteract() {
 		var facX = tmxObj.flippedVertically ? 1 - spr.pivot.centerFactorX : spr.pivot.centerFactorX;
 		polyPrim.translate(-spr.tile.width * facX, 0, -spr.tile.height * spr.pivot.centerFactorY);
 		interact.shape = polyPrim.getCollider();
+	}
+
+	public function turnOnHighlight() {
+		bmp.filter = filter;
+		filter.enable = true;
+		cd.setS("keyboardIconInit", .4);
+		cd.setS("interacted", Const.INFINITE);
+	}
+
+	public function turnOffHighlight() {
+		cd.unset("interacted");
+		bmp.filter = null;
+		filter.enable = false;
+		if (buttonIcon != null)
+			buttonIcon.dispose();
 	}
 
 	override function postUpdate() {
@@ -98,15 +142,7 @@ class Interactive extends Entity {
 		if (interactable)
 			updateKeyIcon();
 		// deactivate interactive if inventory is opened
-		interact.visible = !player.inventory.base.visible;
-	}
-
-	public function turnOffHighlight() {
-		cd.unset("interacted");
-
-		filter.enable = false;
-		if (buttonIcon != null)
-			buttonIcon.dispose();
+		interact.visible = !player.inventory.base.visible && isInPlayerRange();
 	}
 
 	function updateKeyIcon() {
@@ -135,13 +171,24 @@ class Interactive extends Entity {
 		throw "Not part of this array";
 	}
 
+	function dropAllItems(?angle:Float, ?power:Float) {
+		for (i in inv.grid) {
+			for (j in i) {
+				if (j.item != null) {
+					j.item = dropItem(j.item, Math.random() * M.toRad(360), Math.random() * .03 + .01);
+				}
+			}
+		}
+	}
+
 	override function dispose() {
+		interact.visible = false;
+		interact.cursor = Default;
 		super.dispose();
-		
+
 		interact.remove();
 		buttonIcon.remove();
 		filter = null;
 		polyPrim.dispose();
-
 	}
 }

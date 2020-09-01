@@ -30,7 +30,7 @@ class Game extends Process {
 
 	public var level:Level;
 
-	var tmxMap:TmxMap;
+	public var tmxMap:TmxMap;
 
 	public var player:en.player.Player;
 
@@ -75,9 +75,10 @@ class Game extends Process {
 	}
 
 	public function startLevel(name:String) {
-		cd.setF("lvlNotReady", 1 / 0);
+		
 
 		engine.clear(0, 1);
+
 		if (level != null) {
 			level.destroy();
 			for (e in Entity.ALL)
@@ -90,6 +91,7 @@ class Game extends Process {
 		r.resolveTSX = getTSX;
 		tmxMap = r.read(Xml.parse(Res.loader.load(Const.LEVELS_PATH + name).entry.getText()));
 		level = new Level(tmxMap);
+		lvlName = name.split('.')[0];
 		// level.walkable =
 		// Entity spawning
 		CompileTime.importPackage("en");
@@ -101,13 +103,13 @@ class Game extends Process {
 		var eregClass = ~/\.([a-z0-9]+)\n/gi; // регулярка для js, который, нахуй, не работает
 		#end
 
-
 		/**
 			Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity if not found
 		**/
 
 		function searchAndSpawnEnt(e:TmxObject) {
 			for (eClass in entClasses) {
+				eregClass.match('$eClass'.toLowerCase());
 				if (eregClass.match('$eClass'.toLowerCase()) && eregClass.matched(1) == e.name) {
 					Type.createInstance(eClass, [e.x, e.y, e]);
 					return;
@@ -142,7 +144,6 @@ class Game extends Process {
 		// for (en in Entity.ALL)
 		// 	if (en.tmxObj != null)
 		// 		en.footY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
-		cd.unset("lvlNotReady");
 	}
 
 	public function applyTmxObjOnEnt(?ent:Null<Entity>) {
@@ -164,7 +165,7 @@ class Game extends Process {
 									&& tile.objectGroup.objects.length > 0
 									|| (Std.is(ent, SpriteEntity) && ereg.matched(1) == ent.spr.groupName))) /*&& ent.collisions.length == 0*/) {
 								var centerSet = false;
-								for (obj in tile.objectGroup.objects) {
+								for (obj in tile.objectGroup.objects) { // Засовываем объекты для детекта коллизий по Entity
 									var params = {
 										x: M.round(obj.x) + ent.footX,
 										y: M.round(obj.y) + ent.footY,
@@ -179,10 +180,16 @@ class Game extends Process {
 									}
 
 									function setCenter() {
-										var pivotX = (obj.x + xCent) / ent.spr.tile.width;
-										var pivotY = (obj.y + yCent) / ent.spr.tile.height;
-										ent.spr.setCenterRatio(ent.tmxObj.flippedVertically ? 1 - pivotX : pivotX, pivotY);
+										var pivotX = ((obj.x + xCent)) / ent.spr.tile.width;
+										var pivotY = ((obj.y + yCent)) / ent.spr.tile.height;
+										pivotX = ent.tmxObj.flippedVertically ? 1 - pivotX : pivotX;
+										if (obj.name == "center") {
+											ent.mesh.xOff = -(pivotX - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
+											ent.mesh.yOff = (pivotY - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
+											ent.mesh.renewDebugPts();
+										}
 
+										ent.spr.setCenterRatio(pivotX, pivotY);
 										ent.footX += M.round((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width) - Const.GRID_WIDTH / 2;
 										ent.footY -= (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height + Const.GRID_HEIGHT;
 									}
@@ -192,11 +199,10 @@ class Game extends Process {
 											shape.scaleY = params.height / params.width;
 											xCent = M.round(obj.width / 2);
 											yCent = M.round(obj.height / 2);
-
 											ent.collisions.set(shape,
 												{cent: new h3d.Vector(xCent, yCent), offset: new h3d.Vector(obj.x + xCent, -obj.y - yCent)});
 										case OTRectangle:
-											// Точка парсится как OTReacangle, точка с названием center будет обозначать центр
+											// Точка парсится как OTRectangle, точка с названием center будет обозначать центр
 											if (obj.name == "center") {
 												if (centerSet)
 													unsetCenter();
@@ -207,7 +213,6 @@ class Game extends Process {
 												{cent: new h3d.Vector(), offset: new h3d.Vector()});
 										case OTPolygon(points):
 											var pts = checkPolyClockwise(points);
-
 											var verts:Array<Vector> = [];
 											for (i in pts) {
 												verts.push(new Vector((i.x), (-i.y)));
@@ -217,16 +222,26 @@ class Game extends Process {
 											var xArr = verts.copy();
 											xArr.sort(function(a, b) return (a.x < b.x) ? -1 : ((a.x > b.x) ? 1 : 0));
 
+											// xCent и yCent - половины ширины и высоты неповёрнутого полигона соответственно
 											xCent = M.round((xArr[xArr.length - 1].x + xArr[0].x) * .5);
 											yCent = -M.round((yArr[yArr.length - 1].y + yArr[0].y) * .5);
+
+											// c - радиус от начальной точки поли до центра поли
+											var c = Math.sqrt(M.pow(xCent, 2) + M.pow(yCent, 2));
+											// alpha - угол между начальной точкой неповёрнутого полигона и центром полигона
+											var alpha = Math.atan(yCent / xCent);
+
+											// xCent и yCent в данный момент - проекции отрезка, соединяющего начальную точку полигона и центр полигона на оси x и y соответственно
+											yCent = -c * (Math.sin(M.toRad(-obj.rotation) - alpha));
+											xCent = c * (Math.cos(M.toRad(-obj.rotation) - alpha));
+
 											var poly = new Polygon(0, 0, verts);
 											poly.rotation = -obj.rotation;
 
 											// vertical flipping
 											if (ent.tmxObj.flippedVertically)
 												poly.scaleX = -1;
-
-											var xOffset = ent.tmxObj.flippedVertically ? ent.spr.tile.width - obj.x : obj.x;
+											var xOffset = poly.scaleX < 0 ? ent.spr.tile.width - obj.x : obj.x;
 											var yOffset = -obj.y;
 											ent.collisions.set(poly, {cent: new h3d.Vector(xCent, -yCent), offset: new h3d.Vector(xOffset, yOffset)});
 										default:
@@ -235,15 +250,27 @@ class Game extends Process {
 									if (!centerSet) {
 										setCenter();
 										centerSet = true;
+									} else {
+										var pivotX = ((obj.x + xCent)) / ent.spr.tile.width;
+										var pivotY = ((obj.y + yCent)) / ent.spr.tile.height;
+										pivotX = ent.tmxObj.flippedVertically ? 1 - pivotX : pivotX;
+										if (obj.name != "center") {
+											ent.mesh.xOff = (pivotX - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
+											ent.mesh.yOff = -(pivotY - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
+										}
+										#if dispDepthBoxes
+										ent.mesh.renewDebugPts();
+										#end
 									}
 								}
 								try
 									cast(ent, Interactive).rebuildInteract()
 								catch (e:Dynamic) {}
+								if (ent.tmxObj.flippedVertically && ent.mesh.isLong)
+									ent.mesh.flipX();
+								if (Std.is(ent, SpriteEntity) && tile.properties.exists("interactable"))
+									cast(ent, SpriteEntity).interactable = tile.properties.getBool("interactable");
 							}
-
-							if (ent.tmxObj.flippedVertically && ent.mesh.isLong)
-								ent.mesh.flipX();
 						}
 					}
 				}

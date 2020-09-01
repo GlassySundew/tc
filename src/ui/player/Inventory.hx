@@ -22,7 +22,6 @@ import h2d.ScaleGrid;
 **/
 class Inventory extends Object {
 	public var belt:Belt;
-	// public var items:Array<Array<Item>> = [[]];
 	public var invGrid:InventoryGrid;
 
 	var sprInv:HSprite;

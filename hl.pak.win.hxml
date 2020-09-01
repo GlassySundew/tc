@@ -1,7 +1,7 @@
 -debug
 base.hxml
 
--D pak=true
+-D pak
 
 -hl redist/sdl_win/tc/hlboot.dat
 -lib hlsdl

@@ -82,7 +82,7 @@ import h3d.scene.Mesh;
 	public var centerY(get, never):Float;
 
 	inline function get_centerY()
-		return footY - 32 * 0.5;
+		return footY - 11;
 
 	public var dir(default, set) = 6;
 
@@ -191,6 +191,9 @@ import h3d.scene.Mesh;
 	public inline function angTo(e:Entity)
 		return Math.atan2(e.footY - footY, e.footX - footX);
 
+	public inline function angToPxFree(x:Float, y:Float)
+		return Math.atan2(y - footY, x - footX);
+
 	public function blink(?c = 0xffffff) {
 		colorAdd.setColor(c);
 		cd.setS("colorMaintain", 0.03);
@@ -209,11 +212,22 @@ import h3d.scene.Mesh;
 	public function isLocked()
 		return cd.has("lock");
 
-	public function lock()
-		cd.setS("lock", 1 / 0);
+	public function lock(?ms:Float)
+		cd.setMs("lock", ms != null ? ms : 1 / 0);
 
 	public function unlock()
 		cd.unset("lock");
+
+	function dropItem(item:Item, ?angle:Float, ?power:Float = 0):Item {
+		var fItem = new FloatingItem(footX, footY, item);
+		fItem.bump(Math.cos(angle) * power, Math.sin(angle) * power, 0);
+		fItem.lock(1000);
+		item.remove();
+		item = null;
+		return item;
+	}
+
+	
 
 	inline function set_dir(v) {
 		if (dir != v) {
@@ -294,6 +308,9 @@ import h3d.scene.Mesh;
 		mesh = null;
 	}
 
+	public function setFeetPos(x, y)
+		setPosCase(x / Const.GRID_WIDTH - xr, y / Const.GRID_WIDTH - yr);
+
 	public function setPosCase(x, y, ?xr = 0.5, ?yr = 0.5) {
 		cx = x;
 		cy = y;
@@ -320,7 +337,7 @@ import h3d.scene.Mesh;
 
 	public function checkCollsAgainstAll() {
 		for (ent in Entity.ALL) {
-			if (!ent.isOfType(FloatingItem) && ent != this) {
+			if (!(ent.isOfType(FloatingItem) || isOfType(FloatingItem)) && ent != this) {
 				for (collObj in collisions.keys()) {
 					for (entCollObj in ent.collisions.keys()) {
 						var collideInfo = Collision.shapeWithShape(collObj, entCollObj);
