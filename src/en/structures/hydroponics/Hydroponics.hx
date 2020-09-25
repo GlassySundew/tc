@@ -12,6 +12,7 @@ import hxd.Key in K;
 	Использует inv как хранилище для растений
 **/
 class Hydroponics extends Interactive {
+	
 	public function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:TmxObject) {
 		if (spr == null) {
 			spr = new HSprite(Assets.structures);
@@ -21,16 +22,17 @@ class Hydroponics extends Interactive {
 		}
 
 		super(x, z, tmxObj);
-
+		
 		interactable = true;
 		mesh.isLong = true;
 		mesh.isoWidth = 2;
 		mesh.isoHeight = 1;
 		mesh.renewDebugPts();
+
 		inv.giveItem(new Plant());
 		inv.giveItem(new Plant());
 		inv.giveItem(new Plant());
-		inv.giveItem(new Plant());
+		inv.giveItem(new Plant()); 
 
 		// plantCont = new Plant(this);
 
@@ -45,6 +47,8 @@ class Hydroponics extends Interactive {
 		if (inv.itemCout > 0) {
 			dropAllItems();
 		}
+
+		interactable = false;
 		// if (plantCont != null) {
 		// 	interactable = false;
 		// 	new FloatingItem(mesh.x + 1, mesh.z - 1, plantContainer).bumpAwayFrom(this, .05);

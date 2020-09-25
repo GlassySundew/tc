@@ -119,8 +119,7 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 			resetTarget();
 			saoBlur.apply(ctx, saoTarget, allocTarget("saoBlurTmp", false));
 			h3d.pass.Copy.run(saoTarget, colorTex, Multiply);
-		}
-		{ // apply fog\
+		} { // apply fog\
 			post.apply(colorTex, ctx.time);
 			var fogTarget = allocTarget("fog", false, 1);
 			fog.setGlobals(ctx);
@@ -148,22 +147,23 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 		post.flash(color, ctx.time, duration);
 	}
 
+	@:access(h3d.scene.Object)
 	public override function depthSort(frontToBack:Bool, passes:PassList) {
 		var cam = ctx.camera.m;
-		@:privateAccess for (p in passes) {
+		for (p in passes) {
 			var z = p.obj.absPos._41 * cam._13 + p.obj.absPos._42 * cam._23 + p.obj.absPos._43 * cam._33 + cam._43;
 			var w = p.obj.absPos._41 * cam._14 + p.obj.absPos._42 * cam._24 + p.obj.absPos._43 * cam._34 + cam._44;
-			p.depth = p.obj.z / w;
+			p.depth = z / w;
 		}
 
 		if (frontToBack)
 			passes.sort(function(p1, p2) return p1.pass.layer == p2.pass.layer ? (p1.depth > p2.depth ? 1 : -1) : p1.pass.layer - p2.pass.layer);
 		else {
-		passes.sort(function(p1, p2) {
-			// trace(p1.pass.layer, p2.pass.layer);
-			return p1.pass.layer == p2.pass.layer ? (try getFrontPassIso(p1, p2) catch (e:Dynamic) (p1.depth > p2.depth) ? -1 : 1) : p1.pass.layer
-				- p2.pass.layer;
-		});
+			passes.sort(function(p1, p2) {
+				// trace(p1.pass.layer, p2.pass.layer);
+				return p1.pass.layer == p2.pass.layer ? (try getFrontPassIso(p1, p2) catch (e:Dynamic) (p1.depth > p2.depth) ? -1 : 1) : p1.pass.layer
+					- p2.pass.layer;
+			});
 		}
 	}
 

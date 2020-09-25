@@ -1,54 +1,54 @@
 
 structures.png
-size: 1440,156
+size: 1439,156
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 amethyst
   rotate: false
-  xy: 1344, 73
-  size: 46, 35
-  orig: 46, 35
+  xy: 1393, 120
+  size: 46, 36
+  orig: 46, 36
   offset: 0, 0
   index: -1
 back_door
   rotate: false
-  xy: 232, 79
+  xy: 522, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door0
   rotate: false
-  xy: 232, 79
+  xy: 522, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door1
   rotate: false
-  xy: 870, 0
+  xy: 696, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door10
   rotate: false
-  xy: 580, 79
+  xy: 580, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door11
   rotate: false
-  xy: 580, 0
+  xy: 638, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door12
   rotate: false
-  xy: 638, 79
+  xy: 638, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
@@ -62,14 +62,14 @@ back_door13
   index: -1
 back_door14
   rotate: false
-  xy: 522, 79
+  xy: 696, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door15
   rotate: false
-  xy: 348, 79
+  xy: 406, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
@@ -83,7 +83,7 @@ back_door16
   index: -1
 back_door17
   rotate: false
-  xy: 174, 0
+  xy: 232, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
@@ -97,14 +97,14 @@ back_door2
   index: -1
 back_door3
   rotate: false
-  xy: 638, 0
+  xy: 754, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door4
   rotate: false
-  xy: 1102, 79
+  xy: 812, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
@@ -125,7 +125,7 @@ back_door6
   index: -1
 back_door7
   rotate: false
-  xy: 1102, 0
+  xy: 870, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
@@ -172,30 +172,30 @@ bridge_wall
   orig: 114, 134
   offset: 0, 0
   index: -1
-door0
-  rotate: false
-  xy: 116, 79
-  size: 56, 77
-  orig: 56, 77
-  offset: 0, 0
-  index: -1
 door
-  rotate: false
-  xy: 116, 79
-  size: 56, 77
-  orig: 56, 77
-  offset: 0, 0
-  index: -1
-door1
   rotate: false
   xy: 116, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
+door0
+  rotate: false
+  xy: 116, 0
+  size: 56, 77
+  orig: 56, 77
+  offset: 0, 0
+  index: -1
+door1
+  rotate: false
+  xy: 174, 79
+  size: 56, 77
+  orig: 56, 77
+  offset: 0, 0
+  index: -1
 door10
   rotate: false
-  xy: 812, 79
+  xy: 348, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
@@ -209,63 +209,63 @@ door11
   index: -1
 door12
   rotate: false
-  xy: 464, 79
+  xy: 464, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 door13
   rotate: false
-  xy: 348, 0
+  xy: 406, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 door14
   rotate: false
-  xy: 406, 79
+  xy: 1102, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 door15
   rotate: false
-  xy: 406, 0
+  xy: 116, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 door16
   rotate: false
-  xy: 696, 79
+  xy: 464, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 door17
   rotate: false
-  xy: 464, 0
+  xy: 522, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 door2
   rotate: false
-  xy: 174, 79
+  xy: 174, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 door3
   rotate: false
-  xy: 522, 0
+  xy: 580, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 door4
   rotate: false
-  xy: 696, 0
+  xy: 348, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
@@ -293,23 +293,23 @@ door7
   index: -1
 door8
   rotate: false
-  xy: 986, 0
+  xy: 1102, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 door9
   rotate: false
-  xy: 754, 0
+  xy: 986, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 emerald
   rotate: false
-  xy: 1393, 121
-  size: 47, 35
-  orig: 47, 35
+  xy: 1393, 82
+  size: 46, 36
+  orig: 46, 36
   offset: 0, 0
   index: -1
 hydroponics
@@ -335,16 +335,16 @@ hydroponics1
   index: -1
 iron
   rotate: false
-  xy: 1393, 84
-  size: 47, 35
-  orig: 47, 35
+  xy: 1344, 72
+  size: 46, 36
+  orig: 46, 36
   offset: 0, 0
   index: -1
 pcgmw
   rotate: false
   xy: 1316, 110
-  size: 48, 46
-  orig: 48, 46
+  size: 46, 46
+  orig: 46, 46
   offset: 0, 0
   index: -1
 sleeping_pod

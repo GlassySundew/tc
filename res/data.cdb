@@ -5,8 +5,15 @@
 			"columns": [
 				{
 					"typeStr": "0",
-					"name": "id",
-					"scope": null
+					"name": "id"
+				},
+				{
+					"typeStr": "8",
+					"name": "drop"
+				},
+				{
+					"typeStr": "3",
+					"name": "hp"
 				},
 				{
 					"typeStr": "4",
@@ -23,32 +30,63 @@
 			],
 			"lines": [
 				{
-					"id": "Door",
-					"use_range": 15,
+					"id": "door",
+					"use_range": 20,
 					"isoWidth": 0,
-					"isoHeight": 0
+					"isoHeight": 0,
+					"hp": -1,
+					"drop": []
 				},
 				{
-					"id": "Back_Door",
-					"use_range": 15,
+					"id": "back_door",
+					"use_range": 20,
 					"isoWidth": 0,
-					"isoHeight": 0
+					"isoHeight": 0,
+					"hp": -1,
+					"drop": []
 				},
 				{
-					"id": "Hydroponics",
+					"id": "hydroponics",
 					"use_range": 40,
 					"isoWidth": 0,
-					"isoHeight": 0
+					"isoHeight": 0,
+					"hp": 100,
+					"drop": [
+						{
+							"item": "iron",
+							"amount": 3
+						}
+					]
 				},
 				{
-					"id": "",
-					"use_range": 0,
+					"id": "bridge_table_1",
+					"use_range": 100,
 					"isoWidth": 0,
-					"isoHeight": 0
+					"isoHeight": 0,
+					"hp": -1,
+					"drop": []
 				}
 			],
 			"props": {},
 			"separators": []
+		},
+		{
+			"name": "structures@drop",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "6:items",
+					"name": "item"
+				},
+				{
+					"typeStr": "3",
+					"name": "amount"
+				}
+			]
 		},
 		{
 			"name": "items",
@@ -61,7 +99,10 @@
 			],
 			"lines": [
 				{
-					"id": ""
+					"id": "iron"
+				},
+				{
+					"id": "plant"
 				}
 			],
 			"separators": [],

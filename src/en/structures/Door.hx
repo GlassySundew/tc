@@ -32,7 +32,7 @@ class Door extends Interactive {
 					var curLvl = game.lvlName;
 					game.startLevel(leadsTo + ".tmx");
 					var door = findDoor(curLvl);
-					player.setFeetPos(Std.int(door.footX), Std.int(door.footY));
+					player.setFeetPos(door.footX, door.footY);
 					game.camera.recenter();
 				}
 			}
@@ -50,7 +50,7 @@ class Door extends Interactive {
 
 	override function postUpdate() {
 		super.postUpdate();
-		
+
 		// mesh.z += 1 / Camera.ppu;
 	}
 }

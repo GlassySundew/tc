@@ -1,3 +1,4 @@
+import h3d.scene.Object;
 import dn.Rand;
 import en.player.WebPlayer;
 import net.Connect;
@@ -75,8 +76,6 @@ class Game extends Process {
 	}
 
 	public function startLevel(name:String) {
-		
-
 		engine.clear(0, 1);
 
 		if (level != null) {
@@ -93,13 +92,13 @@ class Game extends Process {
 		level = new Level(tmxMap);
 		lvlName = name.split('.')[0];
 		// level.walkable =
+		
 		// Entity spawning
 		CompileTime.importPackage("en");
 		var entClasses = (CompileTime.getAllClasses(Entity));
 
-		#if hl
-		var eregClass = ~/\$([a-z_0-9]+)+$/gi;
-		#else
+		#if js
+	
 		var eregClass = ~/\.([a-z0-9]+)\n/gi; // регулярка для js, который, нахуй, не работает
 		#end
 
@@ -108,6 +107,7 @@ class Game extends Process {
 		**/
 
 		function searchAndSpawnEnt(e:TmxObject) {
+			//  Парсим все классы - наследники en.Entity и спавним их
 			for (eClass in entClasses) {
 				eregClass.match('$eClass'.toLowerCase());
 				if (eregClass.match('$eClass'.toLowerCase()) && eregClass.matched(1) == e.name) {
@@ -119,8 +119,10 @@ class Game extends Process {
 				case OTTile(gid):
 					var source = Tools.getTileByGid(tmxMap, gid).image.source;
 					var ereg = ~/\/([a-z_0-9]+)\./;
-					if (ereg.match(source))
+					if (ereg.match(source)) {
 						new SpriteEntity(e.x, e.y, ereg.matched(1), e);
+						return;
+					}
 				default:
 			}
 		}
@@ -128,12 +130,12 @@ class Game extends Process {
 		for (e in level.entities)
 			searchAndSpawnEnt(e);
 
-		player = Player.inst;
-
 		// putting player inst to the last position of entities array as a depth sorting fix (существует трудновоспроизводимый баг с
 		// сортировкой, когда 2 объекта начаинают неправильно рисоваться при неопределенном положении в списке объектов в Tiled, если они расположены на соседних линиях в изометрии)
 
 		applyTmxObjOnEnt();
+
+		player = Player.inst;
 
 		camera.target = player;
 		camera.recenter();
@@ -144,6 +146,9 @@ class Game extends Process {
 		// for (en in Entity.ALL)
 		// 	if (en.tmxObj != null)
 		// 		en.footY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
+
+		new AxesHelper( Boot.inst.s3d );
+		new GridHelper( Boot.inst.s3d, 10, 10 );
 	}
 
 	public function applyTmxObjOnEnt(?ent:Null<Entity>) {
@@ -268,8 +273,9 @@ class Game extends Process {
 								catch (e:Dynamic) {}
 								if (ent.tmxObj.flippedVertically && ent.mesh.isLong)
 									ent.mesh.flipX();
-								if (Std.is(ent, SpriteEntity) && tile.properties.exists("interactable"))
+								if (Std.is(ent, SpriteEntity) && tile.properties.exists("interactable")) {
 									cast(ent, SpriteEntity).interactable = tile.properties.getBool("interactable");
+								}
 							}
 						}
 					}
@@ -335,6 +341,53 @@ class Game extends Process {
 				}
 			if (ca.selectPressed())
 				restartLevel();
+		}
+	}
+}
+
+class AxesHelper extends h3d.scene.Graphics {
+
+	public function new( ?parent : h3d.scene.Object, size = 2.0, colorX = 0xEB304D, colorY = 0x7FC309, colorZ = 0x288DF9, lineWidth = 2.0 ) {
+
+		super( parent );
+
+		material.props = h3d.mat.MaterialSetup.current.getDefaults( "ui" );
+
+		lineShader.width = lineWidth;
+
+		setColor( colorX );
+		lineTo( size, 0, 0 );
+
+		setColor( colorY );
+		moveTo( 0, 0, 0 );
+		lineTo( 0, size, 0 );
+
+		setColor( colorZ );
+		moveTo( 0, 0, 0 );
+		lineTo( 0, 0, size );
+	}
+}
+
+class GridHelper extends h3d.scene.Graphics {
+
+	public function new( ?parent : Object, size = 10.0, divisions = 10, color1 = 0x444444, color2 = 0x888888, lineWidth = 1.0 ) {
+
+		super( parent );
+
+		material.props = h3d.mat.MaterialSetup.current.getDefaults( "ui" );
+
+		lineShader.width = lineWidth;
+
+		var hsize = size / 2;
+		var csize = size / divisions;
+		var center = divisions / 2;
+		for( i in 0...divisions+1 ) {
+			var p = i * csize;
+			setColor( ( i!=0 && i!=divisions && i%center==0 ) ? color2 : color1 );
+			moveTo( -hsize + p, -hsize, 0 );
+			lineTo( -hsize + p, -hsize + size, 0 );
+			moveTo( -hsize, -hsize + p, 0 );
+			lineTo( -hsize + size, -hsize + p, 0 );
 		}
 	}
 }

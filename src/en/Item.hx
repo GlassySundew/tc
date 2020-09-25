@@ -46,15 +46,20 @@ class Item extends Object {
 			if (Player.inst.inventory.base.visible) {
 				textLabel.dispose();
 				Player.inst.inventory.belt.deselectCells();
+				Player.inst.enableGrids();
+
 				var swapItem = Game.inst.player.holdItem;
+				swapItem = swapItem == this ?null:swapItem;
+				
 				Game.inst.player.holdItem = this;
-				if (Game.inst.player.inventory.invGrid.removeItem(this, swapItem) == null)
-					Game.inst.player.inventory.belt.invGrid.removeItem(this, swapItem);
+				if (Game.inst.player.inventory.belt.invGrid.removeItem(this, swapItem) == null)
+					Game.inst.player.inventory.invGrid.removeItem(this, swapItem);
+
 				Boot.inst.s2d.addChild(this);
 				scaleX = scaleY = 2;
-			} else {
-				var beltGrid = Player.inst.inventory.belt.invGrid.interGrid;
+			} else if (isInSlot()) {
 				// Selecting item in the belt if inventory is hidden
+				var beltGrid = Player.inst.inventory.belt.invGrid.interGrid;
 				for (i in beltGrid) {
 					var cout = 0;
 					for (j in i) {

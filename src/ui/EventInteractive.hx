@@ -5,8 +5,10 @@ import hxd.Event;
 import h3d.scene.Interactive;
 
 /**
-	Simple wrapper to Interactive that allows multiple subscriptions to on* events.
+	Simple wrapper to h3d.scene.Interactive that allows multiple subscriptions to on* events.
 	Overriding on* functions still possible.
+
+	ported to 3d from yanrishatum's code
 **/
 class EventInteractive extends Interactive {
 	public var onOverEvent:EventSignal1<Event> = new EventSignal1();

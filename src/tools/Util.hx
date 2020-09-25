@@ -1,5 +1,6 @@
 package tools;
 
+import format.tmx.Data.TmxTilesetTile;
 import hxd.Res;
 import format.tmx.Data.TmxTileset;
 import h2d.Tile;
@@ -14,7 +15,7 @@ import format.tmx.Data.TmxObject;
 @:publicFields
 @:expose
 class Util {
-	static var eregClass = ~/\.([a-z_0-9]+)+$/gi;
+	static var eregClass = ~/\$([a-z_0-9]+)+$/gi;  // regexp to remove 'en.' prefix
 
 	inline static function checkPolyClockwise(points:Array<Dynamic>) {
 		var pts = points.copy();
@@ -48,14 +49,17 @@ class Util {
 	inline static function getS2dScaledHei()
 		return (Boot.inst.s2d.height / Const.SCALE);
 
-	inline static function getTileFromSeparatedTsx(gid:Int, tileset:TmxTileset):Tile {
+	inline static function getTileFromSeparatedTsx(tile:TmxTilesetTile):Tile {
+		return Res.loader.load(Const.LEVELS_PATH + tile.image.source).toTile();
+	}
+
+	inline static function getTileSource(gid:Int, tileset:TmxTileset):TmxTilesetTile {
 		var fixedGId = gid - tileset.firstGID;
+		// Костыльный фикс на непоследовательные id тайлов
 		for (i in 0...tileset.tiles.length)
 			if (tileset.tiles[i].id == fixedGId && fixedGId > i)
 				while (fixedGId > i)
 					fixedGId--;
-		var imageSource = tileset.tiles[fixedGId];
-
-		return Res.loader.load(Const.LEVELS_PATH + imageSource.image.source).toTile();
+		return (tileset.tiles[fixedGId]);
 	}
 }

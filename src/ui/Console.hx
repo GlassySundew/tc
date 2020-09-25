@@ -68,6 +68,7 @@ class Console extends h2d.Console {
 		this.addCommand("untarget", [], function(?k:String) {
 			Game.inst.camera.stopTracking();
 			new h3d.scene.CameraController(Boot.inst.s3d).loadFromCamera();
+			Level.inst.cursorInteract.visible = false;
 		});
 
 		this.addCommand("loadlvl", [{name: "k", t: AString}], function(?k:String) {
@@ -86,14 +87,14 @@ class Console extends h2d.Console {
 	#if debug
 	public function setFlag(k:String, v)
 		return flags.set(k, v);
- 
+
 	public function hasFlag(k:String)
 		return flags.get(k) == true;
 	#else
 	public function hasFlag(k:String)
 		return false;
 	#end
- 
+
 	override public function addAlias(name, command) {
 		aliases.set("/" + name, command);
 	}
@@ -247,7 +248,7 @@ class Console extends h2d.Console {
 			all.remove("/help");
 			all.push("/help");
 		} else {
-			if (aliases.exists(command)) 
+			if (aliases.exists(command))
 				command = aliases.get(command);
 			if (!commands.exists(command))
 				throw 'Command not found "$command"';

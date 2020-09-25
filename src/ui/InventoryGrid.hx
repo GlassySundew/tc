@@ -12,8 +12,6 @@ class InventoryCell extends h2d.Object {
 
 	inline function set_item(v:Item) {
 		if (v != null) {
-			// v.spr.scaleX = v.spr.scaleY = 1;
-			// v.spr.scaleX = v.spr.scaleY = ((inter.parent == Std.downcast(inter.parent, ScaleGrid)) ? 1 : 3);
 			inter.addChild(v);
 			v.x = inter.width / 2;
 			v.y = inter.height / 2;
@@ -29,9 +27,11 @@ class InventoryCell extends h2d.Object {
 		// inter.visible = false;
 		inter.cursor = Default;
 		inter.onPush = function(e:Event) {
-			if (Game.inst.player.holdItem != null && item == null) {
+			if (Player.inst.holdItem != null && Player.inst.holdItem.isInCursor() && item == null) {
 				item = Game.inst.player.holdItem;
 				Game.inst.player.holdItem = null;
+				// Когда кладём предмет в слот, все курсоры сеток должны быть выключены
+				Player.inst.disableGrids();
 			}
 		}
 	}
@@ -68,7 +68,8 @@ class CellGrid2D {
 	public function disableGrid() {
 		for (i in grid)
 			for (j in i) {
-				j.inter.cursor = Default;
+				if (j.item == null)
+					j.inter.cursor = Default;
 			}
 	}
 
@@ -103,12 +104,21 @@ class CellGrid2D {
 		for (i in grid) {
 			for (j in i) {
 				if (j.item == item) {
+					
 					j.item.remove();
 					j.item = to;
 					return j.item;
 				}
 			}
 		}
+		return null;
+	}
+
+	public function findSlot(item:Item):InventoryCell {
+		for (i in grid)
+			for (j in i)
+				if (j.item == item)
+					return j;
 		return null;
 	}
 
@@ -124,6 +134,7 @@ class InventoryGrid extends h2d.Object {
 	public var getFreeSlot:Void->InventoryCell;
 	public var giveItem:Item->InventoryCell;
 	public var removeItem:Item->Item->Item;
+	public var findSlot:Item->InventoryCell;
 
 	public function new(x:Int, y:Int, width:Int, height:Int, horCellsAmount:Int, verCellsAmount:Int, xGap:Int, yGap:Int, ?parent:h2d.Object) {
 		super(parent);
@@ -134,6 +145,7 @@ class InventoryGrid extends h2d.Object {
 		enableGrid = cellGrid.enableGrid.bind();
 		getFreeSlot = cellGrid.getFreeSlot.bind();
 		giveItem = cellGrid.giveItem.bind();
+		findSlot = cellGrid.findSlot.bind();
 		removeItem = (item:Item, ?to:Item = null) -> {
 			cellGrid.removeItem(item, to);
 		};

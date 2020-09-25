@@ -13,7 +13,7 @@
   <properties>
    <property name="highlight" type="color" value="#ffffffff"/>
   </properties>
-  <image width="48" height="46" source="../separated/structures/pcgmw.png"/>
+  <image width="46" height="46" source="../separated/structures/pcgmw.png"/>
   <objectgroup draworder="index" id="3">
    <object id="113" x="9" y="32">
     <polygon points="1,0 15,7 29,0 15,-7"/>
@@ -21,9 +21,9 @@
   </objectgroup>
  </tile>
  <tile id="4">
-  <image width="47" height="35" source="../separated/structures/emerald.png"/>
+  <image width="46" height="36" source="../separated/structures/emerald.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="13" y="17" width="21" height="10">
+   <object id="1" x="13" y="18" width="21" height="10">
     <ellipse/>
    </object>
   </objectgroup>
@@ -32,7 +32,7 @@
   <properties>
    <property name="highlight" type="color" value="#ffffffff"/>
   </properties>
-  <image width="46" height="35" source="../separated/structures/amethyst.png"/>
+  <image width="46" height="36" source="../separated/structures/amethyst.png"/>
   <objectgroup draworder="index" id="2">
    <object id="1" x="13" y="19" width="21" height="10">
     <ellipse/>
@@ -40,9 +40,9 @@
   </objectgroup>
  </tile>
  <tile id="7">
-  <image width="47" height="35" source="../separated/structures/iron.png"/>
+  <image width="46" height="36" source="../separated/structures/iron.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="12.875" y="16" width="22" height="11.375">
+   <object id="1" x="13" y="16" width="22" height="11">
     <properties>
      <property name="highilightColor" type="color" value=""/>
     </properties>
@@ -80,7 +80,7 @@
    <object id="3" x="11" y="60">
     <polygon points="0,0 24,-12 30,-9 6,3"/>
    </object>
-   <object id="4" name="center" x="29" y="58">
+   <object id="4" name="center" x="30" y="59">
     <point/>
    </object>
   </objectgroup>

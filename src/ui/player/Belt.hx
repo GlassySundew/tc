@@ -41,7 +41,7 @@ class Belt extends Object {
 
 	public var invGrid:InventoryGrid;
 
-	public var beltSlots:Array<BeltCont> = [];
+	var beltSlots:Array<BeltCont> = [];
 
 	public var selectedCell:BeltCont;
 
@@ -59,7 +59,6 @@ class Belt extends Object {
 		}
 
 		invGrid = new InventoryGrid(0, 0, beltSlots[0].beltSlot.outerWidth, beltSlots[0].beltSlot.outerHeight, beltSlots.length, 1, 0, 0, this);
-		invGrid.enableGrid();
 		for (i in 0...beltSlots.length) {
 			beltSlots[i].itemContainer.addChild(invGrid.interGrid[0][i].inter);
 		}
@@ -67,20 +66,18 @@ class Belt extends Object {
 		// var iten = new en.items.GraviTool();
 		// invGrid.interGrid[2][0].item = iten;
 		deselectCells();
+		invGrid.disableGrid();
 	}
 
 	public function selectCell(number:Int = 1) {
-		if (player.holdItem == null) {
 			deselectCells();
 			var cell = beltSlots[number - 1];
 			cell.beltSlot.backgroundTile = h2d.Tile.fromColor(0x6bace6, 1, 1, .58);
 			cell.beltSlotNumber.color = Color.intToVector(0xbabac8);
 			cell.paddingBottom = 10;
-			
-			if (player.holdItem == null && !player.inventory.base.visible){
+
+			if (player.holdItem == null && !player.inventory.base.visible)
 				player.holdItem = invGrid.interGrid[0][number-1].item;
-			}
-		}
 	}
 
 	public function deselectCells() {

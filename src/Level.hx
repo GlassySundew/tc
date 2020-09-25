@@ -1,3 +1,6 @@
+import ui.EventInteractive;
+import hxd.IndexBuffer;
+import h3d.scene.Interactive;
 import h3d.col.Bounds;
 import en.player.Player;
 import h3d.prim.Grid;
@@ -52,13 +55,23 @@ class Level extends dn.Process {
 	public var data:TmxMap;
 	public var entities:Array<TmxObject> = [];
 	public var walkable:Array<Polygon> = [];
+	public var structTiles:Array<StructTile> = [];
 	public var ground:Texture;
 	public var obj:Mesh;
 
 	var layersByName:Map<String, TmxLayer> = new Map();
 
+	/**
+		3d x coord of cursor
+	**/
 	public var cursX:Float;
+
+	/**
+		3d z coord of cursor
+	**/
 	public var cursY:Float;
+
+	public var cursorInteract:Interactive;
 
 	public function new(map:TmxMap) {
 		super(Game.inst);
@@ -98,6 +111,7 @@ class Level extends dn.Process {
 						obj.x = isoX / Const.GRID_WIDTH;
 						obj.y = isoY / Const.GRID_WIDTH;
 
+						// Если Entity никак не назван на карте - то ему присваивается имя его картинки без расширения
 						if (obj.name == "") {
 							switch (obj.objectType) {
 								case OTTile(gid):
@@ -130,6 +144,7 @@ class Level extends dn.Process {
 		super.onDispose();
 		obj.remove();
 		obj.primitive.dispose();
+		cursorInteract.remove();
 		ground.dispose();
 
 		for (i in walkable)
@@ -193,7 +208,7 @@ class Level extends dn.Process {
 					for (obj in ol.objects) {
 						switch (obj.objectType) {
 							case OTTile(gid):
-								var bmp = new Bitmap(getTileFromSeparatedTsx(gid, Tools.getTilesetByGid(data, gid)));
+								var bmp = new Bitmap(getTileFromSeparatedTsx(getTileSource(gid, Tools.getTilesetByGid(data, gid))));
 								bmp.scaleX = obj.flippedVertically ? -1 : 1;
 								bmp.x = obj.x * Const.GRID_WIDTH - obj.width / 2 * bmp.scaleX;
 								bmp.y = hei - obj.y * Const.GRID_WIDTH - obj.height * (bmp.scaleX < 0 ? 0 : 1);
@@ -209,15 +224,19 @@ class Level extends dn.Process {
 		obj.material.mainPass.enableLights = false;
 		obj.material.mainPass.depth(false, LessEqual);
 
-		var bounds = new Bounds();
-		bounds.addPoint(new Point(0, 0, 0));
-		bounds.addPoint(new Point(ground.width, 0, ground.height));
+		// Хуйня чтобы получать 3d координаты курсора
+		{
+			var bounds = new Bounds();
+			bounds.addPoint(new Point(0, 0, 0));
+			bounds.addPoint(new Point(ground.width, 0, ground.height));
 
-		var interactive = new h3d.scene.Interactive(bounds, obj);
-		interactive.cursor = Default;
-		interactive.onMove = function(e:hxd.Event) {
-			cursX = e.relX;
-			cursY = e.relZ;
+			cursorInteract = new h3d.scene.Interactive(bounds, obj);
+			cursorInteract.priority = -10;
+			cursorInteract.cursor = Default;
+			cursorInteract.onMove = function(e:hxd.Event) {
+				cursX = e.relX;
+				cursY = e.relZ;
+			}
 		}
 	}
 
@@ -277,7 +296,6 @@ private class InternalRender extends TileLayerRenderer {
 
 		if (tileset.image == null) {
 			renderOrthoTileFromImageColl(x, y, tile, tileset);
-
 			return;
 		}
 
@@ -300,10 +318,15 @@ private class InternalRender extends TileLayerRenderer {
 			+ layer.offsetY, scaleX, scaleY, h2dTile);
 		g.drawRect(x, y + map.tileHeight - tileset.tileHeight, tileset.tileWidth, tileset.tileHeight);
 		g.endFill();
+
+		h2dTile.dispose();
+		h2dTile = null;
 	}
 
 	function renderOrthoTileFromImageColl(x:Float, y:Float, tile:TmxTile, tileset:TmxTileset):Void {
-		var h2dTile = getTileFromSeparatedTsx(tile.gid, tileset);
+		var sourceTile = getTileSource(tile.gid, tileset);
+		var h2dTile = getTileFromSeparatedTsx(sourceTile);
+
 		var bmp = new Bitmap(h2dTile);
 		if (tile.flippedDiagonally)
 			bmp.rotate(M.toRad(tile.flippedVertically ? -90 : 90));
@@ -323,8 +346,60 @@ private class InternalRender extends TileLayerRenderer {
 			+ layer.offsetY
 			+ (tile.flippedDiagonally ? (tile.flippedVertically ? h2dTile.height : -h2dTile.width + h2dTile.height) : 0);
 
+		// Creating isometric(rombic) h3d.scene.Interactive on top of separated
+		// tiles that contain *floor at the end of their file name as a slots for structures,
+		var ereg = ~/\/([a-z_0-9]+)\./; // regexp to take picture name between last / and . from picture path
+		if (ereg.match(sourceTile.image.source) && StringTools.endsWith(ereg.matched(1), "floor"))
+			Level.inst.structTiles.push(new StructTile(bmp.x, bmp.y, Level.inst.obj));
 		bmp.drawTo(tex);
+		bmp.tile.dispose();
+		bmp.remove();
+		bmp = null;
+
 		g.drawTile(0, 0, Tile.fromTexture(tex));
 		g.endFill();
+	}
+}
+
+class StructTile extends Object {
+	public var taken:Bool = false;
+	public var tile:EventInteractive;
+
+	// Шаблон, из которого берётся коллайдер для {this.tile}
+	static var polyPrim:h3d.prim.Polygon = null;
+
+	// Ortho size of tile
+	var tileW:Int = 48;
+	var tileH:Int = 24;
+
+	override public function new(x:Float, y:Float, ?parent:Object) {
+		super(parent);
+		if (polyPrim == null)
+			initPolygon();
+		tile = new EventInteractive(polyPrim.getCollider(), this);
+		tile.rotate(-0.01, 0, hxd.Math.degToRad(90));
+
+		tile.priority = 2;
+		this.x = x;
+		this.z = y;
+		this.y = 1;
+	}
+
+	function initPolygon() {
+		var pts:Array<Point> = [];
+		pts.push(new Point(tileW / 2, 0, 0));
+		pts.push(new Point(0, 0, -tileH / 2));
+		pts.push(new Point(tileW / 2, 0, -tileH));
+		pts.push(new Point(tileW, 0, -tileH / 2));
+
+		var idx = new IndexBuffer();
+		idx.push(0);
+		idx.push(1);
+		idx.push(2);
+
+		idx.push(0);
+		idx.push(2);
+		idx.push(3);
+		polyPrim = new h3d.prim.Polygon(pts, idx);
 	}
 }

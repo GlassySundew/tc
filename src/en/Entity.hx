@@ -227,8 +227,6 @@ import h3d.scene.Mesh;
 		return item;
 	}
 
-	
-
 	inline function set_dir(v) {
 		if (dir != v) {
 			// spr.anim.getCurrentAnim().curFrameCpt = curFrame;
@@ -308,8 +306,10 @@ import h3d.scene.Mesh;
 		mesh = null;
 	}
 
-	public function setFeetPos(x, y)
-		setPosCase(x / Const.GRID_WIDTH - xr, y / Const.GRID_WIDTH - yr);
+	public function setFeetPos(x, y) {
+		footX = x;
+		footY = y;
+	}
 
 	public function setPosCase(x, y, ?xr = 0.5, ?yr = 0.5) {
 		cx = x;
@@ -448,11 +448,12 @@ import h3d.scene.Mesh;
 				colorAdd.b *= Math.pow(0.6, tmod);
 			}
 
-			if (debugLabel != null) {
-				debugLabel.x = Std.int(footX - debugLabel.textWidth * 0.5);
-				debugLabel.y = Std.int(footY + 1);
-			}
+			// if (debugLabel != null) {
+			// 	debugLabel.x = Std.int(footX - debugLabel.textWidth * 0.5);
+			// 	debugLabel.y = Std.int(footY + 1);
+			// }
 			// curFrame = spr.anim.getCurrentAnim().curFrameCpt;
+
 			if (!isMoving()) {
 				footX = M.round(M.fabs(footX));
 				footY = M.round(M.fabs(footY));
@@ -479,10 +480,11 @@ import h3d.scene.Mesh;
 			tile.getTexture().filter = Nearest;
 			tile.setCenterRatio(spr.pivot.centerFactorX, spr.pivot.centerFactorY);
 			mesh.tile = tile;
-			// if (spr.filter != null)
-			// 	@:privateAccess spr.drawFilters(Boot.inst.s2d.renderer);
-			lastFootX = footX;
-			lastFootY = footY;
+			if (spr.filter != null)
+				@:privateAccess spr.drawFilters(Boot.inst.s2d.renderer);
+			
+			// lastFootX = footX;
+			// lastFootY = footY;
 		}
 	}
 }

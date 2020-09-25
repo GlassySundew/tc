@@ -37,18 +37,7 @@ class Interactive extends Entity {
 		return interactable = v;
 	}
 
-	public var useRange(get, never):Float;
-
-	inline function get_useRange() {
-		eregClass.match('$this');
-		var range:Null<Float> = Const.DEF_USE_RANGE;
-		try {
-			range = Data.structures.resolve(eregClass.matched(1)).use_range;
-		} catch (Dynamic) {
-			interactable = false;
-		}
-		return range;
-	}
+	public var useRange:Float;
 
 	var highlightingColor:String;
 	var polyPrim:Polygon;
@@ -76,7 +65,7 @@ class Interactive extends Entity {
 		for (poly in 0...polygonized.length) {
 			idx.push(findVertexNumberInArray(polygonized[poly][0], translatedPoints));
 			idx.push(findVertexNumberInArray(polygonized[poly][1], translatedPoints));
-			idx.push(findVertexNumberInArray(polygonized[poly][2], translatedPoints));
+			idx.push(findVertexNumberInArray(polygonized[poly][2], translatedPoints)); 
 		}
 
 		polyPrim = new Polygon(translatedPoints, idx);
@@ -101,14 +90,21 @@ class Interactive extends Entity {
 		}
 		interact.onPushEvent.add(event -> {});
 		interact.onOverEvent.add((_) -> activateInteractive());
-
 		interact.onOutEvent.add((e:hxd.Event) -> {
 			turnOffHighlight();
 		});
 
-		// trace('$this');
-		var eregClass = ~/\.([a-z_0-9]+)+$/gi;
-		eregClass.match('$this');
+		// Setting interaciton range from cdb
+		eregClass.match('$this'.toLowerCase());
+
+		useRange = Const.DEF_USE_RANGE;
+		try {
+			useRange = Data.structures.resolve(eregClass.matched(1)).use_range;
+		} catch (Dynamic) {
+			try {
+				useRange = Data.structures.resolve(spr.groupName).use_range;
+			} catch (Dynamic) {}
+		}
 	}
 
 	inline function isInPlayerRange()
@@ -159,7 +155,6 @@ class Interactive extends Entity {
 			buttonIcon.centerFlow.y = pos.y - 100 / Const.SCALE;
 
 			buttonIcon.container.icon.tile = buttonIcon.buttonSpr.tile;
-			// buttonIcon.container.icon.scaleX = buttonIcon.container.icon.scaleY = 2;
 		}
 	}
 

@@ -10,6 +10,7 @@ class SpriteEntity extends Interactive {
 		}
 
 		super(x, z, tmxObj);
+
 		if (tmxObj.properties.exists("interactable"))
 			interactable = tmxObj.properties.getBool("interactable");
 	}

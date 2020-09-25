@@ -64,6 +64,18 @@ class Player extends Entity {
 			ui = new PlayerUI(game.root);
 			inst = this;
 		}
+
+		// Костыльный фикс ебаного бага с бампом игрока при старте уровня
+		lock(30);
+	}
+
+	public function disableGrids() {
+		inventory.invGrid.disableGrid();
+		inventory.belt.invGrid.disableGrid();
+	}
+	public function enableGrids() {
+		inventory.invGrid.enableGrid();
+		inventory.belt.invGrid.enableGrid();
 	}
 
 	override function dispose() {
@@ -130,9 +142,9 @@ class Player extends Entity {
 	}
 
 	override function checkCollisions() {
+		super.checkCollisions();
 		if (!isLocked())
 			checkCollsAgainstAll();
-		super.checkCollisions();
 	}
 
 	function checkBeltInputs() {
@@ -153,8 +165,11 @@ class Player extends Entity {
 			inventory.belt.selectCell(4);
 
 		if (Key.isPressed(Key.Q)) {
-			if (holdItem != null)
+			if (holdItem != null) {
+				if (holdItem.isInSlot())
+					inventory.belt.invGrid.findSlot(holdItem).item = null;
 				holdItem = dropItem(holdItem, this.angToPxFree(level.cursX, level.cursY), 0.05);
+			}
 		}
 	}
 }

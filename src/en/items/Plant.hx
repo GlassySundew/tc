@@ -7,5 +7,6 @@ class Plant extends Item {
 		super(x, y, parent);
 		spr.set("seaweed");
 		displayText = "Seaweed";
+		// getObjectByNamegame.delayer.addF(start, 1);
 	}
 }
