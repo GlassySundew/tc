@@ -172,10 +172,10 @@ class FloatingItem extends Interactive {
 		deDepth.objZ = (polyMesh.z - footY) * Math.sin(-rotAngle);
 		
 		if (!isLocked())
-			bumpAwayFrom(Player.inst, distPx(Player.inst) < 20 ? -.0015 * tmod : 0);
+			bumpAwayFrom(Player.inst, distPx(Player.inst) < 20 ? -.065 * tmod : 0);
 
 		if (player != null && distPx(player) < 10 && !isLocked()) {
-			player.inventory.invGrid.giveItem(item) != null ? dispose() : {};
+			player.ui.inventory.invGrid.giveItem(item) != null ? dispose() : {};
 		}
 	}
 

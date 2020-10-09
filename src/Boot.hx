@@ -3,14 +3,16 @@ import hxd.snd.Manager;
 import hxd.inspect.Inspector;
 
 class Boot extends hxd.App {
-	public static var inst:Boot;
+	public static var inst: Boot;
 
-	public var inspector:Inspector;
+	public var inspector: Inspector;
 
-	public var renderer:CustomRenderer;
+	public var renderer: CustomRenderer;
 
 	// Boot
 	static function main() {
+		hl.UI.closeConsole();
+
 		new Boot();
 	}
 
@@ -43,12 +45,11 @@ class Boot extends hxd.App {
 
 	var speed = 1.0;
 
-	override function update(deltaTime:Float) {
+	override function update(deltaTime: Float) {
 		super.update(deltaTime);
 		// Bullet time
 		#if debug
-		if (hxd.Key.isPressed(hxd.Key.NUMPAD_SUB))
-			speed = speed >= 1 ? 0.33 : 1;
+		if (hxd.Key.isPressed(hxd.Key.NUMPAD_SUB)) speed = speed >= 1 ? 0.33 : 1;
 		#end
 		// Manager.get().listener.syncCamera(s3d.camera);
 		var tmod = hxd.Timer.tmod * speed;

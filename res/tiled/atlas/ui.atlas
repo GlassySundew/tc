@@ -1,90 +1,118 @@
 
 ui.png
-size: 155,128
+size: 362,139
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+caret0
+  rotate: false
+  xy: 0, 0
+  size: 4, 10
+  orig: 4, 10
+  offset: 0, 0
+  index: -1
+caret1
+  rotate: false
+  xy: 252, 24
+  size: 4, 10
+  orig: 4, 10
+  offset: 0, 0
+  index: -1
+close_button_inventory
+  rotate: false
+  xy: 327, 105
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+crafting
+  rotate: false
+  xy: 0, 12
+  size: 134, 127
+  orig: 134, 127
+  offset: 0, 0
+  index: -1
 cursor0
   rotate: false
-  xy: 121, 26
+  xy: 288, 80
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cursor1
   rotate: false
-  xy: 139, 26
+  xy: 309, 101
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cursor2
   rotate: false
-  xy: 121, 8
+  xy: 252, 36
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 health_caret
   rotate: false
-  xy: 142, 58
+  xy: 359, 127
   size: 3, 12
   orig: 3, 12
   offset: 0, 0
   index: -1
 health_line
   rotate: false
-  xy: 142, 44
+  xy: 306, 84
   size: 1, 12
   orig: 1, 12
   offset: 0, 0
   index: -1
-health_scale
-  rotate: false
-  xy: 142, 72
-  size: 12, 12
-  orig: 12, 12
-  offset: 0, 0
-  index: -1
 health_sign
   rotate: false
-  xy: 121, 108
+  xy: 252, 97
   size: 34, 20
   orig: 34, 20
   offset: 0, 0
   index: -1
 inventory
   rotate: false
-  xy: 0, 0
-  size: 119, 128
-  orig: 119, 128
+  xy: 136, 15
+  size: 114, 124
+  orig: 114, 124
   offset: 0, 0
   index: -1
 keyboard_icon0
   rotate: false
-  xy: 121, 44
+  xy: 252, 54
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 keyboard_icon1
   rotate: false
-  xy: 121, 65
+  xy: 288, 98
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 oxygen_scale
   rotate: false
-  xy: 139, 12
+  xy: 273, 61
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 oxygen_sign
   rotate: false
-  xy: 121, 86
+  xy: 252, 75
   size: 34, 20
   orig: 34, 20
+  offset: 0, 0
+  index: -1
+recipe
+  rotate: false
+  xy: 252, 119
+  size: 105, 20
+  orig: 105, 20
   offset: 0, 0
   index: -1

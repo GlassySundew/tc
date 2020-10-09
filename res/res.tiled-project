@@ -6,7 +6,8 @@
     "folders": [
         "tiled",
         ".",
-        "tiled"
+        "tiled",
+        "tiled/separated"
     ],
     "objectTypesFile": ""
 }

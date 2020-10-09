@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="2020.08.05" orientation="isometric" renderorder="right-down" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" nextlayerid="50" nextobjectid="729">
+<map version="1.4" tiledversion="2020.09.22" orientation="isometric" renderorder="right-down" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" nextlayerid="50" nextobjectid="730">
  <tileset firstgid="1" source="alpha.tsx"/>
  <tileset firstgid="43" source="colls.tsx"/>
- <tileset firstgid="61" source="env.tsx"/>
- <layer id="33" name="ground" width="100" height="100" offsetx="-5" offsety="6">
+ <layer id="33" name="ground" width="100" height="100" offsetx="0" offsety="4">
   <data encoding="base64" compression="zlib">
    eAHt07EJACAMBMBs4/4bikXAwqQMFicIYoSHe4ywCBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIEOoHVDc1GBU4XuUeDhT0Fsgt/5MkzfqmPcfIy8O4iz+VjAwIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIEvhTY2A4CSg==
   </data>

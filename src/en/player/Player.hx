@@ -11,19 +11,15 @@ import format.tmx.Data.TmxObject;
 import differ.Collision;
 
 class Player extends Entity {
-	public static var inst:Player;
+	public static var inst: Player;
 
-	public var ui:PlayerUI;
-	public var inventory(get, never):Inventory;
+	public var ui: PlayerUI;
 
-	inline function get_inventory()
-		return ui.inventory;
+	public var holdItem(default, set): Item;
 
-	public var holdItem(default, set):Item;
-
-	inline function set_holdItem(v:Item) {
+	inline function set_holdItem(v: Item) {
 		if (v == null) {
-			inventory.invGrid.disableGrid();
+			ui.inventory.invGrid.disableGrid();
 		}
 		if (v != null) {
 			// inventory.invGrid.enableGrid();
@@ -31,11 +27,10 @@ class Player extends Entity {
 		return holdItem = v;
 	}
 
-	var ca:dn.heaps.Controller.ControllerAccess;
+	var ca: dn.heaps.Controller.ControllerAccess;
 
-	public function new(x:Float, z:Float, ?tmxObj:TmxObject) {
+	public function new(x: Float, z: Float, ?tmxObj: TmxObject) {
 		spr = new HSprite(Assets.player);
-
 		ca = Main.inst.controller.createAccess("player");
 
 		var direcs = [
@@ -61,21 +56,22 @@ class Player extends Entity {
 		mesh.renewDebugPts();
 
 		if (inst == null) {
-			ui = new PlayerUI(game.root);
 			inst = this;
+			ui = new PlayerUI(game.root);
 		}
 
 		// Костыльный фикс ебаного бага с бампом игрока при старте уровня
 		lock(30);
+
+		// inventory.invGrid.giveItem();
 	}
 
 	public function disableGrids() {
-		inventory.invGrid.disableGrid();
-		inventory.belt.invGrid.disableGrid();
+		ui.inventory.invGrid.disableGrid();
 	}
+
 	public function enableGrids() {
-		inventory.invGrid.enableGrid();
-		inventory.belt.invGrid.enableGrid();
+		ui.inventory.invGrid.enableGrid();
 	}
 
 	override function dispose() {
@@ -93,28 +89,21 @@ class Player extends Entity {
 		var leftAng = Math.atan2(ca.lyValue(), ca.lxValue());
 		if (!isLocked()) {
 			if (leftPushed) {
-				var s = 0.0075 * leftDist * tmod;
+				var s = 0.325 * leftDist * tmod;
 				dx += Math.cos(leftAng) * s;
 				dy += Math.sin(leftAng) * s;
 
-				if (ca.lxValue() < -0.3 && M.fabs(ca.lyValue()) < 0.6)
-					dir = 4;
-				else if (ca.lyValue() < -0.3 && M.fabs(ca.lxValue()) < 0.6)
-					dir = 6;
-				else if (ca.lxValue() > 0.3 && M.fabs(ca.lyValue()) < 0.6)
-					dir = 0;
-				else if (ca.lyValue() > 0.3 && M.fabs(ca.lxValue()) < 0.6)
-					dir = 2;
+				if (ca.lxValue() < -0.3 && M.fabs(ca.lyValue()) < 0.6) dir = 4;
+				else if (ca.lyValue() < -0.3 && M.fabs(ca.lxValue()) < 0.6) dir = 6;
+				else if (ca.lxValue() > 0.3 && M.fabs(ca.lyValue()) < 0.6) dir = 0;
+				else if (ca.lyValue() > 0.3 && M.fabs(ca.lxValue()) < 0.6) dir = 2;
 
-				if (ca.lxValue() > 0.3 && ca.lyValue() > 0.3)
-					dir = 1;
-				else if (ca.lxValue() < -0.3 && ca.lyValue() > 0.3)
-					dir = 3;
-				else if (ca.lxValue() < -0.3 && ca.lyValue() < -0.3)
-					dir = 5;
-				else if (ca.lxValue() > 0.3 && ca.lyValue() < -0.3)
-					dir = 7;
-			} else {
+				if (ca.lxValue() > 0.3 && ca.lyValue() > 0.3) dir = 1;
+				else if (ca.lxValue() < -0.3 && ca.lyValue() > 0.3) dir = 3;
+				else if (ca.lxValue() < -0.3 && ca.lyValue() < -0.3) dir = 5;
+				else if (ca.lxValue() > 0.3 && ca.lyValue() < -0.3) dir = 7;
+			}
+			else {
 				dx *= Math.pow(0.6, tmod);
 				dy *= Math.pow(0.6, tmod);
 			}
@@ -123,14 +112,12 @@ class Player extends Entity {
 	}
 
 	public function sendPosToServer() {
-		if (Connect.inst != null && Connect.inst.room != null)
-			Connect.inst.room.send("setPos", {x: footX, y: footY});
+		if (Connect.inst != null && Connect.inst.room != null) Connect.inst.room.send("setPos", {x: footX, y: footY});
 	}
 
 	override function postUpdate() {
 		super.postUpdate();
-		if (this == inst && !isLocked() && ui != null)
-			checkBeltInputs();
+		if (this == inst && !isLocked() && ui != null) checkBeltInputs();
 		// if (Key.isPressed(Key.E)) {
 		// 	new FloatingItem(mesh.x, mesh.z, new GraviTool());
 		// }
@@ -143,32 +130,30 @@ class Player extends Entity {
 
 	override function checkCollisions() {
 		super.checkCollisions();
-		if (!isLocked())
-			checkCollsAgainstAll();
+		if (!isLocked()) checkCollsAgainstAll();
 	}
 
 	function checkBeltInputs() {
 		if (ca.isPressed(LT)) {
-			inventory.toggleVisible();
+			ui.inventory.toggleVisible();
 		}
 
-		if (Key.isPressed(Key.NUMBER_1))
-			inventory.belt.selectCell(1);
+		if (ca.isPressed(DPAD_UP)) {
+			ui.craft.toggleVisible();
+		}
+		
+		if (Key.isPressed(Key.NUMBER_1)) ui.inventory.belt.selectCell(1);
 
-		if (Key.isPressed(Key.NUMBER_2))
-			inventory.belt.selectCell(2);
+		if (Key.isPressed(Key.NUMBER_2)) ui.inventory.belt.selectCell(2);
 
-		if (Key.isPressed(Key.NUMBER_3))
-			inventory.belt.selectCell(3);
+		if (Key.isPressed(Key.NUMBER_3)) ui.inventory.belt.selectCell(3);
 
-		if (Key.isPressed(Key.NUMBER_4))
-			inventory.belt.selectCell(4);
+		if (Key.isPressed(Key.NUMBER_4)) ui.inventory.belt.selectCell(4);
 
 		if (Key.isPressed(Key.Q)) {
 			if (holdItem != null) {
-				if (holdItem.isInSlot())
-					inventory.belt.invGrid.findSlot(holdItem).item = null;
-				holdItem = dropItem(holdItem, this.angToPxFree(level.cursX, level.cursY), 0.05);
+				if (holdItem.isInSlot()) ui.inventory.invGrid.findSlot(holdItem).item = null;
+				holdItem = dropItem(holdItem, this.angToPxFree(level.cursX, level.cursY), 2.3);
 			}
 		}
 	}

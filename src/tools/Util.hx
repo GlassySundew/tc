@@ -1,5 +1,8 @@
 package tools;
 
+import h3d.pass.Default;
+import format.tmx.Data.TmxLayer;
+import format.tmx.Reader;
 import format.tmx.Data.TmxTilesetTile;
 import hxd.Res;
 import format.tmx.Data.TmxTileset;
@@ -15,9 +18,16 @@ import format.tmx.Data.TmxObject;
 @:publicFields
 @:expose
 class Util {
-	static var eregClass = ~/\$([a-z_0-9]+)+$/gi;  // regexp to remove 'en.' prefix
+	/**Regex to get class name provided by CompileTime libs, i.e. en.$Entity -> Entity **/
+	static var eregCompTimeClass = ~/\$([a-z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
 
-	inline static function checkPolyClockwise(points:Array<Dynamic>) {
+	/** Regex to get '$this' class name i.e. en.Entity -> Entity **/
+	static var eregClass = ~/\.([a-z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
+
+	/** Регулярка чтобы взять из абсолютного пути название файла без расширения .png **/
+	static var eregFileName = ~/\/([a-z_0-9]+)\./;
+
+	inline static function checkPolyClockwise(points: Array<Dynamic>) {
 		var pts = points.copy();
 		var sum = .0;
 		for (i in 0...pts.length) {
@@ -28,38 +38,75 @@ class Util {
 		return pts;
 	}
 
-	inline static function cartToIso(x:Float, y:Float):Vector
-		return new Vector((x - y), (x + y) / 2);
+	inline static function cartToIso(x: Float, y: Float): Vector return new Vector((x - y), (x + y) / 2);
 
-	inline static function screenToIsoX(globalX:Float, globalY:Float) {
+	inline static function screenToIsoX(globalX: Float, globalY: Float) {
 		return globalX + globalY;
 	}
 
-	inline static function screenToIsoY(globalX:Float, globalY:Float) {
+	inline static function screenToIsoY(globalX: Float, globalY: Float) {
 		return globalY - globalX / 2;
 	}
 
-	inline static function screenToIso(globalX:Float, globalY:Float) {
+	inline static function screenToIso(globalX: Float, globalY: Float) {
 		return new Vector(screenToIsoX(globalX, globalY), screenToIsoY(globalX, globalY));
 	}
 
-	inline static function getS2dScaledWid()
-		return (Boot.inst.s2d.width / Const.SCALE);
+	inline static function getS2dScaledWid() return (Boot.inst.s2d.width / Const.SCALE);
 
-	inline static function getS2dScaledHei()
-		return (Boot.inst.s2d.height / Const.SCALE);
+	inline static function getS2dScaledHei() return (Boot.inst.s2d.height / Const.SCALE);
 
-	inline static function getTileFromSeparatedTsx(tile:TmxTilesetTile):Tile {
+	inline static function getTileFromSeparatedTsx(tile: TmxTilesetTile): Tile {
 		return Res.loader.load(Const.LEVELS_PATH + tile.image.source).toTile();
 	}
 
-	inline static function getTileSource(gid:Int, tileset:TmxTileset):TmxTilesetTile {
+	inline static function getTileSource(gid: Int, tileset: TmxTileset): TmxTilesetTile {
 		var fixedGId = gid - tileset.firstGID;
-		// Костыльный фикс на непоследовательные id тайлов
+		// фикс на непоследовательные id тайлов
 		for (i in 0...tileset.tiles.length)
-			if (tileset.tiles[i].id == fixedGId && fixedGId > i)
-				while (fixedGId > i)
-					fixedGId--;
+			if (tileset.tiles[i].id == fixedGId && fixedGId > i) while (fixedGId > i)
+				fixedGId--;
 		return (tileset.tiles[fixedGId]);
+	}
+
+	inline static function getTsx(tsx: Map<String, TmxTileset>, r: Reader): String->TmxTileset {
+		return (name: String) -> {
+			var cached: TmxTileset = tsx.get(name);
+			if (cached != null) return cached;
+			cached = r.readTSX(Xml.parse(Res.loader.load(Const.LEVELS_PATH + name).entry.getText()));
+			tsx.set(name, cached);
+			return cached;
+		}
+	}
+}
+
+class TmxMapExtender {
+	public static function getLayersByName(tmxMap: TmxMap): Map<String, TmxLayer> {
+		var map: Map<String, TmxLayer> = new Map();
+		for (i in tmxMap.layers) {
+			var name: String = 'null';
+			switch (i) {
+				case LObjectGroup(group):
+					name = group.name;
+				case LTileLayer(tl):
+					name = tl.name;
+				default:
+			}
+			map.set(name, i);
+		}
+		return map;
+	}
+}
+
+class TmxLayerExtender {
+	public static function getObjectByName(tmxLayer: TmxLayer, name: String): TmxObject {
+		switch (tmxLayer) {
+			case LObjectGroup(group):
+				for (i in group.objects) {
+					if (i.name == name) return i;
+				}
+			default:
+		}
+		return null;
 	}
 }

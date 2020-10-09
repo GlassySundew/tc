@@ -13,15 +13,18 @@
 				},
 				{
 					"typeStr": "3",
-					"name": "hp"
+					"name": "hp",
+					"documentation": "прочность строения, если (-1 - то структура неразрушаемая"
 				},
 				{
 					"typeStr": "4",
-					"name": "isoWidth"
+					"name": "isoWidth",
+					"documentation": "изометрическая ширина сортирующего прямоугольника по X, умноженная на 10; если 0 - то это точка"
 				},
 				{
 					"typeStr": "4",
-					"name": "isoHeight"
+					"name": "isoHeight",
+					"documentation": "изометрическая длина сортирующего прямоугольника по Y, умноженная на 10; если 0 - то это точка"
 				},
 				{
 					"typeStr": "4",
@@ -48,8 +51,8 @@
 				{
 					"id": "hydroponics",
 					"use_range": 40,
-					"isoWidth": 0,
-					"isoHeight": 0,
+					"isoWidth": 2,
+					"isoHeight": 1,
 					"hp": 100,
 					"drop": [
 						{
@@ -89,7 +92,124 @@
 			]
 		},
 		{
+			"name": "recipes",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "id",
+					"scope": null
+				},
+				{
+					"typeStr": "8",
+					"name": "result"
+				},
+				{
+					"typeStr": "8",
+					"name": "comps"
+				}
+			],
+			"lines": [
+				{
+					"comps": [
+						{
+							"item": "iron",
+							"amount": 1
+						}
+					],
+					"id": "hui",
+					"result": [
+						{
+							"item": "axe",
+							"amount": 1
+						}
+					]
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "recipes@result",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "6:items",
+					"name": "item"
+				},
+				{
+					"typeStr": "3",
+					"name": "amount"
+				}
+			]
+		},
+		{
+			"name": "recipes@comps",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "6:items",
+					"name": "item"
+				},
+				{
+					"typeStr": "3",
+					"name": "amount"
+				}
+			]
+		},
+		{
 			"name": "items",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "id",
+					"scope": null
+				},
+				{
+					"typeStr": "1",
+					"name": "atlas_name"
+				},
+				{
+					"typeStr": "1",
+					"name": "display_name"
+				},
+				{
+					"typeStr": "6:item_cat",
+					"name": "cat"
+				}
+			],
+			"lines": [
+				{
+					"id": "iron",
+					"atlas_name": "iron_ore",
+					"display_name": "",
+					"cat": "tool"
+				},
+				{
+					"id": "plant",
+					"atlas_name": "seaweed",
+					"display_name": "Seaweed",
+					"cat": "tool"
+				},
+				{
+					"id": "axe",
+					"atlas_name": "fireaxe",
+					"display_name": "Fireaxe",
+					"cat": "tool"
+				}
+			],
+			"props": {},
+			"separators": []
+		},
+		{
+			"name": "item_cat",
 			"columns": [
 				{
 					"typeStr": "0",
@@ -99,14 +219,14 @@
 			],
 			"lines": [
 				{
-					"id": "iron"
+					"id": "tool"
 				},
 				{
 					"id": "plant"
 				}
 			],
-			"separators": [],
-			"props": {}
+			"props": {},
+			"separators": []
 		}
 	],
 	"customTypes": [],

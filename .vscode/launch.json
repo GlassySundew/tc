@@ -11,19 +11,20 @@
             "name": "HL debug",
             "request": "launch",
             "type": "hl",
-            "hxml": "hl.debug.hxml",
+            // "hxml": "hl.debug.hxml",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "HL debug",
             "profileSamples" : 10000
-        },
-        {
-            "type": "chrome",
-            "request": "launch",
-             "name": "Launch Chrome against localhost",
-            "url": "file://${workspaceFolder}/bin/index.html",
-            "webRoot": "${workspaceFolder}",
-            "preLaunchTask": "JS release"
-            
         }
+        // ,
+        // {
+            // "type": "chrome",
+            // "request": "launch",
+            //  "name": "Launch Chrome against localhost",
+            // "url": "file://${workspaceFolder}/bin/index.html",
+            // "webRoot": "${workspaceFolder}",
+            // "preLaunchTask": "JS release"
+            // 
+        // }
     ]
 }

@@ -41,17 +41,18 @@
 				"$haxe-error",
 				"$haxe-trace"
 			]
-		},
-		{
-			"label": "JS release",
-			"type": "hxml",
-			"file": "js.hxml",
-			"presentation": {
-				"reveal": "never",
-				"panel": "dedicated",
-				"clear": true
-			},
-			"problemMatcher": ["$haxe"]
 		}
+		// ,
+		// {
+		// 	"label": "JS release",
+		// 	"type": "hxml",
+		// 	"file": "js.hxml",
+		// 	"presentation": {
+		// 		"reveal": "never",
+		// 		"panel": "dedicated",
+		// 		"clear": true
+		// 	},
+		// 	"problemMatcher": ["$haxe"]
+		// }
 	]
 }

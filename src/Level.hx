@@ -1,3 +1,4 @@
+import en.structures.hydroponics.Hydroponics;
 import ui.EventInteractive;
 import hxd.IndexBuffer;
 import h3d.scene.Interactive;
@@ -21,59 +22,51 @@ import tools.CPoint;
 import format.tmx.*;
 import format.tmx.Data;
 import tools.Util.*;
-
 /**
-	Level parses tmx entities maps, renders tile layers into mesh
+	Level parses tmx entities maps, renders tie layers into mesh
 **/
 class Level extends dn.Process {
-	public var game(get, never):Game;
+	public var game(get, never): Game;
 
-	inline function get_game()
-		return Game.inst;
+	public static var inst: Level;
 
-	public static var inst:Level;
+	inline function get_game() return Game.inst;
 
 	// public var fx(get, never):Fx;
 
-	public inline function getLayerByName(id:String)
-		return layersByName.get(id);
+	public inline function getLayerByName(id: String) return layersByName.get(id);
 
-	public var wid(get, never):Int;
+	public var wid(get, never): Int;
 
-	inline function get_wid()
-		return M.ceil(data.width * data.tileWidth);
+	inline function get_wid() return M.ceil(data.width * data.tileWidth);
 
-	public var hei(get, never):Int;
+	public var hei(get, never): Int;
 
-	inline function get_hei()
-		return M.ceil(data.height * data.tileHeight);
+	inline function get_hei() return M.ceil(data.height * data.tileHeight);
 
 	//	public var lid(get, never):Int;
 	var invalidatedColls = true;
 	var invalidated = true;
 
-	public var data:TmxMap;
-	public var entities:Array<TmxObject> = [];
-	public var walkable:Array<Polygon> = [];
-	public var structTiles:Array<StructTile> = [];
-	public var ground:Texture;
-	public var obj:Mesh;
+	public var data: TmxMap;
+	public var entities: Array<TmxObject> = [];
+	public var walkable: Array<Polygon> = [];
+	public var ground: Texture;
+	public var obj: Mesh;
 
-	var layersByName:Map<String, TmxLayer> = new Map();
-
+	var layersByName: Map<String, TmxLayer> = new Map();
 	/**
 		3d x coord of cursor
 	**/
-	public var cursX:Float;
-
+	public var cursX: Float;
 	/**
 		3d z coord of cursor
 	**/
-	public var cursY:Float;
+	public var cursY: Float;
 
-	public var cursorInteract:Interactive;
+	public var cursorInteract: Interactive;
 
-	public function new(map:TmxMap) {
+	public function new(map: TmxMap) {
 		super(Game.inst);
 		inst = this;
 		data = map;
@@ -85,7 +78,7 @@ class Level extends dn.Process {
 		Boot.inst.s3d.camera.setFovX(70, Boot.inst.s3d.camera.screenRatio);
 
 		for (layer in data.layers) {
-			var name:String = 'null';
+			var name: String = 'null';
 			switch (layer) {
 				case LObjectGroup(ol):
 					name = ol.name;
@@ -100,29 +93,28 @@ class Level extends dn.Process {
 
 							default:
 						}
-						// все объекты в распаршенных слоях уже с конвертированными координатами
-						// entities export lies ahead
-						var isoX = cartToIsoLocal(obj.x, obj.y).x;
-						var isoY = cartToIsoLocal(obj.x, obj.y).y;
+						if (map.orientation == Isometric) {
+							// все объекты в распаршенных слоях уже с конвертированными координатами
+							// entities export lies ahead
+							var isoX = cartToIsoLocal(obj.x, obj.y).x;
+							var isoY = cartToIsoLocal(obj.x, obj.y).y;
 
-						if (obj.flippedVertically)
-							isoY -= obj.height;
+							if (obj.flippedVertically) isoY -= obj.height;
 
-						obj.x = isoX / Const.GRID_WIDTH;
-						obj.y = isoY / Const.GRID_WIDTH;
+							obj.x = isoX;
+							obj.y = isoY;
 
-						// Если Entity никак не назван на карте - то ему присваивается имя его картинки без расширения
-						if (obj.name == "") {
-							switch (obj.objectType) {
-								case OTTile(gid):
-									var ereg = ~/\/([a-z0-9_\.-]+)\./;
-									if (ereg.match(Tools.getTileByGid(data, gid).image.source)) obj.name = ereg.matched(1);
-								default:
+							// Если Entity никак не назван на карте - то ему присваивается имя его картинки без расширения
+							if (obj.name == "") {
+								switch (obj.objectType) {
+									case OTTile(gid):
+										if (eregFileName.match(Tools.getTileByGid(data, gid).image.source)) obj.name = eregFileName.matched(1);
+									default:
+								}
 							}
-						}
 
-						if (ol.name == 'entities')
-							entities.push(obj);
+							if (ol.name == 'entities') entities.push(obj);
+						}
 					}
 				case LTileLayer(tl):
 					name = tl.name;
@@ -134,8 +126,7 @@ class Level extends dn.Process {
 
 	function get_lid() {
 		var reg = ~/[A-Z\-_.]*([0-9]+)/gi;
-		if (!reg.match(Game.inst.lvlName))
-			return -1;
+		if (!reg.match(Game.inst.lvlName)) return -1;
 		else
 			return Std.parseInt(reg.matched(1));
 	}
@@ -156,31 +147,28 @@ class Level extends dn.Process {
 		layersByName = null;
 	}
 
-	public function getEntities(id:String) {
+	public function getEntities(id: String) {
 		var a = [];
 		for (e in entities)
-			if (e.name == id)
-				a.push(e);
+			if (e.name == id) a.push(e);
 		return a;
 	}
 
-	public function getEntityPts(id:String) {
+	public function getEntityPts(id: String) {
 		var a = [];
 		for (e in entities)
-			if (e.name == id)
-				a.push(new CPoint((e.x), (e.y)));
+			if (e.name == id) a.push(new CPoint((e.x), (e.y)));
 		return a;
 	}
 
-	public function getEntityPt(id:String) {
+	public function getEntityPt(id: String) {
 		for (e in entities)
-			if (e.name == id)
-				return new CPoint((e.x), (e.y));
+			if (e.name == id) return new CPoint((e.x), (e.y));
 		return null;
 	}
 
 	public function render() {
-		var layerRenderer:LayerRender;
+		var layerRenderer: LayerRender;
 
 		invalidated = false;
 
@@ -210,8 +198,8 @@ class Level extends dn.Process {
 							case OTTile(gid):
 								var bmp = new Bitmap(getTileFromSeparatedTsx(getTileSource(gid, Tools.getTilesetByGid(data, gid))));
 								bmp.scaleX = obj.flippedVertically ? -1 : 1;
-								bmp.x = obj.x * Const.GRID_WIDTH - obj.width / 2 * bmp.scaleX;
-								bmp.y = hei - obj.y * Const.GRID_WIDTH - obj.height * (bmp.scaleX < 0 ? 0 : 1);
+								bmp.x = obj.x - obj.width / 2 * bmp.scaleX;
+								bmp.y = hei - obj.y - obj.height * (bmp.scaleX < 0 ? 0 : 1);
 								bmp.drawTo(this.obj.material.texture);
 							default:
 						}
@@ -233,21 +221,22 @@ class Level extends dn.Process {
 			cursorInteract = new h3d.scene.Interactive(bounds, obj);
 			cursorInteract.priority = -10;
 			cursorInteract.cursor = Default;
-			cursorInteract.onMove = function(e:hxd.Event) {
+			cursorInteract.onMove = function(e: hxd.Event) {
 				cursX = e.relX;
 				cursY = e.relZ;
 			}
 		}
 	}
 
-	public function setWalkable(poly:TmxObject, ?points:Array<Dynamic>) { // setting obstacles as a differ polygon
-		var vertices:Array<differ.math.Vector> = [];
+	public function setWalkable(poly: TmxObject, ?points: Array<Dynamic>) { // setting obstacles as a differ polygon
+		var vertices: Array<differ.math.Vector> = [];
 		if (points != null) {
 			points.reverse();
 			for (i in points)
 				vertices.push(new differ.math.Vector(cartToIso(i.x, i.y).x, cartToIso(i.x, i.y).y));
 			walkable.push(new Polygon(cartToIsoLocal(poly.x, poly.y).x, cartToIsoLocal(poly.x, poly.y).y, vertices));
-		} else if (poly.objectType == OTRectangle) {
+		}
+		else if (poly.objectType == OTRectangle) {
 			vertices.push(new differ.math.Vector(cartToIso(poly.width, 0).x, cartToIso(poly.width, 0).y));
 			vertices.push(new differ.math.Vector(cartToIso(poly.width, poly.height).x, cartToIso(poly.width, poly.height).y));
 			vertices.push(new differ.math.Vector(cartToIso(0, poly.height).x, cartToIso(0, poly.height).y));
@@ -266,14 +255,13 @@ class Level extends dn.Process {
 		}
 	}
 
-	public inline function cartToIsoLocal(x:Float, y:Float):Vector
-		return new Vector(wid * .5 + cartToIso(x, y).x, hei - cartToIso(x, y).y);
+	public inline function cartToIsoLocal(x: Float, y: Float): Vector return new Vector(wid * .5 + cartToIso(x, y).x, hei - cartToIso(x, y).y);
 }
 
 class LayerRender extends h2d.Object {
-	public var render:InternalRender;
+	public var render: InternalRender;
 
-	public function new(map:TmxMap, layer:TmxTileLayer) {
+	public function new(map: TmxMap, layer: TmxTileLayer) {
 		super();
 		render = new InternalRender(map, layer);
 		render.g = new h2d.Graphics();
@@ -284,15 +272,14 @@ class LayerRender extends h2d.Object {
 }
 
 private class InternalRender extends TileLayerRenderer {
-	public var g:h2d.Graphics;
+	public var g: h2d.Graphics;
 
-	public var tex:Texture;
+	public var tex: Texture;
 
-	private var uv:Point = new Point();
+	private var uv: Point = new Point();
 
-	override function renderOrthoTile(x:Float, y:Float, tile:TmxTile, tileset:TmxTileset):Void {
-		if (tileset == null)
-			return;
+	override function renderOrthoTile(x: Float, y: Float, tile: TmxTile, tileset: TmxTileset): Void {
+		if (tileset == null) return;
 
 		if (tileset.image == null) {
 			renderOrthoTileFromImageColl(x, y, tile, tileset);
@@ -323,13 +310,12 @@ private class InternalRender extends TileLayerRenderer {
 		h2dTile = null;
 	}
 
-	function renderOrthoTileFromImageColl(x:Float, y:Float, tile:TmxTile, tileset:TmxTileset):Void {
+	function renderOrthoTileFromImageColl(x: Float, y: Float, tile: TmxTile, tileset: TmxTileset): Void {
 		var sourceTile = getTileSource(tile.gid, tileset);
 		var h2dTile = getTileFromSeparatedTsx(sourceTile);
 
 		var bmp = new Bitmap(h2dTile);
-		if (tile.flippedDiagonally)
-			bmp.rotate(M.toRad(tile.flippedVertically ? -90 : 90));
+		if (tile.flippedDiagonally) bmp.rotate(M.toRad(tile.flippedVertically ? -90 : 90));
 
 		var scaleX = (tile.flippedHorizontally && !tile.flippedDiagonally) ? -1 : 1;
 		var scaleY = (tile.flippedVertically && !tile.flippedDiagonally) ? -1 : 1;
@@ -347,10 +333,13 @@ private class InternalRender extends TileLayerRenderer {
 			+ (tile.flippedDiagonally ? (tile.flippedVertically ? h2dTile.height : -h2dTile.width + h2dTile.height) : 0);
 
 		// Creating isometric(rombic) h3d.scene.Interactive on top of separated
-		// tiles that contain *floor at the end of their file name as a slots for structures,
+		// tiles that contain *floor at the end of their file name as a slots for
+		// structures; can be visible only when choosing place for structure to build
 		var ereg = ~/\/([a-z_0-9]+)\./; // regexp to take picture name between last / and . from picture path
-		if (ereg.match(sourceTile.image.source) && StringTools.endsWith(ereg.matched(1), "floor"))
-			Level.inst.structTiles.push(new StructTile(bmp.x, bmp.y, Level.inst.obj));
+		if (ereg.match(sourceTile.image.source)
+			&& StringTools.endsWith(ereg.matched(1),
+				"floor")) Game.inst.structTiles.push(new StructTile(bmp.x + Level.inst.data.tileWidth / 2,
+				Level.inst.ground.height - bmp.y - Level.inst.data.tileHeight / 2, Level.inst.obj));
 		bmp.drawTo(tex);
 		bmp.tile.dispose();
 		bmp.remove();
@@ -359,34 +348,87 @@ private class InternalRender extends TileLayerRenderer {
 		g.drawTile(0, 0, Tile.fromTexture(tex));
 		g.endFill();
 	}
+
+	override function renderIsoTiles(ox: Float, y: Float, tiles: Array<TmxTile>, width: Int, height: Int) {
+		var i: Int = 0;
+		var ix: Int = 0;
+		var iy: Int = 0;
+		var x: Float = ox;
+		var tset: TmxTileset;
+		var tile: TmxTile;
+		var hw: Float = map.tileWidth / 2;
+		var hh: Float = map.tileHeight / 2;
+
+		while (i < tiles.length) {
+			tile = tiles[i];
+			renderIsoTile(x + ((ix - iy) * hw) + map.tileWidth * map.width / 2 - hw, y + (ix + iy) * hh, tile, Tools.getTilesetByGid(map, tile.gid));
+			i++;
+			if (++ix == width) {
+				ix = 0;
+				iy++;
+				// x = ox;
+				// y += hh;
+			}
+			else {
+				// x += hw;
+			}
+		}
+	}
 }
 
+@:allow(Game, InternalRender)
 class StructTile extends Object {
-	public var taken:Bool = false;
-	public var tile:EventInteractive;
+	public var taken: Bool = false;
+	public var tile: EventInteractive;
 
-	// Шаблон, из которого берётся коллайдер для {this.tile}
-	static var polyPrim:h3d.prim.Polygon = null;
+	// Шаблон, из которого берётся коллайдер для tile
+	static var polyPrim: h3d.prim.Polygon = null;
 
 	// Ortho size of tile
-	var tileW:Int = 48;
-	var tileH:Int = 24;
+	var tileW: Int = 44;
+	var tileH: Int = 20;
 
-	override public function new(x:Float, y:Float, ?parent:Object) {
+	override function new(x: Float, y: Float, ?parent: Object) {
 		super(parent);
-		if (polyPrim == null)
-			initPolygon();
+		if (polyPrim == null) initPolygon();
 		tile = new EventInteractive(polyPrim.getCollider(), this);
-		tile.rotate(-0.01, 0, hxd.Math.degToRad(90));
+		tile.rotate(-0.01, 0, hxd.Math.degToRad(180));
 
-		tile.priority = 2;
+		tile.priority = -1;
 		this.x = x;
 		this.z = y;
-		this.y = 1;
+		this.y = 0;
+
+		tile.onPushEvent.add(event -> {
+			// Entity.ALL[Entity.ALL.length - 1].setFeetPos(x, y);
+			var ent = new Hydroponics();
+			Game.inst.applyTmxObjOnEnt(ent);
+			ent.setFeetPos(x, y);
+		});
+
+		#if debug
+		// var prim = new h3d.prim.Cube();
+
+		// // translate it so its center will be at the center of the cube
+		// prim.translate(-0.5, -0.5, -0.5);
+
+		// // unindex the faces to create hard edges normals
+		// prim.unindex();
+
+		// // add face normals
+		// prim.addNormals();
+
+		// // add texture coordinates
+		// prim.addUVs();
+		// var obj2 = new Mesh(prim, this);
+		// obj2.scale(1);
+		// // set the second cube color
+		// obj2.material.color.setColor(0xFFB280);
+		#end
 	}
 
 	function initPolygon() {
-		var pts:Array<Point> = [];
+		var pts: Array<Point> = [];
 		pts.push(new Point(tileW / 2, 0, 0));
 		pts.push(new Point(0, 0, -tileH / 2));
 		pts.push(new Point(tileW / 2, 0, -tileH));
@@ -401,5 +443,6 @@ class StructTile extends Object {
 		idx.push(2);
 		idx.push(3);
 		polyPrim = new h3d.prim.Polygon(pts, idx);
+		polyPrim.translate(-tileW / 2, 0, tileH / 2);
 	}
 }

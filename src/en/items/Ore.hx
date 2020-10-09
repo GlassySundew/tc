@@ -9,7 +9,7 @@ import h2d.Object;
 class Ore extends Item {
 	var type:Type;
 
-	public function new(?x:Float = 0, ?y:Float = 0, ?parent:Object) {
+	public function new( ?parent:Object) {
 		// if (spr == null)
 
 		// switch type {
@@ -19,7 +19,7 @@ class Ore extends Item {
 		// 	default:
 		// }
 
-		super(x, y, parent);
+		super(parent);
 		spr = new HSprite(Assets.items, this);
 	}
 }

@@ -161,8 +161,10 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 		else {
 			passes.sort(function(p1, p2) {
 				// trace(p1.pass.layer, p2.pass.layer);
-				return p1.pass.layer == p2.pass.layer ? (try getFrontPassIso(p1, p2) catch (e:Dynamic) (p1.depth > p2.depth) ? -1 : 1) : p1.pass.layer
-					- p2.pass.layer;
+				return (try getFrontPassIso(p1, p2) catch (e:Dynamic) {
+					// trace("shit");
+					(p1.depth > p2.depth) ? -1 : 1;
+				});
 			});
 		}
 	}
@@ -173,8 +175,8 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 		return if (a.xMax - a.xMin == 0 || a.zMax - a.zMin == 0) // check if player
 		{
 			comparePointAndLine({x: p1.obj.x, y: p1.obj.y, z: p1.obj.z}, {pt1: {x: b.xMin, y: 0, z: b.zMin}, pt2: {x: b.xMax, y: 0, z: b.zMax}});
-		} else if (b.xMax - b.xMin == 0 || b.zMax - b.zMin == 0) {
-			-comparePointAndLine({x: p2.obj.x, y: p2.obj.y, z: p2.obj.z}, {pt1: {x: a.xMin, y: 0, z: a.zMin}, pt2: {x: a.xMax, y: 0, z: a.zMax}});
+		} else if (b.xMax - b.xMin == 0 || b.zMax - b.zMin == 0) { // also check if
+			- comparePointAndLine({x: p2.obj.x, y: p2.obj.y, z: p2.obj.z}, {pt1: {x: a.xMin, y: 0, z: a.zMin}, pt2: {x: a.xMax, y: 0, z: a.zMax}});
 		} else {
 			-Std.int(compareLineAndLine({pt1: {x: b.xMin, y: 0, z: b.zMin}, pt2: {x: b.xMax, y: 0, z: b.zMax}},
 				{pt1: {x: a.xMin, y: 0, z: a.zMin}, pt2: {x: a.xMax, y: 0, z: a.zMax}}));
@@ -189,34 +191,35 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 		} else {
 			var slope = (line.pt2.z - line.pt1.z) / (line.pt2.x - line.pt1.x);
 			var intercept = line.pt1.z - (slope * line.pt1.x);
-			return (slope * pt.x) + intercept > pt.z ? 1 : -1;
+			return (((slope * pt.x) + intercept) > pt.z ? 1 : -1);
 		}
 	}
 
 	function compareLineAndLine(line1:Line, line2:Line) {
 		var comp1 = comparePointAndLine(line1.pt1, line2);
 		var comp2 = comparePointAndLine(line1.pt2, line2);
-		var oneVStwo = comp1 == comp2 ? comp1 : Math.NEGATIVE_INFINITY;
+		var oneVStwo = comp1 == comp2 ? comp1 : -2;
 
 		var comp3 = comparePointAndLine(line2.pt1, line1);
 		var comp4 = comparePointAndLine(line2.pt2, line1);
-		var twoVSone = comp3 == comp4 ? -comp3 : Math.NEGATIVE_INFINITY;
+		var twoVSone = comp3 == comp4 ? -comp3 : -2;
 
-		if (oneVStwo != Math.NEGATIVE_INFINITY && twoVSone != Math.NEGATIVE_INFINITY) {
+		if (oneVStwo != -2 && twoVSone != -2) {
 			if (oneVStwo == twoVSone) {
 				return oneVStwo;
 			}
 			return compareLineCenters(line1, line2);
-		} else if (oneVStwo != Math.NEGATIVE_INFINITY)
+		} else if (oneVStwo != -2)
 			return oneVStwo;
-		else if (twoVSone != Math.NEGATIVE_INFINITY)
+		else if (twoVSone != -2)
 			return twoVSone;
 		else
 			return compareLineCenters(line1, line2);
 	}
 
-	function compareLineCenters(line1:Line, line2:Line)
+	function compareLineCenters(line1:Line, line2:Line) {
 		return centerHeight(line1) > centerHeight(line2) ? -1 : 1;
+	}
 
 	function centerHeight(line:Line)
 		return (line.pt1.y + line.pt2.y) / 2;

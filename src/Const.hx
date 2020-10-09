@@ -11,7 +11,7 @@ class Const {
 	public static var MELEE_REACH = 2;
 	public static var GRAB_REACH = 2;
 	public static var DEF_USE_RANGE = 40.;
-
+ 
 	static var _uniq = 0;
 	public static var NEXT_UNIQ(get, never):Int;
 

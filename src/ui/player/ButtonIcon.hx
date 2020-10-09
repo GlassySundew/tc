@@ -7,21 +7,6 @@ import h2d.Object;
 import h2d.Font;
 import h2d.domkit.Style;
 
-@:uiComp("cont")
-class ButtonIconCont extends h2d.Flow implements h2d.domkit.Object {
-	static var SRC =  <cont>
-		 	<bitmap src={tile} public id="icon">
-				<flow public id="activateTextFlow">
-					<text text="E" public id="activateText" />
-					</flow>
-				</bitmap>
-		</cont>;
-	public function new(?tile:Tile, ?parent) {
-		super(parent);
-		initComponent();
-	}
-}
-
 class ButtonIcon extends Object {
 	public var container:ButtonIconCont;
 	public var buttonSpr:HSprite;
@@ -39,7 +24,7 @@ class ButtonIcon extends Object {
 		Main.inst.root.add(centerFlow, Const.DP_UI);
 
 		buttonSpr = Assets.ui.h_getAndPlay("keyboard_icon", 99999, false, this);
-		buttonSpr.anim.setSpeed(0.025);
+		buttonSpr.anim.setSpeed(0.025 * Game.inst.tmod);
 
 		Game.inst.root.add(this, Const.DP_UI);
 		container = new ButtonIconCont(centerFlow);
@@ -59,6 +44,7 @@ class ButtonIcon extends Object {
 		buttonSpr.remove();
 		centerFlow.remove();
 	}
+
 	override function onRemove() {
 		super.onRemove();
 		dispose();

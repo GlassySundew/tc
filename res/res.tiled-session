@@ -1,5 +1,5 @@
 {
-    "activeFile": "tiled/levels/alphamap.tmx",
+    "activeFile": "tiled/levels/ui.tsx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         ".",
@@ -7,33 +7,73 @@
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
-        "tiled/levels/alpha.tsx": {
+        "/home/glassysundew/Projects/tc (copy)/res/tiled/levels/alpha.tsx": {
+            "dynamicWrapping": false
+        },
+        "/home/glassysundew/Projects/tc (copy)/res/tiled/levels/alphamap.tmx": {
+            "scale": 0.24267791032496916,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 2402.3612170522924,
+                "y": 1736.8700737350619
+            }
+        },
+        "/home/glassysundew/Projects/tc (copy)/res/tiled/levels/bridge.tmx": {
+            "scale": 0.24267791032496916,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 2402.3612170522924,
+                "y": 1188.8185439444019
+            }
+        },
+        "/home/glassysundew/Projects/tc (copy)/res/tiled/levels/colls.tsx": {
+            "dynamicWrapping": false
+        },
+        "/home/glassysundew/Projects/tc (copy)/res/tiled/levels/env.tsx": {
             "dynamicWrapping": true,
-            "scaleInDock": 0.25,
-            "scaleInEditor": 1
+            "scaleInDock": 1
+        },
+        "tiled/levels/alpha.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 0.125,
+            "scaleInEditor": 0.33
         },
         "tiled/levels/alphamap.tmx": {
             "scale": 4,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 2400,
-                "y": 1184.25
+                "x": 2449,
+                "y": 514.875
             }
         },
         "tiled/levels/bridge.tmx": {
-            "scale": 2,
-            "selectedLayer": 0,
+            "scale": 4,
+            "selectedLayer": 5,
             "viewCenter": {
                 "x": 2400,
-                "y": 1184.5
+                "y": 1184.375
             }
         },
         "tiled/levels/colls.tsx": {
+            "dynamicWrapping": true,
             "scaleInDock": 1,
-            "scaleInEditor": 1
+            "scaleInEditor": 0.33
         },
         "tiled/levels/env.tsx": {
             "dynamicWrapping": false,
+            "scaleInDock": 0.5,
+            "scaleInEditor": 1.5
+        },
+        "tiled/levels/ui.tmx": {
+            "scale": 4,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 104.25,
+                "y": 59.875
+            }
+        },
+        "tiled/levels/ui.tsx": {
+            "dynamicWrapping": true,
             "scaleInDock": 1,
             "scaleInEditor": 1
         }
@@ -51,18 +91,23 @@
         "tiled/levels/bridge.tmx",
         "tiled/levels/alpha.tsx",
         "tiled/levels/colls.tsx",
-        "tiled/levels/env.tsx"
+        "tiled/levels/ui.tmx",
+        "tiled/levels/ui.tsx"
     ],
     "project": "res.tiled-project",
-    "property.type": "color",
+    "property.type": "int",
     "recentFiles": [
-        "tiled/levels/env.tsx",
-        "tiled/levels/colls.tsx",
-        "tiled/levels/alpha.tsx",
+        "tiled/levels/alphamap.tmx",
         "tiled/levels/bridge.tmx",
-        "tiled/levels/alphamap.tmx"
+        "tiled/levels/alpha.tsx",
+        "tiled/levels/colls.tsx",
+        "tiled/levels/ui.tmx",
+        "tiled/levels/ui.tsx",
+        "/home/glassysundew/Projects/tc (copy)/res/tiled/levels/bridge.tmx",
+        "tiled/levels/env.tsx"
     ],
     "tileset.embedInMap": false,
+    "tileset.lastUsedFormat": "tsx",
     "tileset.margin": 0,
     "tileset.spacing": 0,
     "tileset.tileSize": {

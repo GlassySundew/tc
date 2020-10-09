@@ -66,9 +66,9 @@ class Main extends Process {
 		controller.bind(AXIS_LEFT_Y_POS, Key.DOWN, Key.S);
 		controller.bind(A, Key.SPACE, Key.F, Key.E);
 		controller.bind(B, Key.ESCAPE, Key.BACKSPACE);
-		controller.bind(SELECT, Key.R);
-		controller.bind(LT, Key.TAB);
-
+		controller.bind(SELECT, Key.R); 
+		controller.bind(LT, Key.TAB); // Inventory
+		controller.bind(DPAD_UP, Key.C);
 		// @:privateAccess new dn.heaps.GameFocusHelper(Boot.inst.s2d, Assets.fontPixel);
 		delayer.addF(start, 1);
 		

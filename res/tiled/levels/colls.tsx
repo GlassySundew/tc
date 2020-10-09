@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.4" tiledversion="2020.08.05" name="colls" tilewidth="114" tileheight="134" tilecount="14" columns="10">
+<tileset version="1.4" tiledversion="2020.09.22" name="colls" tilewidth="114" tileheight="134" tilecount="14" columns="10">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="2">
   <image width="32" height="32" source="../separated/q/player.png"/>
@@ -54,7 +54,10 @@
   <image width="90" height="50" source="../separated/structures/hydroponics.png"/>
   <objectgroup draworder="index" id="2">
    <object id="1" x="-6" y="50">
-    <polygon points="34,-14 74,-34 90,-26 50,-6"/>
+    <polygon points="35,-14 75,-34 89,-27 49,-7"/>
+   </object>
+   <object id="2" name="center" x="56" y="29">
+    <point/>
    </object>
   </objectgroup>
  </tile>
@@ -77,11 +80,11 @@
  <tile id="12">
   <image width="56" height="77" source="../separated/structures/door.png"/>
   <objectgroup draworder="index" id="3">
+   <object id="4" name="center" x="28" y="58">
+    <point/>
+   </object>
    <object id="3" x="11" y="60">
     <polygon points="0,0 24,-12 30,-9 6,3"/>
-   </object>
-   <object id="4" name="center" x="30" y="59">
-    <point/>
    </object>
   </objectgroup>
  </tile>
@@ -144,7 +147,7 @@
    <object id="1" x="41" y="51" rotation="180">
     <polygon points="0,-9 24,3 30,0 6,-12"/>
    </object>
-   <object id="2" name="center" x="31" y="52">
+   <object id="2" name="center" x="29" y="54">
     <point/>
    </object>
   </objectgroup>

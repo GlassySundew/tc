@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="2020.09.22" orientation="isometric" renderorder="right-down" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#ffffff" nextlayerid="50" nextobjectid="719">
+<map version="1.4" tiledversion="2020.09.22" orientation="isometric" renderorder="right-down" compressionlevel="0" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#000000" nextlayerid="50" nextobjectid="732">
  <tileset firstgid="1" source="alpha.tsx"/>
  <tileset firstgid="43" source="colls.tsx"/>
- <tileset firstgid="61" source="env.tsx"/>
- <layer id="33" name="ground" width="100" height="100" offsetx="-5" offsety="6">
+ <layer id="33" name="ground" width="100" height="100" offsetx="0" offsety="4">
   <data encoding="base64" compression="zlib">
    eAHt0TEKACAMA8D+xv//UF1LRzHLFRwMhcKlyhAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECEwC64T9TXuyPwK9i/s3OQF95Oyny/qYVHKZPnL2LhMgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBB4JbABgfkD0A==
   </data>
@@ -26,14 +25,14 @@
   <object id="304" x="432" y="504" width="144" height="24"/>
  </objectgroup>
  <objectgroup id="3" name="entities">
+  <object id="631" name="player" gid="45" x="493.5" y="446.5" width="32" height="32"/>
+  <object id="718" gid="50" x="552.5" y="433.5" width="46" height="36"/>
   <object id="714" gid="1073741879" x="433.5" y="330.5" width="56" height="77" rotation="180">
    <properties>
     <property name="to" value="bridge"/>
    </properties>
   </object>
-  <object id="715" gid="52" x="457.5" y="456.5" width="90" height="50"/>
-  <object id="631" name="player" gid="45" x="493.5" y="446.5" width="32" height="32"/>
-  <object id="716" gid="52" x="457.5" y="504.5" width="90" height="50"/>
-  <object id="718" gid="50" x="552.5" y="433.5" width="46" height="36"/>
+  <object id="723" gid="52" x="457.5" y="504.5" width="90" height="50"/>
+  <object id="724" gid="52" x="481.5" y="504.5" width="90" height="50"/>
  </objectgroup>
 </map>

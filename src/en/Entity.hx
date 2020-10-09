@@ -25,30 +25,27 @@ import h3d.scene.Mesh;
 
 @:keep class Entity {
 	// private var anim:String;
-	public static var ALL:Array<Entity> = [];
-	public static var GC:Array<Entity> = [];
-
+	public static var ALL: Array<Entity> = [];
+	public static var GC: Array<Entity> = [];
 	/**
 		Map of multiple shapes, 1st vector is a center of polygon Shape, 2nd polygon is a position of a poly
 	**/
-	public var collisions = new Map<Shape, {cent:Vector, offset:Vector}>();
+	public var collisions = new Map<Shape, {cent: Vector, offset: Vector}>();
 
-	public var game(get, never):Game;
+	public var game(get, never): Game;
 
-	inline function get_game()
-		return Game.inst;
+	inline function get_game() return Game.inst;
 
-	var level(get, never):Level;
+	var level(get, never): Level;
 
-	inline function get_level()
-		return Game.inst.level;
+	inline function get_level() return Game.inst.level;
 
 	public var destroyed(default, null) = false;
-	public var tmod(get, never):Float;
+	public var tmod(get, never): Float;
 
-	public var uid:Int;
-	public var cx:Float = 0;
-	public var cy:Float = 0;
+	public var uid: Int;
+	public var cx: Float = 0;
+	public var cy: Float = 0;
 	public var xr = 0.5;
 	public var yr = 0.5;
 	public var zr = 0.;
@@ -59,101 +56,92 @@ import h3d.scene.Mesh;
 	public var bdx = 0.;
 	public var bdy = 0.;
 
-	public var dxTotal(get, never):Float;
+	public var dxTotal(get, never): Float;
 
-	inline function get_dxTotal()
-		return dx + bdx;
+	inline function get_dxTotal() return dx + bdx;
 
-	public var dyTotal(get, never):Float;
+	public var dyTotal(get, never): Float;
 
-	inline function get_dyTotal()
-		return dy + bdy;
+	inline function get_dyTotal() return dy + bdy;
 
 	public var frict = 0.62;
 	public var gravity = 0.02;
 	public var bumpFrict = 0.93;
 	public var bumpReduction = 0.;
 
-	public var centerX(get, never):Float;
+	public var centerX(get, never): Float;
 
-	inline function get_centerX()
-		return footX;
+	inline function get_centerX() return footX;
 
-	public var centerY(get, never):Float;
+	public var centerY(get, never): Float;
 
-	inline function get_centerY()
-		return footY - 11;
+	inline function get_centerY() return footY - 11;
 
 	public var dir(default, set) = 6;
 
-	inline function get_tmod()
-		return Game.inst.tmod;
+	inline function get_tmod() return Game.inst.tmod;
 
-	public var player(get, never):en.player.Player;
+	public var player(get, never): en.player.Player;
 
-	inline function get_player()
-		return Game.inst.player;
+	inline function get_player() return Game.inst.player;
 
-	public var footX(get, set):Float;
+	public var footX(get, set): Float;
 
-	inline function get_footX()
-		return (cx + xr) * Const.GRID_WIDTH;
+	inline function get_footX() return (cx + xr);
 
-	inline function set_footX(v:Float) { // небольшой костыль
-		xr = ((v) / Const.GRID_WIDTH) % 1;
-		cx = (Math.floor((v) / Const.GRID_WIDTH));
+	inline function set_footX(v: Float) { // небольшой костыль
+		xr = ((v)) % 1;
+		cx = (Math.floor((v)));
 		return v;
 	}
 
-	public var footY(get, set):Float;
+	public var footY(get, set): Float;
 
-	inline function get_footY()
-		return (cy + yr - zr) * Const.GRID_WIDTH;
+	inline function get_footY() return (cy + yr - zr);
 
-	inline function set_footY(v:Float) { // аналогично
-		yr = ((v) / Const.GRID_WIDTH) % 1;
-		cy = (Math.floor((v) / Const.GRID_WIDTH));
+	inline function set_footY(v: Float) { // аналогично
+		yr = ((v)) % 1;
+		cy = (Math.floor((v)));
 		return v;
 	}
 
-	public var tmxTile(get, never):TmxTilesetTile;
+	public var tmxTile(get, never): TmxTilesetTile;
 
-	inline function get_tmxTile()
-		return Tools.getTileByGid(Level.inst.data, tmxObj.objectType.getParameters()[0]);
+	inline function get_tmxTile() return Tools.getTileByGid(Level.inst.data, tmxObj.objectType.getParameters()[0]);
 
-	public var tmxObj:TmxObject;
-	public var colorAdd:h3d.Vector;
-	public var spr:HSprite;
-	public var mesh:IsoTileSpr;
+	public var tmxObj: TmxObject;
+	public var colorAdd: h3d.Vector;
+	public var spr: HSprite;
+	public var mesh: IsoTileSpr;
 
-	public var tmpDt:Float;
-	public var tmpCur:Float;
+	public var tmpDt: Float;
+	public var tmpCur: Float;
 
-	public var lastFootX:Float;
-	public var lastFootY:Float;
+	public var lastFootX: Float;
+	public var lastFootY: Float;
 
-	public var curFrame:Float = 0;
-	public var prim:Cube;
+	public var curFrame: Float = 0;
+	public var prim: Cube;
 
-	private var rotAngle:Float = -0.01;
-	private var tex:Texture;
-	var bmp:Bitmap;
+	private var rotAngle: Float = -0.01;
+	private var tex: Texture;
+	var bmp: Bitmap;
 
-	public var cd:dn.Cooldown;
-	public var tw:Tweenie;
+	public var cd: dn.Cooldown;
+	public var tw: Tweenie;
 
 	public static var isoCoefficient = 1.2;
 
-	var debugLabel:Null<h2d.Text>;
+	var debugLabel: Null<h2d.Text>;
 
-	public function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:Null<TmxObject>) {
+	public function new(?x: Float = 0, ?z: Float = 0, ?tmxObj: Null<TmxObject>) {
 		uid = Const.NEXT_UNIQ;
 		ALL.push(this);
+
 		cd = new dn.Cooldown(Const.FPS);
 		tw = new Tweenie(Const.FPS);
 
-		if (spr == null)
-			throw "spr hasnt been initialised";
+		if (spr == null) throw "spr hasnt been initialised";
 
 		this.tmxObj = tmxObj;
 		game.root.add(spr, 10);
@@ -179,46 +167,37 @@ import h3d.scene.Mesh;
 		// s.setOp(Keep, DecrementWrap, Keep);
 		// mesh.material.mainPass.stencil = s;
 
-		setPosCase(x, z);
+		setFeetPos(x, z);
 	}
 
-	public function isOfType<T:Entity>(c:Class<T>)
-		return Std.isOfType(this, c);
+	public function isOfType<T: Entity>(c: Class<T>) return Std.isOfType(this, c);
 
-	public function as<T:Entity>(c:Class<T>):T
-		return Std.downcast(this, c);
+	public function as<T: Entity>(c: Class<T>): T return Std.downcast(this, c);
 
-	public inline function angTo(e:Entity)
-		return Math.atan2(e.footY - footY, e.footX - footX);
+	public inline function angTo(e: Entity) return Math.atan2(e.footY - footY, e.footX - footX);
 
-	public inline function angToPxFree(x:Float, y:Float)
-		return Math.atan2(y - footY, x - footX);
+	public inline function angToPxFree(x: Float, y: Float) return Math.atan2(y - footY, x - footX);
 
 	public function blink(?c = 0xffffff) {
 		colorAdd.setColor(c);
 		cd.setS("colorMaintain", 0.03);
 	}
 
-	public inline function isMoving()
-		return M.fabs(dxTotal) >= 0.01 || M.fabs(dyTotal) >= 0.01;
+	public inline function isMoving() return M.fabs(dxTotal) >= 0.01 || M.fabs(dyTotal) >= 0.01;
 
-	public inline function at(x, y)
-		return cx == x && cy == y;
+	public inline function at(x, y) return cx == x && cy == y;
 
 	public inline function isAlive() {
 		return !destroyed; // && life > 0;
 	}
 
-	public function isLocked()
-		return cd.has("lock");
+	public function isLocked() return cd.has("lock");
 
-	public function lock(?ms:Float)
-		cd.setMs("lock", ms != null ? ms : 1 / 0);
+	public function lock(?ms: Float) cd.setMs("lock", ms != null ? ms : 1 / 0);
 
-	public function unlock()
-		cd.unset("lock");
+	public function unlock() cd.unset("lock");
 
-	function dropItem(item:Item, ?angle:Float, ?power:Float = 0):Item {
+	function dropItem(item: Item, ?angle: Float, ?power: Float = 0): Item {
 		var fItem = new FloatingItem(footX, footY, item);
 		fItem.bump(Math.cos(angle) * power, Math.sin(angle) * power, 0);
 		fItem.lock(1000);
@@ -235,12 +214,12 @@ import h3d.scene.Mesh;
 		return dir = v == 0 ? 0 : v == 1 ? 1 : v == 2 ? 2 : v == 3 ? 3 : v == 4 ? 4 : v == 5 ? 5 : v == 6 ? 6 : v == 7 ? 7 : dir;
 	}
 
-	public inline function bumpAwayFrom(e:Entity, spd:Float, ?spdZ = 0., ?ignoreReduction = false) {
+	public inline function bumpAwayFrom(e: Entity, spd: Float, ?spdZ = 0., ?ignoreReduction = false) {
 		var a = e.angTo(this);
 		bump(Math.cos(a) * spd, Math.sin(a) * spd, spdZ, ignoreReduction);
 	}
 
-	public function bump(x:Float, y:Float, z:Float, ?ignoreReduction = false) {
+	public function bump(x: Float, y: Float, z: Float, ?ignoreReduction = false) {
 		var f = ignoreReduction ? 1.0 : 1 - bumpReduction;
 		bdx += x * f;
 		bdy += y * f;
@@ -252,24 +231,23 @@ import h3d.scene.Mesh;
 		dy = bdy = 0;
 	}
 
-	public inline function distCase(e:Entity) {
+	public inline function distCase(e: Entity) {
 		return M.dist(cx + xr, cy + yr, e.cx + e.xr, e.cy + e.yr);
 	}
 
-	public inline function distPx(e:Entity) {
+	public inline function distPx(e: Entity) {
 		return M.dist(footX, footY, e.footX, e.footY);
 	}
 
-	public inline function distCaseFree(tcx:Int, tcy:Int, ?txr = 0.5, ?tyr = 0.5) {
+	public inline function distCaseFree(tcx: Int, tcy: Int, ?txr = 0.5, ?tyr = 0.5) {
 		return M.dist(cx + xr, cy + yr, tcx + txr, tcy + tyr);
 	}
 
-	public inline function distPxFree(x:Float, y:Float) {
+	public inline function distPxFree(x: Float, y: Float) {
 		return M.dist(footX, footY, x, y);
 	}
 
-	public function makePoint()
-		return new CPoint(cx, cy, xr, yr);
+	public function makePoint() return new CPoint(cx, cy, xr, yr);
 
 	public inline function destroy() {
 		if (!destroyed) {
@@ -320,7 +298,7 @@ import h3d.scene.Mesh;
 		lastFootY = footY;
 	}
 
-	public function kill(by:Null<Entity>) {
+	public function kill(by: Null<Entity>) {
 		destroy();
 	}
 
@@ -402,10 +380,8 @@ import h3d.scene.Mesh;
 
 		dx *= Math.pow(frict, tmod);
 		bdx *= Math.pow(bumpFrict, tmod);
-		if (M.fabs(dx) <= 0.0005 * tmod)
-			dx = 0;
-		if (M.fabs(bdx) <= 0.0005 * tmod)
-			bdx = 0;
+		if (M.fabs(dx) <= 0.0005 * tmod) dx = 0;
+		if (M.fabs(bdx) <= 0.0005 * tmod) bdx = 0;
 
 		// y
 		var steps = M.ceil(M.fabs(dyTotal * tmod));
@@ -428,10 +404,8 @@ import h3d.scene.Mesh;
 
 		dy *= Math.pow(frict, tmod);
 		bdy *= Math.pow(bumpFrict, tmod);
-		if (M.fabs(dy) <= 0.0005 * tmod)
-			dy = 0;
-		if (M.fabs(bdy) <= 0.0005 * tmod)
-			bdy = 0;
+		if (M.fabs(dy) <= 0.0005 * tmod) dy = 0;
+		if (M.fabs(bdy) <= 0.0005 * tmod) bdy = 0;
 	}
 
 	public function postUpdate() {
@@ -466,9 +440,7 @@ import h3d.scene.Mesh;
 			tex.clear(0, 0);
 			bmp.tile = spr.tile;
 
-			if (tmxObj != null)
-				if (tmxObj.flippedVertically)
-					spr.tile.flipX();
+			if (tmxObj != null) if (tmxObj.flippedVertically) spr.tile.flipX();
 
 			bmp.tile.setCenterRatio(-spr.pivot.centerFactorX, -spr.pivot.centerFactorY);
 
@@ -480,9 +452,8 @@ import h3d.scene.Mesh;
 			tile.getTexture().filter = Nearest;
 			tile.setCenterRatio(spr.pivot.centerFactorX, spr.pivot.centerFactorY);
 			mesh.tile = tile;
-			if (spr.filter != null)
-				@:privateAccess spr.drawFilters(Boot.inst.s2d.renderer);
-			
+			if (spr.filter != null) @:privateAccess spr.drawFilters(Boot.inst.s2d.renderer);
+
 			// lastFootX = footX;
 			// lastFootY = footY;
 		}

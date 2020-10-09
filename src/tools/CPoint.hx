@@ -6,10 +6,10 @@ class CPoint {
 	public var xr : Float;
 	public var yr : Float;
 
-	public var footX(get,never) : Float; inline function get_footX() return (cx+xr)*Const.GRID_WIDTH;
-	public var footY(get,never) : Float; inline function get_footY() return (cy+yr)*Const.GRID_HEIGHT;
+	public var footX(get,never) : Float; inline function get_footX() return (cx+xr);
+	public var footY(get,never) : Float; inline function get_footY() return (cy+yr);
 	public var centerX(get,never) : Float; inline function get_centerX() return footX;
-	public var centerY(get,never) : Float; inline function get_centerY() return footY-Const.GRID_HEIGHT*0.5;
+	public var centerY(get,never) : Float; inline function get_centerY() return footY;
 
 	public function new(x,y, ?xr=0.5, ?yr=0.5) {
 		cx = x;

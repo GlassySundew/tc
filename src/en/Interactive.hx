@@ -37,7 +37,8 @@ class Interactive extends Entity {
 		return interactable = v;
 	}
 
-	public var useRange:Float;
+	public var cdbI:Structures = null;
+	public var useRange:Float = Const.DEF_USE_RANGE;
 
 	var highlightingColor:String;
 	var polyPrim:Polygon;
@@ -51,7 +52,7 @@ class Interactive extends Entity {
 
 	var inv = new CellGrid2D(4, 4);
 
-	public function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:TmxObject) {
+	function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:TmxObject) {
 		super(x, z, tmxObj);
 		var pixels = Pixels.fromBytes(tex.capturePixels().bytes, Std.int(spr.tile.width), Std.int(spr.tile.height));
 		points = new MarchingSquares(pixels).march();
@@ -65,7 +66,7 @@ class Interactive extends Entity {
 		for (poly in 0...polygonized.length) {
 			idx.push(findVertexNumberInArray(polygonized[poly][0], translatedPoints));
 			idx.push(findVertexNumberInArray(polygonized[poly][1], translatedPoints));
-			idx.push(findVertexNumberInArray(polygonized[poly][2], translatedPoints)); 
+			idx.push(findVertexNumberInArray(polygonized[poly][2], translatedPoints));
 		}
 
 		polyPrim = new Polygon(translatedPoints, idx);
@@ -75,7 +76,8 @@ class Interactive extends Entity {
 		if (tmxObj != null && tmxObj.flippedVertically)
 			interact.scaleX = -1;
 
-		var highlightColor = (try tmxTile.properties.get("highlight") catch (e:Dynamic) "ffffffff");
+		// var highlightColor = (try tmxTile.properties.get("highlight") catch (e:Dynamic) "ffffffff");
+		var highlightColor = null;
 		if (highlightColor == null)
 			highlightColor = "ffffffff";
 
@@ -88,22 +90,33 @@ class Interactive extends Entity {
 			} else
 				return false;
 		}
+		// Нажатие для того, чтобы сломать структуру
 		interact.onPushEvent.add(event -> {});
 		interact.onOverEvent.add((_) -> activateInteractive());
 		interact.onOutEvent.add((e:hxd.Event) -> {
 			turnOffHighlight();
 		});
 
-		// Setting interaciton range from cdb
+		// CDB parsed entry corresponding to this structure instance
 		eregClass.match('$this'.toLowerCase());
-
-		useRange = Const.DEF_USE_RANGE;
 		try {
-			useRange = Data.structures.resolve(eregClass.matched(1)).use_range;
+			cdbI = Data.structures.resolve(eregClass.matched(1));
 		} catch (Dynamic) {
 			try {
-				useRange = Data.structures.resolve(spr.groupName).use_range;
+				cdbI = Data.structures.resolve(spr.groupName);
 			} catch (Dynamic) {}
+		}
+		// Setting interaciton range from cdb
+
+		if (cdbI != null) {
+			useRange = cdbI.use_range;
+
+			if (cdbI.isoHeight != 0 && cdbI.isoWidth != 0) {
+				mesh.isLong = true;
+				mesh.isoWidth = cdbI.isoWidth;
+				mesh.isoHeight = cdbI.isoHeight;
+				mesh.renewDebugPts();
+			}
 		}
 	}
 
@@ -111,7 +124,7 @@ class Interactive extends Entity {
 		return distPx(player) <= useRange;
 
 	public function rebuildInteract() {
-		var facX = tmxObj.flippedVertically ? 1 - spr.pivot.centerFactorX : spr.pivot.centerFactorX;
+		var facX = (tmxObj != null && tmxObj.flippedVertically) ? 1 - spr.pivot.centerFactorX : spr.pivot.centerFactorX;
 		polyPrim.translate(-spr.tile.width * facX, 0, -spr.tile.height * spr.pivot.centerFactorY);
 		interact.shape = polyPrim.getCollider();
 	}
@@ -138,7 +151,7 @@ class Interactive extends Entity {
 		if (interactable)
 			updateKeyIcon();
 		// deactivate interactive if inventory is opened
-		interact.visible = !player.inventory.base.visible && isInPlayerRange();
+		interact.visible = !player.ui.inventory.sprInv.visible && isInPlayerRange();
 	}
 
 	function updateKeyIcon() {
@@ -170,7 +183,7 @@ class Interactive extends Entity {
 		for (i in inv.grid) {
 			for (j in i) {
 				if (j.item != null) {
-					j.item = dropItem(j.item, Math.random() * M.toRad(360), Math.random() * .03 + .01);
+					j.item = dropItem(j.item, Math.random() * M.toRad(360), Math.random() * .03 * 48 + .01);
 				}
 			}
 		}
