@@ -1,5 +1,6 @@
 package en;
 
+import h2d.Scene;
 import differ.shapes.Circle;
 import differ.Collision;
 import ch3.scene.TileSprite;
@@ -144,29 +145,25 @@ import h3d.scene.Mesh;
 		if (spr == null) throw "spr hasnt been initialised";
 
 		this.tmxObj = tmxObj;
-		game.root.add(spr, 10);
 		spr.colorAdd = colorAdd = new h3d.Vector();
-		spr.visible = false;
+		tex = new Texture(Std.int(spr.tile.width), Std.int(spr.tile.height), [Target]);
 		spr.tile.getTexture().filter = Nearest;
-		bmp = new Bitmap(spr.tile);
+		spr.drawTo(tex);
 		mesh = new IsoTileSpr(spr.tile, false, Boot.inst.s3d);
 		mesh.material.mainPass.setBlendMode(AlphaAdd);
 
-		tex = new Texture(Std.int(spr.tile.width), Std.int(spr.tile.height), [Target]);
-
-		bmp.drawTo(tex);
 		mesh.rotate(0, -rotAngle, M.toRad(90));
 		var s = mesh.material.mainPass.addShader(new h3d.shader.ColorAdd());
 		s.color = colorAdd;
 		mesh.material.mainPass.enableLights = false;
 		mesh.material.mainPass.depth(false, Less);
 
+		if (tmxObj != null && tmxObj.flippedVertically) spr.scaleX = -1;
 		// TODO semi-transparent overlapping
 		// var s = new h3d.mat.Stencil();
 		// s.setFunc(LessEqual, 0);
 		// s.setOp(Keep, DecrementWrap, Keep);
 		// mesh.material.mainPass.stencil = s;
-
 		setFeetPos(x, z);
 	}
 
@@ -197,7 +194,7 @@ import h3d.scene.Mesh;
 
 	public function unlock() cd.unset("lock");
 
-	function dropItem(item: Item, ?angle: Float, ?power: Float = 0): Item {
+	function dropItem(item: en.Item, ?angle: Float, ?power: Float = 0): en.Item {
 		var fItem = new FloatingItem(footX, footY, item);
 		fItem.bump(Math.cos(angle) * power, Math.sin(angle) * power, 0);
 		fItem.lock(1000);
@@ -270,16 +267,13 @@ import h3d.scene.Mesh;
 			mesh.remove();
 		}
 		cd.destroy();
-		bmp.remove();
-		bmp.tile.dispose();
 		tex.dispose();
 		tw.destroy();
-
+		cd = null;
 		for (i in collisions.keys())
 			i.destroy();
 
 		collisions = null;
-		bmp = null;
 		spr = null;
 		mesh = null;
 	}
@@ -347,12 +341,12 @@ import h3d.scene.Mesh;
 	}
 
 	public function preUpdate() {
+		spr.anim.update(tmod);
 		cd.update(tmod);
+		tw.update(tmod);
 	}
 
 	public function update() {
-		tw.update();
-		spr.anim.setGlobalSpeed(tmod);
 		@:privateAccess if (spr.anim.getCurrentAnim() != null) {
 			if (tmpCur != 0 && (spr.anim.getCurrentAnim().curFrameCpt - (tmpDt)) == 0) // ANIM LINK HACK
 				spr.anim.getCurrentAnim().curFrameCpt = tmpCur + spr.anim.getAnimCursor();
@@ -438,24 +432,13 @@ import h3d.scene.Mesh;
 	public function frameEnd() {
 		if (mesh != null) {
 			tex.clear(0, 0);
-			bmp.tile = spr.tile;
-
-			if (tmxObj != null) if (tmxObj.flippedVertically) spr.tile.flipX();
-
-			bmp.tile.setCenterRatio(-spr.pivot.centerFactorX, -spr.pivot.centerFactorY);
-
-			bmp.drawTo(tex);
-			bmp.x = -spr.pivot.centerFactorX * spr.tile.width;
-			bmp.y = -spr.pivot.centerFactorY * spr.tile.height;
-			// spr.drawTo(tex);
+			spr.x = spr.scaleX > 0 ? -spr.tile.dx : spr.tile.dx + spr.tile.width;
+			spr.y = -spr.tile.dy;
+			spr.drawTo(tex);
 			var tile = Tile.fromTexture(tex);
 			tile.getTexture().filter = Nearest;
 			tile.setCenterRatio(spr.pivot.centerFactorX, spr.pivot.centerFactorY);
 			mesh.tile = tile;
-			if (spr.filter != null) @:privateAccess spr.drawFilters(Boot.inst.s2d.renderer);
-
-			// lastFootX = footX;
-			// lastFootY = footY;
 		}
 	}
 }

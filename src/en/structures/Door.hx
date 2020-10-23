@@ -6,11 +6,11 @@ import en.objs.IsoTileSpr;
 import format.tmx.Data.TmxObject;
 
 class Door extends Interactive {
-	public var leadsTo:String;
+	public var leadsTo: String;
 
-	public function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:TmxObject) {
+	public function new(?x: Float = 0, ?z: Float = 0, ?tmxObj: TmxObject) {
 		if (spr == null) {
-			spr = new HSprite(Assets.structures);
+			spr = new HSprite(Assets.structures, entParent);
 			spr.set("door");
 		}
 		super(x, z, tmxObj);
@@ -21,10 +21,9 @@ class Door extends Interactive {
 		mesh.isoHeight = 0.4;
 		mesh.renewDebugPts();
 
-		if (tmxObj.properties.exists("to"))
-			leadsTo = tmxObj.properties.getString("to");
+		if (tmxObj.properties.exists("to")) leadsTo = tmxObj.properties.getString("to");
 
-		interact.onTextInputEvent.add((e:Event) -> {
+		interact.onTextInputEvent.add((e: Event) -> {
 			if (Key.isPressed(Key.E)) {
 				turnOffHighlight();
 
@@ -39,7 +38,7 @@ class Door extends Interactive {
 		});
 	}
 
-	function findDoor(to:String):Entity {
+	function findDoor(to: String): Entity {
 		for (e in Entity.ALL) {
 			if (Std.is(e, Door) && e.tmxObj.properties.exists("to") && e.tmxObj.properties.getString("to") == to) {
 				return e;

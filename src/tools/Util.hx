@@ -1,5 +1,6 @@
 package tools;
 
+import h2d.Scene;
 import h3d.pass.Default;
 import format.tmx.Data.TmxLayer;
 import format.tmx.Reader;
@@ -63,9 +64,8 @@ class Util {
 	inline static function getTileSource(gid: Int, tileset: TmxTileset): TmxTilesetTile {
 		var fixedGId = gid - tileset.firstGID;
 		// фикс на непоследовательные id тайлов
-		for (i in 0...tileset.tiles.length)
-			if (tileset.tiles[i].id == fixedGId && fixedGId > i) while (fixedGId > i)
-				fixedGId--;
+		for (i in 0...tileset.tiles.length) if (tileset.tiles[i].id == fixedGId && fixedGId > i) while (fixedGId > i)
+			fixedGId--;
 		return (tileset.tiles[fixedGId]);
 	}
 
@@ -78,6 +78,8 @@ class Util {
 			return cached;
 		}
 	}
+
+	static var entParent: Scene;
 }
 
 class TmxMapExtender {
@@ -104,6 +106,27 @@ class TmxLayerExtender {
 			case LObjectGroup(group):
 				for (i in group.objects) {
 					if (i.name == name) return i;
+				}
+			default:
+		}
+		return null;
+	}
+	/** Localises all objects of this layer to be local to certain object of this layer **/
+	public static function localBy(tmxLayer: TmxLayer, target: TmxObject) {
+		switch (tmxLayer) {
+			case LObjectGroup(group):
+				// Checking if the object belongs to the layer
+				var tempCheck = null;
+				for (i in group.objects) if (target == i) tempCheck = i;
+				if (tempCheck == null) return null;
+				// Offsetting every single object in the layer except for the target one
+				var offsetX = -target.width / 2 + target.x + 1;
+				var offsetY = -target.height + target.y + 1;
+				for (i in group.objects) {
+					if (i != target) {
+						i.x -= offsetX;
+						i.y -= offsetY;
+					}
 				}
 			default:
 		}

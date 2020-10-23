@@ -11,23 +11,23 @@ amethyst
   orig: 46, 36
   offset: 0, 0
   index: -1
-back_door
+back_door0
   rotate: false
-  xy: 232, 0
+  xy: 754, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
-back_door0
+back_door
   rotate: false
-  xy: 232, 0
+  xy: 754, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door1
   rotate: false
-  xy: 754, 79
+  xy: 754, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
@@ -62,21 +62,21 @@ back_door13
   index: -1
 back_door14
   rotate: false
-  xy: 1102, 0
+  xy: 696, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door15
   rotate: false
-  xy: 406, 0
+  xy: 406, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door16
   rotate: false
-  xy: 1044, 0
+  xy: 1102, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
@@ -90,56 +90,56 @@ back_door17
   index: -1
 back_door2
   rotate: false
-  xy: 754, 0
+  xy: 812, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door3
   rotate: false
-  xy: 812, 79
+  xy: 812, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door4
   rotate: false
-  xy: 986, 0
+  xy: 870, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door5
   rotate: false
-  xy: 870, 79
+  xy: 870, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door6
   rotate: false
-  xy: 870, 0
+  xy: 928, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door7
   rotate: false
-  xy: 928, 79
+  xy: 928, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door8
   rotate: false
-  xy: 928, 0
+  xy: 986, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 back_door9
   rotate: false
-  xy: 986, 79
+  xy: 986, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
@@ -195,21 +195,21 @@ door1
   index: -1
 door10
   rotate: false
-  xy: 812, 0
+  xy: 116, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 door11
   rotate: false
-  xy: 1044, 79
+  xy: 1044, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
   index: -1
 door12
   rotate: false
-  xy: 522, 79
+  xy: 406, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
@@ -223,7 +223,7 @@ door13
   index: -1
 door14
   rotate: false
-  xy: 1102, 79
+  xy: 1102, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
@@ -237,7 +237,7 @@ door15
   index: -1
 door16
   rotate: false
-  xy: 696, 0
+  xy: 522, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
@@ -265,7 +265,7 @@ door3
   index: -1
 door4
   rotate: false
-  xy: 406, 79
+  xy: 232, 0
   size: 56, 77
   orig: 56, 77
   offset: 0, 0
@@ -293,7 +293,7 @@ door7
   index: -1
 door8
   rotate: false
-  xy: 116, 79
+  xy: 1044, 79
   size: 56, 77
   orig: 56, 77
   offset: 0, 0

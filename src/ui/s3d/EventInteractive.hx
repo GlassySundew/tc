@@ -1,4 +1,4 @@
-package ui;
+package ui.s3d;
 
 import cherry.soup.EventSignal;
 import hxd.Event;

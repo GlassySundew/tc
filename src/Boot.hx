@@ -1,3 +1,4 @@
+import h2d.Scene;
 import hxd.Res;
 import hxd.snd.Manager;
 import hxd.inspect.Inspector;
@@ -19,8 +20,8 @@ class Boot extends hxd.App {
 	// Engine ready
 	override function init() {
 		inst = this;
+		entParent = new Scene();
 		new Main(s2d);
-
 		renderer = new CustomRenderer();
 		s3d.renderer = renderer;
 		renderer.depthColorMap = hxd.Res.gradients.test.toTexture();

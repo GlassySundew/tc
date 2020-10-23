@@ -1,5 +1,7 @@
 package en.player;
 
+import dn.Process;
+import h2d.Scene;
 import net.Connect;
 import hxd.Window;
 import ui.player.PlayerUI;
@@ -15,9 +17,9 @@ class Player extends Entity {
 
 	public var ui: PlayerUI;
 
-	public var holdItem(default, set): Item;
+	public var holdItem(default, set): en.Item;
 
-	inline function set_holdItem(v: Item) {
+	inline function set_holdItem(v: en.Item) {
 		if (v == null) {
 			ui.inventory.invGrid.disableGrid();
 		}
@@ -30,7 +32,7 @@ class Player extends Entity {
 	var ca: dn.heaps.Controller.ControllerAccess;
 
 	public function new(x: Float, z: Float, ?tmxObj: TmxObject) {
-		spr = new HSprite(Assets.player);
+		spr = new HSprite(Assets.player, entParent);
 		ca = Main.inst.controller.createAccess("player");
 
 		var direcs = [
@@ -43,22 +45,19 @@ class Player extends Entity {
 			{dir: "down", prio: 0},
 			{dir: "down_right", prio: 1}
 		];
-
 		for (i in 0...8) {
-			spr.anim.registerStateAnim("walk_" + direcs[i].dir, direcs[i].prio, (1 / 60 / 0.16) * tmod, function() return isMoving() && dir == i);
-			spr.anim.registerStateAnim("idle_" + direcs[i].dir, direcs[i].prio, (1 / 60 / 0.16) * tmod, function() return !isMoving() && dir == i);
+			spr.anim.registerStateAnim("walk_" + direcs[i].dir, direcs[i].prio, (1 / 60 / 0.16), function() return isMoving() && dir == i);
+			spr.anim.registerStateAnim("idle_" + direcs[i].dir, direcs[i].prio, (1 / 60 / 0.16), function() return !isMoving() && dir == i);
 		}
-
 		super(x, z, tmxObj);
+
+		inst = this;
+		ui = new PlayerUI(game.root);
+
 		mesh.isLong = true;
 		mesh.isoWidth = mesh.isoHeight = 0;
 
 		mesh.renewDebugPts();
-
-		if (inst == null) {
-			inst = this;
-			ui = new PlayerUI(game.root);
-		}
 
 		// Костыльный фикс ебаного бага с бампом игрока при старте уровня
 		lock(30);
@@ -76,7 +75,7 @@ class Player extends Entity {
 
 	override function dispose() {
 		super.dispose();
-		inst = null;
+		// inst = null;
 		ui.remove();
 		ui = null;
 	}
@@ -141,7 +140,7 @@ class Player extends Entity {
 		if (ca.isPressed(DPAD_UP)) {
 			ui.craft.toggleVisible();
 		}
-		
+
 		if (Key.isPressed(Key.NUMBER_1)) ui.inventory.belt.selectCell(1);
 
 		if (Key.isPressed(Key.NUMBER_2)) ui.inventory.belt.selectCell(2);

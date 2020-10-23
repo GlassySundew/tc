@@ -1,5 +1,7 @@
 package en.structures.hydroponics;
 
+import en.player.Player;
+import ui.player.Inventory;
 import ui.InventoryGrid.InventoryCell;
 import hxd.Event;
 import en.items.Plant;
@@ -7,15 +9,14 @@ import en.objs.IsoTileSpr;
 import h3d.Vector;
 import format.tmx.Data.TmxObject;
 import hxd.Key in K;
-
 /**
 	Использует inv как хранилище для растений
 **/
 class Hydroponics extends Interactive {
-	public function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:TmxObject) {
+	public function new(?x: Float = 0, ?z: Float = 0, ?tmxObj: TmxObject) {
 		if (spr == null) {
-			spr = new HSprite(Assets.structures);
-
+			spr = new HSprite(Assets.structures, entParent);
+			@:privateAccess spr.allocated = true;
 			spr.anim.registerStateAnim("hydroponics0", 1, 1, function() return inv != null ? inv.itemCout == 0 : true);
 			spr.anim.registerStateAnim("hydroponics1", 0, 1, function() return inv != null ? inv.itemCout > 0 : true);
 		}
@@ -24,14 +25,13 @@ class Hydroponics extends Interactive {
 
 		interactable = true;
 
-		inv.giveItem(new Item(plant));
-		inv.giveItem(new Item(plant));
-		inv.giveItem(new Item(plant));
-		inv.giveItem(new Item(plant));
+		inv.giveItem(new en.Item(axe));
+		inv.giveItem(new en.Item(plant));
+		inv.giveItem(new en.Item(plant));
+		inv.giveItem(new en.Item(plant));
 
-		interact.onTextInput = function(e:Event) {
-			if (K.isPressed(K.E))
-				dropGrownPlant();
+		interact.onTextInput = function(e: Event) {
+			if (K.isPressed(K.E)) dropGrownPlant();
 		}
 	}
 

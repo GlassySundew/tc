@@ -47,17 +47,17 @@ class Inventory extends Object {
 		sprInv.visible = !sprInv.visible;
 
 		var textLabel = new ui.TextLabel("Inventory", Assets.fontPixel, sprInv);
-		textLabel.minWidth = Std.int(sprInv.tile.width * Const.SCALE);
 		textLabel.scale(.5);
-		// textLabel.horizontalAlign = Middle;
-		textLabel.paddingTop = 2 + textLabel.outerHeight >> 1; // пиздец
-		// trace(Std.int(gridPt.x), Std.int(gridPt.y), gridPt.properties.getInt("tileWidth"), gridPt.properties.getInt("tileHeight"),
-		// 	gridPt.properties.getInt("width"), gridPt.properties.getInt("height"), gridPt.properties.getInt("gapX"), gridPt.properties.getInt("gapY"));
+
+		textLabel.x = configMap.get("inventory").getObjectByName("sign").x;
+		textLabel.y = configMap.get("inventory").getObjectByName("sign").y;
+		textLabel.paddingLeft = -textLabel.innerWidth >> 1;
+		textLabel.paddingTop = -textLabel.innerHeight >> 1;
+
 		invGrid = new InventoryGrid(Std.int(gridPt.x), Std.int(gridPt.y), gridPt.properties.getInt("tileWidth"), gridPt.properties.getInt("tileHeight"),
 			gridPt.properties.getInt("width"), gridPt.properties.getInt("height"), gridPt.properties.getInt("gapX"), gridPt.properties.getInt("gapY"), sprInv);
 		// Освобождаем последний ряд для Belt
-		for (i in invGrid.interGrid[invGrid.interGrid.length - 1])
-			i.remove();
+		for (i in invGrid.interGrid[invGrid.interGrid.length - 1]) i.remove();
 		belt = new Belt(this);
 
 		// invGrid.giveItem(new en.items.Scepter(0, 0));

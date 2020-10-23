@@ -10,10 +10,10 @@ import h2d.domkit.Style;
 @:uiComp("textLabel")
 class TextLabel extends h2d.Flow implements h2d.domkit.Object {
 	static var SRC =
-		<textLabel class="textLabel" public id="textLabel">
-			<flow class="containerFlow" >
+		<textLabel  public id="textLabel">
+			<flow class="containerFlow" public id="containerFlow" >
 				// <flow public id="borderFlow">
-			  		<text public id="labelTxt" />
+			  		<text class="textLabel" public id="labelTxt" />
 				// </flow>
 			</flow>
 		</textLabel>;

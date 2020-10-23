@@ -6,7 +6,7 @@ import h2d.Object;
 // 	Iron;
 // 	Copper;
 // }
-class Ore extends Item {
+class Ore extends en.Item {
 	var type:Type;
 
 	public function new( ?parent:Object) {

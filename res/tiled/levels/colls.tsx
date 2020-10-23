@@ -53,8 +53,8 @@
  <tile id="9">
   <image width="90" height="50" source="../separated/structures/hydroponics.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="-6" y="50">
-    <polygon points="35,-14 75,-34 89,-27 49,-7"/>
+   <object id="1" x="-5" y="50">
+    <polygon points="35,-14 74,-33 88,-26 49,-7"/>
    </object>
    <object id="2" name="center" x="56" y="29">
     <point/>
@@ -80,7 +80,7 @@
  <tile id="12">
   <image width="56" height="77" source="../separated/structures/door.png"/>
   <objectgroup draworder="index" id="3">
-   <object id="4" name="center" x="28" y="58">
+   <object id="4" name="center" x="29" y="58">
     <point/>
    </object>
    <object id="3" x="11" y="60">
@@ -108,7 +108,7 @@
    <object id="1" x="8" y="37">
     <polygon points="0,0 27,14 42,-22"/>
    </object>
-   <object id="2" name="center" x="8" y="36">
+   <object id="2" name="center" x="8" y="40">
     <point/>
    </object>
   </objectgroup>

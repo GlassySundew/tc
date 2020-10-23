@@ -7,10 +7,10 @@ import hxd.Event;
 import en.player.Player;
 
 class InventoryCell extends h2d.Object {
-	public var item(default, set): Item;
+	public var item(default, set): en.Item;
 	public var inter: h2d.Interactive;
 
-	inline function set_item(v: Item) {
+	inline function set_item(v: en.Item) {
 		if (v != null) {
 			inter.addChild(v);
 			v.x = inter.width / 2;
@@ -86,13 +86,13 @@ class CellGrid2D {
 		return null;
 	}
 
-	public function giveItem(item: Item) {
+	public function giveItem(item: en.Item) {
 		var slot = getFreeSlot();
 		if (slot != null) slot.item = item;
 		return slot;
 	}
 
-	public function removeItem(item: Item, ?to: Item = null): Item {
+	public function removeItem(item: en.Item, ?to: en.Item = null): en.Item {
 		for (i in grid) {
 			for (j in i) {
 				if (j.item == item) {
@@ -105,7 +105,7 @@ class CellGrid2D {
 		return null;
 	}
 
-	public function findSlot(item: Item): InventoryCell {
+	public function findSlot(item: en.Item): InventoryCell {
 		for (i in grid)
 			for (j in i)
 				if (j.item == item) return j;
@@ -123,9 +123,9 @@ class InventoryGrid extends h2d.Object {
 	public var disableGrid: Void->Void;
 	public var enableGrid: Void->Void;
 	public var getFreeSlot: Void->InventoryCell;
-	public var giveItem: Item->InventoryCell;
-	public var removeItem: Item->Item->Item;
-	public var findSlot: Item->InventoryCell;
+	public var giveItem: en.Item->InventoryCell;
+	public var removeItem: en.Item->en.Item->en.Item;
+	public var findSlot: en.Item->InventoryCell;
 
 	public function new(x: Int, y: Int, width: Int, height: Int, horCellsAmount: Int, verCellsAmount: Int, xGap: Int, yGap: Int, ?parent: h2d.Object) {
 		super(parent);
@@ -137,7 +137,7 @@ class InventoryGrid extends h2d.Object {
 		getFreeSlot = cellGrid.getFreeSlot.bind();
 		giveItem = cellGrid.giveItem.bind();
 		findSlot = cellGrid.findSlot.bind();
-		removeItem = (item: Item, ?to: Item = null) -> {
+		removeItem = (item: en.Item, ?to: en.Item = null) -> {
 			cellGrid.removeItem(item, to);
 		};
 

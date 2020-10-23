@@ -21,7 +21,7 @@ import h3d.scene.Mesh;
 import format.tmx.Data.TmxObject;
 
 class FloatingItem extends Interactive {
-	var item:Item;
+	var item:en.Item;
 	var polyMesh:Mesh;
 	var shadowMesh:IsoTileSpr;
 	var shadowTex:Texture;
@@ -30,9 +30,9 @@ class FloatingItem extends Interactive {
 	var startWave = Math.random() * 9999;
 	var rotCont:Object;
 
-	public function new(?x:Float = 0, ?z:Float = 0, item:Item, ?tmxObj:TmxObject) {
+	public function new(?x:Float = 0, ?z:Float = 0, item:en.Item, ?tmxObj:TmxObject) {
 		if (spr == null)
-			spr = new HSprite(item.spr.lib, item.spr.groupName);
+			spr = new HSprite(item.spr.lib, item.spr.groupName, entParent);
 
 		super(x, z, tmxObj);
 		this.item = item;

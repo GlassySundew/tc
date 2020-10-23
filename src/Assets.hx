@@ -64,7 +64,6 @@ class Assets {
 		structures.defineAnim("hydroponics", "0-1");
 
 		ui.defineAnim("keyboard_icon", "0-1");
-		ui.defineAnim("cursor", "0-2");
 
 	}
 

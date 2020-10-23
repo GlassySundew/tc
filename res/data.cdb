@@ -100,12 +100,21 @@
 					"scope": null
 				},
 				{
-					"typeStr": "8",
-					"name": "result"
+					"typeStr": "1",
+					"name": "name",
+					"kind": "localizable"
+				},
+				{
+					"typeStr": "6:items",
+					"name": "item_icon"
 				},
 				{
 					"typeStr": "8",
 					"name": "comps"
+				},
+				{
+					"typeStr": "8",
+					"name": "result"
 				}
 			],
 			"lines": [
@@ -113,16 +122,18 @@
 					"comps": [
 						{
 							"item": "iron",
+							"amount": 2
+						}
+					],
+					"id": "hydroponics",
+					"result": [
+						{
+							"item": "Hydroponics",
 							"amount": 1
 						}
 					],
-					"id": "hui",
-					"result": [
-						{
-							"item": "axe",
-							"amount": 1
-						}
-					]
+					"name": "Hydroponics",
+					"item_icon": "Hydroponics"
 				}
 			],
 			"separators": [],
@@ -181,54 +192,71 @@
 					"name": "display_name"
 				},
 				{
-					"typeStr": "6:item_cat",
+					"typeStr": "5:tool,plant,blueprint",
 					"name": "cat"
+				},
+				{
+					"typeStr": "5:_1,_4,_16,_64",
+					"name": "stack"
 				}
 			],
 			"lines": [
 				{
 					"id": "iron",
-					"atlas_name": "iron_ore",
+					"atlas_name": "item_iron_ore",
 					"display_name": "",
-					"cat": "tool"
+					"cat": 0,
+					"stack": 3
 				},
 				{
 					"id": "plant",
 					"atlas_name": "seaweed",
 					"display_name": "Seaweed",
-					"cat": "tool"
+					"cat": 0,
+					"stack": 3
 				},
 				{
 					"id": "axe",
 					"atlas_name": "fireaxe",
 					"display_name": "Fireaxe",
-					"cat": "tool"
-				}
-			],
-			"props": {},
-			"separators": []
-		},
-		{
-			"name": "item_cat",
-			"columns": [
-				{
-					"typeStr": "0",
-					"name": "id",
-					"scope": null
-				}
-			],
-			"lines": [
-				{
-					"id": "tool"
+					"cat": 0,
+					"stack": 0
 				},
 				{
-					"id": "plant"
+					"id": "Hydroponics",
+					"atlas_name": "hydroponics",
+					"display_name": "Hydroponics",
+					"cat": 2,
+					"stack": 2
 				}
 			],
-			"props": {},
-			"separators": []
+			"props": {
+				"separatorTitles": [
+					"tools",
+					"blueprints"
+				]
+			},
+			"separatorIds": [
+				"axe",
+				"Hydroponics"
+			]
 		}
 	],
-	"customTypes": [],
+	"customTypes": [
+		{
+			"name": "Hui",
+			"cases": [
+				{
+					"name": "one",
+					"args": [
+						{
+							"name": "v",
+							"typeStr": "4"
+						}
+					]
+				}
+			]
+		}
+	],
 	"compress": false
 }

@@ -1,6 +1,6 @@
 
 ui.png
-size: 362,139
+size: 361,139
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
@@ -13,7 +13,7 @@ caret0
   index: -1
 caret1
   rotate: false
-  xy: 252, 24
+  xy: 341, 107
   size: 4, 10
   orig: 4, 10
   offset: 0, 0
@@ -55,14 +55,14 @@ cursor2
   index: -1
 health_caret
   rotate: false
-  xy: 359, 127
+  xy: 252, 22
   size: 3, 12
   orig: 3, 12
   offset: 0, 0
   index: -1
 health_line
   rotate: false
-  xy: 306, 84
+  xy: 360, 127
   size: 1, 12
   orig: 1, 12
   offset: 0, 0
@@ -112,7 +112,7 @@ oxygen_sign
 recipe
   rotate: false
   xy: 252, 119
-  size: 105, 20
-  orig: 105, 20
+  size: 106, 20
+  orig: 106, 20
   offset: 0, 0
   index: -1

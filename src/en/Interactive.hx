@@ -1,8 +1,8 @@
 package en;
 
+import ui.s3d.EventInteractive;
 import ui.InventoryGrid;
 import haxe.io.Error;
-import ui.EventInteractive;
 import ui.player.ButtonIcon;
 import hxd.Key;
 import hxd.Event;
@@ -19,40 +19,38 @@ import tools.Util.*;
 import hxGeomAlgo.MarchingSquares;
 import hxPixels.Pixels;
 import hxGeomAlgo.EarCut;
-
 /**
 	An interactive entity
 **/
 class Interactive extends Entity {
-	public var interact:EventInteractive;
-	public var interactable(default, set):Bool = false;
+	public var interact: EventInteractive;
+	public var interactable(default, set): Bool = false;
 
-	inline function set_interactable(v:Bool) {
+	inline function set_interactable(v: Bool) {
 		if (!v) {
 			turnOffHighlight();
-			if (buttonIcon != null)
-				buttonIcon.dispose();
+			if (buttonIcon != null) buttonIcon.dispose();
 			interact.cursor = Default;
 		}
 		return interactable = v;
 	}
 
-	public var cdbI:Structures = null;
-	public var useRange:Float = Const.DEF_USE_RANGE;
+	public var cdbI: Structures = null;
+	public var useRange: Float = Const.DEF_USE_RANGE;
 
-	var highlightingColor:String;
-	var polyPrim:Polygon;
-	var buttonIcon:ButtonIcon;
-	var filter:Glow;
-	var idx:IndexBuffer;
-	var translatedPoints:Array<Point> = [];
-	var polygonized:Array<Tri>;
-	var points:Array<HxPoint>;
-	var iconParent:Object;
+	var highlightingColor: String;
+	var polyPrim: Polygon;
+	var buttonIcon: ButtonIcon;
+	var filter: Glow;
+	var idx: IndexBuffer;
+	var translatedPoints: Array<Point> = [];
+	var polygonized: Array<Tri>;
+	var points: Array<HxPoint>;
+	var iconParent: Object;
 
 	var inv = new CellGrid2D(4, 4);
 
-	function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:TmxObject) {
+	function new(?x: Float = 0, ?z: Float = 0, ?tmxObj: TmxObject) {
 		super(x, z, tmxObj);
 		var pixels = Pixels.fromBytes(tex.capturePixels().bytes, Std.int(spr.tile.width), Std.int(spr.tile.height));
 		points = new MarchingSquares(pixels).march();
@@ -73,13 +71,11 @@ class Interactive extends Entity {
 		interact = new EventInteractive(polyPrim.getCollider(), mesh);
 		interact.rotate(-0.01, hxd.Math.degToRad(180), hxd.Math.degToRad(90));
 
-		if (tmxObj != null && tmxObj.flippedVertically)
-			interact.scaleX = -1;
+		if (tmxObj != null && tmxObj.flippedVertically) interact.scaleX = -1;
 
 		// var highlightColor = (try tmxTile.properties.get("highlight") catch (e:Dynamic) "ffffffff");
 		var highlightColor = null;
-		if (highlightColor == null)
-			highlightColor = "ffffffff";
+		if (highlightColor == null) highlightColor = "ffffffff";
 
 		filter = new h2d.filter.Glow(Color.hexToInt(highlightingColor != null ? highlightingColor : highlightColor), 1.2, 4, 1, 1.5, true);
 
@@ -87,13 +83,14 @@ class Interactive extends Entity {
 			if (interactable && isInPlayerRange()) {
 				turnOnHighlight();
 				return true;
-			} else
+			}
+			else
 				return false;
 		}
 		// Нажатие для того, чтобы сломать структуру
 		interact.onPushEvent.add(event -> {});
 		interact.onOverEvent.add((_) -> activateInteractive());
-		interact.onOutEvent.add((e:hxd.Event) -> {
+		interact.onOutEvent.add((e: hxd.Event) -> {
 			turnOffHighlight();
 		});
 
@@ -101,10 +98,12 @@ class Interactive extends Entity {
 		eregClass.match('$this'.toLowerCase());
 		try {
 			cdbI = Data.structures.resolve(eregClass.matched(1));
-		} catch (Dynamic) {
+		}
+		catch (Dynamic) {
 			try {
 				cdbI = Data.structures.resolve(spr.groupName);
-			} catch (Dynamic) {}
+			}
+			catch (Dynamic) {}
 		}
 		// Setting interaciton range from cdb
 
@@ -120,8 +119,7 @@ class Interactive extends Entity {
 		}
 	}
 
-	inline function isInPlayerRange()
-		return distPx(player) <= useRange;
+	inline function isInPlayerRange() return distPx(player) <= useRange;
 
 	public function rebuildInteract() {
 		var facX = (tmxObj != null && tmxObj.flippedVertically) ? 1 - spr.pivot.centerFactorX : spr.pivot.centerFactorX;
@@ -130,7 +128,7 @@ class Interactive extends Entity {
 	}
 
 	public function turnOnHighlight() {
-		bmp.filter = filter;
+		spr.filter = filter;
 		filter.enable = true;
 		cd.setS("keyboardIconInit", .4);
 		cd.setS("interacted", Const.INFINITE);
@@ -138,20 +136,18 @@ class Interactive extends Entity {
 
 	public function turnOffHighlight() {
 		cd.unset("interacted");
-		bmp.filter = null;
+		spr.filter = null;
 		filter.enable = false;
-		if (buttonIcon != null)
-			buttonIcon.dispose();
+		if (buttonIcon != null) buttonIcon.dispose();
 	}
 
 	override function postUpdate() {
 		super.postUpdate();
 		// if (tw != null) {
 		// }
-		if (interactable)
-			updateKeyIcon();
+		if (interactable) updateKeyIcon();
 		// deactivate interactive if inventory is opened
-		interact.visible = !player.ui.inventory.sprInv.visible && isInPlayerRange();
+		interact.visible = player != null && !player.destroyed && !player.ui.inventory.sprInv.visible && isInPlayerRange();
 	}
 
 	function updateKeyIcon() {
@@ -171,15 +167,14 @@ class Interactive extends Entity {
 		}
 	}
 
-	function findVertexNumberInArray(point:Dynamic, findIn:Array<Point>):Int {
+	function findVertexNumberInArray(point: Dynamic, findIn: Array<Point>): Int {
 		for (pts in 0...findIn.length) {
-			if (point.x == findIn[pts].x && point.y == findIn[pts].z)
-				return pts;
+			if (point.x == findIn[pts].x && point.y == findIn[pts].z) return pts;
 		}
 		throw "Not part of this array";
 	}
 
-	function dropAllItems(?angle:Float, ?power:Float) {
+	function dropAllItems(?angle: Float, ?power: Float) {
 		for (i in inv.grid) {
 			for (j in i) {
 				if (j.item != null) {

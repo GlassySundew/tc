@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="2020.09.22" orientation="orthogonal" renderorder="right-down" width="1000" height="1000" tilewidth="1" tileheight="1" infinite="0" backgroundcolor="#333b3f" nextlayerid="6" nextobjectid="22">
+<map version="1.4" tiledversion="2020.09.22" orientation="orthogonal" renderorder="right-down" width="1000" height="1000" tilewidth="1" tileheight="1" infinite="0" backgroundcolor="#333b3f" nextlayerid="7" nextobjectid="32">
  <tileset firstgid="1" source="ui.tsx"/>
- <objectgroup draworder="index" id="5" name="hz che eto" visible="0"/>
+ <objectgroup draworder="index" id="5" name="hz che eto"/>
  <objectgroup draworder="index" id="2" name="inventory">
-  <object id="21" name="window" gid="2" x="56" y="123" width="114" height="124"/>
-  <object id="10" name="grid" x="9" y="19">
+  <object id="21" name="window" gid="2" x="90" y="316" width="114" height="124"/>
+  <object id="10" name="grid" x="43" y="212">
    <properties>
     <property name="gapX" type="int" value="1"/>
     <property name="gapY" type="int" value="1"/>
@@ -15,21 +15,32 @@
    </properties>
    <point/>
   </object>
-  <object id="12" name="close" x="103" y="1">
+  <object id="12" name="close" x="137" y="194">
    <point/>
   </object>
-  <object id="16" name="sign" x="57" y="11">
+  <object id="16" name="sign" x="91" y="205">
    <properties>
     <property name="text" value="Inventory"/>
    </properties>
    <point/>
   </object>
+  <object id="22" name="dragable" x="34" y="193" width="103" height="14" visible="0"/>
  </objectgroup>
- <objectgroup draworder="index" id="4" name="craft" visible="0">
-  <object id="6" name="window" gid="1" x="66" y="126" width="134" height="127"/>
-  <object id="7" name="caret" gid="3" x="120" y="30" width="4" height="10"/>
-  <object id="13" name="recipes" x="11" y="19" width="104" height="98"/>
-  <object id="17" name="sign" x="67" y="9">
+ <objectgroup draworder="index" id="4" name="craft">
+  <object id="6" name="window" gid="1" x="93" y="133" width="134" height="127"/>
+  <object id="13" name="recipes" x="38" y="26" width="105" height="98"/>
+  <object id="17" name="sign" x="94" y="18">
+   <point/>
+  </object>
+  <object id="23" name="slider" x="146" y="28" width="4" height="93"/>
+  <object id="7" name="caret" gid="3" x="147" y="37" width="4" height="10"/>
+ </objectgroup>
+ <objectgroup draworder="index" id="6" name="craft_recipe">
+  <object id="29" name="window" gid="4" x="222" y="28" width="106" height="20"/>
+  <object id="30" name="icon" x="172" y="11">
+   <point/>
+  </object>
+  <object id="31" name="name" x="192" y="14">
    <point/>
   </object>
  </objectgroup>

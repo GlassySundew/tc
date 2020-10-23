@@ -50,7 +50,6 @@ class Game extends Process {
 		ca.setRightDeadZone(0.2);
 
 		createRootInLayers(Main.inst.root, Const.DP_BG);
-
 		camera = new Camera();
 		// hud = new ui.Hud();
 		startLevel("alphamap.tmx");
@@ -92,8 +91,7 @@ class Game extends Process {
 		lvlName = name.split('.')[0];
 
 		// Entity spawning
-		CompileTime.importPackage("en");
-
+		// CompileTime.importPackage("en");
 		var entClasses = (CompileTime.getAllClasses(Entity));
 		/**
 			Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity and puts name insto spr group if not found
@@ -110,7 +108,6 @@ class Game extends Process {
 			switch (e.objectType) {
 				case OTTile(gid):
 					var source = Tools.getTileByGid(tmxMap, gid).image.source;
-
 					if (eregFileName.match(source)) {
 						new SpriteEntity(e.x, e.y, eregFileName.matched(1), e);
 						return;
@@ -119,7 +116,7 @@ class Game extends Process {
 			}
 		}
 
-		// // Безумно страшный костыль для правильно работающей изометрической сортировки
+		// Безумно страшный костыль для правильно работающей изометрической сортировки
 		for (e in level.entities)
 			if (e.name == "player") {
 				searchAndSpawnEnt(e);
@@ -199,11 +196,7 @@ class Game extends Process {
 										ent.collisions.set(shape, {cent: new h3d.Vector(xCent, yCent), offset: new h3d.Vector(obj.x + xCent, -obj.y - yCent)});
 									case OTRectangle:
 										// Точка парсится как OTRectangle, точка с названием center будет обозначать центр
-										if (obj.name == "center") {
-											if (centerSet) unsetCenter();
-											setCenter();
-											centerSet = true;
-										}
+
 										ent.collisions.set(Polygon.rectangle(params.x, params.y, params.width, params.height),
 											{cent: new h3d.Vector(), offset: new h3d.Vector()});
 									case OTPolygon(points):
@@ -238,6 +231,12 @@ class Game extends Process {
 										var xOffset = poly.scaleX < 0 ? ent.spr.tile.width - obj.x : obj.x;
 										var yOffset = -obj.y;
 										ent.collisions.set(poly, {cent: new h3d.Vector(xCent, -yCent), offset: new h3d.Vector(xOffset, yOffset)});
+									case OTPoint:
+										if (obj.name == "center") {
+											if (centerSet) unsetCenter();
+											setCenter();
+											centerSet = true;
+										}
 									default:
 								}
 

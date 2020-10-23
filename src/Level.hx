@@ -1,5 +1,5 @@
 import en.structures.hydroponics.Hydroponics;
-import ui.EventInteractive;
+import ui.s3d.EventInteractive;
 import hxd.IndexBuffer;
 import h3d.scene.Interactive;
 import h3d.col.Bounds;
@@ -335,6 +335,7 @@ private class InternalRender extends TileLayerRenderer {
 		// Creating isometric(rombic) h3d.scene.Interactive on top of separated
 		// tiles that contain *floor at the end of their file name as a slots for
 		// structures; can be visible only when choosing place for structure to build
+		// Это говнище должно быть visible только тогда, когда у игрока в holdItem есть blueprint
 		var ereg = ~/\/([a-z_0-9]+)\./; // regexp to take picture name between last / and . from picture path
 		if (ereg.match(sourceTile.image.source)
 			&& StringTools.endsWith(ereg.matched(1),

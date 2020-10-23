@@ -34,16 +34,16 @@
             "scaleInDock": 1
         },
         "tiled/levels/alpha.tsx": {
-            "dynamicWrapping": false,
+            "dynamicWrapping": true,
             "scaleInDock": 0.125,
             "scaleInEditor": 0.33
         },
         "tiled/levels/alphamap.tmx": {
-            "scale": 4,
-            "selectedLayer": 0,
+            "scale": 3,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 2449,
-                "y": 514.875
+                "x": 2400,
+                "y": 1184
             }
         },
         "tiled/levels/bridge.tmx": {
@@ -51,7 +51,7 @@
             "selectedLayer": 5,
             "viewCenter": {
                 "x": 2400,
-                "y": 1184.375
+                "y": 1184.5
             }
         },
         "tiled/levels/colls.tsx": {
@@ -65,11 +65,11 @@
             "scaleInEditor": 1.5
         },
         "tiled/levels/ui.tmx": {
-            "scale": 4,
-            "selectedLayer": 1,
+            "scale": 1,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 104.25,
-                "y": 59.875
+                "x": 500,
+                "y": 500
             }
         },
         "tiled/levels/ui.tsx": {

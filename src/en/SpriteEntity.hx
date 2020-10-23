@@ -5,7 +5,7 @@ import format.tmx.Data.TmxObject;
 class SpriteEntity extends Interactive {
 	public function new(?x:Float = 0, ?z:Float = 0, sprite:String, ?tmxObj:TmxObject) {
 		if (spr == null) {
-			spr = new HSprite(Assets.structures);
+			spr = new HSprite(Assets.structures, entParent);
 			spr.set(sprite);
 		}
 

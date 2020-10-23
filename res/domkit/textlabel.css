@@ -1,4 +1,6 @@
 .textLabel {
+  /* position: absolute; */
+
   /* width: 300px;  Ширина слоя */
   /* margin: 7px; /* Значение отступов */
   /* padding: 10px; /* Поля вокруг текста */
@@ -10,12 +12,15 @@
 .containerFlow {
   /* margin-top: 15; */
   /* width: 1; */
+
   padding: 3;
+  padding-top: 0;
   align: middle middle;
   /* position: absolute; */
-  background: rgba(46, 46, 46, 0.513);
-  
+  background: rgba(46, 46, 46, 0.6);
 }
+
+
 /* .borderFlow {
 
 } */

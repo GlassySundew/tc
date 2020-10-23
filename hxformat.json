@@ -9,14 +9,15 @@
     }
   },
   "sameLine": {
-
     "functionBody": "same",
     "ifBody": "same",
-    "ifElse": "next",
-    "doWhile": "next",
+    "ifElse": "same",
+    "doWhile": "same",
     "tryBody": "next",
     "tryCatch": "next",
-    "untypedBody": "keep"
+    "untypedBody": "keep",
+    "forBody": "same"
+
   },
   "emptyLines":{
     "afterLeftCurly": "remove",

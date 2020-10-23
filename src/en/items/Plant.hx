@@ -2,11 +2,10 @@ package en.items;
 
 import h2d.Object;
 
-class Plant extends Item {
-	public function new(?parent:Null<Object>) {
-		super(parent);
+class Plant extends en.Item {
+	public function new(?type:ItemsKind, ?parent:Object) {
+		super(type, parent);
 		spr.set("seaweed");
-		displayText = "Seaweed";
 		// getObjectByNamegame.delayer.addF(start, 1);
 	}
 }
