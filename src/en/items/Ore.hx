@@ -7,9 +7,9 @@ import h2d.Object;
 // 	Copper;
 // }
 class Ore extends en.Item {
-	var type:Type;
+	var type: Type;
 
-	public function new( ?parent:Object) {
+	public function new(cdbEntry: Data.ItemsKind, ?parent: Object) {
 		// if (spr == null)
 
 		// switch type {
@@ -19,7 +19,7 @@ class Ore extends en.Item {
 		// 	default:
 		// }
 
-		super(parent);
+		super(cdbEntry, parent);
 		spr = new HSprite(Assets.items, this);
 	}
 }

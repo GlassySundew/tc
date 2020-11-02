@@ -1,9 +1,16 @@
 
 items.png
-size: 48,32
+size: 64,32
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+door
+  rotate: false
+  xy: 32, 0
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 fireaxe
   rotate: false
   xy: 16, 16
@@ -34,7 +41,7 @@ item_iron_ore
   index: -1
 seaweed
   rotate: false
-  xy: 32, 0
+  xy: 48, 16
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

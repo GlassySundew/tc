@@ -147,7 +147,8 @@ class Interactive extends Entity {
 		// }
 		if (interactable) updateKeyIcon();
 		// deactivate interactive if inventory is opened
-		interact.visible = player != null && !player.destroyed && !player.ui.inventory.sprInv.visible && isInPlayerRange();
+		
+		// interact.visible = player != null && !player.destroyed && !player.ui.inventory.sprInv.visible && isInPlayerRange();
 	}
 
 	function updateKeyIcon() {

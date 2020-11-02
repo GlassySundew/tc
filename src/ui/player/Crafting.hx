@@ -1,5 +1,7 @@
 package ui.player;
 
+import ui.InventoryGrid.InventoryCell;
+import en.player.Player;
 import ui.s2d.EventInteractive;
 import hxd.Event;
 import hxPixels.Pixels.TargetType;
@@ -41,7 +43,7 @@ class Crafting extends Object {
 
 		var recipeConf = configMap.get("craft").getObjectByName("recipes");
 
-		// Scrollable shit for recipes
+		// Scrollable shit for recipesa
 		var caretUp = new HSprite(Assets.ui, "caret0").tile;
 		var caretDown = new HSprite(Assets.ui, "caret1").tile;
 
@@ -102,7 +104,9 @@ class Crafting extends Object {
 class Recipe extends Object {
 	public var inter: EventInteractive;
 
-	override public function new(configMap: Map<String, TmxLayer>, recipe: Data.Recipes, ?parent: Object) {
+	var hint: IngredsHint;
+
+	public function new(configMap: Map<String, TmxLayer>, recipe: Data.Recipes, ?parent: Object) {
 		super(parent);
 		var recSpr = new HSprite(Assets.ui, "recipe", this);
 		var recipeConf = configMap.get("craft_recipe");
@@ -115,6 +119,134 @@ class Recipe extends Object {
 		sign.scale(.5);
 		sign.x = recipeConf.getObjectByName("name").x;
 		sign.y = recipeConf.getObjectByName("name").y;
+
+		var craft_but0 = new HSprite(Assets.ui, "craft_but0");
+		var craft_but1 = new HSprite(Assets.ui, "craft_but1");
+		var craft_but2 = new HSprite(Assets.ui, "craft_but2");
+
+		var craftButton = new ui.Button([craft_but0.tile, craft_but1.tile, craft_but2.tile], this);
+		craftButton.x = recipeConf.getObjectByName("craft_but").x;
+		craftButton.y = recipeConf.getObjectByName("craft_but").y;
+
+		craft_but0.remove();
+		craft_but1.remove();
+		craft_but2.remove();
+
+		craftButton.onClickEvent.add((_) -> {
+			craft(recipe);
+		});
+
+		inter.onOverEvent.add((_) -> hint = new IngredsHint(configMap, recipe, Boot.inst.s2d));
+		inter.onOutEvent.add((_) -> if (hint != null) hint.remove());
+	}
+
+	public function craft(recipe: Data.Recipes) {
+		// checking if player has required items
+		for (i in recipe.ingreds) {
+			var checkedCells: Array<InventoryCell> = [];
+
+			var amountPitch = i.amount;
+			while (amountPitch > 0) {
+				var targetItemSlot = Player.inst.ui.inventory.invGrid.findItemKind(i.item, 1, checkedCells);
+				if (targetItemSlot == null) {
+					return null;
+				} else if (targetItemSlot.item.amount >= i.amount) {
+					amountPitch = 0;
+				} else {
+					amountPitch -= targetItemSlot.item.amount;
+					checkedCells.push(targetItemSlot);
+				}
+			}
+		}
+		for (i in recipe.ingreds) {
+			var amountPitch = i.amount;
+			while (amountPitch > 0) {
+				var targetItemSlot = Player.inst.ui.inventory.invGrid.findItemKind(i.item, 1, []);
+				if (targetItemSlot == null) {
+					return null;
+				} else if (targetItemSlot.item.amount >= i.amount) {
+					targetItemSlot.item.amount -= amountPitch;
+					amountPitch = 0;
+				} else {
+					amountPitch -= targetItemSlot.item.amount;
+					targetItemSlot.item.remove();
+					targetItemSlot.item = null;
+				}
+			}
+		}
+		for (i in recipe.result) {
+			var newItem = new Item(i.itemId);
+			newItem.amount = i.amount;
+			Player.inst.ui.inventory.invGrid.giveItem(newItem);
+		}
+		return null;
+	}
+
+	override function onRemove() {
+		super.onRemove();
+		hint.remove();
+	}
+}
+/** Показывает ингредиенты **/
+class IngredsHint extends Object {
+	var baseGrid: ScaleGrid;
+
+	public function new(configMap: Map<String, TmxLayer>, recipe: Data.Recipes, ?parent: Object) {
+		super(parent);
+		scale(2);
+		var confLayer = configMap.get("ingreds_hint");
+
+		var baseSpr = new HSprite(Assets.ui, "recipe_hint");
+		baseGrid = new ScaleGrid(baseSpr.tile, 0, 11, this);
+		baseSpr.remove();
+
+		var textLabel = new TextLabel("Ingredients", Assets.fontPixel, this);
+		textLabel.x = confLayer.getObjectByName("sign").x;
+		textLabel.y = confLayer.getObjectByName("sign").y;
+		textLabel.scale(.5);
+		textLabel.center();
+
+		var flowCont = new Flow(this);
+		flowCont.x = confLayer.getObjectByName("flow").x;
+		flowCont.y = confLayer.getObjectByName("flow").y;
+		flowCont.addSpacing(1);
+		flowCont.verticalSpacing = 1;
+		flowCont.layout = Vertical;
+
+		for (i in recipe.ingreds) {
+			new IngredComp(configMap, i, flowCont);
+		}
+
+		baseGrid.height = flowCont.outerHeight + 20;
+	}
+
+	override function sync(ctx: RenderContext) {
+		x = Boot.inst.s2d.mouseX + 20;
+		y = Boot.inst.s2d.mouseY + 20;
+		super.sync(ctx);
+	}
+}
+
+class IngredComp extends Object {
+	public function new(configMap: Map<String, TmxLayer>, ingred: Data.Recipes_ingreds, ?parent: Object) {
+		super(parent);
+
+		var conf = configMap.get("ingreds_comp");
+		var baseSpr = new HSprite(Assets.ui, "recipe_comp", this);
+		var iconSpr = new HSprite(Assets.items, ingred.item.atlas_name, this);
+		iconSpr.x = conf.getObjectByName("icon").x;
+		iconSpr.y = conf.getObjectByName("icon").y;
+
+		var nameLabel = new TextLabel(ingred.item.display_name, Assets.fontPixel, this);
+		nameLabel.x = conf.getObjectByName("name").x;
+		nameLabel.y = conf.getObjectByName("name").y;
+		nameLabel.scale(.5);
+
+		var amountLabel = new TextLabel('${ingred.amount}', Assets.fontPixel, this);
+		amountLabel.x = conf.getObjectByName("counter").x;
+		amountLabel.y = conf.getObjectByName("counter").y;
+		amountLabel.scale(.5);
+		amountLabel.center();
 	}
 }
 

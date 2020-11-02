@@ -110,7 +110,7 @@
 				},
 				{
 					"typeStr": "8",
-					"name": "comps"
+					"name": "ingreds"
 				},
 				{
 					"typeStr": "8",
@@ -119,12 +119,6 @@
 			],
 			"lines": [
 				{
-					"comps": [
-						{
-							"item": "iron",
-							"amount": 2
-						}
-					],
 					"id": "hydroponics",
 					"result": [
 						{
@@ -133,7 +127,37 @@
 						}
 					],
 					"name": "Hydroponics",
-					"item_icon": "Hydroponics"
+					"item_icon": "Hydroponics",
+					"ingreds": [
+						{
+							"item": "iron",
+							"amount": 2
+						}
+					]
+				},
+				{
+					"id": "door",
+					"name": "Door",
+					"item_icon": "Door",
+					"result": [],
+					"ingreds": []
+				},
+				{
+					"id": "axe",
+					"name": "Axe",
+					"item_icon": "axe",
+					"ingreds": [
+						{
+							"item": "iron",
+							"amount": 2
+						}
+					],
+					"result": [
+						{
+							"item": "axe",
+							"amount": 1
+						}
+					]
 				}
 			],
 			"separators": [],
@@ -158,7 +182,7 @@
 			]
 		},
 		{
-			"name": "recipes@comps",
+			"name": "recipes@ingreds",
 			"props": {
 				"hide": true
 			},
@@ -204,7 +228,7 @@
 				{
 					"id": "iron",
 					"atlas_name": "item_iron_ore",
-					"display_name": "",
+					"display_name": "Iron",
 					"cat": 0,
 					"stack": 3
 				},
@@ -220,14 +244,28 @@
 					"atlas_name": "fireaxe",
 					"display_name": "Fireaxe",
 					"cat": 0,
-					"stack": 0
+					"stack": 1
 				},
 				{
 					"id": "Hydroponics",
 					"atlas_name": "hydroponics",
 					"display_name": "Hydroponics",
 					"cat": 2,
-					"stack": 2
+					"stack": 1
+				},
+				{
+					"id": "Door",
+					"atlas_name": "door",
+					"display_name": "Door",
+					"cat": 2,
+					"stack": 1
+				},
+				{
+					"id": "",
+					"atlas_name": "",
+					"display_name": "",
+					"cat": 0,
+					"stack": 0
 				}
 			],
 			"props": {

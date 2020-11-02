@@ -194,7 +194,7 @@ import h3d.scene.Mesh;
 
 	public function unlock() cd.unset("lock");
 
-	function dropItem(item: en.Item, ?angle: Float, ?power: Float = 0): en.Item {
+	inline function dropItem(item: en.Item, ?angle: Float, ?power: Float = 0): en.Item {
 		var fItem = new FloatingItem(footX, footY, item);
 		fItem.bump(Math.cos(angle) * power, Math.sin(angle) * power, 0);
 		fItem.lock(1000);
@@ -270,8 +270,7 @@ import h3d.scene.Mesh;
 		tex.dispose();
 		tw.destroy();
 		cd = null;
-		for (i in collisions.keys())
-			i.destroy();
+		for (i in collisions.keys()) i.destroy();
 
 		collisions = null;
 		spr = null;

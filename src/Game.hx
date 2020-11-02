@@ -79,8 +79,7 @@ class Game extends Process {
 
 		if (level != null) {
 			level.destroy();
-			for (e in Entity.ALL)
-				e.destroy();
+			for (e in Entity.ALL) e.destroy();
 			gc();
 		}
 		var tsx = new Map();
@@ -91,13 +90,12 @@ class Game extends Process {
 		lvlName = name.split('.')[0];
 
 		// Entity spawning
-		// CompileTime.importPackage("en");
+		CompileTime.importPackage("en");
 		var entClasses = (CompileTime.getAllClasses(Entity));
-		/**
-			Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity and puts name insto spr group if not found
-		**/
+
+		// Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity and puts name into spr group if not found
 		function searchAndSpawnEnt(e: TmxObject) {
-			//  Парсим все классы - наследники en.Entity и спавним их
+			// Парсим все классы - наследники en.Entity и спавним их
 			for (eClass in entClasses) {
 				eregCompTimeClass.match('$eClass'.toLowerCase());
 				if (eregCompTimeClass.match('$eClass'.toLowerCase()) && eregCompTimeClass.matched(1) == e.name) {
@@ -117,14 +115,12 @@ class Game extends Process {
 		}
 
 		// Безумно страшный костыль для правильно работающей изометрической сортировки
-		for (e in level.entities)
-			if (e.name == "player") {
-				searchAndSpawnEnt(e);
-				break;
-			}
+		for (e in level.entities) {
+			searchAndSpawnEnt(e);
+			// break;
+		}
 
-		for (e in level.entities)
-			if (e.name != "player") searchAndSpawnEnt(e);
+		// for (e in level.entities) if (e.name != "player") searchAndSpawnEnt(e);
 
 		applyTmxObjOnEnt();
 
@@ -243,8 +239,7 @@ class Game extends Process {
 								if (!centerSet) {
 									setCenter();
 									centerSet = true;
-								}
-								else {
+								} else {
 									var pivotX = ((obj.x + xCent)) / ent.spr.tile.width;
 									var pivotY = ((obj.y + yCent)) / ent.spr.tile.height;
 									pivotX = (ent.tmxObj != null && ent.tmxObj.flippedVertically) ? 1 - pivotX : pivotX;
@@ -274,16 +269,15 @@ class Game extends Process {
 	function gc() {
 		if (Entity.GC == null || Entity.GC.length == 0) return;
 
-		for (e in Entity.GC)
-			e.dispose();
+		
+		for (e in Entity.GC) e.dispose();
 		Entity.GC = [];
 	}
 
 	override function onDispose() {
 		super.onDispose();
 
-		for (e in Entity.ALL)
-			e.destroy();
+		for (e in Entity.ALL) e.destroy();
 		gc();
 	}
 
@@ -291,20 +285,15 @@ class Game extends Process {
 		super.update();
 
 		// Updates
-		for (e in Entity.ALL)
-			if (!e.destroyed) e.preUpdate();
-		for (e in Entity.ALL)
-			if (!e.destroyed) e.update();
-		for (e in Entity.ALL)
-			if (!e.destroyed) e.postUpdate();
-		for (e in Entity.ALL)
-			if (!e.destroyed) e.frameEnd();
+		for (e in Entity.ALL) if (!e.destroyed) e.preUpdate();
+		for (e in Entity.ALL) if (!e.destroyed) e.update();
+		for (e in Entity.ALL) if (!e.destroyed) e.postUpdate();
+		for (e in Entity.ALL) if (!e.destroyed) e.frameEnd();
 		gc();
 
 		if (!ui.Console.inst.isActive() && !ui.Modal.hasAny()) {
 			// Exit
-			if (ca.isKeyboardPressed(Key.X)) if (!cd.hasSetS("exitWarn", 3)) trace(Lang.t._("Press X again to exit."));
-			else {
+			if (ca.isKeyboardPressed(Key.X)) if (!cd.hasSetS("exitWarn", 3)) trace(Lang.t._("Press X again to exit.")); else {
 				#if (debug && hl)
 				hxd.System.exit();
 				#else
@@ -316,13 +305,11 @@ class Game extends Process {
 	}
 
 	public function showStrTiles() {
-		for (i in structTiles)
-			i.visible = true;
+		for (i in structTiles) i.visible = true;
 	}
 
 	public function hideStrTiles() {
-		for (i in structTiles)
-			i.visible = false;
+		for (i in structTiles) i.visible = false;
 	}
 }
 

@@ -16,7 +16,6 @@ class Hydroponics extends Interactive {
 	public function new(?x: Float = 0, ?z: Float = 0, ?tmxObj: TmxObject) {
 		if (spr == null) {
 			spr = new HSprite(Assets.structures, entParent);
-			@:privateAccess spr.allocated = true;
 			spr.anim.registerStateAnim("hydroponics0", 1, 1, function() return inv != null ? inv.itemCout == 0 : true);
 			spr.anim.registerStateAnim("hydroponics1", 0, 1, function() return inv != null ? inv.itemCout > 0 : true);
 		}
@@ -25,10 +24,10 @@ class Hydroponics extends Interactive {
 
 		interactable = true;
 
-		inv.giveItem(new en.Item(axe));
-		inv.giveItem(new en.Item(plant));
-		inv.giveItem(new en.Item(plant));
-		inv.giveItem(new en.Item(plant));
+		// inv.giveItem(new en.Item(axe));
+		inv.giveItem(new en.Item(plant), true, false);
+		inv.giveItem(new en.Item(plant), true, false);
+		inv.giveItem(new en.Item(plant), true, false);
 
 		interact.onTextInput = function(e: Event) {
 			if (K.isPressed(K.E)) dropGrownPlant();

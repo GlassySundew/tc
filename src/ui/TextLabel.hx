@@ -10,7 +10,7 @@ import h2d.domkit.Style;
 @:uiComp("textLabel")
 class TextLabel extends h2d.Flow implements h2d.domkit.Object {
 	static var SRC =
-		<textLabel  public id="textLabel">
+		<textLabel public id="textLabel">
 			<flow class="containerFlow" public id="containerFlow" >
 				// <flow public id="borderFlow">
 			  		<text class="textLabel" public id="labelTxt" />
@@ -54,6 +54,10 @@ class TextLabel extends h2d.Flow implements h2d.domkit.Object {
 		// trace(this.filter);
 		// this.filter = null;
 		// this.font.resizeTo(16);
+	}
+	public function center() {
+		paddingLeft = -innerWidth >> 1;
+		paddingTop = -innerHeight >> 1;
 	}
 
 	public function dispose() {

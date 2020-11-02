@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.4" tiledversion="2020.09.22" name="colls" tilewidth="114" tileheight="134" tilecount="14" columns="10">
+<tileset version="1.4" tiledversion="2020.09.22" name="colls" tilewidth="114" tileheight="134" tilecount="15" columns="10">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="2">
   <image width="32" height="32" source="../separated/q/player.png"/>
@@ -56,7 +56,7 @@
    <object id="1" x="-5" y="50">
     <polygon points="35,-14 74,-33 88,-26 49,-7"/>
    </object>
-   <object id="2" name="center" x="56" y="29">
+   <object id="3" name="center" x="56" y="29">
     <point/>
    </object>
   </objectgroup>
@@ -151,5 +151,8 @@
     <point/>
    </object>
   </objectgroup>
+ </tile>
+ <tile id="18">
+  <image width="25" height="25" source="../separated/ui/craft_but0.png"/>
  </tile>
 </tileset>

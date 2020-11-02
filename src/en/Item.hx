@@ -13,12 +13,18 @@ class Item extends Object {
 	public var spr: HSprite;
 	public var interactive: h2d.Interactive;
 	public var cdbEntry: Data.ItemsKind;
-	public var amount: Int = 1;
+	public var amount(default, set): Int = 1;
 	public var amountLabel: TextLabel;
 
 	var displayText: String = "";
 	var textLabel: TextLabel;
 	var bitmap: Bitmap;
+
+	inline function set_amount(v: Int) {
+		if (v == 0) Player.inst.ui.inventory.invGrid.removeItem(this, null);
+		amountLabel.label = '${v}';
+		return amount = v;
+	}
 
 	inline public function isInSlot(): Bool return Std.is(parent, h2d.Interactive);
 
@@ -36,6 +42,7 @@ class Item extends Object {
 				displayText = Data.items.get(cdbEntry).display_name;
 			}
 		}
+		
 		spr.tile.getTexture().filter = Nearest;
 		spr.setCenterRatio();
 
@@ -65,23 +72,35 @@ class Item extends Object {
 		}
 
 		interactive.onPush = function(e: hxd.Event) {
+			var swapHold = () -> {
+				// swapping this item with the one player holds
+				Player.inst.ui.inventory.belt.deselectCells();
+				Player.inst.enableGrids();
+				var swapItem = Game.inst.player.holdItem;
+				swapItem = (swapItem == this) ? null : swapItem;
+
+				Player.inst.holdItem = this;
+				Player.inst.ui.inventory.invGrid.removeItem(this, swapItem);
+
+				Boot.inst.s2d.addChild(this);
+				scaleX = scaleY = 2;
+			}
 			// Picking up the item into the player's holdItem (cursor)
 			if (Player.inst.ui.inventory.sprInv.visible) {
 				textLabel.dispose();
 				if (Player.inst.holdItem != null && isSameTo(Player.inst.holdItem)) {
-					// Trying to stack same items
-					// if(amount> Data.item.get(cdbEntry).)
+					// folding item from cursor with this item
+					if (Player.inst.holdItem.isInCursor()) {
+						if (amount + Player.inst.holdItem.amount <= Data.items.get(cdbEntry).stack.int()) {
+							amount += Player.inst.holdItem.amount;
+							Player.inst.holdItem.dispose();
+							Player.inst.holdItem = null;
+						} else {
+							swapHold();
+						}
+					}
 				} else {
-					Player.inst.ui.inventory.belt.deselectCells();
-					Player.inst.enableGrids();
-					var swapItem = Game.inst.player.holdItem;
-					swapItem = swapItem == this ?null:swapItem;
-
-					Player.inst.holdItem = this;
-					Player.inst.ui.inventory.invGrid.removeItem(this, swapItem);
-
-					Boot.inst.s2d.addChild(this);
-					scaleX = scaleY = 2;
+					swapHold();
 				}
 			} else if (isInSlot()) {
 				// Selecting item in the belt if inventory is hidden
@@ -96,27 +115,39 @@ class Item extends Object {
 	}
 
 	public function dispose() {
+		this.remove();
 		spr.remove();
 		interactive.remove();
-		trace("disposed");
+		spr = null;
 	}
 
 	override function sync(ctx: RenderContext) {
-		super.sync(ctx);
+		amountLabel.paddingLeft = 16 - amountLabel.innerWidth;
 		if (textLabel != null) {
 			textLabel.x = Boot.inst.s2d.mouseX + 20;
 			textLabel.y = Boot.inst.s2d.mouseY + 20;
 		}
-
 		interactive.width = spr.tile.width;
 		interactive.height = spr.tile.height;
 
 		interactive.x = -spr.tile.width / 2;
 		interactive.y = -spr.tile.height / 2;
+
+		if (isInCursor()) {
+			x = Boot.inst.s2d.mouseX + 13 * scaleX;
+			y = Boot.inst.s2d.mouseY + 13 * scaleY;
+		}
+		super.sync(ctx);
 	}
 }
 
-@:enum abstract Stack(Data.Items_stack) {
-	var one = Data.Items_stack._1;
-
+class StackExtender {
+	static public function int(i: Data.Items_stack) {
+		return switch i {
+			case _1: 1;
+			case _4: 4;
+			case _16: 16;
+			case _64: 64;
+		}
+	}
 }

@@ -1,7 +1,7 @@
 {
   "indentation": {
     "conditionalPolicy": "aligned"
-},
+  },
   "lineEnds": {
     "rightCurly": "both",
     "objectLiteralCurly": {
@@ -17,19 +17,18 @@
     "tryCatch": "next",
     "untypedBody": "keep",
     "forBody": "same"
-
   },
-  "emptyLines":{
+  "emptyLines": {
     "afterLeftCurly": "remove",
     "beforeDocCommentEmptyLines": "none",
-    "afterImportsUsing": 1,
     "afterPackage": 1,
     "finalNewline": true,
     "classEmptyLines": {
-        "betweenFunctions": 1
+      "betweenFunctions": 1
     }
   },
-  "whitespace":{
+  "whitespace": {
     "typeHintColonPolicy": "after"
+    
   }
 }

@@ -92,17 +92,13 @@ class Player extends Entity {
 				dx += Math.cos(leftAng) * s;
 				dy += Math.sin(leftAng) * s;
 
-				if (ca.lxValue() < -0.3 && M.fabs(ca.lyValue()) < 0.6) dir = 4;
-				else if (ca.lyValue() < -0.3 && M.fabs(ca.lxValue()) < 0.6) dir = 6;
-				else if (ca.lxValue() > 0.3 && M.fabs(ca.lyValue()) < 0.6) dir = 0;
-				else if (ca.lyValue() > 0.3 && M.fabs(ca.lxValue()) < 0.6) dir = 2;
+				if (ca.lxValue() < -0.3 && M.fabs(ca.lyValue()) < 0.6) dir = 4; else if (ca.lyValue() < -0.3 && M.fabs(ca.lxValue()) < 0.6) dir = 6; else
+					if (ca.lxValue() > 0.3
+					&& M.fabs(ca.lyValue()) < 0.6) dir = 0; else if (ca.lyValue() > 0.3 && M.fabs(ca.lxValue()) < 0.6) dir = 2;
 
-				if (ca.lxValue() > 0.3 && ca.lyValue() > 0.3) dir = 1;
-				else if (ca.lxValue() < -0.3 && ca.lyValue() > 0.3) dir = 3;
-				else if (ca.lxValue() < -0.3 && ca.lyValue() < -0.3) dir = 5;
-				else if (ca.lxValue() > 0.3 && ca.lyValue() < -0.3) dir = 7;
-			}
-			else {
+				if (ca.lxValue() > 0.3 && ca.lyValue() > 0.3) dir = 1; else if (ca.lxValue() < -0.3 && ca.lyValue() > 0.3) dir = 3; else if (ca.lxValue() < -0.3
+					&& ca.lyValue() < -0.3) dir = 5; else if (ca.lxValue() > 0.3 && ca.lyValue() < -0.3) dir = 7;
+			} else {
 				dx *= Math.pow(0.6, tmod);
 				dy *= Math.pow(0.6, tmod);
 			}
@@ -120,11 +116,6 @@ class Player extends Entity {
 		// if (Key.isPressed(Key.E)) {
 		// 	new FloatingItem(mesh.x, mesh.z, new GraviTool());
 		// }
-
-		if (holdItem != null && holdItem.isInCursor()) {
-			holdItem.x = Boot.inst.s2d.mouseX + 15 * holdItem.scaleX;
-			holdItem.y = Boot.inst.s2d.mouseY + 15 * holdItem.scaleX;
-		}
 	}
 
 	override function checkCollisions() {
@@ -142,16 +133,14 @@ class Player extends Entity {
 		}
 
 		if (Key.isPressed(Key.NUMBER_1)) ui.inventory.belt.selectCell(1);
-
 		if (Key.isPressed(Key.NUMBER_2)) ui.inventory.belt.selectCell(2);
-
 		if (Key.isPressed(Key.NUMBER_3)) ui.inventory.belt.selectCell(3);
-
 		if (Key.isPressed(Key.NUMBER_4)) ui.inventory.belt.selectCell(4);
+		if (Key.isPressed(Key.NUMBER_5)) ui.inventory.belt.selectCell(5);
 
 		if (Key.isPressed(Key.Q)) {
 			if (holdItem != null) {
-				if (holdItem.isInSlot()) ui.inventory.invGrid.findSlot(holdItem).item = null;
+				if (holdItem.isInSlot()) ui.inventory.invGrid.findItemSlot(holdItem).item = null;
 				holdItem = dropItem(holdItem, this.angToPxFree(level.cursX, level.cursY), 2.3);
 			}
 		}

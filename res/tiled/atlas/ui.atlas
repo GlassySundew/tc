@@ -1,118 +1,153 @@
 
 ui.png
-size: 361,139
+size: 362,131
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 caret0
   rotate: false
-  xy: 0, 0
+  xy: 358, 121
   size: 4, 10
   orig: 4, 10
   offset: 0, 0
   index: -1
 caret1
   rotate: false
-  xy: 341, 107
+  xy: 358, 109
   size: 4, 10
   orig: 4, 10
   offset: 0, 0
   index: -1
 close_button_inventory
   rotate: false
-  xy: 327, 105
+  xy: 345, 48
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
+craft_but0
+  rotate: false
+  xy: 270, 0
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+craft_but1
+  rotate: false
+  xy: 309, 44
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+craft_but2
+  rotate: false
+  xy: 309, 26
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 crafting
   rotate: false
-  xy: 0, 12
+  xy: 0, 4
   size: 134, 127
   orig: 134, 127
   offset: 0, 0
   index: -1
 cursor0
   rotate: false
-  xy: 288, 80
+  xy: 327, 44
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cursor1
   rotate: false
-  xy: 309, 101
+  xy: 327, 26
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cursor2
   rotate: false
-  xy: 252, 36
+  xy: 252, 0
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 health_caret
   rotate: false
-  xy: 252, 22
+  xy: 302, 6
   size: 3, 12
   orig: 3, 12
   offset: 0, 0
   index: -1
 health_line
   rotate: false
-  xy: 360, 127
+  xy: 352, 70
   size: 1, 12
   orig: 1, 12
   offset: 0, 0
   index: -1
 health_sign
   rotate: false
-  xy: 252, 97
+  xy: 252, 40
   size: 34, 20
   orig: 34, 20
   offset: 0, 0
   index: -1
 inventory
   rotate: false
-  xy: 136, 15
+  xy: 136, 7
   size: 114, 124
   orig: 114, 124
   offset: 0, 0
   index: -1
 keyboard_icon0
   rotate: false
-  xy: 252, 54
+  xy: 288, 20
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 keyboard_icon1
   rotate: false
-  xy: 288, 98
+  xy: 288, 41
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 oxygen_scale
   rotate: false
-  xy: 273, 61
+  xy: 288, 6
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 oxygen_sign
   rotate: false
-  xy: 252, 75
+  xy: 252, 18
   size: 34, 20
   orig: 34, 20
   offset: 0, 0
   index: -1
 recipe
   rotate: false
-  xy: 252, 119
+  xy: 252, 84
   size: 106, 20
   orig: 106, 20
+  offset: 0, 0
+  index: -1
+recipe_comp
+  rotate: false
+  xy: 252, 62
+  size: 98, 20
+  orig: 98, 20
+  offset: 0, 0
+  index: -1
+recipe_hint
+  rotate: false
+  xy: 252, 106
+  size: 104, 25
+  orig: 104, 25
   offset: 0, 0
   index: -1
