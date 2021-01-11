@@ -1,5 +1,13 @@
 package en;
 
+import h2d.Tile;
+import h2d.Bitmap;
+import h3d.mat.Texture;
+import h3d.scene.Scene;
+import h3d.shader.GpuParticle;
+import h3d.col.Bounds;
+import h3d.parts.GpuParticles.GpuPartGroup;
+import hxd.Res;
 import ui.s3d.EventInteractive;
 import ui.InventoryGrid;
 import haxe.io.Error;
@@ -23,42 +31,40 @@ import hxGeomAlgo.EarCut;
 	An interactive entity
 **/
 class Interactive extends Entity {
-	public var interact: EventInteractive;
-	public var interactable(default, set): Bool = false;
+	public var interact : EventInteractive;
+	public var interactable(default, set) : Bool = false;
 
-	inline function set_interactable(v: Bool) {
-		if (!v) {
+	inline function set_interactable(v : Bool) {
+		if ( !v ) {
 			turnOffHighlight();
-			if (buttonIcon != null) buttonIcon.dispose();
+			if ( buttonIcon != null ) buttonIcon.dispose();
 			interact.cursor = Default;
 		}
 		return interactable = v;
 	}
 
-	public var cdbI: Structures = null;
-	public var useRange: Float = Const.DEF_USE_RANGE;
+	public var useRange : Float = Const.DEF_USE_RANGE;
+	public var health : Float;
 
-	var highlightingColor: String;
-	var polyPrim: Polygon;
-	var buttonIcon: ButtonIcon;
-	var filter: Glow;
-	var idx: IndexBuffer;
-	var translatedPoints: Array<Point> = [];
-	var polygonized: Array<Tri>;
-	var points: Array<HxPoint>;
-	var iconParent: Object;
+	var highlightingColor : String;
+	var polyPrim : Polygon;
+	var buttonIcon : ButtonIcon;
+	var filter : Glow;
+	var idx : IndexBuffer;
+	var translatedPoints : Array<Point> = [];
+	var polygonized : Array<Tri>;
+	var points : Array<HxPoint>;
+	var iconParent : Object;
 
 	var inv = new CellGrid2D(4, 4);
 
-	function new(?x: Float = 0, ?z: Float = 0, ?tmxObj: TmxObject) {
+	function new(?x : Float = 0, ?z : Float = 0, ?tmxObj : TmxObject) {
 		super(x, z, tmxObj);
 		var pixels = Pixels.fromBytes(tex.capturePixels().bytes, Std.int(spr.tile.width), Std.int(spr.tile.height));
 		points = new MarchingSquares(pixels).march();
 		polygonized = (EarCut.triangulate(points));
 
-		for (i in polygonized)
-			for (j in i)
-				translatedPoints.push(new Point(j.x, 0, j.y));
+		for (i in polygonized) for (j in i) translatedPoints.push(new Point(j.x, 0, j.y));
 
 		idx = new IndexBuffer();
 		for (poly in 0...polygonized.length) {
@@ -71,52 +77,21 @@ class Interactive extends Entity {
 		interact = new EventInteractive(polyPrim.getCollider(), mesh);
 		interact.rotate(-0.01, hxd.Math.degToRad(180), hxd.Math.degToRad(90));
 
-		if (tmxObj != null && tmxObj.flippedVertically) interact.scaleX = -1;
+		if ( tmxObj != null && tmxObj.flippedVertically ) interact.scaleX = -1;
 
 		// var highlightColor = (try tmxTile.properties.get("highlight") catch (e:Dynamic) "ffffffff");
 		var highlightColor = null;
-		if (highlightColor == null) highlightColor = "ffffffff";
+		if ( highlightColor == null ) highlightColor = "ffffffff";
 
 		filter = new h2d.filter.Glow(Color.hexToInt(highlightingColor != null ? highlightingColor : highlightColor), 1.2, 4, 1, 1.5, true);
+	}
 
-		function activateInteractive() {
-			if (interactable && isInPlayerRange()) {
-				turnOnHighlight();
-				return true;
-			}
-			else
-				return false;
-		}
-		// Нажатие для того, чтобы сломать структуру
-		interact.onPushEvent.add(event -> {});
-		interact.onOverEvent.add((_) -> activateInteractive());
-		interact.onOutEvent.add((e: hxd.Event) -> {
-			turnOffHighlight();
-		});
-
-		// CDB parsed entry corresponding to this structure instance
-		eregClass.match('$this'.toLowerCase());
-		try {
-			cdbI = Data.structures.resolve(eregClass.matched(1));
-		}
-		catch (Dynamic) {
-			try {
-				cdbI = Data.structures.resolve(spr.groupName);
-			}
-			catch (Dynamic) {}
-		}
-		// Setting interaciton range from cdb
-
-		if (cdbI != null) {
-			useRange = cdbI.use_range;
-
-			if (cdbI.isoHeight != 0 && cdbI.isoWidth != 0) {
-				mesh.isLong = true;
-				mesh.isoWidth = cdbI.isoWidth;
-				mesh.isoHeight = cdbI.isoHeight;
-				mesh.renewDebugPts();
-			}
-		}
+	function activateInteractive() {
+		if ( interactable && isInPlayerRange() ) {
+			turnOnHighlight();
+			return true;
+		} else
+			return false;
 	}
 
 	inline function isInPlayerRange() return distPx(player) <= useRange;
@@ -138,27 +113,27 @@ class Interactive extends Entity {
 		cd.unset("interacted");
 		spr.filter = null;
 		filter.enable = false;
-		if (buttonIcon != null) buttonIcon.dispose();
+		if ( buttonIcon != null ) buttonIcon.dispose();
 	}
 
 	override function postUpdate() {
 		super.postUpdate();
 		// if (tw != null) {
 		// }
-		if (interactable) updateKeyIcon();
+		if ( interactable ) updateKeyIcon();
 		// deactivate interactive if inventory is opened
-		
-		// interact.visible = player != null && !player.destroyed && !player.ui.inventory.sprInv.visible && isInPlayerRange();
+
+		interact.visible = player != null && !player.destroyed && /*!player.ui.inventory.sprInv.visible &&*/ isInPlayerRange();
 	}
 
 	function updateKeyIcon() {
-		if (!cd.has("keyboardIconInit") && cd.has("interacted")) {
+		if ( !cd.has("keyboardIconInit") && cd.has("interacted") ) {
 			var pos = Boot.inst.s3d.camera.project(mesh.x, 0, mesh.z, getS2dScaledWid(), getS2dScaledHei());
 			cd.unset("interacted");
 			buttonIcon = new ButtonIcon(pos.x, pos.y);
 			tw.createS(buttonIcon.container.icon.alpha, 0 > 1, TEaseIn, .4);
 		}
-		if (buttonIcon != null) {
+		if ( buttonIcon != null ) {
 			var pos = Boot.inst.s3d.camera.project(mesh.x, 0, mesh.z, getS2dScaledWid(), getS2dScaledHei());
 
 			buttonIcon.centerFlow.x = pos.x - 1;
@@ -168,24 +143,28 @@ class Interactive extends Entity {
 		}
 	}
 
-	function findVertexNumberInArray(point: Dynamic, findIn: Array<Point>): Int {
+	function findVertexNumberInArray(point : Dynamic, findIn : Array<Point>) : Int {
 		for (pts in 0...findIn.length) {
-			if (point.x == findIn[pts].x && point.y == findIn[pts].z) return pts;
+			if ( point.x == findIn[pts].x && point.y == findIn[pts].z ) return pts;
 		}
 		throw "Not part of this array";
 	}
 
-	function dropAllItems(?angle: Float, ?power: Float) {
+	function dropAllItems(?angle : Float, ?power : Float) {
 		for (i in inv.grid) {
 			for (j in i) {
-				if (j.item != null) {
-					j.item = dropItem(j.item, Math.random() * M.toRad(360), Math.random() * .03 * 48 + .01);
+				if ( j.item != null ) {
+					j.item = dropItem(j.item, angle == null ? Math.random() * M.toRad(360) : angle, power == null ? Math.random() * .03 * 48 + .01 : power);
 				}
 			}
 		}
 	}
 
+	
+
 	override function dispose() {
+		
+
 		interact.visible = false;
 		interact.cursor = Default;
 		super.dispose();

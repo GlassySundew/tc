@@ -2,7 +2,6 @@ package en.player;
 
 import dn.Process;
 import h2d.Scene;
-import net.Connect;
 import hxd.Window;
 import ui.player.PlayerUI;
 import ui.player.Inventory;
@@ -107,7 +106,7 @@ class Player extends Entity {
 	}
 
 	public function sendPosToServer() {
-		if (Connect.inst != null && Connect.inst.room != null) Connect.inst.room.send("setPos", {x: footX, y: footY});
+		// if (Connect.inst != null && Connect.inst.room != null) Connect.inst.room.send("setPos", {x: footX, y: footY});
 	}
 
 	override function postUpdate() {

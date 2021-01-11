@@ -102,9 +102,9 @@ class FloatingItem extends Interactive {
 		for (i in translatedPoints.length...idx.length)
 			polyPrim.uvs.push(new UV(0, 0));
 
-		tex = new Texture(Std.int(spr.tile.width), Std.int(spr.tile.height), [Target]);
-		bmp = new Bitmap(spr.tile);
-		bmp.drawTo(tex);
+		
+		
+		spr.drawTo(tex);
 		tex.filter = Nearest;
 
 		polyPrim.addNormals();

@@ -5,6 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         
+        
 
     
     {
@@ -15,6 +16,14 @@
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "HL debug",
             "profileSamples" : 10000
+        },
+        {
+            "name": "HL release",
+            "request": "launch",
+            "type": "hl",
+            // "hxml": "hl.debug.hxml",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "HL release"
         }
         // ,
         // {

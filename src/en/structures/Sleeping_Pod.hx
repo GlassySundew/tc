@@ -2,15 +2,15 @@ package en.structures;
 
 import format.tmx.Data.TmxObject;
 
-class Sleeping_Pod extends Interactive {
-	public function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:TmxObject) {
-		if (spr == null) {
+class Sleeping_Pod extends Structure {
+	public function new(?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : StructuresKind) {
+		if ( spr == null ) {
 			spr = new HSprite(Assets.structures, entParent);
 			spr.set("sleeping_pod");
 		}
-		super(x, z, tmxObj);
+		super(x, z, tmxObj, cdbEntry);
 		interactable = true;
-		
+
 		mesh.isLong = true;
 		mesh.isoWidth = 2;
 		mesh.isoHeight = 1;

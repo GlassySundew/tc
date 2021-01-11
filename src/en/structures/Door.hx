@@ -5,15 +5,15 @@ import hxd.Event;
 import en.objs.IsoTileSpr;
 import format.tmx.Data.TmxObject;
 
-class Door extends Interactive {
+class Door extends Structure {
 	public var leadsTo: String;
 
-	public function new(?x: Float = 0, ?z: Float = 0, ?tmxObj: TmxObject) {
+	public function new(?x: Int = 0, ?z: Int = 0, ?tmxObj: TmxObject , ?cdbEntry : StructuresKind) {
 		if (spr == null) {
 			spr = new HSprite(Assets.structures, entParent);
 			spr.set("door");
 		}
-		super(x, z, tmxObj);
+		super(x, z, tmxObj , cdbEntry );
 		interactable = true;
 
 		mesh.isLong = true;
@@ -40,7 +40,7 @@ class Door extends Interactive {
 
 	function findDoor(to: String): Entity {
 		for (e in Entity.ALL) {
-			if (Std.is(e, Door) && e.tmxObj.properties.exists("to") && e.tmxObj.properties.getString("to") == to) {
+			if (e.isOfType(en.structures.Door) && e.tmxObj.properties.exists("to") && e.tmxObj.properties.getString("to") == to) {
 				return e;
 			}
 		}

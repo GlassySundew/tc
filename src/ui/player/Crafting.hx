@@ -43,7 +43,7 @@ class Crafting extends Object {
 
 		var recipeConf = configMap.get("craft").getObjectByName("recipes");
 
-		// Scrollable shit for recipesa
+		// Scrollable shit for recipes
 		var caretUp = new HSprite(Assets.ui, "caret0").tile;
 		var caretDown = new HSprite(Assets.ui, "caret1").tile;
 

@@ -53,7 +53,7 @@
 					"use_range": 40,
 					"isoWidth": 2,
 					"isoHeight": 1,
-					"hp": 100,
+					"hp": 3,
 					"drop": [
 						{
 							"item": "iron",
@@ -68,6 +68,14 @@
 					"isoHeight": 0,
 					"hp": -1,
 					"drop": []
+				},
+				{
+					"id": "",
+					"drop": [],
+					"hp": 0,
+					"isoWidth": 0,
+					"isoHeight": 0,
+					"use_range": 0
 				}
 			],
 			"props": {},
@@ -222,6 +230,14 @@
 				{
 					"typeStr": "5:_1,_4,_16,_64",
 					"name": "stack"
+				},
+				{
+					"typeStr": "2",
+					"name": "can_hit"
+				},
+				{
+					"typeStr": "4",
+					"name": "damage"
 				}
 			],
 			"lines": [
@@ -230,42 +246,54 @@
 					"atlas_name": "item_iron_ore",
 					"display_name": "Iron",
 					"cat": 0,
-					"stack": 3
+					"stack": 3,
+					"can_hit": false,
+					"damage": 0
 				},
 				{
 					"id": "plant",
 					"atlas_name": "seaweed",
 					"display_name": "Seaweed",
 					"cat": 0,
-					"stack": 3
+					"stack": 3,
+					"can_hit": false,
+					"damage": 0
 				},
 				{
 					"id": "axe",
 					"atlas_name": "fireaxe",
 					"display_name": "Fireaxe",
 					"cat": 0,
-					"stack": 1
+					"stack": 0,
+					"can_hit": true,
+					"damage": 2
 				},
 				{
 					"id": "Hydroponics",
 					"atlas_name": "hydroponics",
 					"display_name": "Hydroponics",
 					"cat": 2,
-					"stack": 1
+					"stack": 1,
+					"can_hit": false,
+					"damage": 0
 				},
 				{
 					"id": "Door",
 					"atlas_name": "door",
 					"display_name": "Door",
 					"cat": 2,
-					"stack": 1
+					"stack": 1,
+					"can_hit": false,
+					"damage": 0
 				},
 				{
 					"id": "",
 					"atlas_name": "",
 					"display_name": "",
 					"cat": 0,
-					"stack": 0
+					"stack": 0,
+					"can_hit": false,
+					"damage": 0
 				}
 			],
 			"props": {

@@ -6,3 +6,7 @@ base.hxml
 -D windowSize=1280x720
 
 -D windowTitle=Total Condemn
+-D hl-ver=1.12.0
+# -D heaps_emit_tile_buffering=true
+
+-D linux

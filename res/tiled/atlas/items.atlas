@@ -6,28 +6,28 @@ filter: Nearest,Nearest
 repeat: none
 door
   rotate: false
-  xy: 32, 0
+  xy: 32, 16
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 fireaxe
   rotate: false
-  xy: 16, 16
+  xy: 0, 16
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 hydroponics
   rotate: false
-  xy: 16, 0
+  xy: 16, 16
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 item_gravity_manipulator
   rotate: false
-  xy: 0, 16
+  xy: 16, 0
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
@@ -41,14 +41,14 @@ item_iron_ore
   index: -1
 seaweed
   rotate: false
-  xy: 48, 16
+  xy: 32, 0
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 shadow
   rotate: false
-  xy: 32, 16
+  xy: 48, 16
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

@@ -1,22 +1,22 @@
 -cp src
 -cp .
+-cp vendor/differ/src
 
-# -lib hide
+-lib hide
 -lib domkit
 -lib format-tiled
--lib heeps
 -lib heaps
+-lib heeps
 -lib castle
 -lib hxbit
-# -lib gasm
 -lib structural
 -lib msignal
 -lib deepnightLibs
 -lib compiletime
--lib colyseus
--lib random 
 
--cp vendor/differ/src
+
+-cp src.helper
+--macro Helper.init()
 
 -dce full
 

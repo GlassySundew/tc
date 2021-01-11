@@ -1,9 +1,8 @@
+import cherry.soup.EventSignal.EventSignal0;
 import Level.StructTile;
 import h3d.scene.Object;
 import dn.Rand;
 import en.player.WebPlayer;
-import net.Connect;
-import hxd.System;
 import h3d.pass.PassList;
 import ui.Hud;
 import en.player.Player;
@@ -41,6 +40,8 @@ class Game extends Process {
 
 	public var structTiles: Array<StructTile> = [];
 
+	public var execAfterLvlLoad: EventSignal0;
+
 	public function new() {
 		super(Main.inst);
 
@@ -76,6 +77,7 @@ class Game extends Process {
 
 	public function startLevel(name: String) {
 		engine.clear(0, 1);
+		execAfterLvlLoad = new EventSignal0();
 
 		if (level != null) {
 			level.destroy();
@@ -113,14 +115,7 @@ class Game extends Process {
 				default:
 			}
 		}
-
-		// Безумно страшный костыль для правильно работающей изометрической сортировки
-		for (e in level.entities) {
-			searchAndSpawnEnt(e);
-			// break;
-		}
-
-		// for (e in level.entities) if (e.name != "player") searchAndSpawnEnt(e);
+		for (e in level.entities) searchAndSpawnEnt(e);
 
 		applyTmxObjOnEnt();
 
@@ -264,12 +259,13 @@ class Game extends Process {
 				}
 			}
 		}
+		execAfterLvlLoad.dispatch();
+		execAfterLvlLoad.removeAll();
 	}
 
 	function gc() {
 		if (Entity.GC == null || Entity.GC.length == 0) return;
 
-		
 		for (e in Entity.GC) e.dispose();
 		Entity.GC = [];
 	}

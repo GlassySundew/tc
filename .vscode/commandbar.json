@@ -10,6 +10,15 @@
       "command": "workbench.action.tasks.runTask|HL debug",
       "alignment": "right",
       "skipTerminateQuickPick": false,
+      "priority": -10
+    },
+    {
+      "text": "Release HL",
+      "color": "#4daa8f",
+      "commandType": "palette",
+      "command": "workbench.action.tasks.runTask|HL release",
+      "alignment": "right",
+      "skipTerminateQuickPick": false,
       "priority": -9
     },
     {

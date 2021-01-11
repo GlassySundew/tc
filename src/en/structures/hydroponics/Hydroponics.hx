@@ -12,15 +12,15 @@ import hxd.Key in K;
 /**
 	Использует inv как хранилище для растений
 **/
-class Hydroponics extends Interactive {
-	public function new(?x: Float = 0, ?z: Float = 0, ?tmxObj: TmxObject) {
-		if (spr == null) {
+class Hydroponics extends Structure {
+	public function new(?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : StructuresKind) {
+		if ( spr == null ) {
 			spr = new HSprite(Assets.structures, entParent);
 			spr.anim.registerStateAnim("hydroponics0", 1, 1, function() return inv != null ? inv.itemCout == 0 : true);
 			spr.anim.registerStateAnim("hydroponics1", 0, 1, function() return inv != null ? inv.itemCout > 0 : true);
 		}
 
-		super(x, z, tmxObj);
+		super(x, z, tmxObj, hydroponics);
 
 		interactable = true;
 
@@ -29,14 +29,14 @@ class Hydroponics extends Interactive {
 		inv.giveItem(new en.Item(plant), true, false);
 		inv.giveItem(new en.Item(plant), true, false);
 
-		interact.onTextInput = function(e: Event) {
-			if (K.isPressed(K.E)) dropGrownPlant();
+		interact.onTextInput = function(e : Event) {
+			if ( K.isPressed(K.E) ) dropGrownPlant();
 		}
 	}
 
 	function dropGrownPlant() {
 		// inv.grid[0][0].item = dropItem(inv.grid[0][0].item);
-		if (inv.itemCout > 0) {
+		if ( inv.itemCout > 0 ) {
 			dropAllItems();
 		}
 

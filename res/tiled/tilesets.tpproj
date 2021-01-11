@@ -149,7 +149,7 @@ limitMemory=true
 useIndexes=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:separated/ui/caret0.png,type:Input,regionName:null},{path:separated/ui/caret1.png,type:Input,regionName:null},{path:separated/ui/close_button_inventory.png,type:Input,regionName:null},{path:separated/ui/craft_but0.png,type:Input,regionName:null},{path:separated/ui/craft_but1.png,type:Input,regionName:null},{path:separated/ui/craft_but2.png,type:Input,regionName:null},{path:separated/ui/crafting.png,type:Input,regionName:null},{path:separated/ui/cursor0.png,type:Input,regionName:null},{path:separated/ui/cursor1.png,type:Input,regionName:null},{path:separated/ui/cursor2.png,type:Input,regionName:null},{path:separated/ui/health_caret.png,type:Input,regionName:null},{path:separated/ui/health_line.png,type:Input,regionName:null},{path:separated/ui/health_sign.png,type:Input,regionName:null},{path:separated/ui/inventory.png,type:Input,regionName:null},{path:separated/ui/keyboard_icon0.png,type:Input,regionName:null},{path:separated/ui/keyboard_icon1.png,type:Input,regionName:null},{path:separated/ui/oxygen_scale.png,type:Input,regionName:null},{path:separated/ui/oxygen_sign.png,type:Input,regionName:null},{path:separated/ui/recipe.png,type:Input,regionName:null},{path:separated/ui/recipe_comp.png,type:Input,regionName:null},{path:separated/ui/recipe_hint.png,type:Input,regionName:null}]
+inputFiles=[{path:separated/ui/caret0.png,type:Input,regionName:null},{path:separated/ui/caret1.png,type:Input,regionName:null},{path:separated/ui/close_button_inventory.png,type:Input,regionName:null},{path:separated/ui/craft_but0.png,type:Input,regionName:null},{path:separated/ui/craft_but1.png,type:Input,regionName:null},{path:separated/ui/craft_but2.png,type:Input,regionName:null},{path:separated/ui/crafting.png,type:Input,regionName:null},{path:separated/ui/cursor0.png,type:Input,regionName:null},{path:separated/ui/cursor1.png,type:Input,regionName:null},{path:separated/ui/cursor2.png,type:Input,regionName:null},{path:separated/ui/discord0.png,type:Input,regionName:null},{path:separated/ui/discord1.png,type:Input,regionName:null},{path:separated/ui/discord2.png,type:Input,regionName:null},{path:separated/ui/health_caret.png,type:Input,regionName:null},{path:separated/ui/health_line.png,type:Input,regionName:null},{path:separated/ui/health_sign.png,type:Input,regionName:null},{path:separated/ui/inventory.png,type:Input,regionName:null},{path:separated/ui/keyboard_icon0.png,type:Input,regionName:null},{path:separated/ui/keyboard_icon1.png,type:Input,regionName:null},{path:separated/ui/oxygen_scale.png,type:Input,regionName:null},{path:separated/ui/oxygen_sign.png,type:Input,regionName:null},{path:separated/ui/recipe.png,type:Input,regionName:null},{path:separated/ui/recipe_comp.png,type:Input,regionName:null},{path:separated/ui/recipe_hint.png,type:Input,regionName:null},{path:separated/ui/twitter0.png,type:Input,regionName:null},{path:separated/ui/twitter1.png,type:Input,regionName:null},{path:separated/ui/twitter2.png,type:Input,regionName:null},{path:separated/ui/vk0.png,type:Input,regionName:null},{path:separated/ui/vk1.png,type:Input,regionName:null},{path:separated/ui/vk2.png,type:Input,regionName:null}]
 
 
 ---
@@ -193,7 +193,7 @@ inputFiles=[{path:separated/env/agro_wall.png,type:Input,regionName:null},{path:
 
 -PROJ-
 
-version=4.8.2
+version=4.9.0
 fileTypeType=png
 fileTypeData={encoding:RGBA8888}
 previewBackgroundColor=ffffffff

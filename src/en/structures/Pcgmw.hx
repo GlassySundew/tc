@@ -3,18 +3,15 @@ package en.structures;
 import en.objs.IsoTileSpr;
 import format.tmx.Data.TmxObject;
 
-class Pcgmw extends Interactive {
-	public function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:TmxObject) {
-		if (spr == null) {
+class Pcgmw extends Structure {
+	public function new(?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : StructuresKind) {
+		if ( spr == null ) {
 			spr = new HSprite(Assets.structures, entParent);
 			spr.set("pcgmw");
 		}
 
-		super(x, z, tmxObj);
-
+		super(x, z, tmxObj, cdbEntry);
 	}
-
-
 
 	override function postUpdate() {
 		super.postUpdate();

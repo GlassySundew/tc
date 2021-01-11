@@ -12,13 +12,14 @@ class Boot extends hxd.App {
 
 	// Boot
 	static function main() {
-		hl.UI.closeConsole();
-
+		
 		new Boot();
 	}
 
 	// Engine ready
 	override function init() {
+		hl.UI.closeConsole();
+
 		inst = this;
 		entParent = new Scene();
 		new Main(s2d);
@@ -31,7 +32,7 @@ class Boot extends hxd.App {
 		// s2d.scaleMode = AutoZoom(640, 360, true);
 		// s2d.scaleMode = LetterBox(640, 360, true, Center, Center);
 
-		s3d.lightSystem.ambientLight.set(0.5, 0.5, 0.5);
+		s3d.lightSystem.ambientLight.set(1, 1, 1);
 		onResize();
 
 		#if (castle && hl && debug)
@@ -47,7 +48,6 @@ class Boot extends hxd.App {
 	var speed = 1.0;
 
 	override function update(deltaTime: Float) {
-		super.update(deltaTime);
 		// Bullet time
 		#if debug
 		if (hxd.Key.isPressed(hxd.Key.NUMPAD_SUB)) speed = speed >= 1 ? 0.33 : 1;
