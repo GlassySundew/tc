@@ -1,0 +1,18 @@
+{
+  "folders": [
+    {
+      "path": ".."
+    },
+    {
+      "path": "game"
+    }
+  ],
+
+  "settings": {
+    "workbench.colorCustomizations": {
+      "titleBar.inactiveBackground": "#134e41",
+      "titleBar.activeBackground": "#1a6b59",
+      "titleBar.activeForeground": "#ffffff"
+    }
+  }
+}

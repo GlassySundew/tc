@@ -20,32 +20,35 @@ import format.tmx.*;
 import hxd.Res;
 import tools.Util.*;
 
-class Game extends Process {
-	public static var inst: Game;
+class GameClient extends Process {
+	static var HOST = "127.0.0.1";
+	// static var HOST = "78.24.222.152";
+	static var PORT = 6676;
 
-	public var lvlName: String;
-	public var ca: dn.heaps.Controller.ControllerAccess;
-	public var camera: Camera;
+	public static var inst : GameClient;
 
-	private var cam: CameraController;
+	public var lvlName : String;
+	public var ca : dn.heaps.Controller.ControllerAccess;
+	public var camera : Camera;
 
-	public var level: Level;
+	private var cam : CameraController;
 
-	public var tmxMap: TmxMap;
+	public var level : Level;
 
-	public var player: en.player.Player;
+	public var tmxMap : TmxMap;
 
-	public var hud: Hud;
-	public var fx: Fx;
+	public var host : hxd.net.SocketHost;
+	public var event : hxd.WaitEvent;
+	public var uid : Int;
+	public var player : en.player.Player;
 
-	public var structTiles: Array<StructTile> = [];
-
-	public var execAfterLvlLoad: EventSignal0;
+	// public var structTiles : Array<StructTile> = [];
+	public var execAfterLvlLoad : EventSignal0;
 
 	public function new() {
 		super(Main.inst);
-
 		inst = this;
+
 		ca = Main.inst.controller.createAccess("game");
 		ca.setLeftDeadZone(0.2);
 		ca.setRightDeadZone(0.2);
@@ -53,33 +56,55 @@ class Game extends Process {
 		createRootInLayers(Main.inst.root, Const.DP_BG);
 		camera = new Camera();
 		// hud = new ui.Hud();
-		startLevel("alphamap.tmx");
+
+		event = new hxd.WaitEvent();
+		host = new hxd.net.SocketHost();
+		host.setLogger(function(msg) trace(msg));
+
+		uid = 1 + Std.random(1000);
+		host.connect(HOST, PORT, function(b) {
+			if ( !b ) {
+				trace("Failed to connect to server");
+				return;
+			}
+			trace("Connected to server");
+			host.sendMessage({type: MessageType.PlayerInit, msg: uid});
+
+			// sys.thread.Thread.create(() -> {
+			// 	while( true ) {
+			// 		Sys.sleep(100);
+			// 		try {
+			// 			host.sendMessage({type: "ping", msg: uid});
+			// 		}
+			// 		catch( e:Dynamic ) {
+			// 			break;
+			// 		}
+			// 	}
+			// });
+		});
+		host.onUnregister = function(o) {};
+        
+        if ( player != null ) {}
+        
+		@:privateAccess engine.window.onClose = function() {
+			try {
+				player.destroy();
+				host.unregister(player);
+			}
+			catch( e:Dynamic ) {
+				trace("error occured while cursor disposing: " + e);
+			}
+			host.flush();
+			return true;
+		}
+        host.flush();
 	}
 
-	public function onCdbReload() {}
-
-	public function nextLevel() {
-		/*
-			if (level.data.getStr("nextLevel") != "")
-				startLevel(level.data.getStr("nextLevel"));
-			else {
-				var ogmoProj = new ogmo.Project(hxd.Res.map.ld45, false);
-				if (ogmoProj.getLevelByName("level" + (level.lid + 1)) == null)
-					startLevel("level" + level.lid);
-				else
-					startLevel("level" + (level.lid + 1));
-		}*/
-	}
-
-	public function restartLevel() {
-		// startLevel(lvlName);
-	}
-
-	public function startLevel(name: String) {
+	public function startLevel(name : String) {
 		engine.clear(0, 1);
 		execAfterLvlLoad = new EventSignal0();
 
-		if (level != null) {
+		if ( level != null ) {
 			level.destroy();
 			for (e in Entity.ALL) e.destroy();
 			gc();
@@ -96,19 +121,19 @@ class Game extends Process {
 		var entClasses = (CompileTime.getAllClasses(Entity));
 
 		// Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity and puts name into spr group if not found
-		function searchAndSpawnEnt(e: TmxObject) {
+		function searchAndSpawnEnt(e : TmxObject) {
 			// Парсим все классы - наследники en.Entity и спавним их
 			for (eClass in entClasses) {
 				eregCompTimeClass.match('$eClass'.toLowerCase());
-				if (eregCompTimeClass.match('$eClass'.toLowerCase()) && eregCompTimeClass.matched(1) == e.name) {
+				if ( eregCompTimeClass.match('$eClass'.toLowerCase()) && eregCompTimeClass.matched(1) == e.name ) {
 					Type.createInstance(eClass, [e.x, e.y, e]);
 					return;
 				}
 			}
-			switch (e.objectType) {
+			switch( e.objectType ) {
 				case OTTile(gid):
 					var source = Tools.getTileByGid(tmxMap, gid).image.source;
-					if (eregFileName.match(source)) {
+					if ( eregFileName.match(source) ) {
 						new SpriteEntity(e.x, e.y, eregFileName.matched(1), e);
 						return;
 					}
@@ -118,8 +143,8 @@ class Game extends Process {
 		for (e in level.entities) searchAndSpawnEnt(e);
 
 		applyTmxObjOnEnt();
-		
-		player = Player.inst;	
+
+		player = Player.inst;
 
 		camera.target = player;
 		camera.recenter();
@@ -135,20 +160,20 @@ class Game extends Process {
 		// new GridHelper(Boot.inst.s3d, 10, 10);
 	}
 
-	public function applyTmxObjOnEnt(?ent: Null<Entity>) {
+	public function applyTmxObjOnEnt(?ent : Null<Entity>) {
 		// если ent не определён, то на все Entity из массива ALL будут добавлены TmxObject из тайлсета с названием colls
 		// parsing collision objects from 'colls' tileset
 		for (tileset in tmxMap.tilesets) {
 			var ereg = ~/(^[^.]*)+/; // regexp to take tileset name
-			if (ereg.match(tileset.source) && ereg.matched(1) == 'colls') for (tile in tileset.tiles) {
-				if (eregFileName.match(tile.image.source)) {
+			if ( ereg.match(tileset.source) && ereg.matched(1) == 'colls' ) for (tile in tileset.tiles) {
+				if ( eregFileName.match(tile.image.source) ) {
 					var ents = ent != null ? [ent] : Entity.ALL;
 					for (ent in ents) {
-						if ((tile.objectGroup != null && eregClass.match('$ent'.toLowerCase()))
+						if ( (tile.objectGroup != null && eregClass.match('$ent'.toLowerCase()))
 							&& ((eregClass.matched(1) == eregFileName.matched(1)
 								&& tile.objectGroup.objects.length > 0
 								|| (Std.is(ent, SpriteEntity)
-									&& eregFileName.matched(1) == ent.spr.groupName))) /*&& ent.collisions.length == 0*/) {
+									&& eregFileName.matched(1) == ent.spr.groupName))) /*&& ent.collisions.length == 0*/ ) {
 							var centerSet = false;
 							for (obj in tile.objectGroup.objects) { // Засовываем объекты для детекта коллизий по Entity
 								var params = {
@@ -168,7 +193,7 @@ class Game extends Process {
 									var pivotX = ((obj.x + xCent)) / ent.spr.tile.width;
 									var pivotY = ((obj.y + yCent)) / ent.spr.tile.height;
 									pivotX = (ent.tmxObj != null && ent.tmxObj.flippedVertically) ? 1 - pivotX : pivotX;
-									if (obj.name == "center") {
+									if ( obj.name == "center" ) {
 										ent.mesh.xOff = -(pivotX - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
 										ent.mesh.yOff = (pivotY - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
 										ent.mesh.renewDebugPts();
@@ -178,7 +203,7 @@ class Game extends Process {
 									ent.footX += M.round((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width);
 									ent.footY -= (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height;
 								}
-								switch (obj.objectType) {
+								switch( obj.objectType ) {
 									case OTEllipse:
 										var shape = new differ.shapes.Circle(0, 0, params.width / 2);
 										shape.scaleY = params.height / params.width;
@@ -192,7 +217,7 @@ class Game extends Process {
 											{cent: new h3d.Vector(), offset: new h3d.Vector()});
 									case OTPolygon(points):
 										var pts = checkPolyClockwise(points);
-										var verts: Array<Vector> = [];
+										var verts : Array<Vector> = [];
 										for (i in pts) {
 											verts.push(new Vector((i.x), (-i.y)));
 										}
@@ -218,27 +243,27 @@ class Game extends Process {
 										poly.rotation = -obj.rotation;
 
 										// vertical flipping
-										if (ent.tmxObj != null && ent.tmxObj.flippedVertically) poly.scaleX = -1;
+										if ( ent.tmxObj != null && ent.tmxObj.flippedVertically ) poly.scaleX = -1;
 										var xOffset = poly.scaleX < 0 ? ent.spr.tile.width - obj.x : obj.x;
 										var yOffset = -obj.y;
 										ent.collisions.set(poly, {cent: new h3d.Vector(xCent, -yCent), offset: new h3d.Vector(xOffset, yOffset)});
 									case OTPoint:
-										if (obj.name == "center") {
-											if (centerSet) unsetCenter();
+										if ( obj.name == "center" ) {
+											if ( centerSet ) unsetCenter();
 											setCenter();
 											centerSet = true;
 										}
 									default:
 								}
 
-								if (!centerSet) {
+								if ( !centerSet ) {
 									setCenter();
 									centerSet = true;
 								} else {
 									var pivotX = ((obj.x + xCent)) / ent.spr.tile.width;
 									var pivotY = ((obj.y + yCent)) / ent.spr.tile.height;
 									pivotX = (ent.tmxObj != null && ent.tmxObj.flippedVertically) ? 1 - pivotX : pivotX;
-									if (obj.name != "center") {
+									if ( obj.name != "center" ) {
 										ent.mesh.xOff = (pivotX - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
 										ent.mesh.yOff = -(pivotY - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
 									}
@@ -249,9 +274,9 @@ class Game extends Process {
 							}
 							try
 								cast(ent, Interactive).rebuildInteract()
-							catch (e:Dynamic) {}
-							if (ent.tmxObj != null && ent.tmxObj.flippedVertically && ent.mesh.isLong) ent.mesh.flipX();
-							if (Std.is(ent, SpriteEntity) && tile.properties.exists("interactable")) {
+							catch( e:Dynamic ) {}
+							if ( ent.tmxObj != null && ent.tmxObj.flippedVertically && ent.mesh.isLong ) ent.mesh.flipX();
+							if ( Std.is(ent, SpriteEntity) && tile.properties.exists("interactable") ) {
 								cast(ent, SpriteEntity).interactable = tile.properties.getBool("interactable");
 							}
 						}
@@ -264,7 +289,7 @@ class Game extends Process {
 	}
 
 	function gc() {
-		if (Entity.GC == null || Entity.GC.length == 0) return;
+		if ( Entity.GC == null || Entity.GC.length == 0 ) return;
 
 		for (e in Entity.GC) e.dispose();
 		Entity.GC = [];
@@ -281,73 +306,23 @@ class Game extends Process {
 		super.update();
 
 		// Updates
-		for (e in Entity.ALL) if (!e.destroyed) e.preUpdate();
-		for (e in Entity.ALL) if (!e.destroyed) e.update();
-		for (e in Entity.ALL) if (!e.destroyed) e.postUpdate();
-		for (e in Entity.ALL) if (!e.destroyed) e.frameEnd();
+		for (e in Entity.ALL) if ( !e.destroyed ) e.preUpdate();
+		for (e in Entity.ALL) if ( !e.destroyed ) e.update();
+		for (e in Entity.ALL) if ( !e.destroyed ) e.postUpdate();
+		for (e in Entity.ALL) if ( !e.destroyed ) e.frameEnd();
 		gc();
 
-		if (!ui.Console.inst.isActive() && !ui.Modal.hasAny()) {
+		if ( !ui.Console.inst.isActive() && !ui.Modal.hasAny() ) {
 			// Exit
-			if (ca.isKeyboardPressed(Key.X)) if (!cd.hasSetS("exitWarn", 3)) trace(Lang.t._("Press X again to exit.")); else {
-				#if (debug && hl)
+			if ( ca.isKeyboardPressed(Key.X) ) if ( !cd.hasSetS("exitWarn", 3) ) trace(Lang.t._("Press X again to exit.")); else {
+				#if( debug && hl )
 				hxd.System.exit();
 				#else
 				destroy();
 				#end
 			}
-			if (ca.selectPressed()) restartLevel();
+			// if (ca.selectPressed()) restartLevel();
 		}
-	}
-
-	public function showStrTiles() {
-		for (i in structTiles) i.visible = true;
-	}
-
-	public function hideStrTiles() {
-		for (i in structTiles) i.visible = false;
-	}
-}
-
-class AxesHelper extends h3d.scene.Graphics {
-	public function new(?parent: h3d.scene.Object, size = 2.0, colorX = 0xEB304D, colorY = 0x7FC309, colorZ = 0x288DF9, lineWidth = 2.0) {
-		super(parent);
-
-		material.props = h3d.mat.MaterialSetup.current.getDefaults("ui");
-
-		lineShader.width = lineWidth;
-
-		setColor(colorX);
-		lineTo(size, 0, 0);
-
-		setColor(colorY);
-		moveTo(0, 0, 0);
-		lineTo(0, size, 0);
-
-		setColor(colorZ);
-		moveTo(0, 0, 0);
-		lineTo(0, 0, size);
-	}
-}
-
-class GridHelper extends h3d.scene.Graphics {
-	public function new(?parent: Object, size = 10.0, divisions = 10, color1 = 0x444444, color2 = 0x888888, lineWidth = 1.0) {
-		super(parent);
-
-		material.props = h3d.mat.MaterialSetup.current.getDefaults("ui");
-
-		lineShader.width = lineWidth;
-
-		var hsize = size / 2;
-		var csize = size / divisions;
-		var center = divisions / 2;
-		for (i in 0...divisions + 1) {
-			var p = i * csize;
-			setColor((i != 0 && i != divisions && i % center == 0) ? color2 : color1);
-			moveTo(-hsize + p, -hsize, 0);
-			lineTo(-hsize + p, -hsize + size, 0);
-			moveTo(-hsize, -hsize + p, 0);
-			lineTo(-hsize + size, -hsize + p, 0);
-		}
+		host.flush();
 	}
 }

@@ -42,8 +42,8 @@
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 2477.6666666666665,
-                "y": 489.8333333333333
+                "x": 2400,
+                "y": 1184
             }
         },
         "tiled/levels/bridge.tmx": {

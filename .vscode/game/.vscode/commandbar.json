@@ -24,7 +24,7 @@
     {
       "text": "Run HL",
       "color": "orange",
-      "command": "hl bin/game.hl",
+      "command": "cd ../../ && hl bin/game.hl",
       "alignment": "right",
       "skipTerminateQuickPick": false,
       "priority": -11
@@ -38,12 +38,13 @@
       "command": "killall hl",
       "alignment": "right",
       "skipTerminateQuickPick": true,
+
       "priority": -11.5
     },
     {
       "text": "Pack sdl_win",
       "color": "green",
-      "command": "./redist/pack_win",
+      "command": "cd ../.. &&  ./redist/pack_win",
       "alignment": "right",
       "skipTerminateQuickPick": false,
       "priority": -22

@@ -19,6 +19,3 @@
 --macro Helper.init()
 
 -dce full
-
--main Boot
-  

@@ -88,12 +88,20 @@ class MainMenu extends Process {
 
 		vertFlow.addSpacing(10);
 
-		new TextButton("start demo", (_) -> {
+		new TextButton("login", (_) -> {
+			root.remove();
+			root.removeChildren();
+			this.destroy();
+			Main.inst.startGameClient();
+		}, vertFlow);
+		
+		new TextButton("start demo (offline)", (_) -> {
 			root.remove();
 			root.removeChildren();
 			this.destroy();
 			Main.inst.startGame();
 		}, vertFlow);
+
 
 		new TextButton("options", (_) -> {
 			var m = new Matrix();
@@ -133,8 +141,9 @@ class MainMenu extends Process {
 }
 
 class TextButton extends ui.Button {
-	public function new(string : String, action : Event->Void, ?parent) {
+	public function new(string : String, ?action : Event->Void, ?color : Int, ?parent) {
 		var text = new Text(Assets.fontPixel);
+		text.color = color != null ? Color.intToVector(color) : Color.intToVector(0xffffff);
 		text.smooth = true;
 		text.text = "  " + string;
 
@@ -149,7 +158,7 @@ class TextButton extends ui.Button {
 		var tex2 = new Texture(Std.int(text.textWidth), Std.int(text.textHeight), [Target]);
 		text.drawTo(tex2);
 		super([h2d.Tile.fromTexture(tex0), h2d.Tile.fromTexture(tex1), h2d.Tile.fromTexture(tex2)], parent);
-		onClickEvent.add(action);
+		onClickEvent.add(action != null ? action : (_) -> {});
 	}
 }
 

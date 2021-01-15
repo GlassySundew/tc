@@ -1,5 +1,7 @@
 package en;
 
+import hxbit.NetworkSerializable;
+import hxbit.Serializable;
 import h2d.Scene;
 import differ.shapes.Circle;
 import differ.Collision;
@@ -44,7 +46,6 @@ import h3d.scene.Mesh;
 	public var destroyed(default, null) = false;
 	public var tmod(get, never) : Float;
 
-	public var uid : Int;
 	public var cx : Float = 0;
 	public var cy : Float = 0;
 	public var xr = 0.5;
@@ -80,7 +81,8 @@ import h3d.scene.Mesh;
 
 	public var dir(default, set) = 6;
 
-	inline function get_tmod() return Game.inst.tmod;
+	inline function get_tmod() return #if headless GameServer.inst.tmod #else if ( Game.inst != null ) Game.inst.tmod else
+		GameClient.inst.tmod #end;
 
 	public var player(get, never) : en.player.Player;
 
@@ -114,13 +116,10 @@ import h3d.scene.Mesh;
 	public var colorAdd : h3d.Vector;
 	public var spr : HSprite;
 	public var mesh : IsoTileSpr;
-
 	public var tmpDt : Float;
 	public var tmpCur : Float;
-
 	public var lastFootX : Float;
 	public var lastFootY : Float;
-
 	public var curFrame : Float = 0;
 
 	private var rotAngle : Float = -0.01;
@@ -134,7 +133,10 @@ import h3d.scene.Mesh;
 	var debugLabel : Null<h2d.Text>;
 
 	public function new(?x : Float = 0, ?z : Float = 0, ?tmxObj : Null<TmxObject>) {
-		uid = Const.NEXT_UNIQ;
+		init(x, z, tmxObj);
+	}
+
+	function init(?x : Float = 0, ?z : Float = 0, ?tmxObj : Null<TmxObject>) {
 		ALL.push(this);
 
 		cd = new dn.Cooldown(Const.FPS);
@@ -143,6 +145,8 @@ import h3d.scene.Mesh;
 		if ( spr == null ) throw "spr hasnt been initialised";
 
 		this.tmxObj = tmxObj;
+
+		#if !headless
 		spr.colorAdd = colorAdd = new h3d.Vector();
 		tex = new Texture(Std.int(spr.tile.width), Std.int(spr.tile.height), [Target]);
 		spr.tile.getTexture().filter = Nearest;
@@ -155,7 +159,7 @@ import h3d.scene.Mesh;
 		s.color = colorAdd;
 		mesh.material.mainPass.enableLights = false;
 		mesh.material.mainPass.depth(false, Less);
-
+		#end
 		if ( tmxObj != null && tmxObj.flippedVertically ) spr.scaleX = -1;
 		// TODO semi-transparent shadow overlapping
 		// var s = new h3d.mat.Stencil();
@@ -247,7 +251,7 @@ import h3d.scene.Mesh;
 
 	public function makePoint() return new CPoint(cx, cy, xr, yr);
 
-	public inline function destroy() {
+	public function destroy() {
 		if ( !destroyed ) {
 			destroyed = true;
 			GC.push(this);
@@ -403,6 +407,7 @@ import h3d.scene.Mesh;
 	}
 
 	public function postUpdate() {
+		#if !headless
 		if ( mesh != null ) {
 			mesh.x = footX;
 			mesh.z = footY;
@@ -421,15 +426,16 @@ import h3d.scene.Mesh;
 			// 	debugLabel.y = Std.int(footY + 1);
 			// }
 			// curFrame = spr.anim.getCurrentAnim().curFrameCpt;
-
-			if ( !isMoving() ) {
-				footX = M.round(M.fabs(footX));
-				footY = M.round(M.fabs(footY));
-			}
+		}
+		#end
+		if ( !isMoving() ) {
+			footX = M.round(M.fabs(footX));
+			footY = M.round(M.fabs(footY));
 		}
 	}
 
 	public function frameEnd() {
+		#if !headless
 		if ( mesh != null ) {
 			tex.clear(0, 0);
 			spr.x = spr.scaleX > 0 ? -spr.tile.dx : spr.tile.dx + spr.tile.width;
@@ -440,5 +446,6 @@ import h3d.scene.Mesh;
 			tile.setCenterRatio(spr.pivot.centerFactorX, spr.pivot.centerFactorY);
 			mesh.tile = tile;
 		}
+		#end
 	}
 }

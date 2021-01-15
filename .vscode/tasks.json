@@ -68,6 +68,25 @@
         "$haxe-error",
         "$haxe-trace"
       ]
+    },
+    {
+      "label": "build server",
+      "type": "hxml",
+      "file": "hl.server.hxml",
+      "presentation": {
+        "echo": true,
+        "reveal": "never",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": [
+        "$haxe-absolute",
+        "$haxe",
+        "$haxe-error",
+        "$haxe-trace"
+      ]
     }
     // ,
     // {

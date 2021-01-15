@@ -53,7 +53,7 @@ class Main extends Process {
 
 		Data.load(hxd.Res.data.entry.getText());
 		// Data.load(hxd.Res.data.entry.getText());
-		
+
 		console = new ui.Console(Assets.fontPixel, s);
 		controller = new dn.heaps.Controller(s);
 		ca = controller.createAccess("main");
@@ -104,6 +104,16 @@ class Main extends Process {
 			// }, 0.1);
 		} else
 			new Game();
+	}
+
+	public function startGameClient() {
+		if ( GameClient.inst != null ) {
+			GameClient.inst.destroy();
+			// delayer.addS(function() {
+			new GameClient();
+			// }, 0.1);
+		} else
+			new GameClient();
 	}
 
 	override function onResize() {

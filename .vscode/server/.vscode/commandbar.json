@@ -1,0 +1,44 @@
+{
+  "skipTerminateQuickPick": true,
+  "skipSwitchToOutput": false,
+  "skipErrorMessage": true,
+
+  "commands": [
+    {
+      "text": "Build Server",
+      "color": "#5056c6",
+      "commandType": "palette",
+      "command": "workbench.action.tasks.runTask|build server",
+      "alignment": "right",
+      "skipTerminateQuickPick": false,
+      "priority": 4
+    },
+    {
+      "text": "Kill HL",
+      "color": "#586284",
+      "skipErrorMessage": true,
+      "skipSwitchToOutput": true,
+      "command": "killall -9 hl",
+      "alignment": "right",
+      "skipTerminateQuickPick": true,
+
+      "priority": 1
+    },
+    {
+      "text": "Run server",
+      "color": "orange",
+      "command": "cd ../.. && hl bin/server.hl",
+      "alignment": "right",
+      "skipTerminateQuickPick": false,
+      "priority": 2
+    },
+    {
+      "text": "Pack server",
+      "color": "#569c82",
+      "command": "cd ../.. && ./redist/pack_server",
+      "alignment": "right",
+      "skipTerminateQuickPick": false,
+      "priority": -1
+    }
+  ]
+}
