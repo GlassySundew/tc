@@ -1,5 +1,7 @@
 package tools;
 
+import cloner.Cloner;
+import hxbit.NetworkHost.NetworkClient;
 import haxe.io.Path;
 import h2d.Scene;
 import h3d.pass.Default;
@@ -40,8 +42,10 @@ class Util {
 		return pts;
 	}
 
-	inline static function cartToIso(x : Float, y : Float) : Vector return new Vector((x - y), (x + y) / 2);
+	public static var cloner : Cloner = new Cloner();
 
+	inline static function cartToIso(x : Float, y : Float) : Vector return new Vector((x - y), (x + y) / 2);
+	
 	inline static function screenToIsoX(globalX : Float, globalY : Float) {
 		return globalX + globalY;
 	}
@@ -70,7 +74,7 @@ class Util {
 		return (tileset.tiles[fixedGId]);
 	}
 
-	inline static function getTsx(tsx : Map<String, TmxTileset>, r : Reader) : String->TmxTileset {
+	inline static function getTsx(tsx : Map<String, TmxTileset>, r : Reader) : String -> TmxTileset {
 		return (name : String) -> {
 			var cached : TmxTileset = tsx.get(name);
 			if ( cached != null ) return cached;
@@ -78,6 +82,14 @@ class Util {
 			tsx.set(name, cached);
 			return cached;
 		}
+	}
+
+	inline static function resolveMap(tmx : TmxMap, lvlName : String) {
+		var tsx = new Map();
+		var r = new Reader();
+		r.resolveTSX = getTsx(tsx, r);
+		tmx = r.read(Xml.parse(Res.loader.load(Const.LEVELS_PATH + lvlName).entry.getText()));
+		return tmx;
 	}
 
 	static var entParent : Scene;
@@ -95,7 +107,7 @@ class Util {
 		sys.FileSystem.createDirectory(Path.directory(SAVEPATH));
 		#end
 		hxd.Save.save({
-			nickname: nickname,
+			nickname : nickname,
 		}, SAVEPATH);
 	}
 
@@ -156,5 +168,13 @@ class TmxLayerExtender {
 			default:
 		}
 		return null;
+	}
+}
+
+class SocketHostExtender {
+	public static function sendTypedMessage(sHost : hxd.net.SocketHost, msg : Message, ?to : NetworkClient) sHost.sendMessage(msg, to);
+
+	public static dynamic function onTypedMessage(sHost : hxd.net.SocketHost, onMessage : NetworkClient -> Message -> Void) {
+		sHost.onMessage = onMessage;
 	}
 }

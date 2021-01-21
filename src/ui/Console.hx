@@ -18,10 +18,10 @@ class Console extends h2d.Console {
 		logTxt = new h2d.HtmlText(f, this);
 		logTxt.x = 2;
 		logTxt.dropShadow = {
-			dx: 0,
-			dy: 1,
-			color: 0,
-			alpha: 0.5
+			dx : 0,
+			dy : 1,
+			color : 0,
+			alpha : 0.5
 		};
 		logTxt.visible = false;
 		// scale(2); // TODO smarter scaling for 4k screens
@@ -36,11 +36,11 @@ class Console extends h2d.Console {
 
 		#if debug
 		flags = new Map();
-		this.addCommand("set", [{name: "k", t: AString}], function(k : String) {
+		this.addCommand("set", [{name : "k", t : AString}], function(k : String) {
 			setFlag(k, true);
 			log("+ " + k, 0x80FF00);
 		});
-		this.addCommand("unset", [{name: "k", t: AString, opt: true}], function(?k : String) {
+		this.addCommand("unset", [{name : "k", t : AString, opt : true}], function(?k : String) {
 			if ( k == null ) {
 				log("Reset all.", 0xFF0000);
 				flags = new Map();
@@ -64,23 +64,16 @@ class Console extends h2d.Console {
 			}
 		});
 
-		this.addCommand("untarget", [], function(?k : String) {
-			Game.inst.camera.stopTracking();
-			new h3d.scene.CameraController(Boot.inst.s3d).loadFromCamera();
-			Level.inst.cursorInteract.visible = false;
+		this.addCommand("giveItem", [
+			{name : "item", t : AString, opt : false},
+			{name : "amount", t : AInt, opt : true}
+		], function(?k : Data.ItemsKind, ?amount : Int = 1) {
+			if ( Data.items.get(k) != null ) {
+				var newItem = Item.fromCdbEntry(k);
+				newItem.amount = amount;
+				Game.inst.player.ui.inventory.invGrid.giveItem(newItem);
+			}
 		});
-
-		this.addCommand("loadlvl", [{name: "k", t: AEnum(["hui", "hui1"])}], function(?k : String) {
-			Game.inst.startLevel(k + ".tmx");
-		});
-		this.addCommand("giveItem", [{name: "item", t: AString, opt: false}, {name: "amount", t: AInt, opt: true}],
-			function(?k : Data.ItemsKind, ?amount : Int = 1) {
-				if ( Data.items.get(k) != null ) {
-					var newItem = Item.fromCdbEntry(k);
-					newItem.amount = amount;
-					Game.inst.player.ui.inventory.invGrid.giveItem(newItem);
-				}
-			});
 
 		this.addCommand("connect", [], function(?k : String) {
 			// (new Connect());
@@ -89,6 +82,14 @@ class Console extends h2d.Console {
 		this.addAlias("+", "set");
 		this.addAlias("-", "unset");
 		#end
+		this.addCommand("untarget", [], function(?k : String) {
+			GameClient.inst.camera.stopTracking();
+			new h3d.scene.CameraController(Boot.inst.s3d).loadFromCamera();
+			Level.inst.cursorInteract.visible = false;
+		});
+		this.addCommand("loadlvl", [{name : "k", t : AString}], function(?k : String) {
+			Game.inst.startLevel(k + ".tmx");
+		});
 	}
 
 	#if debug
@@ -104,7 +105,7 @@ class Console extends h2d.Console {
 	}
 
 	override function addCommand(name : String, ?help : String, args : Array<ConsoleArgDesc>, callb : Dynamic) {
-		commands.set("/" + name, {help: help == null ? "" : help, args: args, callb: callb});
+		commands.set("/" + name, {help : help == null ? "" : help, args : args, callb : callb});
 	}
 
 	// override function runCommand(commandLine:String) {
@@ -246,7 +247,7 @@ class Console extends h2d.Console {
 	override function showHelp(?command : String) {
 		var all;
 		if ( command == null ) {
-			all = Lambda.array({iterator: function() return commands.keys()});
+			all = Lambda.array({iterator : function() return commands.keys()});
 			all.sort(Reflect.compare);
 			all.remove("/help");
 			all.push("/help");
@@ -306,7 +307,7 @@ class Console extends h2d.Console {
 		}
 
 		if ( bg.visible ) {
-			if ( Player.inst != null && Player.inst.isAlive() && !Player.inst.isLocked() ) Player.inst.lock();
-		} else if ( Player.inst != null && Player.inst.isAlive() && Player.inst.isLocked() ) Player.inst.unlock();
+			if ( Player.inst != null ) if ( !Player.inst.isLocked() ) Player.inst.lock();
+		} else if ( Player.inst != null ) if ( Player.inst.isLocked() ) Player.inst.unlock();
 	}
 }

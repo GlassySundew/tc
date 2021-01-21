@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.4" tiledversion="2020.09.22" name="colls" tilewidth="114" tileheight="134" tilecount="15" columns="10">
+<tileset version="1.4" tiledversion="2020.11.25" name="colls" tilewidth="114" tileheight="134" tilecount="15" columns="10">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="2">
   <image width="32" height="32" source="../separated/q/player.png"/>
@@ -54,7 +54,7 @@
   <image width="90" height="50" source="../separated/structures/hydroponics.png"/>
   <objectgroup draworder="index" id="2">
    <object id="1" x="-5" y="50">
-    <polygon points="35,-14 74,-33 88,-26 49,-7"/>
+    <polygon points="35,-14 74,-33 88,-26 49,-6"/>
    </object>
    <object id="3" name="center" x="56" y="29">
     <point/>
@@ -108,7 +108,7 @@
    <object id="1" x="8" y="37">
     <polygon points="0,0 27,14 42,-22"/>
    </object>
-   <object id="2" name="center" x="8" y="40">
+   <object id="2" name="center" x="8" y="37">
     <point/>
    </object>
   </objectgroup>
@@ -153,6 +153,6 @@
   </objectgroup>
  </tile>
  <tile id="18">
-  <image width="25" height="25" source="../separated/ui/craft_but0.png"/>
+  <image width="16" height="16" source="../separated/ui/craft_but0.png"/>
  </tile>
 </tileset>

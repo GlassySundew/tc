@@ -1,8 +1,9 @@
+import Message.PlayerInit;
+import Message.MapLoad;
 import cherry.soup.EventSignal.EventSignal0;
 import Level.StructTile;
 import h3d.scene.Object;
 import dn.Rand;
-import en.player.WebPlayer;
 import h3d.pass.PassList;
 import ui.Hud;
 import en.player.Player;
@@ -20,9 +21,9 @@ import format.tmx.*;
 import hxd.Res;
 import tools.Util.*;
 
-class GameClient extends Process {
-	static var HOST = "127.0.0.1";
-	// static var HOST = "78.24.222.152";
+class GameClient extends Process implements GameAble {
+	// static var HOST = "0.0.0.0";
+	static var HOST = "78.24.222.152";
 	static var PORT = 6676;
 
 	public static var inst : GameClient;
@@ -42,8 +43,8 @@ class GameClient extends Process {
 	public var uid : Int;
 	public var player : en.player.Player;
 
-	// public var structTiles : Array<StructTile> = [];
-	public var execAfterLvlLoad : EventSignal0;
+	public var structTiles : Array<StructTile> = [];
+	public var execAfterLvlLoad : EventSignal0 = new EventSignal0();
 
 	public function new() {
 		super(Main.inst);
@@ -60,7 +61,6 @@ class GameClient extends Process {
 		event = new hxd.WaitEvent();
 		host = new hxd.net.SocketHost();
 		host.setLogger(function(msg) trace(msg));
-
 		uid = 1 + Std.random(1000);
 		host.connect(HOST, PORT, function(b) {
 			if ( !b ) {
@@ -68,7 +68,8 @@ class GameClient extends Process {
 				return;
 			}
 			trace("Connected to server");
-			host.sendMessage({type: MessageType.PlayerInit, msg: uid});
+
+			host.sendTypedMessage(new PlayerInit(uid));
 
 			// sys.thread.Thread.create(() -> {
 			// 	while( true ) {
@@ -82,10 +83,30 @@ class GameClient extends Process {
 			// 	}
 			// });
 		});
+		host.onTypedMessage((c, msg : Message) -> {
+			switch( msg.type ) {
+				case mapLoad:
+					var map = cast(msg, MapLoad);
+					loadMap(map.map);
+				default:
+			}
+		});
+		// host.onMessage = function(c, msg:Message) {
+		// 	trace("zhopa");
+		// 	switch( msg.type ) {
+		// 		case mapLoad:
+		// 			var map = cast(msg, MapLoad);
+		// 			loadMap(map.map);
+		// 			trace("ZHOPA");
+
+		// 		default:
+		// 	}
+		// }
+
 		host.onUnregister = function(o) {};
-        
-        if ( player != null ) {}
-        
+
+		if ( player != null ) {}
+
 		@:privateAccess engine.window.onClose = function() {
 			try {
 				player.destroy();
@@ -97,67 +118,49 @@ class GameClient extends Process {
 			host.flush();
 			return true;
 		}
-        host.flush();
 	}
 
-	public function startLevel(name : String) {
-		engine.clear(0, 1);
-		execAfterLvlLoad = new EventSignal0();
-
+	public function loadMap(tmx : TmxMap) {
 		if ( level != null ) {
 			level.destroy();
 			for (e in Entity.ALL) e.destroy();
 			gc();
 		}
-		var tsx = new Map();
-		var r = new Reader();
-		r.resolveTSX = getTsx(tsx, r);
-		tmxMap = r.read(Xml.parse(Res.loader.load(Const.LEVELS_PATH + name).entry.getText()));
+		tmxMap = tmx;
 		level = new Level(tmxMap);
-		lvlName = name.split('.')[0];
 
 		// Entity spawning
-		CompileTime.importPackage("en");
-		var entClasses = (CompileTime.getAllClasses(Entity));
+		// CompileTime.importPackage("en");
+		// var entClasses = (CompileTime.getAllClasses(Entity));
 
-		// Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity and puts name into spr group if not found
-		function searchAndSpawnEnt(e : TmxObject) {
-			// Парсим все классы - наследники en.Entity и спавним их
-			for (eClass in entClasses) {
-				eregCompTimeClass.match('$eClass'.toLowerCase());
-				if ( eregCompTimeClass.match('$eClass'.toLowerCase()) && eregCompTimeClass.matched(1) == e.name ) {
-					Type.createInstance(eClass, [e.x, e.y, e]);
-					return;
-				}
-			}
-			switch( e.objectType ) {
-				case OTTile(gid):
-					var source = Tools.getTileByGid(tmxMap, gid).image.source;
-					if ( eregFileName.match(source) ) {
-						new SpriteEntity(e.x, e.y, eregFileName.matched(1), e);
-						return;
-					}
-				default:
-			}
-		}
-		for (e in level.entities) searchAndSpawnEnt(e);
+		// // Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity and puts name into spr group if not found
+		// function searchAndSpawnEnt(e : TmxObject) {
+		// 	// Парсим все классы - наследники en.Entity и спавним их
+		// 	for (eClass in entClasses) {
+		// 		eregCompTimeClass.match('$eClass'.toLowerCase());
+		// 		if ( eregCompTimeClass.match('$eClass'.toLowerCase()) && eregCompTimeClass.matched(1) == e.name ) {
+		// 			Type.createInstance(eClass, [e.x, e.y, e]);
+		// 			return;
+		// 		}
+		// 	}
+		// 	switch( e.objectType ) {
+		// 		case OTTile(gid):
+		// 			var source = Tools.getTileByGid(tmxMap, gid).image.source;
+		// 			if ( eregFileName.match(source) ) {
+		// 				new SpriteEntity(e.x, e.y, eregFileName.matched(1), e);
+		// 				return;
+		// 			}
+		// 		default:
+		// 	}
+		// }
+		// for (e in level.entities) searchAndSpawnEnt(e);
 
-		applyTmxObjOnEnt();
+		// applyTmxObjOnEnt();
 
 		player = Player.inst;
 
 		camera.target = player;
 		camera.recenter();
-		// System.openURL("https://pornreactor.cc");
-
-		// rect-obj position fix
-
-		// for (en in Entity.ALL)
-		// 	if (en.tmxObj != null)
-		// 		en.footY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
-
-		// new AxesHelper(Boot.inst.s3d);
-		// new GridHelper(Boot.inst.s3d, 10, 10);
 	}
 
 	public function applyTmxObjOnEnt(?ent : Null<Entity>) {
@@ -177,10 +180,10 @@ class GameClient extends Process {
 							var centerSet = false;
 							for (obj in tile.objectGroup.objects) { // Засовываем объекты для детекта коллизий по Entity
 								var params = {
-									x: M.round(obj.x) + ent.footX,
-									y: M.round(obj.y) + ent.footY,
-									width: M.round(obj.width),
-									height: M.round(obj.height)
+									x : M.round(obj.x) + ent.footX,
+									y : M.round(obj.y) + ent.footY,
+									width : M.round(obj.width),
+									height : M.round(obj.height)
 								};
 								var xCent = 0.;
 								var yCent = 0.;
@@ -209,12 +212,12 @@ class GameClient extends Process {
 										shape.scaleY = params.height / params.width;
 										xCent = M.round(obj.width / 2);
 										yCent = M.round(obj.height / 2);
-										ent.collisions.set(shape, {cent: new h3d.Vector(xCent, yCent), offset: new h3d.Vector(obj.x + xCent, -obj.y - yCent)});
+										ent.collisions.set(shape,
+											{cent : new h3d.Vector(xCent, yCent), offset : new h3d.Vector(obj.x + xCent, -obj.y - yCent)});
 									case OTRectangle:
 										// Точка парсится как OTRectangle, точка с названием center будет обозначать центр
-
 										ent.collisions.set(Polygon.rectangle(params.x, params.y, params.width, params.height),
-											{cent: new h3d.Vector(), offset: new h3d.Vector()});
+											{cent : new h3d.Vector(), offset : new h3d.Vector()});
 									case OTPolygon(points):
 										var pts = checkPolyClockwise(points);
 										var verts : Array<Vector> = [];
@@ -246,7 +249,7 @@ class GameClient extends Process {
 										if ( ent.tmxObj != null && ent.tmxObj.flippedVertically ) poly.scaleX = -1;
 										var xOffset = poly.scaleX < 0 ? ent.spr.tile.width - obj.x : obj.x;
 										var yOffset = -obj.y;
-										ent.collisions.set(poly, {cent: new h3d.Vector(xCent, -yCent), offset: new h3d.Vector(xOffset, yOffset)});
+										ent.collisions.set(poly, {cent : new h3d.Vector(xCent, -yCent), offset : new h3d.Vector(xOffset, yOffset)});
 									case OTPoint:
 										if ( obj.name == "center" ) {
 											if ( centerSet ) unsetCenter();

@@ -28,11 +28,12 @@ class Door extends Structure {
 				turnOffHighlight();
 
 				if (leadsTo != null) {
-					var curLvl = game.lvlName;
-					game.startLevel(leadsTo + ".tmx");
+					var castedG = cast(game, Game);
+					var curLvl = castedG.lvlName;
+					castedG.startLevel(leadsTo + ".tmx");
 					var door = findDoor(curLvl);
 					player.setFeetPos(door.footX, door.footY);
-					game.camera.recenter();
+					castedG.camera.recenter();
 				}
 			}
 		});

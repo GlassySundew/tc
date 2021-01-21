@@ -12,6 +12,7 @@ class Structure extends Interactive {
 		super(x, y, tmxObject);
 		this.cdbEntry = cdbEntry;
 		
+		#if !headless
 		// Нажатие для того, чтобы сломать структуру
 		interact.onPushEvent.add(event -> {
 			if ( Game.inst.player.holdItem != null ) applyItem(Game.inst.player.holdItem);
@@ -20,6 +21,7 @@ class Structure extends Interactive {
 		interact.onOutEvent.add((e : hxd.Event) -> {
 			turnOffHighlight();
 		});
+		#end
 		// CDB parsed entry corresponding to this structure instance
 		if ( cdbEntry != null ) try {
 			eregClass.match('$this'.toLowerCase());
@@ -38,12 +40,14 @@ class Structure extends Interactive {
 			useRange = Data.structures.get(cdbEntry).use_range;
 
 			health = Data.structures.get(cdbEntry).hp;
+			#if !headless
 			if ( Data.structures.get(cdbEntry).isoHeight != 0 && Data.structures.get(cdbEntry).isoWidth != 0 ) {
 				mesh.isLong = true;
 				mesh.isoWidth = Data.structures.get(cdbEntry).isoWidth;
 				mesh.isoHeight = Data.structures.get(cdbEntry).isoHeight;
 				mesh.renewDebugPts();
 			}
+			#end
 		}
 	}
 

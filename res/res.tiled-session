@@ -40,18 +40,18 @@
         },
         "tiled/levels/alphamap.tmx": {
             "scale": 3,
-            "selectedLayer": 0,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 2400,
-                "y": 1184
+                "x": 2423.6666666666665,
+                "y": 470.16666666666663
             }
         },
         "tiled/levels/bridge.tmx": {
-            "scale": 4,
+            "scale": 1.5,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 2400,
-                "y": 1184.5
+                "x": 2446.6666666666665,
+                "y": 467.66666666666663
             }
         },
         "tiled/levels/colls.tsx": {
@@ -69,7 +69,7 @@
             "selectedLayer": 3,
             "viewCenter": {
                 "x": 500,
-                "y": 500
+                "y": 499.66666666666663
             }
         },
         "tiled/levels/ui.tsx": {

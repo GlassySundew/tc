@@ -1,3 +1,6 @@
+import Message.PlayerInit;
+import Message.MapLoad;
+import Message.MessageType;
 import h2d.Scene;
 import en.player.Player;
 import h3d.Engine;
@@ -9,22 +12,22 @@ import hxd.net.SocketHost;
 
 using Server.SocketHostExtender;
 
-
 class Server extends Process {
 	static var parsedPort = Std.parseInt(Sys.getEnv("PORT"));
 	static var PORT : Int = parsedPort != null ? parsedPort : 6676;
-	static var HOST = "127.0.0.1";
+	static var HOST = "0.0.0.0";
 
 	public var host : SocketHost;
 	public var event : hxd.WaitEvent;
 	public var uid : Int;
 
 	public static var game : GameServer;
+	public static var inst : Server;
 
 	var isDisposed : Bool;
 
 	static public function main() : Void {
-		new Server();
+		inst = new Server();
 	}
 
 	public function new() {
@@ -40,13 +43,14 @@ class Server extends Process {
 		loadAssets(function() {
 			mainLoop();
 			hxd.System.setLoop(mainLoop);
+
 			startServer();
 
 			@:privateAccess new h3d.Engine();
 			engine.init();
 
 			entParent = new Scene();
-			
+
 			if ( GameServer.inst != null ) {
 				GameServer.inst.destroy();
 				game = new GameServer();
@@ -77,34 +81,32 @@ class Server extends Process {
 			catch( e:Dynamic ) {}
 		});
 
-		host.onMessage = function(c, msg : Dynamic) {
-			var message : {type : MessageType, msg : Dynamic} = cast(msg);
-			switch( message.type ) {
-				case PlayerInit:
-					var uid : Int = cast(message.msg);
+		host.onTypedMessage((c, msg : Message) -> {
+			switch( msg.type ) {
+				case playerInit:
+					var uid : Int = cast(msg, PlayerInit).uid;
 					log("Client identified (" + uid + ")");
-
 					var cursorClient = new Player(2448, 1933, uid);
+					host.sendMessage(new MapLoad(GameServer.inst.lvlName, GameServer.inst.tmxMap), c);
 					// game.applyTmxObjOnEnt(cursorClient);
 					c.ownerObject = cursorClient;
 					c.sync();
-					if ( c.ownerObject != null ) {}
-					event.update(0);
-					host.flush();
+					// cursorClient.footX = 2448;
+					// cursorClient.footY = 1933;
 				default:
 			}
-		};
+		});
+		host.onUnregister = function(c) {
+			log('unregistered ' + c);
+		}
 
 		log("Server Started");
 		host.makeAlive();
 		host.flush();
-		host.onUnregister = function(c) {
-			log('unregistered ' + c);
-		}
 	}
 
 	@:dox(show)
-	function loadAssets(onLoaded : Void->Void) {
+	function loadAssets(onLoaded : Void -> Void) {
 		onLoaded();
 	}
 
@@ -118,7 +120,6 @@ class Server extends Process {
 	@:dox(show)
 	function updateFixed(dt : Float) {
 		super.update();
-		if ( event != null ) event.update(dt);
 		var tmod = hxd.Timer.tmod * speed;
 		dn.Process.updateAll(tmod);
 		if ( host != null ) host.flush();
@@ -130,8 +131,8 @@ class Server extends Process {
 }
 
 class SocketHostExtender {
-	static public function waitFixed(sHost : SocketHost, host : String, port : Int, ?onConnected : NetworkClient->Void,
-			?onError : SocketClient->Void) @:privateAccess {
+	static public function waitFixed(sHost : SocketHost, host : String, port : Int, ?onConnected : NetworkClient -> Void,
+			?onError : SocketClient -> Void) @:privateAccess {
 		sHost.close();
 		sHost.isAuth = false;
 		sHost.socket = new Socket();

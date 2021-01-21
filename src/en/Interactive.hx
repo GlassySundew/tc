@@ -60,6 +60,7 @@ class Interactive extends Entity {
 
 	function new(?x : Float = 0, ?z : Float = 0, ?tmxObj : TmxObject) {
 		super(x, z, tmxObj);
+		#if !headless
 		var pixels = Pixels.fromBytes(tex.capturePixels().bytes, Std.int(spr.tile.width), Std.int(spr.tile.height));
 		points = new MarchingSquares(pixels).march();
 		polygonized = (EarCut.triangulate(points));
@@ -84,6 +85,7 @@ class Interactive extends Entity {
 		if ( highlightColor == null ) highlightColor = "ffffffff";
 
 		filter = new h2d.filter.Glow(Color.hexToInt(highlightingColor != null ? highlightingColor : highlightColor), 1.2, 4, 1, 1.5, true);
+		#end
 	}
 
 	function activateInteractive() {
@@ -123,7 +125,9 @@ class Interactive extends Entity {
 		if ( interactable ) updateKeyIcon();
 		// deactivate interactive if inventory is opened
 
+		#if !headless
 		interact.visible = player != null && !player.destroyed && /*!player.ui.inventory.sprInv.visible &&*/ isInPlayerRange();
+		#end
 	}
 
 	function updateKeyIcon() {

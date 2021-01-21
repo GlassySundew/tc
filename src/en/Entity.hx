@@ -1,5 +1,6 @@
 package en;
 
+import hxd.System;
 import hxbit.NetworkSerializable;
 import hxbit.Serializable;
 import h2d.Scene;
@@ -26,18 +27,20 @@ import h3d.prim.Cube;
 import h3d.Vector;
 import h3d.scene.Mesh;
 
-@:keep class Entity {
+@:keep class Entity implements NetworkSerializable {
 	// private var anim:String;
 	public static var ALL : Array<Entity> = [];
 	public static var GC : Array<Entity> = [];
 	/**
 		Map of multiple shapes, 1st vector is a center of polygon Shape, 2nd polygon is a position of a poly
 	**/
-	public var collisions = new Map<Shape, {cent : Vector, offset : Vector}>();
+	public var collisions : Map<Shape, {cent : Vector, offset : Vector}>;
 
-	public var game(get, never) : Game;
+	public var game(get, set) : dn.Process;
 
-	inline function get_game() return Game.inst;
+	inline function get_game() return GameClient.inst != null ? GameClient.inst : Game.inst;
+
+	inline function set_game(v) return get_game();
 
 	var level(get, never) : Level;
 
@@ -52,8 +55,8 @@ import h3d.scene.Mesh;
 	public var yr = 0.5;
 	public var zr = 0.;
 
-	public var dx = 0.;
-	public var dy = 0.;
+	@:s public var dx = 0.;
+	@:s public var dy = 0.;
 	public var dz = 0.;
 	public var bdx = 0.;
 	public var bdy = 0.;
@@ -86,26 +89,28 @@ import h3d.scene.Mesh;
 
 	public var player(get, never) : en.player.Player;
 
-	inline function get_player() return Game.inst.player;
+	inline function get_player() return Player.inst;
 
-	public var footX(get, set) : Float;
+	@:s public var uid : Int;
 
-	inline function get_footX() return (cx + xr);
+	@:s public var footX(default, set) : Float;
+
+	// inline function get_footX() return (cx + xr);
 
 	inline function set_footX(v : Float) { // небольшой костыль
 		xr = ((v)) % 1;
 		cx = (Math.floor((v)));
-		return v;
+		return this.footX = v;
 	}
 
-	public var footY(get, set) : Float;
+	@:s public var footY(default, set) : Float;
 
-	inline function get_footY() return (cy + yr - zr);
+	// inline function get_footY() return (cy + yr - zr);
 
 	inline function set_footY(v : Float) { // аналогично
 		yr = ((v)) % 1;
 		cy = (Math.floor((v)));
-		return v;
+		return this.footY = v;
 	}
 
 	public var tmxTile(get, never) : TmxTilesetTile;
@@ -136,9 +141,9 @@ import h3d.scene.Mesh;
 		init(x, z, tmxObj);
 	}
 
-	function init(?x : Float = 0, ?z : Float = 0, ?tmxObj : Null<TmxObject>) {
+	function init(?x : Float, ?z : Float, ?tmxObj : Null<TmxObject>) {
 		ALL.push(this);
-
+		collisions = new Map<Shape, {cent : Vector, offset : Vector}>();
 		cd = new dn.Cooldown(Const.FPS);
 		tw = new Tweenie(Const.FPS);
 
@@ -166,8 +171,10 @@ import h3d.scene.Mesh;
 		// s.setFunc(LessEqual, 0);
 		// s.setOp(Keep, DecrementWrap, Keep);
 		// mesh.material.mainPass.stencil = s;
-		setFeetPos(x, z);
+		if ( x != null && z != null ) setFeetPos(x, z);
 	}
+
+	public function alive() {}
 
 	public function isOfType<T : Entity>(c : Class<T>) return Std.isOfType(this, c);
 
@@ -251,11 +258,17 @@ import h3d.scene.Mesh;
 
 	public function makePoint() return new CPoint(cx, cy, xr, yr);
 
-	public function destroy() {
+	@:rpc public function destroy() {
 		if ( !destroyed ) {
 			destroyed = true;
 			GC.push(this);
 		}
+	}
+
+	public function networkAllow(op : hxbit.NetworkSerializable.Operation, propId : Int, clientSer : hxbit.NetworkSerializable) : Bool {
+		// trace(op, propId, clientSer, clientSer == this);
+		// return #if !headless clientSer == this #else clientSer == this #end;
+		return false;
 	}
 
 	public function dispose() {
@@ -272,11 +285,12 @@ import h3d.scene.Mesh;
 			mesh.remove();
 		}
 		cd.destroy();
+		#if !headless
 		tex.dispose();
+		#end
 		tw.destroy();
 		cd = null;
 		for (i in collisions.keys()) i.destroy();
-
 		collisions = null;
 		spr = null;
 		mesh = null;
@@ -301,17 +315,22 @@ import h3d.scene.Mesh;
 	}
 
 	function checkCollisions() {
-		for (collObj in collisions.keys()) {
-			collObj.x = footX
-				- collisions.get(collObj).cent.x
-				- (spr.pivot.centerFactorX * spr.tile.width - collisions.get(collObj).offset.x - collisions.get(collObj).cent.x);
-			collObj.y = footY
-				- collisions.get(collObj).cent.y
-				+ (spr.pivot.centerFactorY * spr.tile.height + collisions.get(collObj).offset.y + collisions.get(collObj).cent.y);
+		#if !headless
+		if ( collisions != null ) {
+			for (collObj in collisions.keys()) {
+				collObj.x = footX
+					- collisions.get(collObj).cent.x
+					- (spr.pivot.centerFactorX * spr.tile.width - collisions.get(collObj).offset.x - collisions.get(collObj).cent.x);
+				collObj.y = footY
+					- collisions.get(collObj).cent.y
+					+ (spr.pivot.centerFactorY * spr.tile.height + collisions.get(collObj).offset.y + collisions.get(collObj).cent.y);
+			}
 		}
+		#end
 	}
 
 	public function checkCollsAgainstAll() {
+		#if !headless
 		for (ent in Entity.ALL) {
 			if ( !(ent.isOfType(FloatingItem) || isOfType(FloatingItem)) && ent != this ) {
 				for (collObj in collisions.keys()) {
@@ -340,17 +359,21 @@ import h3d.scene.Mesh;
 				}
 			}
 		}
+		#end
 		// footX = (collisions[0].x);
 		// footY = (collisions[0].y);
 	}
 
 	public function preUpdate() {
+		// this.footX = footX;
+		// this.footY = footY;
 		spr.anim.update(tmod);
 		cd.update(tmod);
 		tw.update(tmod);
 	}
 
 	public function update() {
+		#if !headless
 		@:privateAccess if (spr.anim.getCurrentAnim() != null) {
 			if ( tmpCur != 0 && (spr.anim.getCurrentAnim().curFrameCpt - (tmpDt)) == 0 ) // ANIM LINK HACK
 				spr.anim.getCurrentAnim().curFrameCpt = tmpCur + spr.anim.getAnimCursor();
@@ -404,13 +427,15 @@ import h3d.scene.Mesh;
 		bdy *= Math.pow(bumpFrict, tmod);
 		if ( M.fabs(dy) <= 0.0005 * tmod ) dy = 0;
 		if ( M.fabs(bdy) <= 0.0005 * tmod ) bdy = 0;
+		#end
 	}
 
 	public function postUpdate() {
 		#if !headless
 		if ( mesh != null ) {
-			mesh.x = footX;
-			mesh.z = footY;
+			trace(cx, cy, xr, yr);
+			setFeetPos(cx + xr, cy + yr - zr);
+
 			checkCollisions();
 
 			// spr.scaleX = dir * sprScaleX;
@@ -427,11 +452,14 @@ import h3d.scene.Mesh;
 			// }
 			// curFrame = spr.anim.getCurrentAnim().curFrameCpt;
 		}
-		#end
+
 		if ( !isMoving() ) {
 			footX = M.round(M.fabs(footX));
 			footY = M.round(M.fabs(footY));
 		}
+
+		// setFeetPos(footX, footY);
+		#end
 	}
 
 	public function frameEnd() {
@@ -445,6 +473,9 @@ import h3d.scene.Mesh;
 			tile.getTexture().filter = Nearest;
 			tile.setCenterRatio(spr.pivot.centerFactorX, spr.pivot.centerFactorY);
 			mesh.tile = tile;
+
+			mesh.x = footX;
+			mesh.z = footY;
 		}
 		#end
 	}

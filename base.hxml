@@ -13,7 +13,7 @@
 -lib msignal
 -lib deepnightLibs
 -lib compiletime
-
+-lib cloner
 
 -cp src.helper
 --macro Helper.init()

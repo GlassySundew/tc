@@ -19,13 +19,12 @@
  </layer>
  <objectgroup id="47" name="image"/>
  <objectgroup id="34" name="walls">
-  <object id="245" x="408" y="384" width="24" height="144"/>
-  <object id="282" x="408" y="360" width="168" height="24"/>
+  <object id="245" x="408" y="360" width="24" height="168"/>
+  <object id="282" x="432" y="360" width="144" height="24"/>
   <object id="293" x="552" y="384" width="24" height="120"/>
   <object id="304" x="432" y="504" width="144" height="24"/>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="723" gid="52" x="505.5" y="504.5" width="90" height="50"/>
-  <object id="631" name="player" gid="45" x="493.5" y="446.5" width="32" height="32"/>
+  <object id="631" name="player" gid="45" x="492" y="422" width="32" height="32"/>
  </objectgroup>
 </map>

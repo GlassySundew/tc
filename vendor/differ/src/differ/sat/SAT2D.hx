@@ -4,12 +4,11 @@ import differ.math.*;
 import differ.shapes.*;
 import differ.data.*;
 import differ.math.Util.*;
-
 /** Implementation details for the 2D SAT collision queries.
 	Used by the various shapes, and Collision API, mostly internally. */
 class SAT2D {
 	/** Internal api - test a circle against a polygon */
-	public static function testCircleVsPolygon(circle:Circle, polygon:Polygon, ?into:ShapeCollision, flip:Bool = false):ShapeCollision {
+	public static function testCircleVsPolygon(circle : Circle, polygon : Polygon, ?into : ShapeCollision, flip : Bool = false) : ShapeCollision {
 		into = into == null ? new ShapeCollision() : into.reset();
 
 		var verts = polygon.transformedVertices;
@@ -17,12 +16,12 @@ class SAT2D {
 		var circleX = circle.x;
 		var circleY = circle.y;
 
-		var testDistance:Float = 0x3FFFFFFF;
+		var testDistance : Float = 0x3FFFFFFF;
 		var distance = 0.0, closestX = 0.0, closestY = 0.0;
 		for (i in 0...verts.length) {
 			distance = vec_lengthsq(circleX - verts[i].x, circleY - verts[i].y);
 
-			if (distance < testDistance) {
+			if ( distance < testDistance ) {
 				testDistance = distance;
 				closestX = verts[i].x;
 				closestY = verts[i].y;
@@ -42,10 +41,8 @@ class SAT2D {
 
 		for (j in 1...verts.length) {
 			test = vec_dot(normalAxisX, normalAxisY, verts[j].x, verts[j].y);
-			if (test < min1)
-				min1 = test;
-			if (test > max1)
-				max1 = test;
+			if ( test < min1 ) min1 = test;
+			if ( test > max1 ) max1 = test;
 		} // each vert
 
 		// project the circle
@@ -60,13 +57,11 @@ class SAT2D {
 		var test2 = min2 - max1;
 
 		// if either test is greater than 0, there is a gap, we can give up now.
-		if (test1 > 0 || test2 > 0)
-			return null;
+		if ( test1 > 0 || test2 > 0 ) return null;
 
 		// circle distance check
 		var distMin = -(max2 - min1);
-		if (flip)
-			distMin *= -1;
+		if ( flip ) distMin *= -1;
 
 		into.overlap = distMin;
 		into.unitVectorX = normalAxisX;
@@ -97,10 +92,8 @@ class SAT2D {
 			// project all the other points(see, cirlces v. polygons use lots of this...)
 			for (j in 1...verts.length) {
 				test = vec_dot(normalAxisX, normalAxisY, verts[j].x, verts[j].y);
-				if (test < min1)
-					min1 = test;
-				if (test > max1)
-					max1 = test;
+				if ( test < min1 ) min1 = test;
+				if ( test > max1 ) max1 = test;
 			}
 
 			offset = vec_dot(normalAxisX, normalAxisY, -circleX, -circleY);
@@ -118,15 +111,14 @@ class SAT2D {
 			test2 = min2 - max1;
 
 			// failed.. quit now
-			if (test1 > 0 || test2 > 0) {
+			if ( test1 > 0 || test2 > 0 ) {
 				return null;
 			}
 
 			distMin = -(max2 - min1);
-			if (flip)
-				distMin *= -1;
+			if ( flip ) distMin *= -1;
 
-			if (Math.abs(distMin) < closest) {
+			if ( Math.abs(distMin) < closest ) {
 				into.unitVectorX = normalAxisX;
 				into.unitVectorY = normalAxisY;
 				into.overlap = distMin;
@@ -136,11 +128,11 @@ class SAT2D {
 
 		// if you made it here, there is a collision!!!!!
 
-		into.shape1 = if (flip) polygon else circle;
-		into.shape2 = if (flip) circle else polygon;
+		into.shape1 = if ( flip ) polygon else circle;
+		into.shape2 = if ( flip ) circle else polygon;
 		into.separationX = into.unitVectorX * into.overlap;
 		into.separationY = into.unitVectorY * into.overlap;
-		if (!flip) {
+		if ( !flip ) {
 			into.unitVectorX = -into.unitVectorX;
 			into.unitVectorY = -into.unitVectorY;
 		}
@@ -149,7 +141,7 @@ class SAT2D {
 	} // testCircleVsPolygon
 
 	/** Internal api - test a circle against a circle */
-	public static function testCircleVsCircle(circleA:Circle, circleB:Circle, ?into:ShapeCollision, flip:Bool = false):ShapeCollision {
+	public static function testCircleVsCircle(circleA : Circle, circleB : Circle, ?into : ShapeCollision, flip : Bool = false) : ShapeCollision {
 		//
 
 		var circle1 = flip ? circleB : circleA;
@@ -164,7 +156,7 @@ class SAT2D {
 		var distancesq = vec_lengthsq(circle1.x - circle2.x, circle1.y - circle2.y);
 
 		// if your distance is less than the totalRadius square(because distance is squared)
-		if (distancesq < totalRadius * totalRadius) {
+		if ( distancesq < totalRadius * totalRadius ) {
 			into = (into == null) ? new ShapeCollision() : into.reset();
 			// find the difference. Square roots are needed here.
 			var difference = totalRadius - Math.sqrt(distancesq);
@@ -195,23 +187,23 @@ class SAT2D {
 	} // testCircleVsCircle
 
 	/** Internal api - test a polygon against another polygon */
-	static var tmp1:ShapeCollision = new ShapeCollision();
+	static var tmp1 : ShapeCollision = new ShapeCollision();
 
-	static var tmp2:ShapeCollision = new ShapeCollision();
+	static var tmp2 : ShapeCollision = new ShapeCollision();
 
-	public static function testPolygonVsPolygon(polygon1:Polygon, polygon2:Polygon, ?into:ShapeCollision, flip:Bool = false):ShapeCollision {
+	public static function testPolygonVsPolygon(polygon1 : Polygon, polygon2 : Polygon, ?into : ShapeCollision, flip : Bool = false) : ShapeCollision {
 		into = (into == null) ? new ShapeCollision() : into.reset();
 
-		if (checkPolygons(polygon1, polygon2, tmp1, flip) == null) {
+		if ( checkPolygons(polygon1, polygon2, tmp1, flip) == null ) {
 			return null;
 		}
 
-		if (checkPolygons(polygon2, polygon1, tmp2, !flip) == null) {
+		if ( checkPolygons(polygon2, polygon1, tmp2, !flip) == null ) {
 			return null;
 		}
 
 		var result = null, other = null;
-		if (Math.abs(tmp1.overlap) < Math.abs(tmp2.overlap)) {
+		if ( Math.abs(tmp1.overlap) < Math.abs(tmp2.overlap) ) {
 			result = tmp1;
 			other = tmp2;
 		} else {
@@ -232,7 +224,7 @@ class SAT2D {
 	} // testPolygonVsPolygon
 
 	/** Internal api - test a ray against a circle */
-	public static function testRayVsCircle(ray:Ray, circle:Circle, ?into:RayCollision):RayCollision {
+	public static function testRayVsCircle(ray : Ray, circle : Circle, ?into : RayCollision) : RayCollision {
 		var deltaX = ray.end.x - ray.start.x;
 		var deltaY = ray.end.y - ray.start.y;
 		var ray2circleX = ray.start.x - circle.position.x;
@@ -243,19 +235,19 @@ class SAT2D {
 		var c = vec_dot(ray2circleX, ray2circleY, ray2circleX, ray2circleY) - (circle.radius * circle.radius);
 		var d = b * b - 4 * a * c;
 
-		if (d >= 0) {
+		if ( d >= 0 ) {
 			d = Math.sqrt(d);
 
 			var t1 = (-b - d) / (2 * a);
 			var t2 = (-b + d) / (2 * a);
 
-			var valid = switch (ray.infinite) {
+			var valid = switch( ray.infinite ) {
 				case not_infinite: t1 >= 0.0 && t1 <= 1.0;
 				case infinite_from_start: t1 >= 0.0;
 				case infinite: true;
 			}
 
-			if (valid) {
+			if ( valid ) {
 				into = (into == null) ? new RayCollision() : into.reset();
 
 				into.shape = circle;
@@ -271,7 +263,7 @@ class SAT2D {
 	} // testRayVsCircle
 
 	/** Internal api - test a ray against a polygon */
-	public static function testRayVsPolygon(ray:Ray, polygon:Polygon, ?into:RayCollision):RayCollision {
+	public static function testRayVsPolygon(ray : Ray, polygon : Polygon, ?into : RayCollision) : RayCollision {
 		var min_u = Math.POSITIVE_INFINITY;
 		var max_u = Math.NEGATIVE_INFINITY;
 
@@ -288,11 +280,9 @@ class SAT2D {
 		var ua = rayU(ud, startX, startY, v1.x, v1.y, v2.x - v1.x, v2.y - v1.y);
 		var ub = rayU(ud, startX, startY, v1.x, v1.y, deltaX, deltaY);
 
-		if (ud != 0.0 && ub >= 0.0 && ub <= 1.0) {
-			if (ua < min_u)
-				min_u = ua;
-			if (ua > max_u)
-				max_u = ua;
+		if ( ud != 0.0 && ub >= 0.0 && ub <= 1.0 ) {
+			if ( ua < min_u ) min_u = ua;
+			if ( ua > max_u ) max_u = ua;
 		}
 
 		for (i in 1...verts.length) {
@@ -303,21 +293,19 @@ class SAT2D {
 			ua = rayU(ud, startX, startY, v1.x, v1.y, v2.x - v1.x, v2.y - v1.y);
 			ub = rayU(ud, startX, startY, v1.x, v1.y, deltaX, deltaY);
 
-			if (ud != 0.0 && ub >= 0.0 && ub <= 1.0) {
-				if (ua < min_u)
-					min_u = ua;
-				if (ua > max_u)
-					max_u = ua;
+			if ( ud != 0.0 && ub >= 0.0 && ub <= 1.0 ) {
+				if ( ua < min_u ) min_u = ua;
+				if ( ua > max_u ) max_u = ua;
 			}
 		} // each vert
 
-		var valid = switch (ray.infinite) {
+		var valid = switch( ray.infinite ) {
 			case not_infinite: min_u >= 0.0 && min_u <= 1.0;
 			case infinite_from_start: min_u != Math.POSITIVE_INFINITY && min_u >= 0.0;
 			case infinite: (min_u != Math.POSITIVE_INFINITY);
 		}
 
-		if (valid) {
+		if ( valid ) {
 			into = (into == null) ? new RayCollision() : into.reset();
 			into.shape = polygon;
 			into.ray = ray;
@@ -330,7 +318,7 @@ class SAT2D {
 	} // testRayVsPolygon
 
 	/** Internal api - test a ray against another ray */
-	public static function testRayVsRay(ray1:Ray, ray2:Ray, ?into:RayIntersection):RayIntersection {
+	public static function testRayVsRay(ray1 : Ray, ray2 : Ray, ?into : RayIntersection) : RayIntersection {
 		var delta1X = ray1.end.x - ray1.start.x;
 		var delta1Y = ray1.end.y - ray1.start.y;
 		var delta2X = ray2.end.x - ray2.start.x;
@@ -339,26 +327,25 @@ class SAT2D {
 		var diffY = ray1.start.y - ray2.start.y;
 		var ud = delta2Y * delta1X - delta2X * delta1Y;
 
-		if (ud == 0.0)
-			return null;
+		if ( ud == 0.0 ) return null;
 
 		var u1 = (delta2X * diffY - delta2Y * diffX) / ud;
 		var u2 = (delta1X * diffY - delta1Y * diffX) / ud;
 
 		// :todo: ask if ray hit condition difference is intentional (> 0 and not >= 0 like other checks)
-		var valid1 = switch (ray1.infinite) {
+		var valid1 = switch( ray1.infinite ) {
 			case not_infinite: (u1 > 0.0 && u1 <= 1.0);
 			case infinite_from_start: u1 > 0.0;
 			case infinite: true;
 		}
 
-		var valid2 = switch (ray2.infinite) {
+		var valid2 = switch( ray2.infinite ) {
 			case not_infinite: (u2 > 0.0 && u2 <= 1.0);
 			case infinite_from_start: u2 > 0.0;
 			case infinite: true;
 		}
 
-		if (valid1 && valid2) {
+		if ( valid1 && valid2 ) {
 			into = (into == null) ? new RayIntersection() : into.reset();
 
 			into.ray1 = ray1;
@@ -373,14 +360,13 @@ class SAT2D {
 	} // testRayVsRay
 
 	// Internal implementation detail helpers
-
 	/** Internal api - implementation details for testPolygonVsPolygon */
-	static function checkPolygons(polygon1:Polygon, polygon2:Polygon, into:ShapeCollision, flip:Bool = false):ShapeCollision {
+	static function checkPolygons(polygon1 : Polygon, polygon2 : Polygon, into : ShapeCollision, flip : Bool = false) : ShapeCollision {
 		into.reset();
 
 		var offset = 0.0, test1 = 0.0, test2 = 0.0, testNum = 0.0;
 		var min1 = 0.0, max1 = 0.0, min2 = 0.0, max2 = 0.0;
-		var closest:Float = 0x3FFFFFFF;
+		var closest : Float = 0x3FFFFFFF;
 
 		var axisX = 0.0;
 		var axisY = 0.0;
@@ -401,10 +387,8 @@ class SAT2D {
 
 			for (j in 1...verts1.length) {
 				testNum = vec_dot(axisX, axisY, verts1[j].x, verts1[j].y);
-				if (testNum < min1)
-					min1 = testNum;
-				if (testNum > max1)
-					max1 = testNum;
+				if ( testNum < min1 ) min1 = testNum;
+				if ( testNum > max1 ) max1 = testNum;
 			}
 
 			// project polygon2
@@ -413,23 +397,19 @@ class SAT2D {
 
 			for (j in 1...verts2.length) {
 				testNum = vec_dot(axisX, axisY, verts2[j].x, verts2[j].y);
-				if (testNum < min2)
-					min2 = testNum;
-				if (testNum > max2)
-					max2 = testNum;
+				if ( testNum < min2 ) min2 = testNum;
+				if ( testNum > max2 ) max2 = testNum;
 			}
 
 			test1 = min1 - max2;
 			test2 = min2 - max1;
 
-			if (test1 > 0 || test2 > 0)
-				return null;
+			if ( test1 > 0 || test2 > 0 ) return null;
 
 			var distMin = -(max2 - min1);
-			if (flip)
-				distMin *= -1;
+			if ( flip ) distMin *= -1;
 
-			if (Math.abs(distMin) < closest) {
+			if ( Math.abs(distMin) < closest ) {
 				into.unitVectorX = axisX;
 				into.unitVectorY = axisY;
 				into.overlap = distMin;
@@ -437,12 +417,12 @@ class SAT2D {
 			}
 		}
 
-		into.shape1 = if (flip) polygon2 else polygon1;
-		into.shape2 = if (flip) polygon1 else polygon2;
+		into.shape1 = if ( flip ) polygon2 else polygon1;
+		into.shape2 = if ( flip ) polygon1 else polygon2;
 		into.separationX = -into.unitVectorX * into.overlap;
 		into.separationY = -into.unitVectorY * into.overlap;
 
-		if (flip) {
+		if ( flip ) {
 			into.unitVectorX = -into.unitVectorX;
 			into.unitVectorY = -into.unitVectorY;
 		}
@@ -451,18 +431,17 @@ class SAT2D {
 	} // checkPolygons
 
 	// Internal helpers
-
 	/** Internal helper for ray overlaps */
-	static inline function rayU(udelta:Float, aX:Float, aY:Float, bX:Float, bY:Float, dX:Float, dY:Float):Float {
+	static inline function rayU(udelta : Float, aX : Float, aY : Float, bX : Float, bY : Float, dX : Float, dY : Float) : Float {
 		return (dX * (aY - bY) - dY * (aX - bX)) / udelta;
 	} // rayU
 
-	static inline function findNormalAxisX(verts:Array<Vector>, index:Int):Float {
+	static inline function findNormalAxisX(verts : Array<Vector>, index : Int) : Float {
 		var v2 = (index >= verts.length - 1) ? verts[0] : verts[index + 1];
 		return -(v2.y - verts[index].y);
 	}
 
-	static inline function findNormalAxisY(verts:Array<Vector>, index:Int):Float {
+	static inline function findNormalAxisY(verts : Array<Vector>, index : Int) : Float {
 		var v2 = (index >= verts.length - 1) ? verts[0] : verts[index + 1];
 		return (v2.x - verts[index].x);
 	}

@@ -1,3 +1,4 @@
+import cloner.Cloner;
 import h3d.Engine;
 import en.player.Player;
 import differ.shapes.Polygon;
@@ -17,6 +18,8 @@ class GameServer extends Process {
 
 	public var tmxMap : TmxMap;
 
+	public var tmxMapOg : TmxMap;
+
 	public var player : en.player.Player;
 
 	public var execAfterLvlLoad : EventSignal0;
@@ -33,7 +36,7 @@ class GameServer extends Process {
 
 		Assets.init();
 		Data.load(hxd.Res.data.entry.getText());
-		// startLevel("alphamap.tmx");
+		startLevel("alphamap.tmx");
 	}
 
 	public function onCdbReload() {}
@@ -63,10 +66,8 @@ class GameServer extends Process {
 			for (e in Entity.ALL) e.destroy();
 			gc();
 		}
-		var tsx = new Map();
-		var r = new Reader();
-		r.resolveTSX = getTsx(tsx, r);
-		tmxMap = r.read(Xml.parse(Res.loader.load(Const.LEVELS_PATH + name).entry.getText()));
+		tmxMap = resolveMap(tmxMap, name);
+
 		level = new Level(tmxMap);
 		lvlName = name.split('.')[0];
 
@@ -76,11 +77,21 @@ class GameServer extends Process {
 
 		// Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity and puts name into spr group if not found
 		function searchAndSpawnEnt(e : TmxObject) {
+			var isoX = 0., isoY = 0.;
+			if ( tmxMap.orientation == Isometric ) {
+				// все объекты в распаршенных слоях уже с конвертированными координатами
+				// entities export lies ahead
+				isoX = Level.inst.cartToIsoLocal(e.x, e.y).x;
+				isoY = Level.inst.cartToIsoLocal(e.x, e.y).y;
+
+				if ( e.flippedVertically ) isoY -= e.height;
+			}
+
 			// Парсим все классы - наследники en.Entity и спавним их
 			for (eClass in entClasses) {
 				eregCompTimeClass.match('$eClass'.toLowerCase());
 				if ( eregCompTimeClass.match('$eClass'.toLowerCase()) && eregCompTimeClass.matched(1) == e.name ) {
-					Type.createInstance(eClass, [e.x, e.y, e]);
+					Type.createInstance(eClass, [isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, e]);
 					return;
 				}
 			}
@@ -88,7 +99,7 @@ class GameServer extends Process {
 				case OTTile(gid):
 					var source = Tools.getTileByGid(tmxMap, gid).image.source;
 					if ( eregFileName.match(source) ) {
-						new SpriteEntity(e.x, e.y, eregFileName.matched(1), e);
+						new SpriteEntity(isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, eregFileName.matched(1), e);
 						return;
 					}
 				default:
@@ -124,10 +135,10 @@ class GameServer extends Process {
 							var centerSet = false;
 							for (obj in tile.objectGroup.objects) { // Засовываем объекты для детекта коллизий по Entity
 								var params = {
-									x: M.round(obj.x) + ent.footX,
-									y: M.round(obj.y) + ent.footY,
-									width: M.round(obj.width),
-									height: M.round(obj.height)
+									x : M.round(obj.x) + ent.footX,
+									y : M.round(obj.y) + ent.footY,
+									width : M.round(obj.width),
+									height : M.round(obj.height)
 								};
 								var xCent = 0.;
 								var yCent = 0.;
@@ -151,12 +162,13 @@ class GameServer extends Process {
 										shape.scaleY = params.height / params.width;
 										xCent = M.round(obj.width / 2);
 										yCent = M.round(obj.height / 2);
-										ent.collisions.set(shape, {cent: new h3d.Vector(xCent, yCent), offset: new h3d.Vector(obj.x + xCent, -obj.y - yCent)});
+										ent.collisions.set(shape,
+											{cent : new h3d.Vector(xCent, yCent), offset : new h3d.Vector(obj.x + xCent, -obj.y - yCent)});
 									case OTRectangle:
 										// Точка парсится как OTRectangle, точка с названием center будет обозначать центр
 
 										ent.collisions.set(Polygon.rectangle(params.x, params.y, params.width, params.height),
-											{cent: new h3d.Vector(), offset: new h3d.Vector()});
+											{cent : new h3d.Vector(), offset : new h3d.Vector()});
 									case OTPolygon(points):
 										var pts = checkPolyClockwise(points);
 										var verts : Array<Vector> = [];
@@ -188,7 +200,7 @@ class GameServer extends Process {
 										if ( ent.tmxObj != null && ent.tmxObj.flippedVertically ) poly.scaleX = -1;
 										var xOffset = poly.scaleX < 0 ? ent.spr.tile.width - obj.x : obj.x;
 										var yOffset = -obj.y;
-										ent.collisions.set(poly, {cent: new h3d.Vector(xCent, -yCent), offset: new h3d.Vector(xOffset, yOffset)});
+										ent.collisions.set(poly, {cent : new h3d.Vector(xCent, -yCent), offset : new h3d.Vector(xOffset, yOffset)});
 									case OTPoint:
 										if ( obj.name == "center" ) {
 											if ( centerSet ) unsetCenter();

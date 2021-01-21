@@ -10,6 +10,7 @@ import tools.Util.*;
 
 using tools.Util.TmxMapExtender;
 using tools.Util.TmxLayerExtender;
+using tools.Util.SocketHostExtender;
 using Item.StackExtender;
 
 #if !macro

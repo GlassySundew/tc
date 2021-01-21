@@ -26,11 +26,11 @@ import tools.Util.*;
 	Level parses tmx entities maps, renders tie layers into mesh
 **/
 class Level extends dn.Process {
-	public var game(get, never) : Game;
+	public var game(get, never) : GameAble;
+
+	function get_game() : GameAble return Game.inst != null ? Game.inst : GameClient.inst;
 
 	public static var inst : Level;
-
-	inline function get_game() return Game.inst;
 
 	// public var fx(get, never):Fx;
 
@@ -69,13 +69,14 @@ class Level extends dn.Process {
 	public function new(map : TmxMap) {
 		super(Game.inst);
 		inst = this;
+		// data = map;
 		data = map;
-
 		// new AxesHelper(Boot.inst.s3d);
 		// new GridHelper(Boot.inst.s3d, 10, 10);
-
+		#if !headless
 		Boot.inst.engine.backgroundColor = data.backgroundColor;
 		Boot.inst.s3d.camera.setFovX(70, Boot.inst.s3d.camera.screenRatio);
+		#end
 
 		for (layer in data.layers) {
 			var name : String = 'null';
@@ -86,7 +87,8 @@ class Level extends dn.Process {
 						switch( obj.objectType ) {
 							case OTPolygon(points):
 								var pts = checkPolyClockwise(points);
-								pts.reverse();
+								// pts.reverse();
+
 								if ( ol.name == 'walls' ) setWalkable(obj, pts);
 							case OTRectangle:
 								if ( ol.name == 'walls' ) setWalkable(obj);
@@ -96,13 +98,14 @@ class Level extends dn.Process {
 						if ( map.orientation == Isometric ) {
 							// все объекты в распаршенных слоях уже с конвертированными координатами
 							// entities export lies ahead
-							var isoX = cartToIsoLocal(obj.x, obj.y).x;
-							var isoY = cartToIsoLocal(obj.x, obj.y).y;
+							
+							// var isoX = cartToIsoLocal(obj.x, obj.y).x;
+							// var isoY = cartToIsoLocal(obj.x, obj.y).y;
 
-							if ( obj.flippedVertically ) isoY -= obj.height;
+							// if ( obj.flippedVertically ) isoY -= obj.height;
 
-							obj.x = isoX;
-							obj.y = isoY;
+							// obj.x = isoX;
+							// obj.y = isoY;
 
 							// Если Entity никак не назван на карте - то ему присваивается имя его картинки без расширения
 							if ( obj.name == "" ) {
@@ -243,9 +246,11 @@ class Level extends dn.Process {
 	override function postUpdate() {
 		super.postUpdate();
 
+		#if !headless
 		if ( invalidated ) {
 			render();
 		}
+		#end
 	}
 
 	public inline function cartToIsoLocal(x : Float, y : Float) : Vector return new Vector(wid * .5 + cartToIso(x, y).x, hei - cartToIso(x, y).y);
@@ -332,7 +337,7 @@ private class InternalRender extends TileLayerRenderer {
 		var ereg = ~/\/([a-z_0-9]+)\./; // regexp to take picture name between last / and . from picture path
 		if ( ereg.match(sourceTile.image.source)
 			&& StringTools.endsWith(ereg.matched(1),
-				"floor") ) Game.inst.structTiles.push(new StructTile(bmp.x + Level.inst.data.tileWidth / 2,
+				"floor") ) Level.inst.game.structTiles.push(new StructTile(bmp.x + Level.inst.data.tileWidth / 2,
 				Level.inst.ground.height - bmp.y - Level.inst.data.tileHeight / 2, Level.inst.obj));
 		bmp.drawTo(tex);
 		bmp.tile.dispose();
@@ -395,7 +400,7 @@ class StructTile extends Object {
 		tile.onPushEvent.add(event -> {
 			// Entity.ALL[Entity.ALL.length - 1].setFeetPos(x, y);
 			var ent = new Hydroponics(0, 0, hydroponics);
-			Game.inst.applyTmxObjOnEnt(ent);
+			Level.inst.game.applyTmxObjOnEnt(ent);
 			ent.setFeetPos(x, y);
 		});
 

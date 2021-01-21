@@ -29,9 +29,11 @@ class Hydroponics extends Structure {
 		inv.giveItem(new en.Item(plant), true, false);
 		inv.giveItem(new en.Item(plant), true, false);
 
+		#if !headless
 		interact.onTextInput = function(e : Event) {
 			if ( K.isPressed(K.E) ) dropGrownPlant();
 		}
+		#end
 	}
 
 	function dropGrownPlant() {
