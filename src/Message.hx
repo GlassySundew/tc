@@ -15,10 +15,12 @@ enum abstract MessageType(String) from String to String {
 
 @:structInit class PlayerInit extends Message {
 	public var uid : Int;
+	public var nickname : String;
 
-	public function new(uid : Int) {
+	public function new(uid : Int, nickname:String) {
 		super(playerInit);
 		this.uid = uid;
+		this.nickname = nickname;
 	}
 }
 

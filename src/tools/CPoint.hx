@@ -27,14 +27,14 @@ class CPoint {
 
 	public function isOfType(x,y) return cx==x && cy==y;
 
-	public inline function distCase(?e:Entity, ?pt:CPoint, ?cx=0, ?cy=0, ?xr=0.5, ?yr=0.5) {
-		if( e!=null )
-			return M.dist(this.cx+this.xr, this.cy+this.yr, e.cx+e.xr, e.cy+e.yr);
-		else if( pt!=null )
-			return M.dist(this.cx+this.xr, this.cy+this.yr, pt.cx+pt.xr, pt.cy+pt.yr);
-		else
-			return M.dist(this.cx+this.xr, this.cy+this.yr, cx+xr, cy+yr);
-	}
+	// public inline function distCase(?e:Entity, ?pt:CPoint, ?cx=0, ?cy=0, ?xr=0.5, ?yr=0.5) {
+	// 	if( e!=null )
+	// 		return M.dist(this.cx+this.xr, this.cy+this.yr, e.cx+e.xr, e.cy+e.yr);
+	// 	else if( pt!=null )
+	// 		return M.dist(this.cx+this.xr, this.cy+this.yr, pt.cx+pt.xr, pt.cy+pt.yr);
+	// 	else
+	// 		return M.dist(this.cx+this.xr, this.cy+this.yr, cx+xr, cy+yr);
+	// }
 
 	public inline function distPx(?e:Entity, ?pt:CPoint, ?x=0., ?y=0.) {
 		if( e!=null )

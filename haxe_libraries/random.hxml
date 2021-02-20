@@ -1,0 +1,3 @@
+# @install: lix --silent download "gh://github.com/jasononeil/hxrandom#222278f40c16c9d96b0c62061fbcbedbe4b454ba" into random/1.4.0/github/222278f40c16c9d96b0c62061fbcbedbe4b454ba
+-cp ${HAXE_LIBCACHE}/random/1.4.0/github/222278f40c16c9d96b0c62061fbcbedbe4b454ba/src/
+-D random=1.4.0

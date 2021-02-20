@@ -36,12 +36,6 @@ import h3d.scene.Mesh;
 	**/
 	public var collisions : Map<Shape, {cent : Vector, offset : Vector}>;
 
-	public var game(get, set) : dn.Process;
-
-	inline function get_game() return GameClient.inst != null ? GameClient.inst : Game.inst;
-
-	inline function set_game(v) return get_game();
-
 	var level(get, never) : Level;
 
 	inline function get_level() return Game.inst.level;
@@ -49,14 +43,12 @@ import h3d.scene.Mesh;
 	public var destroyed(default, null) = false;
 	public var tmod(get, never) : Float;
 
-	public var cx : Float = 0;
-	public var cy : Float = 0;
 	public var xr = 0.5;
 	public var yr = 0.5;
 	public var zr = 0.;
 
-	@:s public var dx = 0.;
-	@:s public var dy = 0.;
+	public var dx = 0.;
+	public var dy = 0.;
 	public var dz = 0.;
 	public var bdx = 0.;
 	public var bdy = 0.;
@@ -93,23 +85,34 @@ import h3d.scene.Mesh;
 
 	@:s public var uid : Int;
 
-	@:s public var footX(default, set) : Float;
+	@:s public var netX(default, set) : Float;
+	@:s public var netY(default, set) : Float;
+
+	function set_netX(v : Float) {
+		return netX = v;
+	}
+
+	function set_netY(v : Float) {
+		return netY = v;
+	}
+
+	@:s @:condSend(false) public var footX(default, set) : Float;
 
 	// inline function get_footX() return (cx + xr);
 
-	inline function set_footX(v : Float) { // небольшой костыль
-		xr = ((v)) % 1;
-		cx = (Math.floor((v)));
+	function set_footX(v : Float) { // небольшой костыль
+		// xr = ((v)) % 1;
+		// cx = (Math.floor((v)));
 		return this.footX = v;
 	}
 
-	@:s public var footY(default, set) : Float;
+	@:s @:condSend(false) public var footY(default, set) : Float;
 
 	// inline function get_footY() return (cy + yr - zr);
 
-	inline function set_footY(v : Float) { // аналогично
-		yr = ((v)) % 1;
-		cy = (Math.floor((v)));
+	function set_footY(v : Float) { // аналогично
+		// yr = ((v)) % 1;
+		// cy = (Math.floor((v)));
 		return this.footY = v;
 	}
 
@@ -132,6 +135,7 @@ import h3d.scene.Mesh;
 
 	public var cd : dn.Cooldown;
 	public var tw : Tweenie;
+	public var flippedX = false;
 
 	public static var isoCoefficient = 1.2;
 
@@ -156,22 +160,26 @@ import h3d.scene.Mesh;
 		tex = new Texture(Std.int(spr.tile.width), Std.int(spr.tile.height), [Target]);
 		spr.tile.getTexture().filter = Nearest;
 		spr.drawTo(tex);
+		spr.blendMode = AlphaAdd;
+		
 		mesh = new IsoTileSpr(spr.tile, false, Boot.inst.s3d);
-		mesh.material.mainPass.setBlendMode(AlphaAdd);
+		mesh.material.mainPass.setBlendMode(Alpha);
 
-		mesh.rotate(0, -rotAngle, M.toRad(90));
+		mesh.rotate(tmxObj != null ? M.toRad(tmxObj.rotation) : 0, -rotAngle, M.toRad(90));
 		var s = mesh.material.mainPass.addShader(new h3d.shader.ColorAdd());
 		s.color = colorAdd;
-		mesh.material.mainPass.enableLights = false;
+		// mesh.material.mainPass.enableLights = false;
 		mesh.material.mainPass.depth(false, Less);
 		#end
-		if ( tmxObj != null && tmxObj.flippedVertically ) spr.scaleX = -1;
 		// TODO semi-transparent shadow overlapping
 		// var s = new h3d.mat.Stencil();
 		// s.setFunc(LessEqual, 0);
 		// s.setOp(Keep, DecrementWrap, Keep);
 		// mesh.material.mainPass.stencil = s;
 		if ( x != null && z != null ) setFeetPos(x, z);
+
+		if ( tmxObj != null && tmxObj.flippedVertically ) spr.scaleY = -1;
+		if ( tmxObj != null && tmxObj.flippedHorizontally ) spr.scaleX = -1;
 	}
 
 	public function alive() {}
@@ -191,7 +199,7 @@ import h3d.scene.Mesh;
 
 	public inline function isMoving() return M.fabs(dxTotal) >= 0.01 || M.fabs(dyTotal) >= 0.01;
 
-	public inline function at(x, y) return cx == x && cy == y;
+	public inline function at(x, y) return footX == x && footY == y;
 
 	public inline function isAlive() {
 		return !destroyed; // && life > 0;
@@ -203,7 +211,7 @@ import h3d.scene.Mesh;
 
 	public function unlock() cd.unset("lock");
 
-	inline function dropItem(item : en.Item, ?angle : Float, ?power : Float) : en.Item {
+	public inline function dropItem(item : en.Item, ?angle : Float, ?power : Float) : en.Item {
 		angle = angle == null ? Math.random() * M.toRad(360) : angle;
 		power = power == null ? Math.random() * .04 * 48 + .01 : power;
 
@@ -212,6 +220,9 @@ import h3d.scene.Mesh;
 		fItem.lock(1000);
 		item.remove();
 		item = null;
+
+		Player.inst.ui.belt.deselectCells();
+
 		return item;
 	}
 
@@ -221,6 +232,36 @@ import h3d.scene.Mesh;
 		}
 
 		return dir = v == 0 ? 0 : v == 1 ? 1 : v == 2 ? 2 : v == 3 ? 3 : v == 4 ? 4 : v == 5 ? 5 : v == 6 ? 6 : v == 7 ? 7 : dir;
+	}
+	/**Flips spr.scaleX, all of collision objects, and sorting rectangle**/
+	public function flipX() {
+		checkCollisions();
+		if ( collisions != null ) {
+			for (collObj in collisions.keys()) {
+				collObj.x = 0;
+				collObj.y = 0;
+			}
+		}
+
+		footX -= M.round((spr.pivot.centerFactorX - .5) * spr.tile.width);
+
+		for (i in collisions.keys()) {
+			i.scaleX *= -1;
+			collisions.get(i).offset.x = i.scaleX < 0 ? spr.tile.width - i.x + 1 : i.x;
+		}
+
+		spr.scaleX *= -1;
+		spr.pivot.centerFactorX = 1 - spr.pivot.centerFactorX;
+
+		mesh.xOff *= -1;
+		mesh.flipX();
+		footX += ((spr.pivot.centerFactorX - .5) * spr.tile.width);
+
+		flippedX = !flippedX;
+		try {
+			cast(this, Interactive).interact.scaleX = spr.scaleX;
+		}
+		catch( e:Dynamic ) {}
 	}
 
 	public inline function bumpAwayFrom(e : Entity, spd : Float, ?spdZ = 0., ?ignoreReduction = false) {
@@ -240,23 +281,13 @@ import h3d.scene.Mesh;
 		dy = bdy = 0;
 	}
 
-	public inline function distCase(e : Entity) {
-		return M.dist(cx + xr, cy + yr, e.cx + e.xr, e.cy + e.yr);
-	}
-
 	public inline function distPx(e : Entity) {
 		return M.dist(footX, footY, e.footX, e.footY);
-	}
-
-	public inline function distCaseFree(tcx : Int, tcy : Int, ?txr = 0.5, ?tyr = 0.5) {
-		return M.dist(cx + xr, cy + yr, tcx + txr, tcy + tyr);
 	}
 
 	public inline function distPxFree(x : Float, y : Float) {
 		return M.dist(footX, footY, x, y);
 	}
-
-	public function makePoint() return new CPoint(cx, cy, xr, yr);
 
 	@:rpc public function destroy() {
 		if ( !destroyed ) {
@@ -296,25 +327,21 @@ import h3d.scene.Mesh;
 		mesh = null;
 	}
 
-	public function setFeetPos(x, y) {
+	@:rpc public function setFeetPos(x : Float, y : Float) {
 		footX = x;
 		footY = y;
 	}
 
-	public function setPosCase(x, y, ?xr = 0.5, ?yr = 0.5) {
-		cx = x;
-		cy = y;
-		this.xr = xr;
-		this.yr = yr;
-		lastFootX = footX;
-		lastFootY = footY;
+	public function offsetFootByCenter() {
+		footX += ((spr.pivot.centerFactorX - .5) * spr.tile.width);
+		footY -= (spr.pivot.centerFactorY) * spr.tile.height - spr.tile.height;
 	}
 
 	public function kill(by : Null<Entity>) {
 		destroy();
 	}
 
-	function checkCollisions() {
+	public function checkCollisions() {
 		#if !headless
 		if ( collisions != null ) {
 			for (collObj in collisions.keys()) {
@@ -329,19 +356,26 @@ import h3d.scene.Mesh;
 		#end
 	}
 
-	public function checkCollsAgainstAll() {
+	public function checkCollsAgainstAll(?doMove : Bool = true) : Bool {
 		#if !headless
+		var collided = false;
 		for (ent in Entity.ALL) {
-			if ( !(ent.isOfType(FloatingItem) || isOfType(FloatingItem)) && ent != this ) {
+			if ( !(ent.isOfType(FloatingItem) || isOfType(FloatingItem))
+				&& !(Std.isOfType(ent, Structure) && !(cast(ent, Structure).toBeCollidedAgainst))
+				&& ent != this ) {
 				for (collObj in collisions.keys()) {
 					for (entCollObj in ent.collisions.keys()) {
 						var collideInfo = Collision.shapeWithShape(collObj, entCollObj);
 						if ( collideInfo != null ) {
+							collided = true;
+
 							collObj.x += (collideInfo.separationX);
 							collObj.y += (collideInfo.separationY);
 
-							footX += (collideInfo.separationX);
-							footY += (collideInfo.separationY);
+							if ( doMove ) {
+								footX += (collideInfo.separationX);
+								footY += (collideInfo.separationY);
+							}
 						}
 					}
 				}
@@ -351,14 +385,19 @@ import h3d.scene.Mesh;
 			for (collObj in collisions.keys()) {
 				var collideInfo = Collision.shapeWithShape(collObj, poly);
 				if ( collideInfo != null ) {
+					collided = true;
+
 					collObj.x += (collideInfo.separationX);
 					collObj.y += (collideInfo.separationY);
 
-					footX += (collideInfo.separationX);
-					footY += (collideInfo.separationY);
+					if ( doMove ) {
+						footX += (collideInfo.separationX);
+						footY += (collideInfo.separationY);
+					}
 				}
 			}
 		}
+		return collided;
 		#end
 		// footX = (collisions[0].x);
 		// footY = (collisions[0].y);
@@ -390,11 +429,11 @@ import h3d.scene.Mesh;
 			xr += step;
 			while( xr > 1 ) {
 				xr--;
-				cx++;
+				footX++;
 			}
 			while( xr < 0 ) {
 				xr++;
-				cx--;
+				footX--;
 			}
 			steps--;
 		}
@@ -414,11 +453,11 @@ import h3d.scene.Mesh;
 			yr += step;
 			while( yr > 1 ) {
 				yr--;
-				cy++;
+				footY++;
 			}
 			while( yr < 0 ) {
 				yr++;
-				cy--;
+				footY--;
 			}
 			steps--;
 		}
@@ -433,11 +472,7 @@ import h3d.scene.Mesh;
 	public function postUpdate() {
 		#if !headless
 		if ( mesh != null ) {
-			trace(cx, cy, xr, yr);
-			setFeetPos(cx + xr, cy + yr - zr);
-
 			checkCollisions();
-
 			// spr.scaleX = dir * sprScaleX;
 			// spr.scaleY = sprScaleY;
 			if ( !cd.has("colorMaintain") ) {
@@ -457,8 +492,6 @@ import h3d.scene.Mesh;
 			footX = M.round(M.fabs(footX));
 			footY = M.round(M.fabs(footY));
 		}
-
-		// setFeetPos(footX, footY);
 		#end
 	}
 
@@ -467,7 +500,10 @@ import h3d.scene.Mesh;
 		if ( mesh != null ) {
 			tex.clear(0, 0);
 			spr.x = spr.scaleX > 0 ? -spr.tile.dx : spr.tile.dx + spr.tile.width;
-			spr.y = -spr.tile.dy;
+			spr.y = spr.scaleY > 0 ? -spr.tile.dy : spr.tile.dy + spr.tile.height;
+
+			// if ( tmxObj.flippedVertically ) mesh.rotate(0, 0.1, 0);
+
 			spr.drawTo(tex);
 			var tile = Tile.fromTexture(tex);
 			tile.getTexture().filter = Nearest;

@@ -2,13 +2,9 @@ package en.ores;
 
 import format.tmx.Data.TmxObject;
 
-class Emerald extends Interactive {
-	public function new(?x:Float = 0, ?z:Float = 0, ?tmxObj:TmxObject) {
-		if (spr == null) {
-			spr = new HSprite(Assets.structures);
-			spr.set("emerald");
-		}
-		super(x, z, tmxObj);
+class Emerald extends Structure {
+	public function new(x : Float = 0, z : Float = 0, ?tmxObj : TmxObject, ?cdbEntry : StructuresKind) {
+		super(x, z, tmxObj, cdbEntry);
 		// sprOffX += -spr.tile.width;
 		// sprOffY -= Const.GRID_HEIGHT * .5;
 	}

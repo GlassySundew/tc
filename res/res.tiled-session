@@ -1,5 +1,9 @@
 {
-    "activeFile": "tiled/levels/alphamap.tmx",
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "tiled/levels/ui.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         ".",
@@ -7,6 +11,469 @@
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
+        "": {
+            "scaleInEditor": 3
+        },
+        "/home/glassysundew/Projects/heaps examples/examples/desert.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 3
+        },
+        "/home/glassysundew/Projects/heaps examples/examples/isometric_grass_and_water.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 893.3333333333333,
+                "y": 422
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/examples/isometric_grass_and_water.tmx#isometric_grass_and_water": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/examples/isometric_staggered_grass_and_water.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 870,
+                "y": 761
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/examples/isometric_staggered_grass_and_water.tmx#isometric_grass_and_water": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/examples/orthogonal-outside.tmx": {
+            "scale": 3,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 346,
+                "y": 290.8333333333333
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/examples/orthogonal-outside.tmx#outdoor": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 5.5
+        },
+        "/home/glassysundew/Projects/heaps examples/examples/perspective_walls.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/examples/sticker-knight/map/objs.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 0.25
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/cave/cave_test.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 3129.333333333333,
+                "y": 1130
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/cave/cave_test.tmx#cave": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/cave/cave_test.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/cave/cave_test.tmx#set_rules": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/cave/rules/cave_ruleset0.tmx": {
+            "scale": 3.1147135416666667,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 191.99197357969982,
+                "y": 31.94515279461561
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/cave/rules/cave_ruleset0.tmx#cave": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/cave/rules/cave_ruleset0.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/cave/rules/cave_ruleset0.tmx#set_rules": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/cave/rules/cave_ruleset1.tmx": {
+            "scale": 1.868828125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 319.9866226328331,
+                "y": 95.51440157184064
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/cave/rules/cave_ruleset1.tmx#cave": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/cave/rules/cave_ruleset1.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/cave/rules/cave_ruleset1.tmx#set_rules": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/cave/rules/cave_ruleset2.tmx": {
+            "scale": 1.334877232142857,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 448.73040424731414,
+                "y": 160.68893440909662
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/cave/rules/cave_ruleset2.tmx#cave": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/cave/rules/cave_ruleset2.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/cave/rules/cave_ruleset2.tmx#set_rules": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/dungeon/dungeon_test.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 3110.6666666666665,
+                "y": 851.3333333333333
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/dungeon/dungeon_test.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/dungeon/dungeon_test.tmx#dungeon": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/dungeon/dungeon_test.tmx#set_rules": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/dungeon/rules/dungeon_ruleset0.tmx": {
+            "scale": 3.1147135416666667,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 191.67091676769363,
+                "y": 32.2662096066218
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/dungeon/rules/dungeon_ruleset0.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/dungeon/rules/dungeon_ruleset0.tmx#dungeon": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/dungeon/rules/dungeon_ruleset0.tmx#set_rules": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/dungeon/rules/dungeon_ruleset1.tmx": {
+            "scale": 1.868828125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 320.52171731951006,
+                "y": 96.04949625851762
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/dungeon/rules/dungeon_ruleset1.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/dungeon/rules/dungeon_ruleset1.tmx#dungeon": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/dungeon/rules/dungeon_ruleset1.tmx#set_rules": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/grassland_test.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 542.6666666666666,
+                "y": 113
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/grassland_test.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/grassland_test.tmx#grassland": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/grassland_test.tmx#set_rules": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/grassland_test.tmx#tall structures": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/grassland_test.tmx#trees": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/grassland_test.tmx#water": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset0.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 226.66666666666666,
+                "y": 109
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset0.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset0.tmx#grassland": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset0.tmx#set_rules": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset0.tmx#tall structures": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset0.tmx#trees": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset0.tmx#water": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset1.tmx": {
+            "scale": 1.868828125,
+            "selectedLayer": -1,
+            "viewCenter": {
+                "x": 320.52171731951006,
+                "y": 112.10233685882694
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset1.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset1.tmx#grassland": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset1.tmx#set_rules": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset1.tmx#tall structures": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset1.tmx#trees": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset1.tmx#water": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset2.tmx": {
+            "scale": 2,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 348.5,
+                "y": 172.25
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset2.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset2.tmx#grassland": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset2.tmx#set_rules": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset2.tmx#tall structures": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset2.tmx#trees": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/FLARE/grassland/rules/grassland_ruleset2.tmx#water": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World 2/Woodland_ground1.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1.5
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World 2/example.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 387.3333333333333,
+                "y": 418.33333333333326
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World 2/example.tmx#Woodland_ground": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World 2/rule_001.tmx": {
+            "scale": 3,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 13.666666666666657,
+                "y": 82.16666666666667
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World 2/rule_001.tmx#Woodland_ground": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_001.tmx": {
+            "scale": 1.461284722222222,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 256.6235000594036,
+                "y": 256.28133539265775
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_001.tmx#cave": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_001.tmx#cave_x2": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_001.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_001.tmx#set": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_001.tmx#set_rules": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_003.tmx": {
+            "scale": 2,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 178.5,
+                "y": 70.25
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_003.tmx#cave": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_003.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_003.tmx#set": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_003.tmx#set_rules": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_100.tmx": {
+            "scale": 2.875120192307692,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 208.33911625768155,
+                "y": 144.16788595794492
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_100.tmx#cave": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_100.tmx#cave_x2": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_100.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_100.tmx#set": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/cave/rule_cave_100.tmx#set_rules": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/example_cave.tmx": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 982,
+                "y": 719.5
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/example_cave.tmx#cave": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/example_cave.tmx#cave_x2": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/example_cave.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/example_cave.tmx#set_cave": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/example_cave.tmx#set_rules": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/example_icecave.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 633.3333333333333,
+                "y": 482
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/example_icecave.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/example_icecave.tmx#icecave": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/example_icecave.tmx#set_icecave": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/example_icecave.tmx#set_rules": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/example_mountain.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 754,
+                "y": 727
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/example_mountain.tmx#Snow": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/example_mountain.tmx#Snow_ground": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/example_mountain.tmx#collision": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/The Mana World/rules/example_mountain.tmx#set": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/orthogonal_height_type/map_under_construction.tmx": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 402,
+                "y": 341.5
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/orthogonal_height_type/map_under_construction.tmx#output": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/orthogonal_height_type/map_under_construction.tmx#rules_input": {
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/orthogonal_height_type/rules1.tmx": {
+            "scale": 3,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 131.99999999999997,
+                "y": 107.16666666666667
+            }
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/orthogonal_height_type/rules1.tmx#output": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "/home/glassysundew/Projects/heaps examples/tiled_examples-master/orthogonal_height_type/rules1.tmx#rules_input": {
+            "scaleInDock": 1
+        },
         "/home/glassysundew/Projects/tc (copy)/res/tiled/levels/alpha.tsx": {
             "dynamicWrapping": false
         },
@@ -36,22 +503,30 @@
         "tiled/levels/alpha.tsx": {
             "dynamicWrapping": true,
             "scaleInDock": 0.25,
-            "scaleInEditor": 0.33
+            "scaleInEditor": 0.5
         },
         "tiled/levels/alphamap.tmx": {
-            "scale": 3,
-            "selectedLayer": 5,
+            "scale": 2,
+            "selectedLayer": 7,
             "viewCenter": {
-                "x": 2423.6666666666665,
-                "y": 470.16666666666663
+                "x": 600,
+                "y": 299.75
+            }
+        },
+        "tiled/levels/asteroid.tmx": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 2499,
+                "y": 1089
             }
         },
         "tiled/levels/bridge.tmx": {
-            "scale": 1.5,
+            "scale": 5.5,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 2446.6666666666665,
-                "y": 467.66666666666663
+                "x": 1328.3636363636365,
+                "y": 476.27272727272725
             }
         },
         "tiled/levels/colls.tsx": {
@@ -64,27 +539,69 @@
             "scaleInDock": 0.5,
             "scaleInEditor": 1.5
         },
-        "tiled/levels/ui.tmx": {
-            "scale": 1.5,
+        "tiled/levels/items.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 16
+        },
+        "tiled/levels/rules.tmx": {
+            "scale": 4,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 500,
-                "y": 499.66666666666663
+                "x": 2858,
+                "y": 283.875
+            }
+        },
+        "tiled/levels/rules/alpha.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1
+        },
+        "tiled/levels/rules/rules.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 2400,
+                "y": 1088
+            }
+        },
+        "tiled/levels/rules/rules1.tmx": {
+            "scale": 0.03125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 2400,
+                "y": 1216
+            }
+        },
+        "tiled/levels/server_test.tmx": {
+            "scale": 3,
+            "selectedLayer": 7,
+            "viewCenter": {
+                "x": 656.5,
+                "y": 288.8333333333333
+            }
+        },
+        "tiled/levels/ui.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 288,
+                "y": 295.66666666666663
             }
         },
         "tiled/levels/ui.tsx": {
             "dynamicWrapping": true,
-            "scaleInDock": 0.75,
-            "scaleInEditor": 1
+            "scaleInDock": 0.5,
+            "scaleInEditor": 0.5
         }
     },
     "map.fixedSize": true,
     "map.height": 100,
+    "map.lastUsedFormat": "tmx",
     "map.layerDataFormat": 3,
     "map.orientation": 2,
     "map.renderOrder": 1,
-    "map.tileHeight": 48,
-    "map.tileWidth": 24,
+    "map.tileHeight": 24,
+    "map.tileWidth": 48,
     "map.width": 100,
     "openFiles": [
         "tiled/levels/alphamap.tmx",
@@ -92,20 +609,28 @@
         "tiled/levels/alpha.tsx",
         "tiled/levels/colls.tsx",
         "tiled/levels/ui.tmx",
-        "tiled/levels/ui.tsx"
+        "tiled/levels/ui.tsx",
+        "tiled/levels/rules/rules1.tmx",
+        "tiled/levels/rules/rules.tmx",
+        "tiled/levels/asteroid.tmx"
     ],
     "project": "res.tiled-project",
-    "property.type": "int",
+    "property.type": "file",
     "recentFiles": [
+        "tiled/levels/alphamap.tmx",
+        "tiled/levels/bridge.tmx",
+        "tiled/levels/alpha.tsx",
+        "tiled/levels/colls.tsx",
+        "tiled/levels/asteroid.tmx",
+        "tiled/levels/rules/rules.tmx",
+        "tiled/levels/rules/rules1.tmx",
         "tiled/levels/ui.tsx",
         "tiled/levels/ui.tmx",
-        "tiled/levels/colls.tsx",
-        "tiled/levels/alpha.tsx",
-        "tiled/levels/bridge.tmx",
-        "tiled/levels/alphamap.tmx",
-        "/home/glassysundew/Projects/tc (copy)/res/tiled/levels/bridge.tmx",
-        "tiled/levels/env.tsx"
+        "tiled/levels/items.tsx",
+        "tiled/levels/server_test.tmx",
+        "tiled/levels/rules.tmx"
     ],
+    "resizeMap.removeObjects": true,
     "tileset.embedInMap": false,
     "tileset.lastUsedFormat": "tsx",
     "tileset.margin": 0,

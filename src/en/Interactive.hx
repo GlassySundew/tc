@@ -56,10 +56,11 @@ class Interactive extends Entity {
 	var points : Array<HxPoint>;
 	var iconParent : Object;
 
-	var inv = new CellGrid2D(4, 4);
+	var inv : CellGrid;
 
 	function new(?x : Float = 0, ?z : Float = 0, ?tmxObj : TmxObject) {
 		super(x, z, tmxObj);
+		if ( inv == null ) inv = new CellGrid(4, 4);
 		#if !headless
 		var pixels = Pixels.fromBytes(tex.capturePixels().bytes, Std.int(spr.tile.width), Std.int(spr.tile.height));
 		points = new MarchingSquares(pixels).march();
@@ -78,7 +79,7 @@ class Interactive extends Entity {
 		interact = new EventInteractive(polyPrim.getCollider(), mesh);
 		interact.rotate(-0.01, hxd.Math.degToRad(180), hxd.Math.degToRad(90));
 
-		if ( tmxObj != null && tmxObj.flippedVertically ) interact.scaleX = -1;
+		if ( tmxObj != null && tmxObj.flippedHorizontally ) interact.scaleX = -1;
 
 		// var highlightColor = (try tmxTile.properties.get("highlight") catch (e:Dynamic) "ffffffff");
 		var highlightColor = null;
@@ -99,7 +100,8 @@ class Interactive extends Entity {
 	inline function isInPlayerRange() return distPx(player) <= useRange;
 
 	public function rebuildInteract() {
-		var facX = (tmxObj != null && tmxObj.flippedVertically) ? 1 - spr.pivot.centerFactorX : spr.pivot.centerFactorX;
+		interact.scaleX = spr.scaleX;
+		var facX = (tmxObj != null && tmxObj.flippedHorizontally) ? 1 - spr.pivot.centerFactorX : spr.pivot.centerFactorX;
 		polyPrim.translate(-spr.tile.width * facX, 0, -spr.tile.height * spr.pivot.centerFactorY);
 		interact.shape = polyPrim.getCollider();
 	}
@@ -122,10 +124,14 @@ class Interactive extends Entity {
 		super.postUpdate();
 		// if (tw != null) {
 		// }
-		if ( interactable ) updateKeyIcon();
 		// deactivate interactive if inventory is opened
+		updateInteract();
+		
+	}
 
+	function updateInteract() {
 		#if !headless
+		if ( interactable ) updateKeyIcon();
 		interact.visible = player != null && !player.destroyed && /*!player.ui.inventory.sprInv.visible &&*/ isInPlayerRange();
 		#end
 	}
@@ -164,11 +170,7 @@ class Interactive extends Entity {
 		}
 	}
 
-	
-
 	override function dispose() {
-		
-
 		interact.visible = false;
 		interact.cursor = Default;
 		super.dispose();

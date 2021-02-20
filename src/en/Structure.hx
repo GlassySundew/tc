@@ -1,17 +1,46 @@
 package en;
 
+import ui.InventoryGrid.CellGrid;
+import format.tmx.Data.TmxLayer;
 import format.tmx.Data.TmxObject;
 import h2d.Bitmap;
 import h3d.mat.Texture;
 import hxd.Res;
+import format.tmx.*;
 
 class Structure extends Interactive {
 	public var cdbEntry : StructuresKind = null;
+	public var toBeCollidedAgainst = true;
 
-	public function new(x : Int, y : Int, ?tmxObject : TmxObject, ?cdbEntry : StructuresKind) {
+	public static var ALLplaceColliders = new Map<Structure, differ.shapes.Polygon>();
+
+	public function new(x : Float, y : Float, ?tmxObject : TmxObject, ?cdbEntry : StructuresKind) {
+		// CDB parsed entry corresponding to this structure instance
+		if ( cdbEntry == null ) try {
+			eregClass.match('$this'.toLowerCase());
+			cdbEntry = Data.structures.resolve(eregClass.matched(1)).id;
+		}
+		catch( Dynamic ) {}
+
+		/**
+			Initializing spr and making it static sprite from structures atlas as a
+			from class name if not initialized in custom structure class file
+		**/
+		if ( spr == null ) {
+			spr = new HSprite(Assets.structures, entParent);
+			eregClass.match('$this'.toLowerCase());
+			spr.set(eregClass.matched(1));
+		}
+
 		super(x, y, tmxObject);
+
 		this.cdbEntry = cdbEntry;
-		
+
+		if ( cdbEntry == null ) try {
+			cdbEntry = Data.structures.resolve(spr.groupName).id;
+		}
+
+		catch( Dynamic ) {}
 		#if !headless
 		// Нажатие для того, чтобы сломать структуру
 		interact.onPushEvent.add(event -> {
@@ -22,30 +51,21 @@ class Structure extends Interactive {
 			turnOffHighlight();
 		});
 		#end
-		// CDB parsed entry corresponding to this structure instance
-		if ( cdbEntry != null ) try {
-			eregClass.match('$this'.toLowerCase());
-			cdbEntry = Data.structures.resolve(eregClass.matched(1)).id;
-		}
-		catch( Dynamic ) {
-			// or name of the picture
-			try {
-				cdbEntry = Data.structures.resolve(spr.groupName).id;
-			}
-			catch( Dynamic ) {}
-		}
 
 		// Setting parameters from cdb entry
 		if ( cdbEntry != null ) {
 			useRange = Data.structures.get(cdbEntry).use_range;
-
+			if ( useRange > 0 ) interactable = true;
 			health = Data.structures.get(cdbEntry).hp;
 			#if !headless
 			if ( Data.structures.get(cdbEntry).isoHeight != 0 && Data.structures.get(cdbEntry).isoWidth != 0 ) {
 				mesh.isLong = true;
 				mesh.isoWidth = Data.structures.get(cdbEntry).isoWidth;
 				mesh.isoHeight = Data.structures.get(cdbEntry).isoHeight;
+
+				#if dispDepthBoxes
 				mesh.renewDebugPts();
+				#end
 			}
 			#end
 		}
@@ -58,10 +78,14 @@ class Structure extends Interactive {
 			if ( health > Data.items.get(item.cdbEntry).damage ) {
 				health -= Data.items.get(item.cdbEntry).damage;
 			} else {
+				if ( cdbEntry != null ) {
+					for (i in Data.structures.get(cdbEntry).drop) inline dropItem(Item.fromCdbEntry(i.item.id, i.amount));
+					dropAllItems();
+				}
 				dispose();
 			}
 		} else {
-			item.structureUsingEvent.dispatch();
+			item.onStructureUse.dispatch();
 		}
 	}
 
@@ -94,28 +118,33 @@ class Structure extends Interactive {
 		};
 	}
 
+	function initInv(gridConf : TmxObject) {
+		inv = new CellGrid(gridConf.properties.getInt("width"), gridConf.properties.getInt("height"), gridConf.properties.getInt("tileWidth"),
+			gridConf.properties.getInt("tileHeight"));
+
+		for (j in 0...inv.grid.length) {
+			for (i in 0...inv.grid[j].length) {
+				var tempInter = inv.grid[j][i];
+				tempInter.inter.x = gridConf.x + i * (gridConf.properties.getInt("tileWidth") + gridConf.properties.getInt("gapX"));
+				tempInter.inter.y = gridConf.y + j * (gridConf.properties.getInt("tileHeight") + gridConf.properties.getInt("gapY"));
+			}
+		}
+	}
+
 	public static function fromCdbEntry(x : Int, y : Int, cdbEntry : StructuresKind, ?amount : Int = 1) : Structure {
 		var structure : Structure = null;
 		var entClasses = (CompileTime.getAllClasses(Structure));
 		for (e in entClasses) {
-			// if ( Data.structures.get(cdbEntry).cat != blueprint ) {
 			if ( eregCompTimeClass.match('$e'.toLowerCase())
 				&& eregCompTimeClass.matched(1) == Data.structures.get(cdbEntry).id.toString() ) {
-				structure = Type.createInstance(e, [x, y, cdbEntry]);
+				structure = Type.createInstance(e, [x, y, null, cdbEntry]);
 			}
-			// }
-			// else
-			// structure = new Blueprint(cdbEntry, parent);
 		}
 		structure = structure == null ? new Structure(x, y, cdbEntry) : structure;
 		return structure;
 	}
 
 	override function dispose() {
-		if ( cdbEntry != null ) {
-			for (i in Data.structures.get(cdbEntry).drop) inline dropItem(Item.fromCdbEntry(i.item.id, i.amount));
-			dropAllItems();
-		}
 		super.dispose();
 	}
 }

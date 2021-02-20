@@ -2,21 +2,31 @@ import h3d.col.Bounds;
 import h3d.Vector;
 
 class Camera extends dn.Process {
-	public var target:Null<Entity>;
-	public var s3dCam(get, never):h3d.Camera;
+	public var target(default, set) : Null<Entity>;
 
-	inline function get_s3dCam()
-		return Boot.inst.s3d.camera;
+	function set_target(v : Null<Entity>) {
+		if ( parallax != null && v != null ) {
+			parallax.x = v.footX;
+			parallax.z = v.footY;
+		}
 
-	public var x(default, set):Float;
-	public var y(default, set):Float;
+		return target = v;
+	}
 
-	public var dx:Float;
-	public var dy:Float;
+	public var s3dCam(get, never) : h3d.Camera;
 
-	public static var ppu = 3;
+	inline function get_s3dCam() return Boot.inst.s3d.camera;
 
-	var yMult:Float;
+	public var x(default, set) : Float;
+	public var y(default, set) : Float;
+
+	public var dx : Float;
+	public var dy : Float;
+
+	public static var ppu = 2;
+
+	var yMult : Float;
+	var parallax : Parallax;
 
 	// public var wid(get, never):Int;
 	// public var hei(get, never):Int;
@@ -29,6 +39,10 @@ class Camera extends dn.Process {
 		var temp = new h3d.scene.CameraController(Boot.inst.s3d);
 		temp.loadFromCamera();
 		temp.remove();
+		
+		// parallax = new Parallax(Boot.inst.s3d);
+		// parallax.y = -1;
+		onResize();
 	}
 
 	function updateCamera(?x = 0., ?y = 0.) {
@@ -38,12 +52,12 @@ class Camera extends dn.Process {
 		// s3dCam.pos = s3dCam.target.add(new Vector(0, (h() * 1) / (2 * 32 * Math.tan(s3dCam.getFovX() / 2)), -0.01));
 	}
 
-	inline function set_x(v:Float) {
+	inline function set_x(v : Float) {
 		// updateCamera(M.round(v), M.round(y / yMult) * yMult);
 		return x = v;
 	}
 
-	inline function set_y(v:Float) {
+	inline function set_y(v : Float) {
 		updateCamera(M.round(x), M.round(v));
 		// updateCamera(M.round(x), M.round(v / yMult) * yMult);
 		return y = v;
@@ -61,7 +75,7 @@ class Camera extends dn.Process {
 	// }f
 
 	public function recenter() {
-		if (target != null) {
+		if ( target != null ) {
 			x = target.centerX;
 			y = target.centerY;
 		}
@@ -69,7 +83,7 @@ class Camera extends dn.Process {
 
 	var shakePower = 1.0;
 
-	public function shakeS(t:Float, ?pow = 1.0) {
+	public function shakeS(t : Float, ?pow = 1.0) {
 		cd.setS("shaking", t, false);
 		shakePower = pow;
 	}
@@ -86,7 +100,7 @@ class Camera extends dn.Process {
 	override function postUpdate() {
 		super.postUpdate();
 		// for (i in 0...9)
-		if (!ui.Console.inst.hasFlag("scroll")) {
+		if ( !ui.Console.inst.hasFlag("scroll") ) {
 			// var level = Game.inst.level;
 			// var scroller = Game.inst.scroller;
 
@@ -111,14 +125,14 @@ class Camera extends dn.Process {
 			// 	scroller.x += Math.cos(ftime * 1.16) * 1 * Const.SCALE * shakePower * cd.getRatio("shaking");
 			// 	scroller.y += Math.sin(0.3 + ftime * 1.33) * 1 * Const.SCALE * shakePower * cd.getRatio("shaking");
 			// }
-			if (target != null) {
+			if ( target != null ) {
 				yMult = (M.fabs(target.dx) > 0.001 && M.fabs(target.dy) > 0.001) ? .5 : 1;
 				var s = 0.006;
 				var deadZone = 5;
 				var tx = target.footX;
 				var ty = target.footY;
 				var d = M.dist(x, y, tx, ty);
-				if (d >= deadZone) {
+				if ( d >= deadZone ) {
 					var a = Math.atan2(ty - y, tx - x);
 					dx += Math.cos(a) * (d - deadZone) * s * tmod;
 					dy += Math.sin(a) * (d - deadZone) * s * tmod;
@@ -135,6 +149,16 @@ class Camera extends dn.Process {
 
 			// x = M.round(x);
 			// y = M.round(y / yMult) * yMult;
+		}
+	}
+
+	override function onResize() {
+		super.onResize();
+		if ( parallax != null ) {
+			@:privateAccess {
+				parallax.mesh.plane.ox = -parallax.tex.width / 2;
+				parallax.mesh.plane.oy = -parallax.tex.height / 2;
+			}
 		}
 	}
 }

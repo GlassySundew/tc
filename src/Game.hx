@@ -33,7 +33,6 @@ class Game extends Process implements GameAble {
 	public var tmxMap : TmxMap;
 
 	public var player : en.player.Player;
-
 	public var hud : Hud;
 	public var fx : Fx;
 
@@ -51,7 +50,6 @@ class Game extends Process implements GameAble {
 
 		createRootInLayers(Main.inst.root, Const.DP_BG);
 		camera = new Camera();
-		// hud = new ui.Hud();
 
 		startLevel("alphamap.tmx");
 	}
@@ -84,7 +82,7 @@ class Game extends Process implements GameAble {
 			for (e in Entity.ALL) e.destroy();
 			gc();
 		}
-		tmxMap = resolveMap(tmxMap, name);
+		tmxMap = resolveMap(name);
 
 		level = new Level(tmxMap);
 		lvlName = name.split('.')[0];
@@ -101,8 +99,6 @@ class Game extends Process implements GameAble {
 				// entities export lies ahead
 				isoX = Level.inst.cartToIsoLocal(e.x, e.y).x;
 				isoY = Level.inst.cartToIsoLocal(e.x, e.y).y;
-
-				if ( e.flippedVertically ) isoY -= e.height;
 			}
 
 			// Парсим все классы - наследники en.Entity и спавним их
@@ -131,6 +127,11 @@ class Game extends Process implements GameAble {
 
 		camera.target = player;
 		camera.recenter();
+
+		delayer.addF(() -> {
+			hideStrTiles();
+		}, 1);
+
 		// System.openURL("https://pornreactor.cc");
 
 		// rect-obj position fix
@@ -153,7 +154,7 @@ class Game extends Process implements GameAble {
 					var ents = ent != null ? [ent] : Entity.ALL;
 					for (ent in ents) {
 						if ( (tile.objectGroup != null && eregClass.match('$ent'.toLowerCase()))
-							&& ((eregClass.matched(1) == eregFileName.matched(1)
+							&& (((eregClass.matched(1) == eregFileName.matched(1) || ent.spr.groupName == eregFileName.matched(1))
 								&& tile.objectGroup.objects.length > 0
 								|| (Std.is(ent, SpriteEntity)
 									&& eregFileName.matched(1) == ent.spr.groupName))) /*&& ent.collisions.length == 0*/ ) {
@@ -168,23 +169,28 @@ class Game extends Process implements GameAble {
 								var xCent = 0.;
 								var yCent = 0.;
 								function unsetCenter() {
-									ent.footX -= M.round((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width);
+									ent.footX -= ((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width);
 									ent.footY += (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height;
 								}
-
-								function setCenter() {
+								function getCenterPivot() : h3d.Vector {
 									var pivotX = ((obj.x + xCent)) / ent.spr.tile.width;
 									var pivotY = ((obj.y + yCent)) / ent.spr.tile.height;
-									pivotX = (ent.tmxObj != null && ent.tmxObj.flippedVertically) ? 1 - pivotX : pivotX;
+									pivotX = (ent.tmxObj != null && ent.tmxObj.flippedHorizontally) ? 1 - pivotX : pivotX;
+									pivotY = (ent.tmxObj != null && ent.tmxObj.flippedVertically) ? 1 - pivotY : pivotY;
+									return new h3d.Vector(pivotX, pivotY);
+								}
+								function setCenter() {
+									var center = getCenterPivot();
+
 									if ( obj.name == "center" ) {
-										ent.mesh.xOff = -(pivotX - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
-										ent.mesh.yOff = (pivotY - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
+										ent.mesh.xOff = -(center.x - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
+										ent.mesh.yOff = (center.y - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
+										#if dispDepthBoxes
 										ent.mesh.renewDebugPts();
+										#end
 									}
 
-									ent.spr.setCenterRatio(pivotX, pivotY);
-									ent.footX += M.round((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width);
-									ent.footY -= (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height;
+									ent.spr.setCenterRatio(center.x, center.y);
 								}
 								switch( obj.objectType ) {
 									case OTEllipse:
@@ -200,34 +206,21 @@ class Game extends Process implements GameAble {
 										ent.collisions.set(Polygon.rectangle(params.x, params.y, params.width, params.height),
 											{cent : new h3d.Vector(), offset : new h3d.Vector()});
 									case OTPolygon(points):
+										var cents = getProjectedDifferPolygonRect(obj, points);
+										xCent = cents.x;
+										yCent = cents.y;
+
 										var pts = checkPolyClockwise(points);
 										var verts : Array<Vector> = [];
-										for (i in pts) {
-											verts.push(new Vector((i.x), (-i.y)));
-										}
-										var yArr = verts.copy();
-										yArr.sort(function(a, b) return (a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0));
-										var xArr = verts.copy();
-										xArr.sort(function(a, b) return (a.x < b.x) ? -1 : ((a.x > b.x) ? 1 : 0));
-
-										// xCent и yCent - половины ширины и высоты неповёрнутого полигона соответственно
-										xCent = M.round((xArr[xArr.length - 1].x + xArr[0].x) * .5);
-										yCent = -M.round((yArr[yArr.length - 1].y + yArr[0].y) * .5);
-
-										// c - радиус от начальной точки поли до центра поли
-										var c = Math.sqrt(M.pow(xCent, 2) + M.pow(yCent, 2));
-										// alpha - угол между начальной точкой неповёрнутого полигона и центром полигона
-										var alpha = Math.atan(yCent / xCent);
-
-										// xCent и yCent в данный момент - проекции отрезка, соединяющего начальную точку полигона и центр полигона на оси x и y соответственно
-										yCent = -c * (Math.sin(M.toRad(-obj.rotation) - alpha));
-										xCent = c * (Math.cos(M.toRad(-obj.rotation) - alpha));
+										for (i in pts) verts.push(new Vector((i.x), (-i.y)));
 
 										var poly = new Polygon(0, 0, verts);
 										poly.rotation = -obj.rotation;
 
 										// vertical flipping
-										if ( ent.tmxObj != null && ent.tmxObj.flippedVertically ) poly.scaleX = -1;
+										if ( ent.tmxObj != null && ent.tmxObj.flippedHorizontally ) poly.scaleX = -1;
+										if ( ent.tmxObj != null && ent.tmxObj.flippedVertically ) poly.scaleY = -1;
+
 										var xOffset = poly.scaleX < 0 ? ent.spr.tile.width - obj.x : obj.x;
 										var yOffset = -obj.y;
 										ent.collisions.set(poly, {cent : new h3d.Vector(xCent, -yCent), offset : new h3d.Vector(xOffset, yOffset)});
@@ -235,6 +228,7 @@ class Game extends Process implements GameAble {
 										if ( obj.name == "center" ) {
 											if ( centerSet ) unsetCenter();
 											setCenter();
+											ent.offsetFootByCenter();
 											centerSet = true;
 										}
 									default:
@@ -242,24 +236,22 @@ class Game extends Process implements GameAble {
 
 								if ( !centerSet ) {
 									setCenter();
+									ent.offsetFootByCenter();
+
 									centerSet = true;
 								} else {
-									var pivotX = ((obj.x + xCent)) / ent.spr.tile.width;
-									var pivotY = ((obj.y + yCent)) / ent.spr.tile.height;
-									pivotX = (ent.tmxObj != null && ent.tmxObj.flippedVertically) ? 1 - pivotX : pivotX;
+									var center = getCenterPivot();
 									if ( obj.name != "center" ) {
-										ent.mesh.xOff = (pivotX - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
-										ent.mesh.yOff = -(pivotY - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
+										ent.mesh.xOff = (center.x - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
+										ent.mesh.yOff = -(center.y - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
 									}
-									#if dispDepthBoxes
-									ent.mesh.renewDebugPts();
-									#end
 								}
 							}
 							try
 								cast(ent, Interactive).rebuildInteract()
 							catch( e:Dynamic ) {}
-							if ( ent.tmxObj != null && ent.tmxObj.flippedVertically && ent.mesh.isLong ) ent.mesh.flipX();
+							if ( ent.tmxObj != null && ent.tmxObj.flippedHorizontally && ent.mesh.isLong ) ent.mesh.flipX();
+
 							if ( Std.is(ent, SpriteEntity) && tile.properties.exists("interactable") ) {
 								cast(ent, SpriteEntity).interactable = tile.properties.getBool("interactable");
 							}
@@ -268,6 +260,7 @@ class Game extends Process implements GameAble {
 				}
 			}
 		}
+
 		execAfterLvlLoad.dispatch();
 		execAfterLvlLoad.removeAll();
 	}
@@ -284,6 +277,10 @@ class Game extends Process implements GameAble {
 
 		for (e in Entity.ALL) e.destroy();
 		gc();
+	}
+
+	public override function onResize() {
+		super.onResize();
 	}
 
 	override function update() {

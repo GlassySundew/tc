@@ -1,19 +1,19 @@
 -cp src
 -cp .
 -cp vendor/differ/src
+-cp vendor/format-tiled/
 
 -lib hide
 -lib domkit
--lib format-tiled
 -lib heaps
--lib heeps
+-lib Heeps
 -lib castle
 -lib hxbit
--lib structural
--lib msignal
+# -lib msignal
 -lib deepnightLibs
 -lib compiletime
--lib cloner
+-lib oauth
+-lib random
 
 -cp src.helper
 --macro Helper.init()

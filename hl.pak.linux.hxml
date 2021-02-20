@@ -1,11 +1,5 @@
--debug
-base.hxml
+hl.hxml
+-hl redist/sdl_linux/tc/hlboot.dat
 
 -D pak
-
--hl redist/sdl_linux/tc/hlboot.dat
--lib hlsdl
--D windowSize=1280x720
--D windowTitle=Total Condemn
-
 -D linux

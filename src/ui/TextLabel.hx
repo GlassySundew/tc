@@ -55,10 +55,7 @@ class TextLabel extends h2d.Flow implements h2d.domkit.Object {
 		// this.filter = null;
 		// this.font.resizeTo(16);
 	}
-	public function center() {
-		paddingLeft = -innerWidth >> 1;
-		paddingTop = -innerHeight >> 1;
-	}
+	
 
 	public function dispose() {
 		textLabel.remove();

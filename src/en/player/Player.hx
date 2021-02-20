@@ -1,5 +1,13 @@
 package en.player;
 
+import en.items.Blueprint;
+import ui.InventoryGrid.CellGrid;
+import h2d.Tile;
+import h3d.mat.Texture;
+import ch3.scene.TileSprite;
+import h3d.scene.Mesh;
+import ui.TextLabel;
+import h2d.Text;
 import hxd.System;
 import hxbit.NetworkSerializable;
 import dn.Process;
@@ -16,36 +24,58 @@ import differ.Collision;
 class Player extends Entity {
 	public static var inst : Player;
 
+	var nicknameMesh : TileSprite;
+
+	@:s public var sprFrame : {group : String, frame : Int};
+
+	@:s public var nickname : String;
 	public var ui : PlayerUI;
+	public var invGrid : CellGrid;
 
 	var ca : dn.heaps.Controller.ControllerAccess;
 
 	public var holdItem(default, set) : en.Item;
 
 	inline function set_holdItem(v : en.Item) {
+		if ( holdItem != null ) holdItem.onPlayerRemove.dispatch();
 		if ( v == null ) {
-			ui.inventory.invGrid.disableGrid();
+			for (i in Inventory.ALL) i.invGrid.disableGrid();
 		}
 		if ( v != null ) {
+			v.onPlayerHold.dispatch();
+			Boot.inst.s2d.addChild(v);
+			v.scaleX = v.scaleY = 2;
 			// inventory.invGrid.enableGrid();
 		}
 		return holdItem = v;
 	}
 
-	public function new(x : Float, z : Float, ?tmxObj : TmxObject, ?uid : Int) {
+	public function new(x : Float, z : Float, ?tmxObj : TmxObject, ?uid : Int, ?nickname : String) {
+		this.nickname = nickname;
 		this.uid = uid;
 		inst = this;
-		#if !headless
-		#end
+
 		super(x, z, tmxObj);
+	}
+
+	override function set_netX(v : Float) : Float {
+		if ( inst != this ) {
+			footX = v;
+		}
+		return super.set_netX(v);
+	}
+
+	override function set_netY(v : Float) : Float {
+		if ( inst != this ) {
+			footY = v;
+		}
+		return super.set_netY(v);
 	}
 
 	override public function networkAllow(op : hxbit.NetworkSerializable.Operation, propId : Int, clientSer : hxbit.NetworkSerializable) : Bool {
 		// trace(clientSer == this && this == inst);
 		// var player = cast(clientSer, Player);
-
-		trace(op, propId, clientSer, clientSer == this);
-		return #if !headless inst == this #else clientSer == this #end;
+		return clientSer == this;
 	}
 
 	override function init(?x : Float, ?z : Float, ?tmxObj : TmxObject) {
@@ -71,12 +101,16 @@ class Player extends Entity {
 		super.init(x, z, tmxObj);
 
 		#if !headless
-		ui = new PlayerUI(game.root);
+		// public var invGrid : InventoryGrid;
+
+		ui = new PlayerUI(Main.inst.root);
 
 		mesh.isLong = true;
 		mesh.isoWidth = mesh.isoHeight = 0;
 
+		#if dispDepthBoxes
 		mesh.renewDebugPts();
+		#end
 		#end
 
 		// Костыльный фикс ебаного бага с бампом игрока при старте уровня
@@ -91,10 +125,9 @@ class Player extends Entity {
 	override public function alive() {
 		super.alive();
 		enableReplication = true;
-		// this.footX = footX;
-		// this.footY = footY;
+
 		init();
-		// GameClient.inst.applyTmxObjOnEnt(this);
+		GameClient.inst.applyTmxObjOnEnt(this);
 		if ( uid == GameClient.inst.uid ) {
 			inst = this;
 			GameClient.inst.camera.target = this;
@@ -102,7 +135,26 @@ class Player extends Entity {
 
 			GameClient.inst.player = this;
 			GameClient.inst.host.self.ownerObject = this;
+			sprFrame = {group : "zhopa", frame : 0};
 		}
+		this.netX = netX;
+		this.netY = netY;
+		initNickname();
+		syncFrames();
+	}
+
+	public function initNickname() {
+		var nicknameLabel = new TextLabel(nickname, Assets.fontPixel);
+		var nicknameTex = new Texture(nicknameLabel.innerWidth, nicknameLabel.innerHeight + 10, [Target]);
+		nicknameLabel.drawTo(nicknameTex);
+		nicknameMesh = new TileSprite(Tile.fromTexture(nicknameTex), false, mesh);
+		nicknameMesh.material.mainPass.setBlendMode(AlphaAdd);
+		nicknameMesh.material.mainPass.enableLights = false;
+		nicknameMesh.material.mainPass.depth(false, Less);
+		nicknameMesh.scale(.5);
+		nicknameMesh.z += 40;
+		nicknameMesh.y += 1;
+		@:privateAccess nicknameMesh.plane.ox = -nicknameLabel.innerWidth / 2;
 	}
 
 	public function disableGrids() {
@@ -119,7 +171,21 @@ class Player extends Entity {
 		inst = null;
 		ui.remove();
 		ui = null;
+		if ( nicknameMesh != null ) {
+			nicknameMesh.remove();
+			nicknameMesh = null;
+		}
 		#end
+	}
+
+	function syncFrames() {
+		if ( sprFrame != null ) {
+			if ( spr.frame != sprFrame.frame || spr.groupName != sprFrame.group ) {
+				if ( this == inst ) sprFrame = {group : spr.groupName, frame : spr.frame}; else if ( sprFrame == null ) sprFrame = {group : "zhopa", frame : 0}
+				else
+					spr.set(sprFrame.group, sprFrame.frame);
+			}
+		}
 	}
 
 	override public function update() {
@@ -147,7 +213,10 @@ class Player extends Entity {
 					dy *= Math.pow(0.6, tmod);
 				}
 			}
+			netX = footX;
+			netY = footY;
 		}
+		syncFrames();
 		#end
 	}
 
@@ -157,6 +226,11 @@ class Player extends Entity {
 		// if (Key.isPressed(Key.E)) {
 		// 	new FloatingItem(mesh.x, mesh.z, new GraviTool());
 		// }
+		if ( ca.isKeyboardPressed(Key.R) ) {
+			if ( holdItem != null && Std.isOfType(holdItem, Blueprint) && cast(holdItem, Blueprint).ghostStructure != null ) {
+				cast(holdItem, Blueprint).ghostStructure.flipX();
+			}
+		}
 	}
 
 	override function checkCollisions() {
@@ -173,16 +247,27 @@ class Player extends Entity {
 			ui.craft.toggleVisible();
 		}
 
-		if ( Key.isPressed(Key.NUMBER_1) ) ui.inventory.belt.selectCell(1);
-		if ( Key.isPressed(Key.NUMBER_2) ) ui.inventory.belt.selectCell(2);
-		if ( Key.isPressed(Key.NUMBER_3) ) ui.inventory.belt.selectCell(3);
-		if ( Key.isPressed(Key.NUMBER_4) ) ui.inventory.belt.selectCell(4);
-		if ( Key.isPressed(Key.NUMBER_5) ) ui.inventory.belt.selectCell(5);
+		if ( Key.isPressed(Key.NUMBER_1) ) ui.belt.selectCell(1);
+		if ( Key.isPressed(Key.NUMBER_2) ) ui.belt.selectCell(2);
+		if ( Key.isPressed(Key.NUMBER_3) ) ui.belt.selectCell(3);
+		if ( Key.isPressed(Key.NUMBER_4) ) ui.belt.selectCell(4);
+		if ( Key.isPressed(Key.NUMBER_5) ) ui.belt.selectCell(5);
 
-		if ( Key.isPressed(Key.Q) ) {
-			if ( holdItem != null ) {
-				if ( holdItem.isInSlot() ) ui.inventory.invGrid.findItemSlot(holdItem).item = null;
-				holdItem = dropItem(holdItem, this.angToPxFree(level.cursX, level.cursY), 2.3);
+		if ( ca.isKeyboardPressed(Key.MOUSE_WHEEL_DOWN) ) {}
+		if ( ca.isKeyboardPressed(Key.MOUSE_WHEEL_UP) ) {}
+
+		if ( ca.yPressed() ) {
+			if ( holdItem != null && !holdItem.isDisposed ) {
+				if ( Key.isDown(Key.CTRL) ) {
+					// dropping whole stack
+					dropItem(Item.fromCdbEntry(holdItem.cdbEntry, holdItem.amount), angToPxFree(Level.inst.cursX, Level.inst.cursY), 2.3);
+					holdItem.amount = 0;
+					holdItem = null;
+				} else {
+					// dropping 1 item
+					dropItem(Item.fromCdbEntry(holdItem.cdbEntry, 1), angToPxFree(Level.inst.cursX, Level.inst.cursY), 2.3);
+					holdItem.amount--;
+				}
 			}
 		}
 	}

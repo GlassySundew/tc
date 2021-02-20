@@ -85,14 +85,16 @@ class Server extends Process {
 			switch( msg.type ) {
 				case playerInit:
 					var uid : Int = cast(msg, PlayerInit).uid;
-					log("Client identified (" + uid + ")");
-					var cursorClient = new Player(2448, 1933, uid);
-					host.sendMessage(new MapLoad(GameServer.inst.lvlName, GameServer.inst.tmxMap), c);
+					log("Client identified (" + uid + "nickname: " + cast(msg, PlayerInit).nickname + ")");
+					var cursorClient = new Player(GameServer.inst.tmxMap.properties.getFloat("playerX"),
+						GameServer.inst.tmxMap.properties.getFloat("playerY"), uid, cast(msg, PlayerInit).nickname);
 					// game.applyTmxObjOnEnt(cursorClient);
+					host.sendMessage(new MapLoad(GameServer.inst.lvlName, GameServer.inst.tmxMap), c);
 					c.ownerObject = cursorClient;
 					c.sync();
-					// cursorClient.footX = 2448;
-					// cursorClient.footY = 1933;
+
+				// cursorClient.footX = 2448;
+				// cursorClient.footY = 1933;
 				default:
 			}
 		});

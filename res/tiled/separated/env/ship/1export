@@ -1,7 +1,0 @@
-#!/bin/sh
-
-
-ase -b ../ase/items.ase --save-as items/{slice}.png
-
-
-echo $dirname

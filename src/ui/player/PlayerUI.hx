@@ -1,5 +1,6 @@
 package ui.player;
 
+import ui.InventoryGrid.CellGrid;
 import format.tmx.Data.TmxLayer;
 import hxd.Res;
 import format.tmx.Data.TmxMap;
@@ -15,29 +16,48 @@ import h2d.Font;
 import h2d.domkit.Style;
 
 class PlayerUI extends Layers {
-	public var inventory: Inventory;
-	public var craft: Crafting;
-	public var configMap: Map<String, TmxLayer>;
+	public var inventory : Inventory;
+	public var belt : Belt;
 
-	var leftTop: SideCont;
+	public var craft : Crafting;
+	public var configMap : Map<String, TmxLayer>;
 
-	public function new(parent: Layers) {
+	var leftTop : SideCont;
+
+	public function new(parent : Layers) {
 		super();
 
-		var r = new Reader();
-		r.resolveTSX = getTsx(new Map(), r);
-		configMap = r.read(Xml.parse(Res.loader.load(Const.LEVELS_PATH + "ui.tmx").entry.getText())).getLayersByName();
+		configMap = resolveMap("ui.tmx").getLayersByName();
 		for (i in configMap) i.localBy(i.getObjectByName("window"));
 
+		var gridConf = configMap.get("inventory").getObjectByName("grid");
+
+		Player.inst.invGrid = new CellGrid(gridConf.properties.getInt("width"), gridConf.properties.getInt("height"), gridConf.properties.getInt("tileWidth"),
+			gridConf.properties.getInt("tileHeight"));
+
+		for (j in 0...Player.inst.invGrid.grid.length) {
+			for (i in 0...Player.inst.invGrid.grid[j].length) {
+				var tempInter = Player.inst.invGrid.grid[j][i];
+				tempInter.inter.x = gridConf.x + i * (gridConf.properties.getInt("tileWidth") + gridConf.properties.getInt("gapX"));
+				tempInter.inter.y = gridConf.y + j * (gridConf.properties.getInt("tileHeight") + gridConf.properties.getInt("gapY"));
+			}
+		}
+		
 		parent.add(this, Const.DP_UI);
-		inventory = new Inventory(configMap, this);
-		this.add(inventory, Const.DP_UI);
+		inventory = new Inventory(configMap, Player.inst.invGrid, this);
+		inventory.containmentEntity = Player.inst;
+		for (i in inventory.invGrid.grid[inventory.invGrid.grid.length - 1]) i.remove();
+
+		this.add(inventory.win, Const.DP_UI);
+
+		belt = new Belt(Player.inst.invGrid.grid[Player.inst.invGrid.grid.length - 1], this);
+		this.add(belt, Const.DP_UI);
 
 		leftTop = new SideCont(Top, Left, this);
 		this.add(leftTop, Const.DP_UI);
 
 		craft = new Crafting(configMap, this);
-		this.add(craft, Const.DP_UI);
+		this.add(craft.win, Const.DP_UI);
 
 		// new StatView(Health, leftTop);
 
@@ -46,7 +66,7 @@ class PlayerUI extends Layers {
 		style.addObject(leftTop);
 	}
 
-	override function sync(ctx: RenderContext) {
+	override function sync(ctx : RenderContext) {
 		super.sync(ctx);
 	}
 

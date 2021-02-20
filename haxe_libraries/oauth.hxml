@@ -1,0 +1,3 @@
+# @install: lix --silent download "gh://github.com/hexonaut/haxe-oauth#99c7cb3904e214f91bcb958df146f8f3f05e6d81" into oauth/0.2.1/github/99c7cb3904e214f91bcb958df146f8f3f05e6d81
+-cp ${HAXE_LIBCACHE}/oauth/0.2.1/github/99c7cb3904e214f91bcb958df146f8f3f05e6d81/
+-D oauth=0.2.1

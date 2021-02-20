@@ -1,3 +1,4 @@
+import hxd.Key;
 import haxe.io.Path;
 import h2d.TextInput;
 import cherry.soup.EventSignal.EventSignal0;
@@ -44,6 +45,7 @@ class MainMenu extends Process {
 		socialFlow.paddingRight = 7;
 		socialFlow.paddingBottom = 7;
 		socialFlow.horizontalSpacing = 9;
+
 		var disco0 = new HSprite(Assets.ui, "discord0");
 		var disco1 = new HSprite(Assets.ui, "discord1");
 		var disco2 = new HSprite(Assets.ui, "discord2");
@@ -88,20 +90,19 @@ class MainMenu extends Process {
 
 		vertFlow.addSpacing(10);
 
-		new TextButton("login", (_) -> {
-			root.remove();
-			root.removeChildren();
-			this.destroy();
-			Main.inst.startGameClient();
-		}, vertFlow);
-		
+		// new TextButton("login", (_) -> {
+		// 	root.remove();
+		// 	root.removeChildren();
+		// 	this.destroy();
+		// 	Main.inst.startGameClient();
+		// }, vertFlow);
+
 		new TextButton("start demo (offline)", (_) -> {
 			root.remove();
 			root.removeChildren();
 			this.destroy();
 			Main.inst.startGame();
 		}, vertFlow);
-
 
 		new TextButton("options", (_) -> {
 			var m = new Matrix();
@@ -119,6 +120,7 @@ class MainMenu extends Process {
 		}, vertFlow);
 
 		// var but1 = new TextButton("Multiplayer", () -> {}, vertFlow);
+		onResize();
 	}
 
 	// override function update() {
@@ -141,7 +143,7 @@ class MainMenu extends Process {
 }
 
 class TextButton extends ui.Button {
-	public function new(string : String, ?action : Event->Void, ?color : Int, ?parent) {
+	public function new(string : String, ?action : Event -> Void, ?color : Int, ?parent) {
 		var text = new Text(Assets.fontPixel);
 		text.color = color != null ? Color.intToVector(color) : Color.intToVector(0xffffff);
 		text.smooth = true;
@@ -165,10 +167,10 @@ class TextButton extends ui.Button {
 class OptionsMenu extends Object {
 	var vertFlow : Flow;
 
-	var onRemoveEvent : Void->Void;
+	var onRemoveEvent : Void -> Void;
 	var nicknameInput : ui.TextInput;
 
-	public function new(?parent, ?onRemove : Void->Void) {
+	public function new(?parent, ?onRemove : Void -> Void) {
 		super(parent);
 		this.onRemoveEvent = onRemove;
 		var exitInteractive = new EventInteractive(Util.getS2dScaledWid(), Util.getS2dScaledHei(), this);
@@ -201,6 +203,17 @@ class OptionsMenu extends Object {
 
 		nicknameInput = new ui.TextInput(Assets.fontPixel, horFlow);
 		nicknameInput.text = Util.nickname != null ? Util.nickname : "Unnamed player";
+		nicknameInput.onFocusLost = function(e : Event) {
+			Util.nickname = nicknameInput.text;
+			Util.saveSettings();
+		}
+		// nicknameInput.onKeyDown = function(e : Event) {
+		// 	if ( e.keyCode == Key.ENTER ) {
+		// 		Util.nickname = nicknameInput.text;
+		// 		Util.saveSettings();
+		// 		if ( onRemoveEvent != null ) onRemoveEvent();
+		// 	}
+		// }
 	}
 
 	override function sync(ctx : RenderContext) {
@@ -210,10 +223,12 @@ class OptionsMenu extends Object {
 		super.sync(ctx);
 
 		if ( Main.inst.ca.isPressed(SELECT) ) {
-			Util.nickname = nicknameInput.text;
-			Util.saveSettings();
 			remove();
 			if ( onRemoveEvent != null ) onRemoveEvent();
 		}
+	}
+
+	override function onRemove() {
+		super.onRemove();
 	}
 }

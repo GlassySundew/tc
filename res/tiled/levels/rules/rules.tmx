@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.4" tiledversion="2020.11.25" orientation="isometric" renderorder="right-up" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#afafaf" nextlayerid="59" nextobjectid="73">
+ <properties>
+  <property name="DeleteTiles" type="bool" value="true"/>
+  <property name="NoOverlappingRules" type="bool" value="true"/>
+ </properties>
+ <tileset firstgid="1" source="../alpha.tsx"/>
+ <layer id="16" name="regions_input" width="100" height="100">
+  <data encoding="base64" compression="zlib">
+   eJzt18ENgCAMAED2YQOnc3T/JMRiQAjcvaHRFtqQ0jry7A9YSCQXI/OVK/FPrFEtF61rynXlnmiMr+tP01qPco/8soMrpbvHOa7FcEfeRfpK68zXn8bJqe/cZ77etTqp9iP+Uz2+mfk2i/bE05T//Nf8eNt/yp2IiOZBvtiZ872WUe9qvb+f6DyPxKAPudyL+7EW9fifnK9FLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGjxAMW8Dtc=
+  </data>
+ </layer>
+ <layer id="10" name="regions_output" width="100" height="100">
+  <data encoding="base64" compression="zlib">
+   eJzt2EsOgyAUBVD24/7310kHTYPlr69yTuJIQeAan5gS0RzvI+IY7h7XHWryqM3s87rvNqU+cucjPCv/LJfB2bma9rXt6COTdrPmftbHkfrusVMeNe+VnvUr1Qv6tdZzYpudlezHyKPPyr1Zzx7k1zh2ySSndt4je8vSt5dv4XYz6r5M4mnN5KkizXO01jzByjnusH5XWP0PBSCSXepvJNY8FlkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQ4gWPOhH6
+  </data>
+ </layer>
+ <layer id="1" name="input_proto" width="100" height="100" opacity="0.62">
+  <data encoding="base64" compression="zlib">
+   eJzt2EEKhDAMBdDcxo33P98slVnYdEiZ1r4HQhFxkU8SNIJVHQPffXbef7tMrTPPnHHV8H6O2Le2o/TmEQ9nWFXVntAPvxuxq79nF3WO29UigzVU94v+m8suWYz87mvJ1HiXHJ5kd8dosrhk81Az3myGuURbRU5mWZ2KnS4PYAX+b/yHms9DFgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPT4AP9oB8A=
+  </data>
+ </layer>
+ <layer id="43" name="output_ground_bot" width="100" height="100">
+  <data encoding="base64" compression="zlib">
+   eJzt1tEJwCAMBUBnqtCu5+hVOoAULNp495sQHoFAUgKAOI7ZATb0due1v3yRg0eeHQAAIJD2u+bB/+s1chj8wNmpuwkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGBVNw9AA1M=
+  </data>
+ </layer>
+ <layer id="6" name="output_ground" width="100" height="100">
+  <data encoding="base64" compression="zlib">
+   eJzt2VsKhCAUANB2Mz861Q5b+thfTEUF5gPOAUFF5KLiA4cB9qbz+qVkHD353GgTUooH+dXZmPOeMaXvprzNz4VjgZaF2gF07M7Z8NT/3kVeb8wZ9ax31znj/XXM1RF0whsFANrnzd6WeN0EoLq0Vy3Bf19xzux2ROsfAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAB36ECgfI
+  </data>
+ </layer>
+ <layer id="57" name="output_shadows" width="100" height="100">
+  <data encoding="base64" compression="zlib">
+   eJzt2DEKACAMA8B+S1/n03V2qUuRwt2cIVsgEUBmPmRGeQsAoNrZ8/W7AwD92A8A6M+/CwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAbQPaAQIf
+  </data>
+ </layer>
+ <layer id="2" name="output_walls" width="100" height="100">
+  <data encoding="base64" compression="zlib">
+   eJzt2DEKACAMA8C+pH7Vpyu4dpKCDneQrUO2QCP4zdjJiPm6B0c23QBAxeYDcMN+AAD08d8FAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCyAFA1AlQ=
+  </data>
+ </layer>
+ <objectgroup id="13" name="output_obstacles">
+  <object id="11" x="144" y="240" width="24" height="24"/>
+  <object id="12" x="120" y="360" width="24" height="24"/>
+  <object id="43" x="840" y="24" width="24" height="24"/>
+  <object id="44" x="960" y="48" width="24" height="24"/>
+  <object id="62" x="240" y="48" width="24" height="24"/>
+  <object id="63" x="264" y="144" width="24" height="24"/>
+  <object id="65" x="1080" y="264" width="24" height="24"/>
+  <object id="66" x="24" y="24" width="24" height="48"/>
+  <object id="67" x="48" y="24" width="24" height="24"/>
+  <object id="68" x="264" y="240" width="24" height="24"/>
+  <object id="69" x="240" y="384" width="24" height="24"/>
+  <object id="70" x="504" y="264" width="24" height="24"/>
+  <object id="71" x="480" y="168" width="24" height="24"/>
+  <object id="72" x="480" y="480" width="24" height="24"/>
+ </objectgroup>
+</map>

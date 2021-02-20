@@ -1,44 +1,164 @@
 package ui;
 
+import en.player.Player;
+import tools.Util;
+import h2d.Flow;
+import ui.player.Dragable;
+import format.tmx.Data.TmxLayer;
+import h2d.Object;
+
 class Window extends dn.Process {
-	public var win: h2d.Flow;
+	public static var ALL : Array<Window> = [];
 
-	public function new() {
+	public var win : Object;
+	/**backdround sprite**/
+	var spr : HSprite;
+	/**	Parsed ui.tmx file **/
+	var configMap : Map<String, TmxLayer>;
+
+	static var centrizerFlow : Flow;
+
+	public function new(?configMap : Map<String, TmxLayer>, ?parent : h2d.Object) {
 		super(Main.inst);
+		ALL.push(this);
+		this.configMap = configMap;
 
-		createRootInLayers(Boot.inst.s2d, Const.DP_UI);
-		root.scale(Const.UI_SCALE);
-
-		win = new h2d.Flow(root);
-		win.backgroundTile = h2d.Tile.fromColor(0xffffff, 32,32);
-		win.borderWidth = 7;
-		win.borderHeight = 7;
-		win.layout = Vertical;
-		win.verticalSpacing = 2;
-
+		win = new h2d.Object(parent);
 		dn.Process.resizeAll();
+	}
+	/**Create close button based on config**/
+	function createCloseBut(layerConf : String) {
+		var closeConf = configMap.get(layerConf).getObjectByName("close");
+
+		var close_button_inventory0 = new HSprite(Assets.ui, "close_button_inventory0");
+		var close_button_inventory1 = new HSprite(Assets.ui, "close_button_inventory1");
+		var close_button_inventory2 = new HSprite(Assets.ui, "close_button_inventory2");
+
+		var closeButton = new Button([
+			close_button_inventory0.tile,
+			close_button_inventory1.tile,
+			close_button_inventory2.tile
+		], spr);
+
+		closeButton.x = closeConf.x;
+		closeButton.y = closeConf.y;
+
+		closeButton.onClickEvent.add((_) -> {
+			toggleVisible();
+		});
+	}
+	/**create dragable area based on config**/
+	function createDragable(layerConf : String) {
+		var dragableConf = configMap.get(layerConf).getObjectByName("dragable");
+		var dragable = new Dragable(dragableConf.width, dragableConf.height, () -> {
+			clampInScreen();
+			bringOnTopOfALL();
+		}, win);
+		dragable.x = dragableConf.x;
+		dragable.y = dragableConf.y;
+	}
+
+	function recenter() {
+		if ( spr != null ) {
+			win.x = Std.int((getS2dScaledWid() - spr.tile.width) / 2);
+			win.y = Std.int((getS2dScaledHei() - spr.tile.height) / 2);
+		}
+	}
+
+	function clampInScreen() {
+		win.x = hxd.Math.clamp(win.x, 0, Game.inst.w() / Const.SCALE - spr.tile.width);
+		win.y = hxd.Math.clamp(win.y, 0, Game.inst.h() / Const.SCALE - spr.tile.height);
+	}
+
+	function bringOnTopOfALL() {
+		ALL.remove(this);
+		ALL.unshift(this);
+	}
+
+	public function toggleVisible() {
+		bringOnTopOfALL();
+		win.visible = !win.visible;
+		// recenter();
 	}
 
 	public function clearWindow() {
 		win.removeChildren();
 	}
 
-	public inline function add(e:h2d.Flow) {
+	public static function centrizeTwoWins(win1 : Window, win2 : Window) {
+		if ( centrizerFlow != null ) {
+			centrizerFlow.onAfterReflow = () -> {};
+			centrizerFlow.remove();
+		}
+
+		centrizerFlow = new Flow();
+
+		centrizerFlow.paddingLeft = Std.int(win1.win.x);
+		centrizerFlow.paddingTop = Std.int(win1.win.y);
+		centrizerFlow.x -= (win1.win.getSize().xMax + win2.win.getSize().xMax) / 4;
+
+		if ( centrizerFlow.paddingLeft + centrizerFlow.x < 0 ) centrizerFlow.paddingLeft += M.iabs(centrizerFlow.paddingLeft + Std.int(centrizerFlow.x));
+		if ( centrizerFlow.paddingLeft + centrizerFlow.x + (win1.win.getSize().xMax + win2.win.getSize().xMax) > Util.getS2dScaledWid() ) {
+			centrizerFlow.paddingLeft -= Std.int(centrizerFlow.paddingLeft + centrizerFlow.x + (win1.win.getSize().xMax + win2.win.getSize().xMax)
+				- Util.getS2dScaledWid());
+		}
+
+		centrizerFlow.addChild(win1.win);
+		centrizerFlow.addChild(win2.win);
+
+		centrizerFlow.verticalAlign = Middle;
+		centrizerFlow.horizontalAlign = Middle;
+
+		Player.inst.ui.add(centrizerFlow, Const.DP_UI);
+
+		win1.clampInScreen();
+		win2.clampInScreen();
+
+		centrizerFlow.reflow();
+		centrizerFlow.needReflow = false;
+
+		centrizerFlow.onAfterReflow = function() {
+			if ( win1.win.parent != centrizerFlow || !win1.win.visible ) {
+				// Кто-то потянул за первое окно и его родитель стал Player.inst.ui вместо centrizerFlow
+				win2.win.x += win2.win.getSize().xMax / 2;
+				Player.inst.ui.add(win2.win, Const.DP_UI);
+			} else if ( win2.win.parent != centrizerFlow || !win2.win.visible ) {
+				// Кто-то потянул за win2
+				win1.win.x -= win1.win.getSize().xMax / 2;
+				Player.inst.ui.add(win1.win, Const.DP_UI);
+			}
+			centrizerFlow.onAfterReflow = () -> {};
+		}
+	}
+
+	override function update() {
+		super.update();
+	}
+
+	public static function removeCentrizer() {
+		centrizerFlow.remove();
+	}
+
+	public inline function add(e : h2d.Flow) {
 		win.addChild(e);
 		onResize();
 	}
 
 	override function onResize() {
 		super.onResize();
-		var w = M.ceil( w()/Const.UI_SCALE );
-		var h = M.ceil( h()/Const.UI_SCALE );
-		win.x = Std.int( w*0.5 - win.outerWidth*0.5 );
-		win.y = Std.int( h*0.5 - win.outerHeight*0.5 );
+		if ( spr != null ) clampInScreen();
 	}
 
 	function onClose() {}
+
+	override function onDispose() {
+		super.onDispose();
+		win.remove();
+		ALL.remove(this);
+	}
+
 	public function close() {
-		if( !destroyed ) {
+		if ( !destroyed ) {
 			destroy();
 			onClose();
 		}

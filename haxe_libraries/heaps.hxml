@@ -1,0 +1,4 @@
+# @install: lix --silent download "gh://github.com/HeapsIO/heaps#38ff719a72b8133613c5af4309afee0fc7a1aa33" into heaps/1.8.0/github/38ff719a72b8133613c5af4309afee0fc7a1aa33
+-lib format
+-cp ${HAXE_LIBCACHE}/heaps/1.8.0/github/38ff719a72b8133613c5af4309afee0fc7a1aa33/
+-D heaps=1.8.0

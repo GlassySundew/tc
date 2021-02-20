@@ -1,6 +1,8 @@
 package tools;
 
-import cloner.Cloner;
+import h2d.Flow;
+import hxd.res.Any;
+import hxd.res.Loader;
 import hxbit.NetworkHost.NetworkClient;
 import haxe.io.Path;
 import h2d.Scene;
@@ -18,6 +20,8 @@ import h2d.Bitmap;
 import h3d.Vector;
 import format.tmx.Data.TmxPoint;
 import format.tmx.Data.TmxObject;
+
+using Util.LoaderExtender;
 
 @:publicFields
 @:expose
@@ -42,10 +46,8 @@ class Util {
 		return pts;
 	}
 
-	public static var cloner : Cloner = new Cloner();
-
 	inline static function cartToIso(x : Float, y : Float) : Vector return new Vector((x - y), (x + y) / 2);
-	
+
 	inline static function screenToIsoX(globalX : Float, globalY : Float) {
 		return globalX + globalY;
 	}
@@ -63,7 +65,11 @@ class Util {
 	inline static function getS2dScaledHei() return (Boot.inst.s2d.height / Const.SCALE);
 
 	inline static function getTileFromSeparatedTsx(tile : TmxTilesetTile) : Tile {
+		// #if pak
+		// return Res.loader.loadParentalFix(Const.LEVELS_PATH + tile.image.source).toTile();
+		// #else
 		return Res.loader.load(Const.LEVELS_PATH + tile.image.source).toTile();
+		// #end
 	}
 
 	inline static function getTileSource(gid : Int, tileset : TmxTileset) : TmxTilesetTile {
@@ -84,23 +90,52 @@ class Util {
 		}
 	}
 
-	inline static function resolveMap(tmx : TmxMap, lvlName : String) {
+	inline static function resolveMap(lvlName : String) {
 		var tsx = new Map();
 		var r = new Reader();
 		r.resolveTSX = getTsx(tsx, r);
-		tmx = r.read(Xml.parse(Res.loader.load(Const.LEVELS_PATH + lvlName).entry.getText()));
+		var tmx = r.read(Xml.parse(Res.loader.load(Const.LEVELS_PATH + lvlName).entry.getText()));
 		return tmx;
+	}
+
+	inline static function getProjectedDifferPolygonRect(?obj : TmxObject, points : Array<TmxPoint>) : Vector {
+		var pts = checkPolyClockwise(points);
+		var verts : Array<Vector> = [];
+		for (i in pts) verts.push(new Vector((i.x), (-i.y)));
+
+		var yArr = verts.copy();
+		yArr.sort(function(a, b) return (a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0));
+		var xArr = verts.copy();
+		xArr.sort(function(a, b) return (a.x < b.x) ? -1 : ((a.x > b.x) ? 1 : 0));
+
+		// xCent и yCent - половины ширины и высоты неповёрнутого полигона соответственно
+		var xCent : Float = M.round((xArr[xArr.length - 1].x + xArr[0].x) * .5);
+		var yCent : Float = -M.round((yArr[yArr.length - 1].y + yArr[0].y) * .5);
+
+		// c - радиус от начальной точки поли до центра поли
+		var c = Math.sqrt(M.pow(xCent, 2) + M.pow(yCent, 2));
+		// alpha - угол между начальной точкой неповёрнутого полигона и центром полигона
+		var alpha = Math.atan(yCent / xCent);
+
+		// xCent и yCent в данный момент - проекции отрезка, соединяющего начальную точку полигона и центр полигона на оси x и y соответственно
+		if ( obj != null ) {
+			yCent = -c * (Math.sin(M.toRad(-obj.rotation) - alpha));
+			xCent = c * (Math.cos(M.toRad(-obj.rotation) - alpha));
+		}
+		return new Vector(xCent, yCent);
 	}
 
 	static var entParent : Scene;
 
 	static var SAVEPATH : String = Path.join([
-		#if windows Sys.getEnv("APPDATA") #elseif linux Sys.getEnv("HOME"),
+		#if windows Sys.getEnv("APPDATA"), #elseif linux Sys.getEnv("HOME"),
 		#end
 		"/.config/TotalCondemn/settings"
 	]);
 
 	public static var nickname : String;
+
+	public static var fullscreen : Bool;
 
 	public static function saveSettings() {
 		#if hl
@@ -108,6 +143,7 @@ class Util {
 		#end
 		hxd.Save.save({
 			nickname : nickname,
+			fullscreen : fullscreen,
 		}, SAVEPATH);
 	}
 
@@ -115,6 +151,7 @@ class Util {
 		var data = hxd.Save.load(null, SAVEPATH);
 		if ( data != null ) {
 			nickname = data.nickname;
+			fullscreen = data.fullscreen;
 		}
 	}
 }
@@ -163,6 +200,12 @@ class TmxLayerExtender {
 					if ( i != target ) {
 						i.x -= offsetX;
 						i.y -= offsetY;
+						switch( i.objectType ) {
+							case OTTile(gid):
+								i.x -= i.width / 2 - 1;
+								i.y -= i.height - 1;
+							default:
+						}
 					}
 				}
 			default:
@@ -176,5 +219,22 @@ class SocketHostExtender {
 
 	public static dynamic function onTypedMessage(sHost : hxd.net.SocketHost, onMessage : NetworkClient -> Message -> Void) {
 		sHost.onMessage = onMessage;
+	}
+}
+
+class LoaderExtender {
+	// unsafe crutch, removes ../ from path, use only if you you have link to the folder upper in dir
+	public static function loadParentalFix(loader : Loader, path : String) : Any {
+		if ( StringTools.contains(path, "../") ) {
+			path = StringTools.replace(path, "../", "");
+		}
+		return new Any(loader, loader.fs.get(path));
+	}
+}
+
+class FlowExtender {
+	public static function center(flow : Flow) {
+		flow.paddingLeft = -flow.innerWidth >> 1;
+		flow.paddingTop = -flow.innerHeight >> 1;
 	}
 }

@@ -1,0 +1,6 @@
+# @install: lix --silent download "gh://github.com/Yanrishatum/heeps#55a9e19e39792f6b89a8e40153ece16c667856d2" into Heeps/1.3.0/github/55a9e19e39792f6b89a8e40153ece16c667856d2
+-lib heaps
+-cp ${HAXE_LIBCACHE}/Heeps/1.3.0/github/55a9e19e39792f6b89a8e40153ece16c667856d2/
+-D Heeps=1.3.0
+--macro cherry.macro.Extensions.init()
+--macro cherry.macro.Helper.init()

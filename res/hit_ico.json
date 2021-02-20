@@ -33,7 +33,7 @@
 					"blend": "Alpha",
 					"shadows": false,
 					"culling": false,
-					"depthTest": "Less",
+					"depthTest": "LessEqual",
 					"colorMask": 15,
 					"enableStencil": false,
 					"drawOrder": 0,

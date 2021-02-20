@@ -1,6 +1,10 @@
 package;
 
 // import game.comps.GameUI;
+import hxd.System;
+import ui.Window;
+import haxe.Timer;
+import cherry.soup.EventSignal.EventSignal0;
 import tools.Util;
 import hxd.fmt.pak.FileSystem;
 import h3d.mat.Texture;
@@ -21,6 +25,7 @@ class Main extends Process {
 	public var console : ui.Console;
 	public var controller : dn.heaps.Controller;
 	public var ca : dn.heaps.Controller.ControllerAccess;
+	public var onClose : EventSignal0;
 
 	public function new(s : h2d.Scene) {
 		super();
@@ -46,13 +51,12 @@ class Main extends Process {
 			}, 0.2);
 		});
 		#end
-
+		
 		Assets.init();
 		Cursors.init();
 		Lang.init("en");
 
 		Data.load(hxd.Res.data.entry.getText());
-		// Data.load(hxd.Res.data.entry.getText());
 
 		console = new ui.Console(Assets.fontPixel, s);
 		controller = new dn.heaps.Controller(s);
@@ -62,18 +66,26 @@ class Main extends Process {
 		controller.bind(AXIS_LEFT_X_POS, Key.RIGHT, Key.D);
 		controller.bind(AXIS_LEFT_Y_NEG, Key.UP, Key.W);
 		controller.bind(AXIS_LEFT_Y_POS, Key.DOWN, Key.S);
-		controller.bind(A, Key.SPACE, Key.F, Key.E);
-		controller.bind(B, Key.ESCAPE, Key.BACKSPACE);
-		controller.bind(SELECT, Key.R);
+
+		controller.bind(A, Key.E);
+		controller.bind(Y, Key.Q);
+		// controller.bind(B, Key.ESCAPE, Key.BACKSPACE); // ??
 		controller.bind(LT, Key.TAB); // Inventory
 		controller.bind(DPAD_UP, Key.C);
 		controller.bind(SELECT, Key.ESCAPE);
 
-		// @:privateAccess new dn.heaps.GameFocusHelper(Boot.inst.s2d, Assets.fontPixel);
-
-		// delayer.addF(start, 1);
+		onClose = new EventSignal0();
 		Util.loadSettings();
-		start();
+		onClose.add(() -> Util.saveSettings());
+
+		if ( Util.fullscreen ) toggleFullscreen();
+
+		@:privateAccess engine.window.onClose = function() {
+			onClose.dispatch();
+			return true;
+		}
+
+		delayer.addF(start, 1);
 	}
 
 	function start() {
@@ -93,6 +105,7 @@ class Main extends Process {
 		#if hl
 		var s = hxd.Window.getInstance();
 		s.displayMode = s.displayMode == Fullscreen ? Windowed : Fullscreen;
+		Util.fullscreen = s.displayMode == Fullscreen;
 		#end
 	}
 
@@ -130,7 +143,18 @@ class Main extends Process {
 		// dn.heaps.slib.SpriteLib.TMOD = tmod;
 		if ( ca.isKeyboardPressed(Key.F11) ) toggleFullscreen();
 		// if ( ca.isKeyboardPressed(Key.M) ) Assets.toggleMusicPause();
-
+		// сделано наспех, итерирует по массиву ALL, скрывает первый видимый инстанс и выходит из цикла
 		super.update();
+		if ( Main.inst.ca.selectPressed() ) {
+			var zhopa = () -> {
+				for (i in Window.ALL) {
+					if ( i.win.visible ) {
+						i.toggleVisible();
+						return;
+					}
+				}
+			};
+			zhopa();
+		}
 	}
 }

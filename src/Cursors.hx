@@ -1,3 +1,4 @@
+import hxd.File;
 import hxd.Cursor.CustomCursor;
 import hxd.Pixels;
 import h3d.mat.Texture;
@@ -7,10 +8,8 @@ class Cursors {
 	public static var cursorScale = 2;
 
 	public static function init() {
-		function uploadPixels(pixels:Pixels, bmp:BitmapData) {
-			for (i in 0...pixels.height)
-				for (j in 0...pixels.width)
-					bmp.setPixel(j, i, pixels.getPixel(j, i));
+		function uploadPixels(pixels : Pixels, bmp : BitmapData) {
+			for (i in 0...pixels.height) for (j in 0...pixels.width) bmp.setPixel(j, i, pixels.getPixel(j, i));
 			return bmp;
 		}
 
@@ -23,6 +22,7 @@ class Cursors {
 		var tex = new Texture(Std.int(sprCursor.tile.width * cursorScale), Std.int(sprCursor.tile.height * cursorScale), [Target]);
 		sprCursor.drawTo(tex);
 		var pixels = tex.capturePixels();
+
 		cursors.push(uploadPixels(pixels, new BitmapData(Std.int(sprCursor.tile.width * cursorScale), Std.int(sprCursor.tile.height * cursorScale))));
 
 		bmpMap.set(Default, cursors.copy());
@@ -41,8 +41,8 @@ class Cursors {
 
 		var defalutCur = new CustomCursor(bmpMap.get(Default), 0, 0, 0);
 		var handCur = new CustomCursor(bmpMap.get(Button), 0, 6, 2);
-		hxd.System.setCursor = function(cur:hxd.Cursor) {
-			if (cur == Default) {
+		hxd.System.setCursor = function(cur : hxd.Cursor) {
+			if ( cur == Default ) {
 				// // Pressed (idk how to set)
 				// var sprCursor = Assets.ui.getBitmap("cursor", 1);
 				// sprCursor.scale(cursorScale);
@@ -51,9 +51,9 @@ class Cursors {
 				// var pixels = tex.capturePixels();
 				// cursors.push(uploadPixels(pixels, new BitmapData(Std.int(sprCursor.tile.width * cursorScale), Std.int(sprCursor.tile.height * cursorScale))));
 				hxd.System.setNativeCursor(Custom(defalutCur));
-			} else if (cur == Button) {
+			} else if ( cur == Button ) {
 				hxd.System.setNativeCursor(Custom(handCur));
-			} else if (cur == Hide) {} else {
+			} else if ( cur == Hide ) {} else {
 				hxd.System.setNativeCursor(cur);
 			}
 		}

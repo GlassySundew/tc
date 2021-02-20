@@ -9,6 +9,10 @@ import dn.Lib;
 class Console extends h2d.Console {
 	public static var inst : Console;
 
+	public var game(get, never) : GameAble;
+
+	function get_game() : GameAble return Game.inst != null ? Game.inst : GameClient.inst;
+
 	#if debug
 	var flags : Map<String, Bool>;
 	#end
@@ -49,6 +53,35 @@ class Console extends h2d.Console {
 				setFlag(k, false);
 			}
 		});
+
+		this.addCommand("giveItem", [
+			{name : "item", t : AString, opt : false},
+			{name : "amount", t : AInt, opt : true}
+		], function(?k : Data.ItemsKind, ?amount : Int = 1) {
+			if ( Data.items.get(k) != null ) {
+				var newItem = Item.fromCdbEntry(k, amount);
+				Game.inst.player.ui.inventory.invGrid.giveItem(newItem, Game.inst.player, false);
+			}
+		});
+
+		this.addCommand("connect", [], function(?k : String) {
+			// (new Connect());
+		});
+
+		this.addCommand("hud", [], function(?k : String) {
+			Player.inst.ui.visible = !Player.inst.ui.visible;
+		});
+
+		this.addAlias("+", "set");
+		this.addAlias("-", "unset");
+		this.addCommand("untarget", [], function(?k : String) {
+			game.camera.stopTracking();
+			new h3d.scene.CameraController(Boot.inst.s3d).loadFromCamera();
+			Level.inst.cursorInteract.visible = false;
+		});
+		this.addCommand("loadlvl", [{name : "k", t : AString}], function(?k : String) {
+			Game.inst.startLevel(k + ".tmx");
+		});
 		var pp : Bool = true;
 		this.addCommand("pp", [], function(?k : String) {
 			if ( pp ) {
@@ -63,33 +96,7 @@ class Console extends h2d.Console {
 				pp = true;
 			}
 		});
-
-		this.addCommand("giveItem", [
-			{name : "item", t : AString, opt : false},
-			{name : "amount", t : AInt, opt : true}
-		], function(?k : Data.ItemsKind, ?amount : Int = 1) {
-			if ( Data.items.get(k) != null ) {
-				var newItem = Item.fromCdbEntry(k);
-				newItem.amount = amount;
-				Game.inst.player.ui.inventory.invGrid.giveItem(newItem);
-			}
-		});
-
-		this.addCommand("connect", [], function(?k : String) {
-			// (new Connect());
-		});
-
-		this.addAlias("+", "set");
-		this.addAlias("-", "unset");
 		#end
-		this.addCommand("untarget", [], function(?k : String) {
-			GameClient.inst.camera.stopTracking();
-			new h3d.scene.CameraController(Boot.inst.s3d).loadFromCamera();
-			Level.inst.cursorInteract.visible = false;
-		});
-		this.addCommand("loadlvl", [{name : "k", t : AString}], function(?k : String) {
-			Game.inst.startLevel(k + ".tmx");
-		});
 	}
 
 	#if debug

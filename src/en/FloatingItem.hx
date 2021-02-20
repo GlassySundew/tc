@@ -175,7 +175,7 @@ class FloatingItem extends Interactive {
 			bumpAwayFrom(Player.inst, distPx(Player.inst) < 20 ? -.065 * tmod : 0);
 
 		if (player != null && distPx(player) < 10 && !isLocked()) {
-			player.ui.inventory.invGrid.giveItem(item) != null ? dispose() : {};
+			player.ui.inventory.invGrid.giveItem(item, player) != null ? dispose() : {};
 		}
 	}
 

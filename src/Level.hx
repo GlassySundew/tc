@@ -1,3 +1,5 @@
+import en.items.Blueprint;
+import en.structures.Chest;
 import en.structures.hydroponics.Hydroponics;
 import ui.s3d.EventInteractive;
 import hxd.IndexBuffer;
@@ -89,24 +91,13 @@ class Level extends dn.Process {
 								var pts = checkPolyClockwise(points);
 								// pts.reverse();
 
-								if ( ol.name == 'walls' ) setWalkable(obj, pts);
+								if ( ol.name == 'obstacles' ) setWalkable(obj, pts);
 							case OTRectangle:
-								if ( ol.name == 'walls' ) setWalkable(obj);
+								if ( ol.name == 'obstacles' ) setWalkable(obj);
 
 							default:
 						}
 						if ( map.orientation == Isometric ) {
-							// все объекты в распаршенных слоях уже с конвертированными координатами
-							// entities export lies ahead
-							
-							// var isoX = cartToIsoLocal(obj.x, obj.y).x;
-							// var isoY = cartToIsoLocal(obj.x, obj.y).y;
-
-							// if ( obj.flippedVertically ) isoY -= obj.height;
-
-							// obj.x = isoX;
-							// obj.y = isoY;
-
 							// Если Entity никак не назван на карте - то ему присваивается имя его картинки без расширения
 							if ( obj.name == "" ) {
 								switch( obj.objectType ) {
@@ -115,7 +106,6 @@ class Level extends dn.Process {
 									default:
 								}
 							}
-
 							if ( ol.name == 'entities' ) entities.push(obj);
 						}
 					}
@@ -170,18 +160,23 @@ class Level extends dn.Process {
 
 		invalidated = false;
 
-		ground = new h3d.mat.Texture(data.width * data.tileWidth, data.height * data.tileHeight, [Target, WasCleared]);
+		ground = new h3d.mat.Texture(data.width * data.tileWidth, data.height * data.tileHeight, [Target]);
 		ground.filter = Nearest;
 		var prim = new PlanePrim(ground.width, ground.height, -ground.width, -ground.height, Y);
 
 		obj = new Mesh(prim, Material.create(ground), Boot.inst.s3d);
-		obj.material.mainPass.setBlendMode(AlphaAdd);
+
+		obj.material.shadows = false;
+		obj.material.mainPass.enableLights = false;
+		obj.material.mainPass.depth(false, Less);
+		obj.material.mainPass.setBlendMode(Alpha);
+
 		for (e in data.layers) {
 			switch( e ) {
 				case LTileLayer(layer):
-					if ( layer.visible ) {
+					if ( layer.visible && layer.name != "proto" ) {
 						layerRenderer = new LayerRender(data, layer);
-						layerRenderer.render.g.drawTo(obj.material.texture);
+						layerRenderer.render.g.drawTo(ground);
 					}
 				default:
 			}
@@ -192,12 +187,20 @@ class Level extends dn.Process {
 			switch( imageLayer ) {
 				case LObjectGroup(ol):
 					for (obj in ol.objects) {
+						var isoX = 0., isoY = 0.;
+						if ( data.orientation == Isometric ) {
+							// все объекты в распаршенных слоях уже с конвертированными координатами
+							// entities export lies ahead
+							isoX = Level.inst.cartToIsoLocal(obj.x, obj.y).x;
+							isoY = Level.inst.cartToIsoLocal(obj.x, obj.y).y;
+						}
+
 						switch( obj.objectType ) {
 							case OTTile(gid):
 								var bmp = new Bitmap(getTileFromSeparatedTsx(getTileSource(gid, Tools.getTilesetByGid(data, gid))));
 								bmp.scaleX = obj.flippedVertically ? -1 : 1;
-								bmp.x = obj.x - obj.width / 2 * bmp.scaleX;
-								bmp.y = hei - obj.y - obj.height * (bmp.scaleX < 0 ? 0 : 1);
+								bmp.x = isoX - obj.width / 2 * bmp.scaleX;
+								bmp.y = hei - isoY - obj.height * (bmp.scaleX < 0 ? 0 : 1);
 								bmp.drawTo(this.obj.material.texture);
 							default:
 						}
@@ -205,11 +208,6 @@ class Level extends dn.Process {
 				default:
 			}
 		}
-
-		obj.material.shadows = false;
-		obj.material.mainPass.enableLights = false;
-		obj.material.mainPass.depth(false, LessEqual);
-
 		// Хуйня чтобы получать 3d координаты курсора
 		{
 			var bounds = new Bounds();
@@ -265,6 +263,7 @@ class LayerRender extends h2d.Object {
 		render.g = new h2d.Graphics();
 		render.g.blendMode = Alpha;
 		render.tex = new Texture(map.tileWidth * map.width, map.tileHeight * map.height, [Target]);
+
 		render.render();
 	}
 }
@@ -292,6 +291,7 @@ private class InternalRender extends TileLayerRenderer {
 		var scaleY = tile.flippedVertically ? -1 : 1;
 		Tools.getTileUVByLidUnsafe(tileset, tile.gid - tileset.firstGID, uv);
 		var h2dTile = Res.loader.load(Const.LEVELS_PATH + tileset.image.source).toTile();
+
 		g.beginTileFill(x
 			- uv.x
 			+ (scaleX == 1 ? 0 : map.tileWidth)
@@ -333,6 +333,7 @@ private class InternalRender extends TileLayerRenderer {
 		// Creating isometric(rombic) h3d.scene.Interactive on top of separated
 		// tiles that contain *floor at the end of their file name as a slots for
 		// structures; can be visible only when choosing place for structure to build
+		
 		// Это говнище должно быть visible только тогда, когда у игрока в holdItem есть blueprint
 		var ereg = ~/\/([a-z_0-9]+)\./; // regexp to take picture name between last / and . from picture path
 		if ( ereg.match(sourceTile.image.source)
@@ -344,8 +345,8 @@ private class InternalRender extends TileLayerRenderer {
 		bmp.remove();
 		bmp = null;
 
+		g.clear();
 		g.drawTile(0, 0, Tile.fromTexture(tex));
-		g.endFill();
 	}
 
 	override function renderIsoTiles(ox : Float, y : Float, tiles : Array<TmxTile>, width : Int, height : Int) {
@@ -380,11 +381,11 @@ class StructTile extends Object {
 	public var tile : EventInteractive;
 
 	// Шаблон, из которого берётся коллайдер для tile
-	static var polyPrim : h3d.prim.Polygon = null;
+	public static var polyPrim : h3d.prim.Polygon = null;
 
 	// Ortho size of tile
-	var tileW : Int = 44;
-	var tileH : Int = 20;
+	public static var tileW : Int = 44;
+	public static var tileH : Int = 20;
 
 	override function new(x : Float, y : Float, ?parent : Object) {
 		super(parent);
@@ -392,16 +393,21 @@ class StructTile extends Object {
 		tile = new EventInteractive(polyPrim.getCollider(), this);
 		tile.rotate(-0.01, 0, hxd.Math.degToRad(180));
 
-		tile.priority = -1;
+		tile.priority = -2;
 		this.x = x;
 		this.z = y;
 		this.y = 0;
 
+		tile.onMoveEvent.add((event) -> {
+			if ( Player.inst != null && Player.inst.holdItem != null && Std.isOfType(Player.inst.holdItem, Blueprint) ) {
+				cast(Player.inst.holdItem, Blueprint).onStructTileMove.dispatch(this);
+			}
+		});
+
 		tile.onPushEvent.add(event -> {
-			// Entity.ALL[Entity.ALL.length - 1].setFeetPos(x, y);
-			var ent = new Hydroponics(0, 0, hydroponics);
-			Level.inst.game.applyTmxObjOnEnt(ent);
-			ent.setFeetPos(x, y);
+			if ( Player.inst != null && Player.inst.holdItem != null && Std.isOfType(Player.inst.holdItem, Blueprint) ) {
+				cast(Player.inst.holdItem, Blueprint).onStructurePlace.dispatch(this);
+			}
 		});
 
 		#if debug
@@ -419,7 +425,7 @@ class StructTile extends Object {
 		// // add texture coordinates
 		// prim.addUVs();
 		// var obj2 = new Mesh(prim, this);
-		// obj2.scale(1);
+		// obj2.scale(10);
 		// // set the second cube color
 		// obj2.material.color.setColor(0xFFB280);
 		#end

@@ -1,8 +1,8 @@
 
 ui.png
-size: 426,142
+size: 426, 142
 format: RGBA8888
-filter: Nearest,Nearest
+filter: Nearest, Nearest
 repeat: none
 caret0
   rotate: false
@@ -18,9 +18,23 @@ caret1
   orig: 4, 10
   offset: 0, 0
   index: -1
-close_button_inventory
+close_button_inventory0
+  rotate: false
+  xy: 0, 1
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+close_button_inventory1
   rotate: false
   xy: 376, 40
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+close_button_inventory2
+  rotate: false
+  xy: 376, 26
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
@@ -139,7 +153,7 @@ keyboard_icon1
   index: -1
 oxygen_scale
   rotate: false
-  xy: 0, 1
+  xy: 390, 28
   size: 12, 12
   orig: 12, 12
   offset: 0, 0

@@ -1,7 +1,13 @@
 package en;
 
+import ui.s2d.EventInteractive;
+import hxd.Res;
+import en.structures.Chest;
+import ui.InventoryGrid.InventoryCell;
+import hxd.Key;
+import ui.player.Inventory;
 import cherry.soup.EventSignal.EventSignal0;
-import en.items.Blueprints.Blueprint;
+import en.items.Blueprint;
 import h2d.Scene;
 import h2d.RenderContext;
 import en.player.Player;
@@ -10,22 +16,31 @@ import h2d.Bitmap;
 import h2d.Object;
 import h2d.Interactive;
 
-@:keep
-class Item extends Object {
+@:keep class Item extends Object {
 	public var ent : Entity;
 	public var spr : HSprite;
-	public var interactive : h2d.Interactive;
+	public var interactive : EventInteractive;
 	public var cdbEntry : Data.ItemsKind;
 	public var amount(default, set) : Int = 1;
 	public var amountLabel : TextLabel;
-	public var structureUsingEvent = new EventSignal0();
+
+	var over : Bool = false;
+
+	public var onStructureUse = new EventSignal0();
+	public var onPlayerHold = new EventSignal0();
+	public var onPlayerRemove = new EventSignal0();
+
+	public var containerEntity : Entity;
+
+	public var isDisposed : Bool;
 
 	var displayText : String = "";
 	var textLabel : TextLabel;
 	var bitmap : Bitmap;
+	var ca : dn.heaps.Controller.ControllerAccess;
 
 	inline function set_amount(v : Int) {
-		if ( v == 0 ) Player.inst.ui.inventory.invGrid.removeItem(this, null);
+		if ( v <= 0 ) dispose();
 		amountLabel.label = '${v}';
 		return amount = v;
 	}
@@ -34,10 +49,20 @@ class Item extends Object {
 
 	inline public function isInCursor() : Bool return Std.is(parent, Scene);
 
+	public function isInBelt() : Bool {
+		if ( Player.inst != null ) {
+			for (i in Player.inst.invGrid.grid[Player.inst.invGrid.grid.length - 1]) if ( i.item == this ) return true;
+			return false;
+		} else
+			return false;
+	}
+
 	inline public function isSameTo(item : Item) : Bool return '${item}' == '$this' && item.cdbEntry == cdbEntry;
 
 	public function new(cdbEntry : ItemsKind, ?parent : Object) {
 		super(parent);
+		ca = Main.inst.controller.createAccess("chest");
+
 		this.cdbEntry = cdbEntry;
 		if ( spr == null ) {
 			spr = new HSprite(Assets.items, this);
@@ -62,109 +87,207 @@ class Item extends Object {
 		amountLabel.containerFlow.paddingTop = -4;
 		amountLabel.containerFlow.paddingBottom = 3;
 		amountLabel.containerFlow.paddingLeft = 1;
-		// amountLabel.containerFlow.paddingTop  = -2;
 
-		// amountLabel.containerFlow.he = 2;
+		interactive = new EventInteractive(spr.tile.width, spr.tile.height, spr);
+		interactive.enableRightButton = true;
 
-		interactive = new Interactive(spr.tile.width, spr.tile.height, spr);
 		interactive.onOver = function(e : hxd.Event) {
+			over = true;
 			textLabel = new TextLabel(displayText, Assets.fontPixel, Boot.inst.s2d);
 		}
 
 		interactive.onOut = function(e : hxd.Event) {
+			over = false;
 			textLabel.dispose();
 		}
 
+		interactive.onFocusEvent.add(function(e : hxd.Event) {});
+
 		interactive.onPush = function(e : hxd.Event) {
-			var swapHold = () -> {
-				// swapping this item with the one player holds
-				Player.inst.ui.inventory.belt.deselectCells();
-				Player.inst.enableGrids();
-				var swapItem = Game.inst.player.holdItem;
-				swapItem = (swapItem == this) ? null : swapItem;
+			if ( e.button == 0 ) {
+				// Левая кнопка мыши
+				var swapHold = () -> {
+					// swapping this item with the one player holds
+					Player.inst.ui.belt.deselectCells();
+					for (i in Inventory.ALL) i.invGrid.enableGrid();
 
-				Player.inst.holdItem = this;
-				Player.inst.ui.inventory.invGrid.removeItem(this, swapItem);
+					var swapItem = Game.inst.player.holdItem;
+					swapItem = (swapItem == this) ? null : swapItem;
 
-				Boot.inst.s2d.addChild(this);
-				scaleX = scaleY = 2;
-			}
-			// Picking up the item into the player's holdItem (cursor)
-			if ( Player.inst.ui.inventory.sprInv.visible ) {
-				textLabel.dispose();
-				if ( Player.inst.holdItem != null && isSameTo(Player.inst.holdItem) ) {
-					// folding item from cursor with this item
-					if ( Player.inst.holdItem.isInCursor() ) {
-						if ( amount + Player.inst.holdItem.amount <= Data.items.get(cdbEntry).stack.int() ) {
-							amount += Player.inst.holdItem.amount;
-							Player.inst.holdItem.dispose();
+					for (i in Inventory.ALL) i.invGrid.findAndReplaceItem(this, swapItem);
+					Player.inst.holdItem = this;
+				}
+				// Быстрый перенос предмета через shift
+				if ( Key.isDown(Key.SHIFT) ) {
+					// Если предмет в поясе, то перенести в основной инвентарь
+					if ( isInBelt() ) {
+						// Если предмет выбран на поясе, то очистить выбор
+						if ( Player.inst.holdItem != null && Player.inst.holdItem.isInBelt() ) {
+							Player.inst.ui.belt.deselectCells();
 							Player.inst.holdItem = null;
 						}
-					} else
-						swapHold();
-				} else if ( Player.inst.holdItem == null ) swapHold(); else if ( !Player.inst.holdItem.isInCursor() ) {
-					Player.inst.ui.inventory.belt.deselectCells();
-					Player.inst.enableGrids();
-					Player.inst.ui.inventory.invGrid.removeItem(this, null);
-					Boot.inst.s2d.addChild(this);
-					scaleX = scaleY = 2;
-					Player.inst.holdItem = this;
+						var freeSlot = Player.inst.invGrid.getFreeSlot();
+						if ( freeSlot != null ) {
+							textLabel.dispose();
+							Player.inst.invGrid.findAndReplaceItem(this);
+							Player.inst.invGrid.findAndReplaceItem(freeSlot.item, this);
+						}
+					} else {
+						// Предмет был кликнут в какой-то инвентарной сетке
+						if ( containerEntity.isOfType(Chest) ) {
+							// Если данный предмет в сундуке - то перенести его в инвентарь игрока
+
+							var freeSlot = Player.inst.invGrid.getFreeSlot();
+							if ( freeSlot != null ) {
+								textLabel.dispose();
+								containerEntity = Player.inst;
+
+								for (i in Inventory.ALL) if ( i.invGrid != Player.inst.invGrid
+									&& i.invGrid.findAndReplaceItem(this) != null ) break;
+								Player.inst.invGrid.findAndReplaceItem(freeSlot.item, this);
+							}
+						} else if ( containerEntity.isOfType(Player) ) {
+							// Предмет был кликнут в инвентарной сетке игрока
+							var itemWasMoved = false;
+							var giveItemToFirstVisibleChest = () -> {
+								for (i in Inventory.ALL) {
+									if ( i.containmentEntity.isOfType(Chest) && i.win.visible && i.win.parent != null ) {
+										// Перемещаем из игрока в тот сундук, с которым в прошлый раз взаимодействовали
+										var freeSlot = i.invGrid.getFreeSlot();
+										if ( freeSlot != null ) {
+											containerEntity = i.containmentEntity;
+											textLabel.dispose();
+											Player.inst.invGrid.findAndReplaceItem(this);
+											i.invGrid.findAndReplaceItem(freeSlot.item, this);
+											itemWasMoved = true;
+										}
+										return;
+									}
+								}
+							}
+							giveItemToFirstVisibleChest();
+
+							// Если не открыто ни одного окна с сундуком - то переместить предмет в пояс
+							if ( !itemWasMoved ) {
+								var freeSlot = Player.inst.ui.belt.getFreeSlot();
+								if ( freeSlot != null ) {
+									textLabel.dispose();
+									Player.inst.invGrid.findAndReplaceItem(this);
+									Player.inst.ui.belt.findAndReplaceItem(freeSlot.item, this);
+								}
+							}
+						}
+					}
 				} else {
-					swapHold();
+					// Picking up the item into the player's holdItem (cursor)
+					if ( isInBelt() && !Player.inst.ui.inventory.win.visible ) {
+						// Selecting item in the belt if inventory is hidden
+						var beltGrid = Player.inst.invGrid.grid[Player.inst.invGrid.grid.length - 1];
+						var cout = 1;
+						for (i in beltGrid) {
+							if ( i.item == this ) Player.inst.ui.belt.selectCell(cout);
+							cout++;
+						}
+					} else {
+						textLabel.dispose();
+						if ( Player.inst.holdItem != null && !Player.inst.holdItem.isDisposed && isSameTo(Player.inst.holdItem)
+							&& !Player.inst.holdItem.isInBelt() ) {
+							// folding item from cursor with this item
+							if ( Player.inst.holdItem.isInCursor() ) {
+								if ( amount + Player.inst.holdItem.amount <= Data.items.get(cdbEntry).stack.int() ) {
+									amount += Player.inst.holdItem.amount;
+									Player.inst.holdItem.dispose();
+									Player.inst.holdItem = null;
+								} else
+									swapHold();
+							} else
+								swapHold();
+						} else if ( Player.inst.holdItem != null && Player.inst.holdItem.isInBelt() ) {
+							Player.inst.ui.belt.deselectCells();
+							Player.inst.holdItem = null;
+							swapHold();
+						} else {
+							swapHold();
+						}
+					}
 				}
-				// if ( Player.inst.holdItem != null && !Player.inst.holdItem.isInCursor() ) {
-				// 	Player.inst.holdItem = this;
-				// }
-			} else if ( isInSlot() ) {
-				// Selecting item in the belt if inventory is hidden
-				var beltGrid = Player.inst.ui.inventory.invGrid.interGrid[Player.inst.ui.inventory.invGrid.interGrid.length - 1];
-				var cout = 1;
-				for (i in beltGrid) {
-					if ( i.item == this ) Player.inst.ui.inventory.belt.selectCell(cout);
-					cout++;
+			} else {
+				// Правая кнопка мыши
+				if ( Player.inst.holdItem == null || (Player.inst.holdItem != null && Player.inst.holdItem.isInBelt()) ) {
+					Player.inst.ui.belt.deselectCells();
+					Player.inst.holdItem = Item.fromCdbEntry(cdbEntry, Math.ceil(amount - amount / 2));
+					amount = Std.int(amount / 2);
 				}
 			}
 		}
+		isDisposed = false;
 	}
 
-	public function dispose() {
+	override function onRemove() {
+		super.onRemove();
+		// isDisposed = true;
+	}
+
+	inline public function dispose() {
+		if ( Player.inst != null && this == Player.inst.holdItem ) Player.inst.holdItem = null;
+
+		isDisposed = true;
 		this.remove();
 		spr.remove();
 		interactive.remove();
 		spr = null;
+		textLabel.remove();
+		amountLabel.remove();
+
+		for (i in Inventory.ALL) i.invGrid.findAndReplaceItem(this);
 	}
 
 	override function sync(ctx : RenderContext) {
-		amountLabel.paddingLeft = 16 - amountLabel.innerWidth;
-		if ( textLabel != null ) {
-			textLabel.x = Boot.inst.s2d.mouseX + 20;
-			textLabel.y = Boot.inst.s2d.mouseY + 20;
-		}
-		interactive.width = spr.tile.width;
-		interactive.height = spr.tile.height;
-
-		interactive.x = -spr.tile.width / 2;
-		interactive.y = -spr.tile.height / 2;
-
-		if ( isInCursor() ) {
-			x = Boot.inst.s2d.mouseX + 13 * scaleX;
-			y = Boot.inst.s2d.mouseY + 13 * scaleY;
-		}
 		super.sync(ctx);
+		if ( spr != null ) {
+			amountLabel.paddingLeft = 16 - amountLabel.innerWidth;
+			if ( textLabel != null ) {
+				textLabel.x = Boot.inst.s2d.mouseX + 20;
+				textLabel.y = Boot.inst.s2d.mouseY + 20;
+			}
+			interactive.width = spr.tile.width;
+			interactive.height = spr.tile.height;
+
+			interactive.x = -spr.tile.width / 2;
+			interactive.y = -spr.tile.height / 2;
+
+			if ( isInCursor() ) {
+				x = Boot.inst.s2d.mouseX + 13 * scaleX;
+				y = Boot.inst.s2d.mouseY + 13 * scaleY;
+			}
+
+			if ( over ) {
+				if ( ca.yPressed() ) {
+					if ( !isDisposed ) if ( Key.isDown(Key.CTRL) ) {
+						// dropping whole stack
+						Player.inst.dropItem(Item.fromCdbEntry(cdbEntry, amount), Player.inst.angToPxFree(Level.inst.cursX, Level.inst.cursY), 2.3);
+						amount = 0;
+					} else {
+						// dropping 1 item
+						amount--;
+						Player.inst.dropItem(Item.fromCdbEntry(cdbEntry, 1), Player.inst.angToPxFree(Level.inst.cursX, Level.inst.cursY), 2.3);
+					}
+				}
+			}
+		}
 	}
 
 	public static function fromCdbEntry(cdbEntry : ItemsKind, ?amount : Int = 1, ?parent : Object) {
 		var item : Item = null;
+
 		var entClasses = (CompileTime.getAllClasses(Item));
 		for (e in entClasses) {
-			if ( Data.items.get(cdbEntry).cat != blueprint ) {
-				if ( eregCompTimeClass.match('$e'.toLowerCase())
-					&& eregCompTimeClass.matched(1) == Data.items.get(cdbEntry).id.toString() ) {
-					item = Type.createInstance(e, [cdbEntry, parent]);
-				}
-			} else
-				item = new Blueprint(cdbEntry, parent);
+			if ( eregCompTimeClass.match('$e'.toLowerCase())
+				&& eregCompTimeClass.matched(1) == Data.items.get(cdbEntry).id.toString().toLowerCase() ) {
+				item = Type.createInstance(e, [cdbEntry, parent]);
+			}
 		}
+		// if(item == null && Data.cdbEntry)
 		item = item == null ? new Item(cdbEntry) : item;
 		item.amount = amount;
 

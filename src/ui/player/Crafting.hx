@@ -11,8 +11,6 @@ import h2d.Tile;
 import h2d.Mask;
 import h2d.RenderContext;
 import h2d.Slider;
-import ch2.ui.CustomButton;
-import ch2.ui.Button;
 import h2d.Flow;
 import h2d.col.Point;
 import h2d.col.Bounds;
@@ -20,26 +18,19 @@ import ch2.ui.ScrollArea;
 import format.tmx.Data.TmxLayer;
 import h2d.Object;
 
-class Crafting extends Object {
-	var configMap: Map<String, TmxLayer>;
-	var sprCraft: HSprite;
-	var scrollable: ScrollArea;
+class Crafting extends Window {
+	var scrollable : ScrollArea;
 
-	public function new(configMap: Map<String, TmxLayer>, ?parent: Object) {
-		super(parent);
-		this.configMap = configMap;
-		toggleVisible();
-		sprCraft = new HSprite(Assets.ui, this);
-		sprCraft.set("crafting");
+	public function new(configMap : Map<String, TmxLayer>, ?parent : Object) {
+		super(configMap, parent);
+		spr = new HSprite(Assets.ui, win);
+		spr.set("crafting");
 
-		var textLabel = new ui.TextLabel("Crafting", Assets.fontPixel, sprCraft);
-		// textLabel.minWidth = Std.int(sprCraft.tile.width * Const.SCALE);
+		var textLabel = new ui.TextLabel("Crafting", Assets.fontPixel, win);
 		textLabel.scale(.5);
-		// textLabel.paddingTop = 4 + textLabel.outerHeight >> 1 ;
 		textLabel.x = configMap.get("craft").getObjectByName("sign").x;
 		textLabel.y = configMap.get("craft").getObjectByName("sign").y;
-		textLabel.paddingLeft = -textLabel.innerWidth >> 1;
-		textLabel.paddingTop = -textLabel.innerHeight >> 1;
+		textLabel.center();
 
 		var recipeConf = configMap.get("craft").getObjectByName("recipes");
 
@@ -47,20 +38,20 @@ class Crafting extends Object {
 		var caretUp = new HSprite(Assets.ui, "caret0").tile;
 		var caretDown = new HSprite(Assets.ui, "caret1").tile;
 
-		var grid = new ScaleGrid(caretUp, 3, 3, this);
+		var grid = new ScaleGrid(caretUp, 3, 3, win);
 
 		var sliderConf = configMap.get("craft").getObjectByName("slider");
-		var slider = new VerticalSlider(Std.int(sliderConf.width), Std.int(sliderConf.height), grid, this);
+		var slider = new VerticalSlider(Std.int(sliderConf.width), Std.int(sliderConf.height), grid, win);
 		slider.x = sliderConf.x;
 		slider.y = sliderConf.y;
 
-		var scrollVoid = (e: Event) -> {
+		var scrollVoid = (e : Event) -> {
 			scrollable.scrollBy(0, e.wheelDelta);
 			slider.value = scrollable.scrollY;
 		};
 		slider.onWheelEvent.add(scrollVoid);
 
-		scrollable = new FixedScrollArea(Std.int(recipeConf.width), Std.int(recipeConf.height), sprCraft);
+		scrollable = new FixedScrollArea(Std.int(recipeConf.width), Std.int(recipeConf.height), win);
 		scrollable.x = recipeConf.x;
 		scrollable.y = recipeConf.y;
 
@@ -93,20 +84,21 @@ class Crafting extends Object {
 		slider.onReleaseEvent.add((_) -> slider.cursorObj.tile = caretUp);
 
 		slider.onChange = () -> scrollable.scrollTo(0, slider.value);
-	}
 
-	public function toggleVisible() {
-		visible = !visible;
-		// recenter();
+		createDragable("craft");
+		createCloseBut("craft");
+
+		recenter();
+		toggleVisible();
 	}
 }
 
 class Recipe extends Object {
-	public var inter: EventInteractive;
+	public var inter : EventInteractive;
 
-	var hint: IngredsHint;
+	var hint : IngredsHint;
 
-	public function new(configMap: Map<String, TmxLayer>, recipe: Data.Recipes, ?parent: Object) {
+	public function new(configMap : Map<String, TmxLayer>, recipe : Data.Recipes, ?parent : Object) {
 		super(parent);
 		var recSpr = new HSprite(Assets.ui, "recipe", this);
 		var recipeConf = configMap.get("craft_recipe");
@@ -137,20 +129,20 @@ class Recipe extends Object {
 		});
 
 		inter.onOverEvent.add((_) -> hint = new IngredsHint(configMap, recipe, Boot.inst.s2d));
-		inter.onOutEvent.add((_) -> if (hint != null) hint.remove());
+		inter.onOutEvent.add((_) -> if ( hint != null ) hint.remove());
 	}
 
-	public function craft(recipe: Data.Recipes) {
+	public function craft(recipe : Data.Recipes) {
 		// checking if player has required items
 		for (i in recipe.ingreds) {
-			var checkedCells: Array<InventoryCell> = [];
+			var checkedCells : Array<InventoryCell> = [];
 
 			var amountPitch = i.amount;
-			while (amountPitch > 0) {
+			while( amountPitch > 0 ) {
 				var targetItemSlot = Player.inst.ui.inventory.invGrid.findItemKind(i.item, 1, checkedCells);
-				if (targetItemSlot == null) {
+				if ( targetItemSlot == null ) {
 					return null;
-				} else if (targetItemSlot.item.amount >= i.amount) {
+				} else if ( targetItemSlot.item.amount >= i.amount ) {
 					amountPitch = 0;
 				} else {
 					amountPitch -= targetItemSlot.item.amount;
@@ -158,13 +150,14 @@ class Recipe extends Object {
 				}
 			}
 		}
+		// removing itemns from player inventory
 		for (i in recipe.ingreds) {
 			var amountPitch = i.amount;
-			while (amountPitch > 0) {
+			while( amountPitch > 0 ) {
 				var targetItemSlot = Player.inst.ui.inventory.invGrid.findItemKind(i.item, 1, []);
-				if (targetItemSlot == null) {
+				if ( targetItemSlot == null ) {
 					return null;
-				} else if (targetItemSlot.item.amount >= i.amount) {
+				} else if ( targetItemSlot.item.amount >= i.amount ) {
 					targetItemSlot.item.amount -= amountPitch;
 					amountPitch = 0;
 				} else {
@@ -175,9 +168,8 @@ class Recipe extends Object {
 			}
 		}
 		for (i in recipe.result) {
-			var newItem = new Item(i.itemId);
-			newItem.amount = i.amount;
-			Player.inst.ui.inventory.invGrid.giveItem(newItem);
+			var newItem = Item.fromCdbEntry(i.itemId, i.amount);
+			Player.inst.ui.inventory.invGrid.giveItem(newItem, Player.inst);
 		}
 		return null;
 	}
@@ -189,9 +181,9 @@ class Recipe extends Object {
 }
 /** Показывает ингредиенты **/
 class IngredsHint extends Object {
-	var baseGrid: ScaleGrid;
+	var baseGrid : ScaleGrid;
 
-	public function new(configMap: Map<String, TmxLayer>, recipe: Data.Recipes, ?parent: Object) {
+	public function new(configMap : Map<String, TmxLayer>, recipe : Data.Recipes, ?parent : Object) {
 		super(parent);
 		scale(2);
 		var confLayer = configMap.get("ingreds_hint");
@@ -220,7 +212,7 @@ class IngredsHint extends Object {
 		baseGrid.height = flowCont.outerHeight + 20;
 	}
 
-	override function sync(ctx: RenderContext) {
+	override function sync(ctx : RenderContext) {
 		x = Boot.inst.s2d.mouseX + 20;
 		y = Boot.inst.s2d.mouseY + 20;
 		super.sync(ctx);
@@ -228,7 +220,7 @@ class IngredsHint extends Object {
 }
 
 class IngredComp extends Object {
-	public function new(configMap: Map<String, TmxLayer>, ingred: Data.Recipes_ingreds, ?parent: Object) {
+	public function new(configMap : Map<String, TmxLayer>, ingred : Data.Recipes_ingreds, ?parent : Object) {
 		super(parent);
 
 		var conf = configMap.get("ingreds_comp");
@@ -251,47 +243,46 @@ class IngredComp extends Object {
 }
 
 class VerticalSlider extends EventInteractive {
-	public var tile: h2d.Tile;
-	public var cursorObj: ScaleGrid;
-	public var minValue(default, set): Float = 0;
-	public var maxValue(default, set): Float = 1;
-	public var value(default, set): Float = 0;
+	public var tile : h2d.Tile;
+	public var cursorObj : ScaleGrid;
+	public var minValue(default, set) : Float = 0;
+	public var maxValue(default, set) : Float = 1;
+	public var value(default, set) : Float = 0;
 
-	public function new(?width: Int = 50, ?height: Int = 10, cursorObj: ScaleGrid, ?parent) {
+	public function new(?width : Int = 50, ?height : Int = 10, cursorObj : ScaleGrid, ?parent) {
 		super(width, height, parent);
 
 		tile = h2d.Tile.fromColor(Color.addAlphaI(0x00000000), width, height, 0);
-		// tile.dy = (width - 4) >> 1;
 		this.cursorObj = cursorObj;
-		addChild(this.cursorObj);
+		addChild(cursorObj);
 	}
 
 	function set_minValue(v) {
-		if (value < v) value = v;
+		if ( value < v ) value = v;
 		return minValue = v;
 	}
 
 	function set_maxValue(v) {
-		if (value > v) value = v;
+		if ( value > v ) value = v;
 		return maxValue = v;
 	}
 
 	function set_value(v) {
-		if (v < minValue) v = minValue;
-		if (v > maxValue) v = maxValue;
+		if ( v < minValue ) v = minValue;
+		if ( v > maxValue ) v = maxValue;
 		return value = v;
 	}
 
 	override function getBoundsRec(relativeTo, out, forSize) {
 		super.getBoundsRec(relativeTo, out, forSize);
-		if (forSize) addBounds(relativeTo, out, 0, 0, width, height);
-		if (tile != null) addBounds(relativeTo, out, tile.dx, tile.dy, tile.width, tile.height);
-		if (cursorObj != null) addBounds(relativeTo, out, cursorObj.y + getDy(), cursorObj.y, cursorObj.width, cursorObj.height);
+		if ( forSize ) addBounds(relativeTo, out, 0, 0, width, height);
+		if ( tile != null ) addBounds(relativeTo, out, tile.dx, tile.dy, tile.width, tile.height);
+		if ( cursorObj != null ) addBounds(relativeTo, out, cursorObj.y + getDy(), cursorObj.y, cursorObj.width, cursorObj.height);
 	}
 
-	override function draw(ctx: RenderContext) {
+	override function draw(ctx : RenderContext) {
 		super.draw(ctx);
-		if (tile.height != Std.int(height)) tile.setSize(Std.int(width), tile.height);
+		if ( tile.height != Std.int(height) ) tile.setSize(Std.int(width), tile.height);
 		emitTile(ctx, tile);
 		var px = getDy();
 		cursorObj.y = px;
@@ -303,30 +294,31 @@ class VerticalSlider extends EventInteractive {
 		return Math.round((value - minValue) * (height - cursorObj.height) / (maxValue - minValue));
 	}
 
-	inline function getValue(cursorX: Float): Float {
+	inline function getValue(cursorX : Float) : Float {
 		return ((cursorX - handleDX) / (height - cursorObj.height)) * (maxValue - minValue) + minValue;
 	}
 
-	override function handleEvent(e: hxd.Event) {
+	override function handleEvent(e : hxd.Event) {
 		super.handleEvent(e);
-		if (e.cancel) return;
-		switch (e.kind) {
+		if ( e.cancel ) return;
+		switch( e.kind ) {
 			case EPush:
 				var dx = getDy();
 				handleDX = e.relY - dx;
 
 				// If clicking the slider outside the handle, drag the handle
 				// by the center of it.
-				if (handleDX - cursorObj.tile.dy < 0 || handleDX - cursorObj.tile.dy > cursorObj.height) {
+
+				if ( handleDX - cursorObj.tile.dy < 0 || handleDX - cursorObj.tile.dy > cursorObj.height ) {
 					handleDX = cursorObj.height * 0.5;
 				}
 
 				value = getValue(e.relY);
 				onChange();
 				var scene = scene;
-				startDrag(function(e) {
-					if (this.scene != scene || e.kind == ERelease) {
-						scene.stopDrag();
+				startCapture(function(e) {
+					if ( this.scene != scene || e.kind == ERelease ) {
+						scene.stopCapture();
 						return;
 					}
 					value = getValue(e.relY);
@@ -340,10 +332,10 @@ class VerticalSlider extends EventInteractive {
 }
 
 class FixedScrollArea extends ScrollArea {
-	override function drawRec(ctx: h2d.RenderContext) @:privateAccess {
-		if (!visible) return;
+	override function drawRec(ctx : h2d.RenderContext) @:privateAccess {
+		if ( !visible ) return;
 		// fallback in case the object was added during a sync() event and we somehow didn't update it
-		if (posChanged) {
+		if ( posChanged ) {
 			// only sync anim, don't update() (prevent any event from occuring during draw())
 			// if( currentAnimation != null ) currentAnimation.sync();
 			calcAbsPos();
@@ -358,13 +350,13 @@ class FixedScrollArea extends ScrollArea {
 		var y2 = width * matB + height * matD + y1;
 
 		var tmp;
-		if (x1 > x2) {
+		if ( x1 > x2 ) {
 			tmp = x1;
 			x1 = x2;
 			x2 = tmp;
 		}
 
-		if (y1 > y2) {
+		if ( y1 > y2 ) {
 			tmp = y1;
 			y1 = y2;
 			y2 = tmp;

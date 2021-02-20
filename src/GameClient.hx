@@ -1,3 +1,4 @@
+import tools.Util;
 import Message.PlayerInit;
 import Message.MapLoad;
 import cherry.soup.EventSignal.EventSignal0;
@@ -69,7 +70,7 @@ class GameClient extends Process implements GameAble {
 			}
 			trace("Connected to server");
 
-			host.sendTypedMessage(new PlayerInit(uid));
+			host.sendTypedMessage(new PlayerInit(uid, Util.nickname));
 
 			// sys.thread.Thread.create(() -> {
 			// 	while( true ) {
@@ -107,7 +108,7 @@ class GameClient extends Process implements GameAble {
 
 		if ( player != null ) {}
 
-		@:privateAccess engine.window.onClose = function() {
+		@:privateAccess Main.inst.onClose.add(() -> {
 			try {
 				player.destroy();
 				host.unregister(player);
@@ -116,8 +117,7 @@ class GameClient extends Process implements GameAble {
 				trace("error occured while cursor disposing: " + e);
 			}
 			host.flush();
-			return true;
-		}
+		});
 	}
 
 	public function loadMap(tmx : TmxMap) {
@@ -199,7 +199,9 @@ class GameClient extends Process implements GameAble {
 									if ( obj.name == "center" ) {
 										ent.mesh.xOff = -(pivotX - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
 										ent.mesh.yOff = (pivotY - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
+										#if dispDepthBoxes
 										ent.mesh.renewDebugPts();
+										#end
 									}
 
 									ent.spr.setCenterRatio(pivotX, pivotY);
@@ -266,10 +268,8 @@ class GameClient extends Process implements GameAble {
 									var pivotX = ((obj.x + xCent)) / ent.spr.tile.width;
 									var pivotY = ((obj.y + yCent)) / ent.spr.tile.height;
 									pivotX = (ent.tmxObj != null && ent.tmxObj.flippedVertically) ? 1 - pivotX : pivotX;
-									if ( obj.name != "center" ) {
-										ent.mesh.xOff = (pivotX - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
-										ent.mesh.yOff = -(pivotY - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
-									}
+									ent.mesh.xOff = (pivotX - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
+									ent.mesh.yOff = -(pivotY - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
 									#if dispDepthBoxes
 									ent.mesh.renewDebugPts();
 									#end
@@ -327,5 +327,13 @@ class GameClient extends Process implements GameAble {
 			// if (ca.selectPressed()) restartLevel();
 		}
 		host.flush();
+	}
+
+	public function showStrTiles() {
+		for (i in structTiles) i.visible = true;
+	}
+
+	public function hideStrTiles() {
+		for (i in structTiles) i.visible = false;
 	}
 }

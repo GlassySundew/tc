@@ -35,16 +35,21 @@
 				{
 					"id": "door",
 					"use_range": 20,
-					"isoWidth": 0,
-					"isoHeight": 0,
+					"isoWidth": 1,
+					"isoHeight": 0.1,
 					"hp": -1,
-					"drop": []
+					"drop": [
+						{
+							"item": "iron",
+							"amount": 3
+						}
+					]
 				},
 				{
 					"id": "back_door",
 					"use_range": 20,
-					"isoWidth": 0,
-					"isoHeight": 0,
+					"isoWidth": 1,
+					"isoHeight": 0.1,
 					"hp": -1,
 					"drop": []
 				},
@@ -70,16 +75,64 @@
 					"drop": []
 				},
 				{
-					"id": "",
+					"id": "chest",
+					"drop": [],
+					"hp": 0,
+					"isoWidth": 1,
+					"isoHeight": 0.7,
+					"use_range": 30
+				},
+				{
+					"id": "sleeping_pod",
 					"drop": [],
 					"hp": 0,
 					"isoWidth": 0,
 					"isoHeight": 0,
 					"use_range": 0
+				},
+				{
+					"id": "teleport",
+					"drop": [],
+					"hp": 0,
+					"isoWidth": 0,
+					"isoHeight": 0,
+					"use_range": 20
+				},
+				{
+					"id": "emerald",
+					"drop": [
+						{
+							"item": "emerald",
+							"amount": 4
+						}
+					],
+					"hp": 3,
+					"isoWidth": 0,
+					"isoHeight": 0,
+					"use_range": 20
+				},
+				{
+					"id": "iron",
+					"drop": [
+						{
+							"item": "iron",
+							"amount": 3
+						}
+					],
+					"hp": 4,
+					"isoWidth": 0,
+					"isoHeight": 0,
+					"use_range": 20
 				}
 			],
-			"props": {},
-			"separators": []
+			"props": {
+				"separatorTitles": [
+					"resources"
+				]
+			},
+			"separatorIds": [
+				"emerald"
+			]
 		},
 		{
 			"name": "structures@drop",
@@ -130,12 +183,12 @@
 					"id": "hydroponics",
 					"result": [
 						{
-							"item": "Hydroponics",
+							"item": "hydroponics",
 							"amount": 1
 						}
 					],
 					"name": "Hydroponics",
-					"item_icon": "Hydroponics",
+					"item_icon": "hydroponics",
 					"ingreds": [
 						{
 							"item": "iron",
@@ -146,9 +199,19 @@
 				{
 					"id": "door",
 					"name": "Door",
-					"item_icon": "Door",
-					"result": [],
-					"ingreds": []
+					"item_icon": "door",
+					"result": [
+						{
+							"item": "door",
+							"amount": 1
+						}
+					],
+					"ingreds": [
+						{
+							"item": "iron",
+							"amount": 4
+						}
+					]
 				},
 				{
 					"id": "axe",
@@ -224,7 +287,7 @@
 					"name": "display_name"
 				},
 				{
-					"typeStr": "5:tool,plant,blueprint",
+					"typeStr": "5:tool,plant,blueprint,resource",
 					"name": "cat"
 				},
 				{
@@ -245,7 +308,16 @@
 					"id": "iron",
 					"atlas_name": "item_iron_ore",
 					"display_name": "Iron",
-					"cat": 0,
+					"cat": 3,
+					"stack": 3,
+					"can_hit": false,
+					"damage": 0
+				},
+				{
+					"id": "emerald",
+					"atlas_name": "emerald",
+					"display_name": "Emerald crystalline",
+					"cat": 3,
 					"stack": 3,
 					"can_hit": false,
 					"damage": 0
@@ -254,7 +326,7 @@
 					"id": "plant",
 					"atlas_name": "seaweed",
 					"display_name": "Seaweed",
-					"cat": 0,
+					"cat": 3,
 					"stack": 3,
 					"can_hit": false,
 					"damage": 0
@@ -266,10 +338,10 @@
 					"cat": 0,
 					"stack": 0,
 					"can_hit": true,
-					"damage": 2
+					"damage": 1
 				},
 				{
-					"id": "Hydroponics",
+					"id": "hydroponics",
 					"atlas_name": "hydroponics",
 					"display_name": "Hydroponics",
 					"cat": 2,
@@ -278,20 +350,11 @@
 					"damage": 0
 				},
 				{
-					"id": "Door",
+					"id": "door",
 					"atlas_name": "door",
 					"display_name": "Door",
 					"cat": 2,
 					"stack": 1,
-					"can_hit": false,
-					"damage": 0
-				},
-				{
-					"id": "",
-					"atlas_name": "",
-					"display_name": "",
-					"cat": 0,
-					"stack": 0,
 					"can_hit": false,
 					"damage": 0
 				}
@@ -304,8 +367,43 @@
 			},
 			"separatorIds": [
 				"axe",
-				"Hydroponics"
+				"hydroponics"
 			]
+		},
+		{
+			"name": "blueprints",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "id",
+					"kind": null,
+					"scope": null
+				},
+				{
+					"typeStr": "6:items",
+					"name": "item",
+					"kind": null
+				},
+				{
+					"typeStr": "6:structures",
+					"name": "structure",
+					"kind": null
+				}
+			],
+			"lines": [
+				{
+					"id": "hydroponics",
+					"item": "hydroponics",
+					"structure": "hydroponics"
+				},
+				{
+					"id": "door",
+					"item": "door",
+					"structure": "door"
+				}
+			],
+			"separators": [],
+			"props": {}
 		}
 	],
 	"customTypes": [

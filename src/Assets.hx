@@ -17,15 +17,11 @@ class Assets {
 	public static var items:SpriteLib;
 	public static var structures:SpriteLib;
 	public static var ui:SpriteLib;
+	public static var env:SpriteLib;
 
 	static var music:dn.heaps.Sfx;
 
-	static var initDone = false;
-
 	public static function init() {
-		if (initDone)
-			return;
-		initDone = true;
 
 		dn.heaps.Sfx.muteGroup(0); // HACK
 		dn.heaps.Sfx.setGroupVolume(0, 0.6);
@@ -52,6 +48,7 @@ class Assets {
 		items = Atlas.load(Const.ATLAS_PATH + "items.atlas");
 		structures = Atlas.load(Const.ATLAS_PATH + "structures.atlas");
 		ui = Atlas.load(Const.ATLAS_PATH + "ui.atlas");
+		env = Atlas.load(Const.ATLAS_PATH + "env.atlas");
 
 		var action = ["idle_", "walk_"];
 		var direc = ["left", "up", "down", "right", "down_left", "down_right", "up_left", "up_right"];

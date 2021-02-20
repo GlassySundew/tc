@@ -1,4 +1,3 @@
-import cloner.Cloner;
 import h3d.Engine;
 import en.player.Player;
 import differ.shapes.Polygon;
@@ -36,7 +35,7 @@ class GameServer extends Process {
 
 		Assets.init();
 		Data.load(hxd.Res.data.entry.getText());
-		startLevel("alphamap.tmx");
+		startLevel("server_test.tmx");
 	}
 
 	public function onCdbReload() {}
@@ -66,13 +65,14 @@ class GameServer extends Process {
 			for (e in Entity.ALL) e.destroy();
 			gc();
 		}
-		tmxMap = resolveMap(tmxMap, name);
+		tmxMap = resolveMap(name);
 
 		level = new Level(tmxMap);
 		lvlName = name.split('.')[0];
 
 		// Entity spawning
 		CompileTime.importPackage("en");
+
 		var entClasses = (CompileTime.getAllClasses(Entity));
 
 		// Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity and puts name into spr group if not found
@@ -83,14 +83,16 @@ class GameServer extends Process {
 				// entities export lies ahead
 				isoX = Level.inst.cartToIsoLocal(e.x, e.y).x;
 				isoY = Level.inst.cartToIsoLocal(e.x, e.y).y;
-
-				if ( e.flippedVertically ) isoY -= e.height;
 			}
 
 			// Парсим все классы - наследники en.Entity и спавним их
 			for (eClass in entClasses) {
 				eregCompTimeClass.match('$eClass'.toLowerCase());
-				if ( eregCompTimeClass.match('$eClass'.toLowerCase()) && eregCompTimeClass.matched(1) == e.name ) {
+				if ( e.name == "player" ) {
+					tmxMap.properties.setFloat("playerX", isoX);
+					tmxMap.properties.setFloat("playerY", isoY);
+					return;
+				} else if ( eregCompTimeClass.match('$eClass'.toLowerCase()) && eregCompTimeClass.matched(1) == e.name ) {
 					Type.createInstance(eClass, [isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, e]);
 					return;
 				}

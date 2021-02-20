@@ -1,28 +1,31 @@
+import hl.UI.Window;
 import h2d.Scene;
 import hxd.Res;
 import hxd.snd.Manager;
 import hxd.inspect.Inspector;
 
 class Boot extends hxd.App {
-	public static var inst: Boot;
+	public static var inst : Boot;
 
-	public var inspector: Inspector;
+	public var inspector : Inspector;
 
-	public var renderer: CustomRenderer;
+	public var renderer : CustomRenderer;
 
 	// Boot
 	static function main() {
-		
 		new Boot();
 	}
 
 	// Engine ready
 	override function init() {
+		#if !debug
 		hl.UI.closeConsole();
+		#end
 
 		inst = this;
 		entParent = new Scene();
 		new Main(s2d);
+
 		renderer = new CustomRenderer();
 		s3d.renderer = renderer;
 		renderer.depthColorMap = hxd.Res.gradients.test.toTexture();
@@ -34,8 +37,8 @@ class Boot extends hxd.App {
 
 		s3d.lightSystem.ambientLight.set(1, 1, 1);
 		onResize();
-
-		#if (castle && hl && debug)
+		// Window.
+		#if( castle && hl && debug )
 		inspector = new hxd.inspect.Inspector(s3d);
 		#end
 	}
@@ -47,10 +50,10 @@ class Boot extends hxd.App {
 
 	var speed = 1.0;
 
-	override function update(deltaTime: Float) {
+	override function update(deltaTime : Float) {
 		// Bullet time
 		#if debug
-		if (hxd.Key.isPressed(hxd.Key.NUMPAD_SUB)) speed = speed >= 1 ? 0.33 : 1;
+		if ( hxd.Key.isPressed(hxd.Key.NUMPAD_SUB) ) speed = speed >= 1 ? 0.33 : 1;
 		#end
 		// Manager.get().listener.syncCamera(s3d.camera);
 		var tmod = hxd.Timer.tmod * speed;

@@ -1,9 +1,11 @@
 package ui;
 
+import ui.CustomButton.ButtonFlags;
+import ui.CustomButton.ButtonState;
+import ui.CustomButton.IButtonStateView;
 import h2d.Object;
 import h2d.RenderContext;
 import h2d.Tile;
-import ch2.ui.CustomButton;
 
 class Button extends CustomButton implements IButtonStateView {
 	var curr : Tile;

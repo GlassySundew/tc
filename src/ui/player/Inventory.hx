@@ -1,5 +1,7 @@
 package ui.player;
 
+import ui.InventoryGrid.CellGrid;
+import ui.s2d.EventInteractive;
 import format.tmx.Data.TmxLayer;
 import en.items.Scepter;
 import en.player.Player;
@@ -20,64 +22,64 @@ import h2d.ScaleGrid;
 /**
 	Формочки для Player, визуализация InventoryGrid
 **/
-class Inventory extends Object {
-	public var invGrid: InventoryGrid;
-	public var belt: Belt;
+class Inventory extends Window {
+	public static var ALL : Array<Inventory> = [];
 
-	public var player(get, never): Player;
+	public var player(get, never) : Player;
 
 	inline function get_player() return Player.inst;
 
-	var configMap: Map<String, TmxLayer>;
+	var ca : dn.heaps.Controller.ControllerAccess;
 
-	public var sprInv: HSprite;
+	public var headingLabel : TextLabel;
 
-	var ca: dn.heaps.Controller.ControllerAccess;
+	public var invGrid : CellGrid;
+	public var containmentEntity : Entity;
 
-	public var base: Bitmap;
-
-	public function new(configMap: Map<String, TmxLayer>, ?parent: Object) {
-		super(parent);
+	public function new(?configMap : Map<String, TmxLayer>, ?invGrid : CellGrid, ?parent : Object) {
+		super(configMap, parent);
+		ALL.push(this);
 		this.configMap = configMap;
+		this.invGrid = invGrid;
+
 		ca = Main.inst.controller.createAccess("inventory");
-		sprInv = new HSprite(Assets.ui, this);
-		sprInv.set("inventory");
+		spr = new HSprite(Assets.ui, win);
+		spr.set("inventory");
 
-		var gridPt = configMap.get("inventory").getObjectByName("grid");
-		sprInv.visible = !sprInv.visible;
+		headingLabel = new ui.TextLabel("Inventory", Assets.fontPixel, spr);
+		headingLabel.scale(.5);
 
-		var textLabel = new ui.TextLabel("Inventory", Assets.fontPixel, sprInv);
-		textLabel.scale(.5);
+		headingLabel.x = configMap.get("inventory").getObjectByName("sign").x;
+		headingLabel.y = configMap.get("inventory").getObjectByName("sign").y;
+		headingLabel.center();
 
-		textLabel.x = configMap.get("inventory").getObjectByName("sign").x;
-		textLabel.y = configMap.get("inventory").getObjectByName("sign").y;
-		textLabel.paddingLeft = -textLabel.innerWidth >> 1;
-		textLabel.paddingTop = -textLabel.innerHeight >> 1;
-
-		invGrid = new InventoryGrid(Std.int(gridPt.x), Std.int(gridPt.y), gridPt.properties.getInt("tileWidth"), gridPt.properties.getInt("tileHeight"),
-			gridPt.properties.getInt("width"), gridPt.properties.getInt("height"), gridPt.properties.getInt("gapX"), gridPt.properties.getInt("gapY"), sprInv);
+		win.addChild(invGrid);
 		// Освобождаем последний ряд для Belt
-		for (i in invGrid.interGrid[invGrid.interGrid.length - 1]) i.remove();
-		belt = new Belt(this);
+		
 
 		// invGrid.giveItem(new en.items.Scepter(0, 0));
 		// items[0].push(new en.items.Ore(invGrid0x, invGrid0y, Iron, base));
-	}
 
-	function recenter() {
-		sprInv.x = Std.int((getS2dScaledWid() - sprInv.tile.width) / 2);
-		sprInv.y = Std.int((getS2dScaledHei() - sprInv.tile.height) / 2);
-	}
-
-	public function toggleVisible() {
-		sprInv.visible = !sprInv.visible;
+		createDragable("inventory");
+		createCloseBut("inventory");
 		recenter();
+		toggleVisible();
 	}
 
-	override function onRemove() {
-		super.onRemove();
-		sprInv.remove();
-		sprInv.tile.dispose();
-		sprInv.remove();
+	public override function bringOnTopOfALL() {
+		super.bringOnTopOfALL();
+
+			ALL.remove(this);
+			ALL.unshift(this);
+	}
+
+	override function toggleVisible() {
+		clampInScreen();
+		super.toggleVisible();
+	}
+
+	override function onDispose() {
+		super.onDispose();
+		ALL.remove(this);
 	}
 }

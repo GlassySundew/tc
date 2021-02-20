@@ -1,0 +1,4 @@
+# @install: lix --silent download "gh://github.com/HeapsIO/hide#690ec27dda60c138f8aa863f94d8d79923bcce71" into hide/0.1.0/github/690ec27dda60c138f8aa863f94d8d79923bcce71
+-lib heaps
+-cp ${HAXE_LIBCACHE}/hide/0.1.0/github/690ec27dda60c138f8aa863f94d8d79923bcce71/
+-D hide=0.1.0
