@@ -9,7 +9,6 @@ class Camera extends dn.Process {
 			parallax.x = v.footX;
 			parallax.z = v.footY;
 		}
-
 		return target = v;
 	}
 
@@ -17,8 +16,8 @@ class Camera extends dn.Process {
 
 	inline function get_s3dCam() return Boot.inst.s3d.camera;
 
-	public var x(default, set) : Float;
-	public var y(default, set) : Float;
+	public var x : Float;
+	public var y : Float;
 
 	public var dx : Float;
 	public var dy : Float;
@@ -35,32 +34,25 @@ class Camera extends dn.Process {
 		super(Game.inst);
 		x = y = 0;
 		dx = dy = 0;
+		updateCamera(M.round(x), M.round(y));
 		// little hack to prevent z-fight
 		var temp = new h3d.scene.CameraController(Boot.inst.s3d);
 		temp.loadFromCamera();
 		temp.remove();
-		
-		// parallax = new Parallax(Boot.inst.s3d);
-		// parallax.y = -1;
+
+		parallax = new Parallax(Boot.inst.s3d);
+		parallax.y = -1;
 		onResize();
 	}
 
 	function updateCamera(?x = 0., ?y = 0.) {
+		if ( parallax != null ) {
+			parallax.x = x;
+			parallax.z = y;
+		}
 		s3dCam.target.x = (x);
 		s3dCam.target.z = (y);
-		s3dCam.pos = s3dCam.target.add(new Vector(0, -(w() * 1) / (2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * (Math.PI / 180))), -3 / ppu));
-		// s3dCam.pos = s3dCam.target.add(new Vector(0, (h() * 1) / (2 * 32 * Math.tan(s3dCam.getFovX() / 2)), -0.01));
-	}
-
-	inline function set_x(v : Float) {
-		// updateCamera(M.round(v), M.round(y / yMult) * yMult);
-		return x = v;
-	}
-
-	inline function set_y(v : Float) {
-		updateCamera(M.round(x), M.round(v));
-		// updateCamera(M.round(x), M.round(v / yMult) * yMult);
-		return y = v;
+		s3dCam.pos = s3dCam.target.add(new Vector(0, -(w() * 1) / (2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * (Math.PI / 180))), 0.001));
 	}
 
 	public inline function stopTracking() {
@@ -144,6 +136,7 @@ class Camera extends dn.Process {
 
 				y += dy * tmod;
 				dy *= Math.pow(frict, tmod);
+				updateCamera(M.round(x), M.round(y));
 			}
 			// Rounding
 
@@ -154,11 +147,6 @@ class Camera extends dn.Process {
 
 	override function onResize() {
 		super.onResize();
-		if ( parallax != null ) {
-			@:privateAccess {
-				parallax.mesh.plane.ox = -parallax.tex.width / 2;
-				parallax.mesh.plane.oy = -parallax.tex.height / 2;
-			}
-		}
+		if ( parallax != null ) parallax.drawParallax();
 	}
 }

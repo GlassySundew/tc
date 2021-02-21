@@ -8,7 +8,9 @@ import h3d.scene.Object;
 
 class Parallax extends Object {
 	var drawer : HSprite;
-	var mesh : TileSprite;
+
+	public var mesh : TileSprite;
+
 	var tex : Texture;
 
 	var cameraX = 0.;
@@ -19,27 +21,32 @@ class Parallax extends Object {
 	public function new(?parent : Object) {
 		super(parent);
 		drawer = new HSprite(Assets.env);
+
 		drawParallax();
 
 		mesh = new TileSprite(Tile.fromTexture(tex), 1, false, this);
 		mesh.rotate(0, 0, M.toRad(90));
 		mesh.material.blendMode = Alpha;
+		mesh.tile = mesh.tile.center();
 
-		mesh.material.mainPass.depth(false, Less);
+		mesh.material.mainPass.depth(false, LessEqual);
 
 		Main.inst.delayer.addF(() -> {
 			cameraX = Game.inst.camera.x;
 			cameraY = Game.inst.camera.y;
 		}, 1);
 		mesh.scale(.5);
+		mesh.alwaysSync = true;
 	}
 
-	function drawParallax() {
+	public function drawParallax() {
 		tex = new Texture(Main.inst.w(), Main.inst.h(), [Target]);
+		tex.wrap = Repeat;
+
 		tex.filter = Nearest;
 		var tileGroup = new h2d.TileGroup(drawer.tile);
 
-		for (i in 0...Random.int(200, 300)) {
+		for (i in 0...Std.int(Random.int(200, 300) * Main.inst.h() / 720)) {
 			drawer.set(Assets.env, Random.fromArray([
 				"red_star_big",
 				"blue_star_big",
@@ -51,17 +58,22 @@ class Parallax extends Object {
 			tileGroup.add(Std.random(Main.inst.w()), Std.random(Main.inst.h()), drawer.tile);
 		}
 		tileGroup.drawTo(tex);
+
+		if ( mesh != null ) {
+			mesh.tile = Tile.fromTexture(tex);
+			mesh.tile = mesh.tile.center();
+		}
 	}
 
 	override function sync(ctx : RenderContext) {
 		super.sync(ctx);
+		var deltaX = Game.inst.camera.x - cameraX;
+		var deltaY = Game.inst.camera.y - cameraY;
 
-		// var deltaX = Game.inst.camera.x - cameraX;
-		// var deltaY = Game.inst.camera.x - cameraY;
+		mesh.tile.scrollDiscrete(deltaX * parallaxEffect.x, deltaY * parallaxEffect.y);
+		mesh.tile = mesh.tile;
 
-		// @:privateAccess {
-		// 	mesh.tile.u += deltaX * parallaxEffect.x;
-		// 	mesh.tile.v += deltaY * parallaxEffect.y;
-		// }
+		cameraX = Game.inst.camera.x;
+		cameraY = Game.inst.camera.y;
 	}
 }

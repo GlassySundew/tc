@@ -1,3 +1,4 @@
+import ch3.scene.TileSprite;
 import en.items.Blueprint;
 import en.structures.Chest;
 import en.structures.hydroponics.Hydroponics;
@@ -54,7 +55,7 @@ class Level extends dn.Process {
 	public var entities : Array<TmxObject> = [];
 	public var walkable : Array<Polygon> = [];
 	public var ground : Texture;
-	public var obj : Mesh;
+	public var obj : TileSprite;
 
 	var layersByName : Map<String, TmxLayer> = new Map();
 	/**
@@ -162,13 +163,15 @@ class Level extends dn.Process {
 
 		ground = new h3d.mat.Texture(data.width * data.tileWidth, data.height * data.tileHeight, [Target]);
 		ground.filter = Nearest;
-		var prim = new PlanePrim(ground.width, ground.height, -ground.width, -ground.height, Y);
 
-		obj = new Mesh(prim, Material.create(ground), Boot.inst.s3d);
+		obj = new TileSprite(Tile.fromTexture(ground), false, Boot.inst.s3d);
+		obj.alwaysSync = false;
+		obj.rotate(0, 0, M.toRad(90));
 
+		@:privateAccess obj.plane.oy -= ground.height;
 		obj.material.shadows = false;
 		obj.material.mainPass.enableLights = false;
-		obj.material.mainPass.depth(false, Less);
+		obj.material.mainPass.depth(false, LessEqual);
 		obj.material.mainPass.setBlendMode(Alpha);
 
 		for (e in data.layers) {
@@ -214,7 +217,7 @@ class Level extends dn.Process {
 			bounds.addPoint(new Point(0, 0, 0));
 			bounds.addPoint(new Point(ground.width, 0, ground.height));
 
-			cursorInteract = new h3d.scene.Interactive(bounds, obj);
+			cursorInteract = new h3d.scene.Interactive(bounds, Boot.inst.s3d);
 			cursorInteract.priority = -10;
 			cursorInteract.cursor = Default;
 			cursorInteract.onMove = function(e : hxd.Event) {
@@ -333,7 +336,7 @@ private class InternalRender extends TileLayerRenderer {
 		// Creating isometric(rombic) h3d.scene.Interactive on top of separated
 		// tiles that contain *floor at the end of their file name as a slots for
 		// structures; can be visible only when choosing place for structure to build
-		
+
 		// Это говнище должно быть visible только тогда, когда у игрока в holdItem есть blueprint
 		var ereg = ~/\/([a-z_0-9]+)\./; // regexp to take picture name between last / and . from picture path
 		if ( ereg.match(sourceTile.image.source)

@@ -86,7 +86,7 @@
   </properties>
   <image width="114" height="134" source="separated/structures/bridge_wall.png"/>
   <objectgroup draworder="index" id="3">
-   <object id="7" name="center" x="8" y="143">
+   <object id="7" name="center" x="14" y="130">
     <point/>
    </object>
   </objectgroup>

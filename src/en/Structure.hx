@@ -15,7 +15,7 @@ class Structure extends Interactive {
 	public static var ALLplaceColliders = new Map<Structure, differ.shapes.Polygon>();
 
 	public function new(x : Float, y : Float, ?tmxObject : TmxObject, ?cdbEntry : StructuresKind) {
-		// CDB parsed entry corresponding to this structure instance
+		// CDB parsed entry corresponding to this structure instance class name
 		if ( cdbEntry == null ) try {
 			eregClass.match('$this'.toLowerCase());
 			cdbEntry = Data.structures.resolve(eregClass.matched(1)).id;
@@ -24,7 +24,7 @@ class Structure extends Interactive {
 
 		/**
 			Initializing spr and making it static sprite from structures atlas as a
-			from class name if not initialized in custom structure class file
+			class name if not initialized in custom structure class file
 		**/
 		if ( spr == null ) {
 			spr = new HSprite(Assets.structures, entParent);
@@ -32,15 +32,15 @@ class Structure extends Interactive {
 			spr.set(eregClass.matched(1));
 		}
 
+		if ( cdbEntry == null ) try {
+			cdbEntry = Data.structures.resolve(spr.groupName).id;
+		}
+		catch( Dynamic ) {}
+
 		super(x, y, tmxObject);
 
 		this.cdbEntry = cdbEntry;
 
-		if ( cdbEntry == null ) try {
-			cdbEntry = Data.structures.resolve(spr.groupName).id;
-		}
-
-		catch( Dynamic ) {}
 		#if !headless
 		// Нажатие для того, чтобы сломать структуру
 		interact.onPushEvent.add(event -> {

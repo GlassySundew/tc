@@ -75,6 +75,14 @@
 					"drop": []
 				},
 				{
+					"id": "bridge_wall",
+					"drop": [],
+					"hp": 0,
+					"isoWidth": 0,
+					"isoHeight": 0,
+					"use_range": 0
+				},
+				{
 					"id": "chest",
 					"drop": [],
 					"hp": 0,
@@ -136,124 +144,6 @@
 		},
 		{
 			"name": "structures@drop",
-			"props": {
-				"hide": true
-			},
-			"separators": [],
-			"lines": [],
-			"columns": [
-				{
-					"typeStr": "6:items",
-					"name": "item"
-				},
-				{
-					"typeStr": "3",
-					"name": "amount"
-				}
-			]
-		},
-		{
-			"name": "recipes",
-			"columns": [
-				{
-					"typeStr": "0",
-					"name": "id",
-					"scope": null
-				},
-				{
-					"typeStr": "1",
-					"name": "name",
-					"kind": "localizable"
-				},
-				{
-					"typeStr": "6:items",
-					"name": "item_icon"
-				},
-				{
-					"typeStr": "8",
-					"name": "ingreds"
-				},
-				{
-					"typeStr": "8",
-					"name": "result"
-				}
-			],
-			"lines": [
-				{
-					"id": "hydroponics",
-					"result": [
-						{
-							"item": "hydroponics",
-							"amount": 1
-						}
-					],
-					"name": "Hydroponics",
-					"item_icon": "hydroponics",
-					"ingreds": [
-						{
-							"item": "iron",
-							"amount": 2
-						}
-					]
-				},
-				{
-					"id": "door",
-					"name": "Door",
-					"item_icon": "door",
-					"result": [
-						{
-							"item": "door",
-							"amount": 1
-						}
-					],
-					"ingreds": [
-						{
-							"item": "iron",
-							"amount": 4
-						}
-					]
-				},
-				{
-					"id": "axe",
-					"name": "Axe",
-					"item_icon": "axe",
-					"ingreds": [
-						{
-							"item": "iron",
-							"amount": 2
-						}
-					],
-					"result": [
-						{
-							"item": "axe",
-							"amount": 1
-						}
-					]
-				}
-			],
-			"separators": [],
-			"props": {}
-		},
-		{
-			"name": "recipes@result",
-			"props": {
-				"hide": true
-			},
-			"separators": [],
-			"lines": [],
-			"columns": [
-				{
-					"typeStr": "6:items",
-					"name": "item"
-				},
-				{
-					"typeStr": "3",
-					"name": "amount"
-				}
-			]
-		},
-		{
-			"name": "recipes@ingreds",
 			"props": {
 				"hide": true
 			},
@@ -404,6 +294,107 @@
 			],
 			"separators": [],
 			"props": {}
+		},
+		{
+			"name": "recipes",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "id",
+					"scope": null
+				},
+				{
+					"typeStr": "1",
+					"name": "name",
+					"kind": "localizable"
+				},
+				{
+					"typeStr": "6:items",
+					"name": "item_icon"
+				},
+				{
+					"typeStr": "8",
+					"name": "ingreds"
+				},
+				{
+					"typeStr": "8",
+					"name": "result"
+				}
+			],
+			"lines": [
+				{
+					"id": "hydroponics",
+					"result": [
+						{
+							"item": "hydroponics",
+							"amount": 1
+						}
+					],
+					"name": "Hydroponics",
+					"item_icon": "hydroponics",
+					"ingreds": [
+						{
+							"item": "iron",
+							"amount": 2
+						}
+					]
+				},
+				{
+					"id": "axe",
+					"name": "Axe",
+					"item_icon": "axe",
+					"ingreds": [
+						{
+							"item": "iron",
+							"amount": 2
+						}
+					],
+					"result": [
+						{
+							"item": "axe",
+							"amount": 1
+						}
+					]
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "recipes@result",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "6:items",
+					"name": "item"
+				},
+				{
+					"typeStr": "3",
+					"name": "amount"
+				}
+			]
+		},
+		{
+			"name": "recipes@ingreds",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "6:items",
+					"name": "item"
+				},
+				{
+					"typeStr": "3",
+					"name": "amount"
+				}
+			]
 		}
 	],
 	"customTypes": [

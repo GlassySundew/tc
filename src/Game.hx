@@ -49,8 +49,8 @@ class Game extends Process implements GameAble {
 		ca.setRightDeadZone(0.2);
 
 		createRootInLayers(Main.inst.root, Const.DP_BG);
-		camera = new Camera();
 
+		camera = new Camera();
 		startLevel("alphamap.tmx");
 	}
 

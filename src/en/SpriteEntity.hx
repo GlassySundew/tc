@@ -13,6 +13,8 @@ class SpriteEntity extends Structure {
 		if ( tmxObj.properties.exists("interactable") ) {
 			interactable = tmxObj.properties.getBool("interactable");
 		}
+
+		
 	}
 
 	override function postUpdate() {

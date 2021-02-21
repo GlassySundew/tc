@@ -161,7 +161,7 @@ import h3d.scene.Mesh;
 		spr.tile.getTexture().filter = Nearest;
 		spr.drawTo(tex);
 		spr.blendMode = AlphaAdd;
-		
+
 		mesh = new IsoTileSpr(spr.tile, false, Boot.inst.s3d);
 		mesh.material.mainPass.setBlendMode(Alpha);
 
