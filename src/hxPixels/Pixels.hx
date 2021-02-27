@@ -1,8 +1,8 @@
 package hxPixels;
 
 import haxe.io.Bytes;
-import haxe.io.UInt8Array;
 import haxe.io.UInt32Array;
+import haxe.io.UInt8Array;
 
 #if (openfl && !nme)
   #if (openfl >= "8.0.0")

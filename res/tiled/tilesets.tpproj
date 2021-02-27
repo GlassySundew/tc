@@ -67,7 +67,7 @@ premultiplyAlpha=false
 grid=false
 square=false
 bleed=false
-limitMemory=true
+limitMemory=false
 useIndexes=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
@@ -89,8 +89,8 @@ fast=false
 filterMag=Nearest
 filterMin=Nearest
 ignoreBlankImages=true
-maxHeight=2048
-maxWidth=2048
+maxHeight=8192
+maxWidth=8192
 minHeight=16
 minWidth=16
 paddingX=2
@@ -104,13 +104,13 @@ wrapX=ClampToEdge
 wrapY=ClampToEdge
 premultiplyAlpha=false
 grid=false
-square=false
+square=true
 bleed=false
-limitMemory=true
+limitMemory=false
 useIndexes=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:separated/structures/bridge chair.png,type:Input,regionName:null},{path:separated/structures/amethyst.png,type:Input,regionName:null},{path:separated/structures/back_door.png,type:Input,regionName:null},{path:separated/structures/back_door0.png,type:Input,regionName:null},{path:separated/structures/back_door1.png,type:Input,regionName:null},{path:separated/structures/back_door2.png,type:Input,regionName:null},{path:separated/structures/back_door3.png,type:Input,regionName:null},{path:separated/structures/back_door4.png,type:Input,regionName:null},{path:separated/structures/back_door5.png,type:Input,regionName:null},{path:separated/structures/back_door6.png,type:Input,regionName:null},{path:separated/structures/back_door7.png,type:Input,regionName:null},{path:separated/structures/back_door8.png,type:Input,regionName:null},{path:separated/structures/back_door9.png,type:Input,regionName:null},{path:separated/structures/back_door10.png,type:Input,regionName:null},{path:separated/structures/back_door11.png,type:Input,regionName:null},{path:separated/structures/back_door12.png,type:Input,regionName:null},{path:separated/structures/back_door13.png,type:Input,regionName:null},{path:separated/structures/back_door14.png,type:Input,regionName:null},{path:separated/structures/back_door15.png,type:Input,regionName:null},{path:separated/structures/back_door16.png,type:Input,regionName:null},{path:separated/structures/back_door17.png,type:Input,regionName:null},{path:separated/structures/bridge_chair.png,type:Input,regionName:null},{path:separated/structures/bridge_table_1.png,type:Input,regionName:null},{path:separated/structures/bridge_table_2.png,type:Input,regionName:null},{path:separated/structures/bridge_wall.png,type:Input,regionName:null},{path:separated/structures/chest.png,type:Input,regionName:null},{path:separated/structures/door.png,type:Input,regionName:null},{path:separated/structures/door0.png,type:Input,regionName:null},{path:separated/structures/door1.png,type:Input,regionName:null},{path:separated/structures/door2.png,type:Input,regionName:null},{path:separated/structures/door3.png,type:Input,regionName:null},{path:separated/structures/door4.png,type:Input,regionName:null},{path:separated/structures/door5.png,type:Input,regionName:null},{path:separated/structures/door6.png,type:Input,regionName:null},{path:separated/structures/door7.png,type:Input,regionName:null},{path:separated/structures/door8.png,type:Input,regionName:null},{path:separated/structures/door9.png,type:Input,regionName:null},{path:separated/structures/door10.png,type:Input,regionName:null},{path:separated/structures/door11.png,type:Input,regionName:null},{path:separated/structures/door12.png,type:Input,regionName:null},{path:separated/structures/door13.png,type:Input,regionName:null},{path:separated/structures/door14.png,type:Input,regionName:null},{path:separated/structures/door15.png,type:Input,regionName:null},{path:separated/structures/door16.png,type:Input,regionName:null},{path:separated/structures/door17.png,type:Input,regionName:null},{path:separated/structures/emerald.png,type:Input,regionName:null},{path:separated/structures/hydroponics.png,type:Input,regionName:null},{path:separated/structures/hydroponics0.png,type:Input,regionName:null},{path:separated/structures/hydroponics1.png,type:Input,regionName:null},{path:separated/structures/iron.png,type:Input,regionName:null},{path:separated/structures/pcgmw.png,type:Input,regionName:null},{path:separated/structures/sleeping_pod.png,type:Input,regionName:null},{path:separated/structures/teleport.png,type:Input,regionName:null}]
+inputFiles=[{path:separated/structures/bridge chair.png,type:Input,regionName:null},{path:separated/structures/amethyst.png,type:Input,regionName:null},{path:separated/structures/back_door.png,type:Input,regionName:null},{path:separated/structures/back_door0.png,type:Input,regionName:null},{path:separated/structures/back_door1.png,type:Input,regionName:null},{path:separated/structures/back_door2.png,type:Input,regionName:null},{path:separated/structures/back_door3.png,type:Input,regionName:null},{path:separated/structures/back_door4.png,type:Input,regionName:null},{path:separated/structures/back_door5.png,type:Input,regionName:null},{path:separated/structures/back_door6.png,type:Input,regionName:null},{path:separated/structures/back_door7.png,type:Input,regionName:null},{path:separated/structures/back_door8.png,type:Input,regionName:null},{path:separated/structures/back_door9.png,type:Input,regionName:null},{path:separated/structures/back_door10.png,type:Input,regionName:null},{path:separated/structures/back_door11.png,type:Input,regionName:null},{path:separated/structures/back_door12.png,type:Input,regionName:null},{path:separated/structures/back_door13.png,type:Input,regionName:null},{path:separated/structures/back_door14.png,type:Input,regionName:null},{path:separated/structures/back_door15.png,type:Input,regionName:null},{path:separated/structures/back_door16.png,type:Input,regionName:null},{path:separated/structures/back_door17.png,type:Input,regionName:null},{path:separated/structures/bridge_chair.png,type:Input,regionName:null},{path:separated/structures/bridge_table_2.png,type:Input,regionName:null},{path:separated/structures/bridge_wall.png,type:Input,regionName:null},{path:separated/structures/chest.png,type:Input,regionName:null},{path:separated/structures/door.png,type:Input,regionName:null},{path:separated/structures/door0.png,type:Input,regionName:null},{path:separated/structures/door1.png,type:Input,regionName:null},{path:separated/structures/door2.png,type:Input,regionName:null},{path:separated/structures/door3.png,type:Input,regionName:null},{path:separated/structures/door4.png,type:Input,regionName:null},{path:separated/structures/door5.png,type:Input,regionName:null},{path:separated/structures/door6.png,type:Input,regionName:null},{path:separated/structures/door7.png,type:Input,regionName:null},{path:separated/structures/door8.png,type:Input,regionName:null},{path:separated/structures/door9.png,type:Input,regionName:null},{path:separated/structures/door10.png,type:Input,regionName:null},{path:separated/structures/door11.png,type:Input,regionName:null},{path:separated/structures/door12.png,type:Input,regionName:null},{path:separated/structures/door13.png,type:Input,regionName:null},{path:separated/structures/door14.png,type:Input,regionName:null},{path:separated/structures/door15.png,type:Input,regionName:null},{path:separated/structures/door16.png,type:Input,regionName:null},{path:separated/structures/door17.png,type:Input,regionName:null},{path:separated/structures/emerald.png,type:Input,regionName:null},{path:separated/structures/hydroponics.png,type:Input,regionName:null},{path:separated/structures/hydroponics0.png,type:Input,regionName:null},{path:separated/structures/hydroponics1.png,type:Input,regionName:null},{path:separated/structures/iron.png,type:Input,regionName:null},{path:separated/structures/pcgmw.png,type:Input,regionName:null},{path:separated/structures/sleeping_pod.png,type:Input,regionName:null},{path:separated/structures/teleport.png,type:Input,regionName:null},{path:separated/structures/navigation_console.png,type:Input,regionName:null}]
 
 
 ---
@@ -123,13 +123,13 @@ alias=true
 alphaThreshold=0
 debug=false
 duplicatePadding=false
-edgePadding=true
+edgePadding=false
 fast=false
 filterMag=Nearest
 filterMin=Nearest
 ignoreBlankImages=true
-maxHeight=2048
-maxWidth=2048
+maxHeight=8192
+maxWidth=8192
 minHeight=16
 minWidth=16
 paddingX=2
@@ -143,9 +143,9 @@ wrapX=ClampToEdge
 wrapY=ClampToEdge
 premultiplyAlpha=false
 grid=false
-square=false
-bleed=true
-limitMemory=true
+square=true
+bleed=false
+limitMemory=false
 useIndexes=true
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
@@ -171,8 +171,8 @@ maxHeight=2048
 maxWidth=2048
 minHeight=16
 minWidth=16
-paddingX=2
-paddingY=2
+paddingX=0
+paddingY=0
 pot=false
 mof=false
 rotation=false
@@ -181,14 +181,14 @@ stripWhitespaceY=false
 wrapX=ClampToEdge
 wrapY=ClampToEdge
 premultiplyAlpha=false
-grid=false
+grid=true
 square=false
 bleed=false
-limitMemory=true
+limitMemory=false
 useIndexes=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:separated/ui/close_button_inventory.png,type:Input,regionName:null},{path:separated/ui/caret0.png,type:Input,regionName:null},{path:separated/ui/caret1.png,type:Input,regionName:null},{path:separated/ui/close_button_inventory0.png,type:Input,regionName:null},{path:separated/ui/close_button_inventory1.png,type:Input,regionName:null},{path:separated/ui/close_button_inventory2.png,type:Input,regionName:null},{path:separated/ui/craft_but0.png,type:Input,regionName:null},{path:separated/ui/craft_but1.png,type:Input,regionName:null},{path:separated/ui/craft_but2.png,type:Input,regionName:null},{path:separated/ui/crafting.png,type:Input,regionName:null},{path:separated/ui/cursor0.png,type:Input,regionName:null},{path:separated/ui/cursor1.png,type:Input,regionName:null},{path:separated/ui/cursor2.png,type:Input,regionName:null},{path:separated/ui/discord0.png,type:Input,regionName:null},{path:separated/ui/discord1.png,type:Input,regionName:null},{path:separated/ui/discord2.png,type:Input,regionName:null},{path:separated/ui/health_caret.png,type:Input,regionName:null},{path:separated/ui/health_line.png,type:Input,regionName:null},{path:separated/ui/health_sign.png,type:Input,regionName:null},{path:separated/ui/inventory.png,type:Input,regionName:null},{path:separated/ui/keyboard_icon0.png,type:Input,regionName:null},{path:separated/ui/keyboard_icon1.png,type:Input,regionName:null},{path:separated/ui/oxygen_scale.png,type:Input,regionName:null},{path:separated/ui/oxygen_sign.png,type:Input,regionName:null},{path:separated/ui/recipe.png,type:Input,regionName:null},{path:separated/ui/recipe_comp.png,type:Input,regionName:null},{path:separated/ui/recipe_hint.png,type:Input,regionName:null},{path:separated/ui/twitter0.png,type:Input,regionName:null},{path:separated/ui/twitter1.png,type:Input,regionName:null},{path:separated/ui/twitter2.png,type:Input,regionName:null},{path:separated/ui/vk0.png,type:Input,regionName:null},{path:separated/ui/vk1.png,type:Input,regionName:null},{path:separated/ui/vk2.png,type:Input,regionName:null}]
+inputFiles=[{path:separated/ui/close_button_inventory.png,type:Input,regionName:null},{path:separated/ui/asteroi1.png,type:Input,regionName:null},{path:separated/ui/asteroi2.png,type:Input,regionName:null},{path:separated/ui/asteroi3.png,type:Input,regionName:null},{path:separated/ui/asteroid0.png,type:Input,regionName:null},{path:separated/ui/caret0.png,type:Input,regionName:null},{path:separated/ui/caret1.png,type:Input,regionName:null},{path:separated/ui/close_button_inventory0.png,type:Input,regionName:null},{path:separated/ui/close_button_inventory1.png,type:Input,regionName:null},{path:separated/ui/close_button_inventory2.png,type:Input,regionName:null},{path:separated/ui/craft_but0.png,type:Input,regionName:null},{path:separated/ui/craft_but1.png,type:Input,regionName:null},{path:separated/ui/craft_but2.png,type:Input,regionName:null},{path:separated/ui/crafting.png,type:Input,regionName:null},{path:separated/ui/cursor0.png,type:Input,regionName:null},{path:separated/ui/cursor1.png,type:Input,regionName:null},{path:separated/ui/cursor2.png,type:Input,regionName:null},{path:separated/ui/discord0.png,type:Input,regionName:null},{path:separated/ui/discord1.png,type:Input,regionName:null},{path:separated/ui/discord2.png,type:Input,regionName:null},{path:separated/ui/health_caret.png,type:Input,regionName:null},{path:separated/ui/health_line.png,type:Input,regionName:null},{path:separated/ui/health_sign.png,type:Input,regionName:null},{path:separated/ui/inventory.png,type:Input,regionName:null},{path:separated/ui/keyboard_icon0.png,type:Input,regionName:null},{path:separated/ui/keyboard_icon1.png,type:Input,regionName:null},{path:separated/ui/navigation.png,type:Input,regionName:null},{path:separated/ui/oxygen_scale.png,type:Input,regionName:null},{path:separated/ui/oxygen_sign.png,type:Input,regionName:null},{path:separated/ui/recipe.png,type:Input,regionName:null},{path:separated/ui/recipe_comp.png,type:Input,regionName:null},{path:separated/ui/recipe_hint.png,type:Input,regionName:null},{path:separated/ui/travel_but0.png,type:Input,regionName:null},{path:separated/ui/travel_but1.png,type:Input,regionName:null},{path:separated/ui/twitter0.png,type:Input,regionName:null},{path:separated/ui/twitter1.png,type:Input,regionName:null},{path:separated/ui/twitter2.png,type:Input,regionName:null},{path:separated/ui/vk0.png,type:Input,regionName:null},{path:separated/ui/vk1.png,type:Input,regionName:null},{path:separated/ui/vk2.png,type:Input,regionName:null}]
 
 
 -PROJ-

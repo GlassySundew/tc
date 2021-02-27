@@ -1,11 +1,10 @@
 package ui;
 
 import en.player.Player;
-import tools.Util;
 import h2d.Flow;
-import ui.player.Dragable;
-import format.tmx.Data.TmxLayer;
+import h2d.Interactive;
 import h2d.Object;
+import ui.player.Dragable;
 
 class Window extends dn.Process {
 	public static var ALL : Array<Window> = [];
@@ -13,22 +12,28 @@ class Window extends dn.Process {
 	public var win : Object;
 	/**backdround sprite**/
 	var spr : HSprite;
-	/**	Parsed ui.tmx file **/
-	var configMap : Map<String, TmxLayer>;
 
 	static var centrizerFlow : Flow;
 
-	public function new(?configMap : Map<String, TmxLayer>, ?parent : h2d.Object) {
+	public function new(?parent : h2d.Object) {
 		super(Main.inst);
 		ALL.push(this);
-		this.configMap = configMap;
-
 		win = new h2d.Object(parent);
+		if ( spr != null ) {
+			win.addChild(spr);
+
+			var backgroundInter = new Interactive(spr.tile.width, spr.tile.height, spr);
+			backgroundInter.cursor = Default;
+			backgroundInter.onPush = function(e) {
+				bringOnTopOfALL();
+			}
+		}
+
 		dn.Process.resizeAll();
 	}
-	/**Create close button based on config**/
+	/** Create close button based on config **/
 	function createCloseBut(layerConf : String) {
-		var closeConf = configMap.get(layerConf).getObjectByName("close");
+		var closeConf = uiConf.get(layerConf).getObjectByName("close");
 
 		var close_button_inventory0 = new HSprite(Assets.ui, "close_button_inventory0");
 		var close_button_inventory1 = new HSprite(Assets.ui, "close_button_inventory1");
@@ -49,8 +54,11 @@ class Window extends dn.Process {
 	}
 	/**create dragable area based on config**/
 	function createDragable(layerConf : String) {
-		var dragableConf = configMap.get(layerConf).getObjectByName("dragable");
-		var dragable = new Dragable(dragableConf.width, dragableConf.height, () -> {
+		var dragableConf = uiConf.get(layerConf).getObjectByName("dragable");
+		var dragable = new Dragable(dragableConf.width, dragableConf.height, (deltaX : Float, deltaY : Float) -> {
+			win.x += deltaX;
+			win.y += deltaY;
+
 			clampInScreen();
 			bringOnTopOfALL();
 		}, win);
@@ -71,6 +79,7 @@ class Window extends dn.Process {
 	}
 
 	function bringOnTopOfALL() {
+		win.parent.addChild(win);
 		ALL.remove(this);
 		ALL.unshift(this);
 	}
@@ -84,7 +93,8 @@ class Window extends dn.Process {
 	public function clearWindow() {
 		win.removeChildren();
 	}
-
+	
+	// TODO
 	public static function centrizeTwoWins(win1 : Window, win2 : Window) {
 		if ( centrizerFlow != null ) {
 			centrizerFlow.onAfterReflow = () -> {};
@@ -120,13 +130,15 @@ class Window extends dn.Process {
 		centrizerFlow.onAfterReflow = function() {
 			if ( win1.win.parent != centrizerFlow || !win1.win.visible ) {
 				// Кто-то потянул за первое окно и его родитель стал Player.inst.ui вместо centrizerFlow
-				win2.win.x += win2.win.getSize().xMax / 2;
-				Player.inst.ui.add(win2.win, Const.DP_UI);
+				win1.win.x -= win1.win.getSize().xMax / 2;
+				win2.win.x += win1.win.getSize().xMax;
+				// Player.inst.ui.add(win1.win, Const.DP_UI);
 			} else if ( win2.win.parent != centrizerFlow || !win2.win.visible ) {
 				// Кто-то потянул за win2
-				win1.win.x -= win1.win.getSize().xMax / 2;
-				Player.inst.ui.add(win1.win, Const.DP_UI);
+				win2.win.x -= win2.win.getSize().xMax / 2;
+				// Player.inst.ui.add(win2.win, Const.DP_UI);
 			}
+
 			centrizerFlow.onAfterReflow = () -> {};
 		}
 	}

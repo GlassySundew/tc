@@ -9,9 +9,9 @@ import ui.s2d.EventInteractive;
 class Dragable extends EventInteractive {
 	var handleDX = 0.0;
 	var handleDY = 0.0;
-	var onDrag : Void -> Void;
+	var onDrag : Float -> Float -> Void;
 
-	public function new(width, height, ?onDrag : Void -> Void, ?parent, ?shape) {
+	public function new(width, height, ?onDrag : Float -> Float -> Void, ?parent, ?shape) {
 		super(width, height, parent, shape);
 		this.onDrag = onDrag;
 	}
@@ -23,10 +23,10 @@ class Dragable extends EventInteractive {
 		switch( e.kind ) {
 			case EPush:
 				Player.inst.ui.add(parent, Const.DP_UI);
-				if ( onDrag != null ) onDrag();
-
 				handleDX = e.relX;
 				handleDY = e.relY;
+				if ( onDrag != null ) onDrag(0, 0);
+
 				// If clicking the slider outside the handle, drag the handle
 				// by the center of it.
 				var followCursor = () -> {
@@ -35,7 +35,6 @@ class Dragable extends EventInteractive {
 					parent.y = hxd.Math.clamp(Boot.inst.s2d.mouseY / Const.SCALE - handleDY - y, 0,
 						Game.inst.h() / Const.SCALE /*- cast(parent, HSprite).tile.height*/);
 				}
-				followCursor();
 
 				var scene = scene;
 				startCapture(function(e) {
@@ -43,8 +42,7 @@ class Dragable extends EventInteractive {
 						scene.stopCapture();
 						return;
 					}
-					followCursor();
-					if ( onDrag != null ) onDrag();
+					if ( onDrag != null ) onDrag(((e.relX - handleDX) / 8.5), ((e.relY - handleDY) / 8.5));
 				});
 
 			default:

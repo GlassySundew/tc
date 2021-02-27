@@ -1,4 +1,4 @@
-import tools.Util;
+import tools.Settings;
 import Message.PlayerInit;
 import Message.MapLoad;
 import cherry.soup.EventSignal.EventSignal0;
@@ -20,7 +20,6 @@ import hxd.Key;
 import format.tmx.Data;
 import format.tmx.*;
 import hxd.Res;
-import tools.Util.*;
 
 class GameClient extends Process implements GameAble {
 	// static var HOST = "0.0.0.0";
@@ -70,7 +69,7 @@ class GameClient extends Process implements GameAble {
 			}
 			trace("Connected to server");
 
-			host.sendTypedMessage(new PlayerInit(uid, Util.nickname));
+			host.sendTypedMessage(new PlayerInit(uid, Settings.nickname));
 
 			// sys.thread.Thread.create(() -> {
 			// 	while( true ) {

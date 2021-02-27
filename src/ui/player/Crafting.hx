@@ -21,18 +21,18 @@ import h2d.Object;
 class Crafting extends Window {
 	var scrollable : ScrollArea;
 
-	public function new(configMap : Map<String, TmxLayer>, ?parent : Object) {
-		super(configMap, parent);
-		spr = new HSprite(Assets.ui, win);
+	public function new(?parent : Object) {
+		spr = new HSprite(Assets.ui);
 		spr.set("crafting");
+		super(parent);
 
 		var textLabel = new ui.TextLabel("Crafting", Assets.fontPixel, win);
 		textLabel.scale(.5);
-		textLabel.x = configMap.get("craft").getObjectByName("sign").x;
-		textLabel.y = configMap.get("craft").getObjectByName("sign").y;
+		textLabel.x = uiConf.get("craft").getObjectByName("sign").x;
+		textLabel.y = uiConf.get("craft").getObjectByName("sign").y;
 		textLabel.center();
 
-		var recipeConf = configMap.get("craft").getObjectByName("recipes");
+		var recipeConf = uiConf.get("craft").getObjectByName("recipes");
 
 		// Scrollable shit for recipes
 		var caretUp = new HSprite(Assets.ui, "caret0").tile;
@@ -40,7 +40,7 @@ class Crafting extends Window {
 
 		var grid = new ScaleGrid(caretUp, 3, 3, win);
 
-		var sliderConf = configMap.get("craft").getObjectByName("slider");
+		var sliderConf = uiConf.get("craft").getObjectByName("slider");
 		var slider = new VerticalSlider(Std.int(sliderConf.width), Std.int(sliderConf.height), grid, win);
 		slider.x = sliderConf.x;
 		slider.y = sliderConf.y;
@@ -63,7 +63,7 @@ class Crafting extends Window {
 		flowCont.verticalSpacing = 1;
 
 		for (recipe in Data.recipes.all) {
-			var rec = new Recipe(configMap, recipe, flowCont);
+			var rec = new Recipe(uiConf, recipe, flowCont);
 			rec.inter.onWheelEvent.add(scrollVoid);
 		}
 
@@ -329,43 +329,4 @@ class VerticalSlider extends EventInteractive {
 	}
 
 	public dynamic function onChange() {}
-}
-
-class FixedScrollArea extends ScrollArea {
-	override function drawRec(ctx : h2d.RenderContext) @:privateAccess {
-		if ( !visible ) return;
-		// fallback in case the object was added during a sync() event and we somehow didn't update it
-		if ( posChanged ) {
-			// only sync anim, don't update() (prevent any event from occuring during draw())
-			// if( currentAnimation != null ) currentAnimation.sync();
-			calcAbsPos();
-			for (c in children) c.posChanged = true;
-			posChanged = false;
-		}
-
-		var x1 = absX + scrollX * 2;
-		var y1 = absY + scrollY * 2;
-
-		var x2 = width * matA + height * matC + x1;
-		var y2 = width * matB + height * matD + y1;
-
-		var tmp;
-		if ( x1 > x2 ) {
-			tmp = x1;
-			x1 = x2;
-			x2 = tmp;
-		}
-
-		if ( y1 > y2 ) {
-			tmp = y1;
-			y1 = y2;
-			y2 = tmp;
-		}
-
-		ctx.flush();
-		ctx.pushRenderZone(x1, y1, x2 - x1, y2 - y1);
-		objDrawRec(ctx);
-		ctx.flush();
-		ctx.popRenderZone();
-	}
 }

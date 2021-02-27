@@ -67,7 +67,7 @@
 					]
 				},
 				{
-					"id": "bridge_table_1",
+					"id": "navigation_console",
 					"use_range": 100,
 					"isoWidth": 0,
 					"isoHeight": 0,
@@ -88,7 +88,7 @@
 					"hp": 0,
 					"isoWidth": 1,
 					"isoHeight": 0.7,
-					"use_range": 30
+					"use_range": 25
 				},
 				{
 					"id": "sleeping_pod",
@@ -285,11 +285,6 @@
 					"id": "hydroponics",
 					"item": "hydroponics",
 					"structure": "hydroponics"
-				},
-				{
-					"id": "door",
-					"item": "door",
-					"structure": "door"
 				}
 			],
 			"separators": [],
@@ -357,6 +352,72 @@
 					]
 				}
 			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "navigation_targets",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "id",
+					"kind": null,
+					"scope": null
+				},
+				{
+					"typeStr": "14",
+					"name": "img",
+					"kind": null,
+					"editor": {
+						"categories": null
+					}
+				}
+			],
+			"lines": [
+				{
+					"id": "asteroid0",
+					"img": {
+						"file": "../../../../../../../../../../../..//home/glassysundew/Projects/tc/res/tiled/atlas/ui.png",
+						"size": 32,
+						"x": 0,
+						"y": 0
+					}
+				},
+				{
+					"id": "asteroid1",
+					"img": {
+						"file": "../../../../../../../../../../../..//home/glassysundew/Projects/tc/res/tiled/atlas/ui.png",
+						"size": 32,
+						"x": 5,
+						"y": 0
+					}
+				},
+				{
+					"id": "asteroid2",
+					"img": {
+						"file": "../../../../../../../../../../../..//home/glassysundew/Projects/tc/res/tiled/atlas/ui.png",
+						"size": 32,
+						"x": 10,
+						"y": 0
+					}
+				},
+				{
+					"id": "asteroid3",
+					"img": {
+						"file": "../../../../../../../../../../../..//home/glassysundew/Projects/tc/res/tiled/atlas/ui.png",
+						"size": 32,
+						"x": 15,
+						"y": 0
+					}
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "test",
+			"columns": [],
+			"lines": [],
 			"separators": [],
 			"props": {}
 		},

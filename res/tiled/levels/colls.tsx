@@ -109,7 +109,7 @@
   <properties>
    <property name="interactable" type="bool" value="true"/>
   </properties>
-  <image width="104" height="44" source="separated/structures/bridge_table_1.png"/>
+  <image width="104" height="44" source="separated/structures/navigation_console.png"/>
   <objectgroup draworder="index" id="2">
    <object id="6" name="center" x="78" y="27">
     <point/>

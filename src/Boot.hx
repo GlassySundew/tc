@@ -1,7 +1,4 @@
-import hl.UI.Window;
 import h2d.Scene;
-import hxd.Res;
-import hxd.snd.Manager;
 import hxd.inspect.Inspector;
 
 class Boot extends hxd.App {

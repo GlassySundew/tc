@@ -1,22 +1,12 @@
 package;
 
-// import game.comps.GameUI;
-import hxd.System;
-import ui.Window;
-import haxe.Timer;
 import cherry.soup.EventSignal.EventSignal0;
-import tools.Util;
-import hxd.fmt.pak.FileSystem;
-import h3d.mat.Texture;
-import h2d.Bitmap;
-import hxd.Cursor.CustomCursor;
-import hxd.BitmapData;
-import hxd.Pixels;
-import hxd.Key;
 import dn.M;
 import dn.Process;
+import en.player.Player;
 import hxd.Key;
-import hxd.Res;
+import tools.Settings;
+import ui.Window;
 
 @:publicFields
 class Main extends Process {
@@ -31,7 +21,6 @@ class Main extends Process {
 		super();
 		inst = this;
 		createRoot(s);
-
 		// root.filter = new h2d.filter.ColorMatrix();
 
 		#if( hl && pak )
@@ -51,10 +40,13 @@ class Main extends Process {
 			}, 0.2);
 		});
 		#end
-		
+
 		Assets.init();
 		Cursors.init();
 		Lang.init("en");
+
+		uiConf = resolveMap("ui.tmx").getLayersByName();
+		for (i in uiConf) i.localBy(i.getObjectByName("window"));
 
 		Data.load(hxd.Res.data.entry.getText());
 
@@ -75,10 +67,16 @@ class Main extends Process {
 		controller.bind(SELECT, Key.ESCAPE);
 
 		onClose = new EventSignal0();
-		Util.loadSettings();
-		onClose.add(() -> Util.saveSettings());
+		Settings.loadSettings();
+		onClose.add(() -> {
+			if ( Player.inst != null ) {
+				Settings.inventoryCoordRatio.x = Player.inst.ui.inventory.win.x / w();
+				Settings.inventoryCoordRatio.y = Player.inst.ui.inventory.win.y / h();
+			}
+			Settings.saveSettings();
+		});
 
-		if ( Util.fullscreen ) toggleFullscreen();
+		if ( Settings.fullscreen ) toggleFullscreen();
 
 		@:privateAccess engine.window.onClose = function() {
 			onClose.dispatch();
@@ -105,16 +103,14 @@ class Main extends Process {
 		#if hl
 		var s = hxd.Window.getInstance();
 		s.displayMode = s.displayMode == Fullscreen ? Windowed : Fullscreen;
-		Util.fullscreen = s.displayMode == Fullscreen;
+		Settings.fullscreen = s.displayMode == Fullscreen;
 		#end
 	}
 
 	public function startGame() {
 		if ( Game.inst != null ) {
 			Game.inst.destroy();
-			// delayer.addS(function() {
 			new Game();
-			// }, 0.1);
 		} else
 			new Game();
 	}

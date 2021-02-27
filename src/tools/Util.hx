@@ -1,27 +1,22 @@
 package tools;
 
+import format.tmx.Data.TmxLayer;
+import format.tmx.Data.TmxMap;
+import format.tmx.Data.TmxObject;
+import format.tmx.Data.TmxPoint;
+import format.tmx.Data.TmxTileset;
+import format.tmx.Data.TmxTilesetTile;
+import format.tmx.Reader;
 import h2d.Flow;
+import h2d.Scene;
+import h2d.Tile;
+import h3d.Vector;
+import hxbit.NetworkHost.NetworkClient;
+import hxd.Res;
 import hxd.res.Any;
 import hxd.res.Loader;
-import hxbit.NetworkHost.NetworkClient;
-import haxe.io.Path;
-import h2d.Scene;
-import h3d.pass.Default;
-import format.tmx.Data.TmxLayer;
-import format.tmx.Reader;
-import format.tmx.Data.TmxTilesetTile;
-import hxd.Res;
-import format.tmx.Data.TmxTileset;
-import h2d.Tile;
-import format.tmx.Tools;
-import format.tmx.Data.TmxMap;
-import hxd.BitmapData;
-import h2d.Bitmap;
-import h3d.Vector;
-import format.tmx.Data.TmxPoint;
-import format.tmx.Data.TmxObject;
 
-using Util.LoaderExtender;
+// using Util.LoaderExtender;
 
 @:publicFields
 @:expose
@@ -127,33 +122,10 @@ class Util {
 
 	static var entParent : Scene;
 
-	static var SAVEPATH : String = Path.join([
-		#if windows Sys.getEnv("APPDATA"), #elseif linux Sys.getEnv("HOME"),
-		#end
-		"/.config/TotalCondemn/settings"
-	]);
+	public static var uiConf:Map<String, TmxLayer>;
 
-	public static var nickname : String;
-
-	public static var fullscreen : Bool;
-
-	public static function saveSettings() {
-		#if hl
-		sys.FileSystem.createDirectory(Path.directory(SAVEPATH));
-		#end
-		hxd.Save.save({
-			nickname : nickname,
-			fullscreen : fullscreen,
-		}, SAVEPATH);
-	}
-
-	public static function loadSettings() {
-		var data = hxd.Save.load(null, SAVEPATH);
-		if ( data != null ) {
-			nickname = data.nickname;
-			fullscreen = data.fullscreen;
-		}
-	}
+	public static var inventoryCoordRatio : Vector = new Vector(-1, -1);
+	
 }
 
 class TmxMapExtender {

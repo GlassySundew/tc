@@ -1,32 +1,19 @@
 package en;
 
-import h2d.Tile;
-import h2d.Bitmap;
-import h3d.mat.Texture;
-import h3d.scene.Scene;
-import h3d.shader.GpuParticle;
-import h3d.col.Bounds;
-import h3d.parts.GpuParticles.GpuPartGroup;
-import hxd.Res;
-import ui.s3d.EventInteractive;
-import ui.InventoryGrid;
-import haxe.io.Error;
-import ui.player.ButtonIcon;
-import hxd.Key;
-import hxd.Event;
-import h2d.Object;
-import hxGeomAlgo.PolyTools.Tri;
-import hxGeomAlgo.HxPoint;
-import h3d.prim.Polygon;
-import hxd.IndexBuffer;
-import h3d.col.Point;
-import h2d.filter.Glow;
-import h3d.scene.Interactive;
 import format.tmx.Data.TmxObject;
-import tools.Util.*;
-import hxGeomAlgo.MarchingSquares;
-import hxPixels.Pixels;
+import h2d.Object;
+import h2d.filter.Glow;
+import h3d.col.Point;
+import h3d.prim.Polygon;
 import hxGeomAlgo.EarCut;
+import hxGeomAlgo.HxPoint;
+import hxGeomAlgo.MarchingSquares;
+import hxGeomAlgo.PolyTools.Tri;
+import hxPixels.Pixels;
+import hxd.IndexBuffer;
+import ui.InventoryGrid;
+import ui.player.ButtonIcon;
+import ui.s3d.EventInteractive;
 /**
 	An interactive entity
 **/

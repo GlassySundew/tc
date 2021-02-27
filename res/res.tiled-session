@@ -506,27 +506,27 @@
             "scaleInEditor": 0.5
         },
         "tiled/levels/alphamap.tmx": {
-            "scale": 3,
-            "selectedLayer": 7,
+            "scale": 2,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 629,
-                "y": 252.49999999999997
+                "x": 675,
+                "y": 176
             }
         },
         "tiled/levels/asteroid.tmx": {
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 2260,
-                "y": 898.5
+                "x": 2499,
+                "y": 1089
             }
         },
         "tiled/levels/bridge.tmx": {
             "scale": 1.5,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 1283.3333333333333,
-                "y": 559.6666666666666
+                "x": 1200,
+                "y": 584
             }
         },
         "tiled/levels/colls.tsx": {
@@ -568,8 +568,8 @@
             "scale": 0.03125,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 2432,
-                "y": 1232
+                "x": 2400,
+                "y": 1216
             }
         },
         "tiled/levels/server_test.tmx": {
@@ -584,8 +584,8 @@
             "scale": 3,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 557.3333333333333,
-                "y": 293.8333333333333
+                "x": 513,
+                "y": 302.5
             }
         },
         "tiled/levels/ui.tsx": {

@@ -1,25 +1,19 @@
-import hxd.Key;
-import haxe.io.Path;
-import h2d.TextInput;
-import cherry.soup.EventSignal.EventSignal0;
+import tools.Settings;
 import ch2.ui.EventInteractive;
-import h3d.Matrix;
+import dn.Process;
+import h2d.Flow;
+import h2d.Object;
+import h2d.RenderContext;
+import h2d.Scene;
+import h2d.Text;
+import h2d.TextInput;
+import h2d.Tile;
 import h2d.filter.ColorMatrix;
-import h2d.filter.Bloom;
-import h2d.filter.Blur;
+import h3d.Matrix;
+import h3d.mat.Texture;
 import hxd.Event;
-import hxd.res.Resource;
 import hxd.System;
 import ui.Button;
-import tools.Util;
-import dn.Process;
-import h2d.Scene;
-import h2d.RenderContext;
-import h3d.mat.Texture;
-import h2d.Tile;
-import h2d.Flow;
-import h2d.Text;
-import h2d.Object;
 
 class MainMenu extends Process {
 	var parentFlow : Object;
@@ -130,12 +124,7 @@ class MainMenu extends Process {
 		super.onResize();
 		vertFlow.minHeight = socialFlow.minHeight = Std.int(Util.getS2dScaledHei());
 		vertFlow.minWidth = socialFlow.minWidth = Std.int(Util.getS2dScaledWid());
-		// vertFlow.paddingTop = -Std.int(Util.getS2dScaledHei() / 4);
 	}
-
-	// override function sync(ctx : RenderContext) {
-	// 	super.sync(ctx);
-	// }
 
 	override function onDispose() {
 		super.onDispose();
@@ -202,10 +191,10 @@ class OptionsMenu extends Object {
 		nickname.text = "Nickname: ";
 
 		nicknameInput = new ui.TextInput(Assets.fontPixel, horFlow);
-		nicknameInput.text = Util.nickname != null ? Util.nickname : "Unnamed player";
+		nicknameInput.text = Settings.nickname != null ? Settings.nickname : "Unnamed player";
 		nicknameInput.onFocusLost = function(e : Event) {
-			Util.nickname = nicknameInput.text;
-			Util.saveSettings();
+			Settings.nickname = nicknameInput.text;
+			Settings.saveSettings();
 		}
 		// nicknameInput.onKeyDown = function(e : Event) {
 		// 	if ( e.keyCode == Key.ENTER ) {

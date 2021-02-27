@@ -24,7 +24,6 @@ import h3d.scene.CameraController;
 import tools.CPoint;
 import format.tmx.*;
 import format.tmx.Data;
-import tools.Util.*;
 /**
 	Level parses tmx entities maps, renders tie layers into mesh
 **/
@@ -342,7 +341,7 @@ private class InternalRender extends TileLayerRenderer {
 		if ( ereg.match(sourceTile.image.source)
 			&& StringTools.endsWith(ereg.matched(1),
 				"floor") ) Level.inst.game.structTiles.push(new StructTile(bmp.x + Level.inst.data.tileWidth / 2,
-				Level.inst.ground.height - bmp.y - Level.inst.data.tileHeight / 2, Level.inst.obj));
+				Level.inst.ground.height - bmp.y - Level.inst.data.tileHeight / 2, Boot.inst.s3d));
 		bmp.drawTo(tex);
 		bmp.tile.dispose();
 		bmp.remove();

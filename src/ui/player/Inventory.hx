@@ -36,27 +36,24 @@ class Inventory extends Window {
 	public var invGrid : CellGrid;
 	public var containmentEntity : Entity;
 
-	public function new(?configMap : Map<String, TmxLayer>, ?invGrid : CellGrid, ?parent : Object) {
-		super(configMap, parent);
+	public function new( ?invGrid : CellGrid, ?parent : Object) {
+		spr = new HSprite(Assets.ui);
+		spr.set("inventory");
+		
+		super( parent);
 		ALL.push(this);
-		this.configMap = configMap;
 		this.invGrid = invGrid;
 
 		ca = Main.inst.controller.createAccess("inventory");
-		spr = new HSprite(Assets.ui, win);
-		spr.set("inventory");
 
 		headingLabel = new ui.TextLabel("Inventory", Assets.fontPixel, spr);
 		headingLabel.scale(.5);
 
-		headingLabel.x = configMap.get("inventory").getObjectByName("sign").x;
-		headingLabel.y = configMap.get("inventory").getObjectByName("sign").y;
+		headingLabel.x = uiConf.get("inventory").getObjectByName("sign").x;
+		headingLabel.y = uiConf.get("inventory").getObjectByName("sign").y;
 		headingLabel.center();
 
 		win.addChild(invGrid);
-		// Освобождаем последний ряд для Belt
-		
-
 		// invGrid.giveItem(new en.items.Scepter(0, 0));
 		// items[0].push(new en.items.Ore(invGrid0x, invGrid0y, Iron, base));
 

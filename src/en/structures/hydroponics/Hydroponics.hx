@@ -43,11 +43,6 @@ class Hydroponics extends Structure {
 		}
 
 		interactable = false;
-		// if (plantCont != null) {
-		// 	interactable = false;
-		// 	new FloatingItem(mesh.x + 1, mesh.z - 1, plantContainer).bumpAwayFrom(this, .05);
-		// 	plantContainer = null;
-		// }
 	}
 
 	override function update() {

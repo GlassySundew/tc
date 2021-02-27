@@ -1,23 +1,17 @@
-import cherry.soup.EventSignal.EventSignal0;
+import tools.Settings;
 import Level.StructTile;
-import h3d.scene.Object;
-import dn.Rand;
-import h3d.pass.PassList;
-import ui.Hud;
-import en.player.Player;
+import cherry.soup.EventSignal.EventSignal0;
 import differ.math.Vector;
 import differ.shapes.Circle;
 import differ.shapes.Polygon;
-import h3d.scene.Scene;
-import h3d.scene.Mesh;
-import h3d.mat.Texture;
-import h3d.scene.CameraController;
 import dn.Process;
-import hxd.Key;
-import format.tmx.Data;
+import en.player.Player;
 import format.tmx.*;
-import hxd.Res;
-import tools.Util.*;
+import format.tmx.Data;
+import h3d.scene.CameraController;
+import h3d.scene.Object;
+import hxd.Key;
+import ui.Hud;
 
 class Game extends Process implements GameAble {
 	public static var inst : Game;
