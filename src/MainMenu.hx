@@ -1,3 +1,4 @@
+import h2d.filter.Nothing;
 import tools.Settings;
 import ch2.ui.EventInteractive;
 import dn.Process;
@@ -84,17 +85,13 @@ class MainMenu extends Process {
 
 		vertFlow.addSpacing(10);
 
-		// new TextButton("login", (_) -> {
-		// 	root.remove();
-		// 	root.removeChildren();
-		// 	this.destroy();
-		// 	Main.inst.startGameClient();
-		// }, vertFlow);
+		new TextButton("login", (_) -> {
+			destroy();
+			Main.inst.startGameClient();
+		}, vertFlow);
 
 		new TextButton("start demo (offline)", (_) -> {
-			root.remove();
-			root.removeChildren();
-			this.destroy();
+			destroy();
 			Main.inst.startGame();
 		}, vertFlow);
 
@@ -114,6 +111,8 @@ class MainMenu extends Process {
 		}, vertFlow);
 
 		// var but1 = new TextButton("Multiplayer", () -> {}, vertFlow);
+
+		Boot.inst.engine.backgroundColor = 0x000000;
 		onResize();
 	}
 
@@ -122,12 +121,15 @@ class MainMenu extends Process {
 	// }
 	override function onResize() {
 		super.onResize();
-		vertFlow.minHeight = socialFlow.minHeight = Std.int(Util.getS2dScaledHei());
-		vertFlow.minWidth = socialFlow.minWidth = Std.int(Util.getS2dScaledWid());
+		vertFlow.minHeight = socialFlow.minHeight = Std.int(Util.hScaled);
+		vertFlow.minWidth = socialFlow.minWidth = Std.int(Util.wScaled);
 	}
 
 	override function onDispose() {
 		super.onDispose();
+		root.remove();
+			root.removeChildren();
+			this.destroy();
 	}
 }
 
@@ -162,7 +164,7 @@ class OptionsMenu extends Object {
 	public function new(?parent, ?onRemove : Void -> Void) {
 		super(parent);
 		this.onRemoveEvent = onRemove;
-		var exitInteractive = new EventInteractive(Util.getS2dScaledWid(), Util.getS2dScaledHei(), this);
+		var exitInteractive = new EventInteractive(Util.wScaled, Util.hScaled, this);
 
 		exitInteractive.onClickEvent.add((_) -> {
 			remove();
@@ -196,6 +198,7 @@ class OptionsMenu extends Object {
 			Settings.nickname = nicknameInput.text;
 			Settings.saveSettings();
 		}
+
 		// nicknameInput.onKeyDown = function(e : Event) {
 		// 	if ( e.keyCode == Key.ENTER ) {
 		// 		Util.nickname = nicknameInput.text;
@@ -205,10 +208,11 @@ class OptionsMenu extends Object {
 		// }
 	}
 
+
 	override function sync(ctx : RenderContext) {
-		vertFlow.minHeight = Std.int(Util.getS2dScaledHei());
-		vertFlow.minWidth = Std.int(Util.getS2dScaledWid());
-		vertFlow.paddingTop = -Std.int(Util.getS2dScaledHei() / 4);
+		vertFlow.minHeight = Std.int(Util.hScaled);
+		vertFlow.minWidth = Std.int(Util.wScaled);
+		vertFlow.paddingTop = -Std.int(Util.hScaled / 4);
 		super.sync(ctx);
 
 		if ( Main.inst.ca.isPressed(SELECT) ) {

@@ -8,7 +8,6 @@ class Boot extends hxd.App {
 
 	public var renderer : CustomRenderer;
 
-	// Boot
 	static function main() {
 		new Boot();
 	}

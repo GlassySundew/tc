@@ -32,8 +32,8 @@ class Parallax extends Object {
 		mesh.material.mainPass.depth(false, LessEqual);
 
 		Main.inst.delayer.addF(() -> {
-			cameraX = Game.inst.camera.x;
-			cameraY = Game.inst.camera.y;
+			cameraX = Level.inst.game.camera.x;
+			cameraY = Level.inst.game.camera.y;
 		}, 1);
 		mesh.scale(.5);
 		mesh.alwaysSync = true;
@@ -67,13 +67,13 @@ class Parallax extends Object {
 
 	override function sync(ctx : RenderContext) {
 		super.sync(ctx);
-		var deltaX = Game.inst.camera.x - cameraX;
-		var deltaY = Game.inst.camera.y - cameraY;
+		var deltaX = Level.inst.game.camera.x - cameraX;
+		var deltaY = Level.inst.game.camera.y - cameraY;
 
 		mesh.tile.scrollDiscrete(deltaX * parallaxEffect.x, deltaY * parallaxEffect.y);
 		mesh.tile = mesh.tile;
 
-		cameraX = Game.inst.camera.x;
-		cameraY = Game.inst.camera.y;
+		cameraX = Level.inst.game.camera.x;
+		cameraY = Level.inst.game.camera.y;
 	}
 }

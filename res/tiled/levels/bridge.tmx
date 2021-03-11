@@ -52,7 +52,7 @@
   <object id="719" gid="78" x="529" y="409" width="60" height="50"/>
   <object id="733" gid="81" x="504" y="504" width="48" height="66">
    <properties>
-    <property name="to" type="file" value="alphamap.tmx"/>
+    <property name="to" type="file" value="ship_pascal.tmx"/>
    </properties>
   </object>
   <object id="734" gid="66" x="504" y="456" width="48" height="48"/>

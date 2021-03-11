@@ -6,7 +6,6 @@ import dn.Process;
 import en.player.Player;
 import hxd.Key;
 import tools.Settings;
-import ui.Window;
 
 @:publicFields
 class Main extends Process {
@@ -68,6 +67,7 @@ class Main extends Process {
 
 		onClose = new EventSignal0();
 		Settings.loadSettings();
+
 		onClose.add(() -> {
 			if ( Player.inst != null ) {
 				Settings.inventoryCoordRatio.x = Player.inst.ui.inventory.win.x / w();
@@ -109,7 +109,10 @@ class Main extends Process {
 
 	public function startGame() {
 		if ( Game.inst != null ) {
-			Game.inst.destroy();
+			delayer.addF(function() {
+				Game.inst.destroy();
+			}, 1);
+
 			new Game();
 		} else
 			new Game();
@@ -118,9 +121,9 @@ class Main extends Process {
 	public function startGameClient() {
 		if ( GameClient.inst != null ) {
 			GameClient.inst.destroy();
-			// delayer.addS(function() {
-			new GameClient();
-			// }, 0.1);
+			delayer.addF(function() {
+				new GameClient();
+			}, 0.1);
 		} else
 			new GameClient();
 	}
@@ -141,16 +144,5 @@ class Main extends Process {
 		// if ( ca.isKeyboardPressed(Key.M) ) Assets.toggleMusicPause();
 		// сделано наспех, итерирует по массиву ALL, скрывает первый видимый инстанс и выходит из цикла
 		super.update();
-		if ( Main.inst.ca.selectPressed() ) {
-			var zhopa = () -> {
-				for (i in Window.ALL) {
-					if ( i.win.visible ) {
-						i.toggleVisible();
-						return;
-					}
-				}
-			};
-			zhopa();
-		}
 	}
 }

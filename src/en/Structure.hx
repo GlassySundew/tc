@@ -1,5 +1,7 @@
 package en;
 
+import Level.StructTile;
+import hxbit.Serializer;
 import ui.InventoryGrid.CellGrid;
 import format.tmx.Data.TmxLayer;
 import format.tmx.Data.TmxObject;
@@ -15,6 +17,11 @@ class Structure extends Interactive {
 	public static var ALLplaceColliders = new Map<Structure, differ.shapes.Polygon>();
 
 	public function new(x : Float, y : Float, ?tmxObject : TmxObject, ?cdbEntry : StructuresKind) {
+		this.cdbEntry = cdbEntry;
+		super(x, y, tmxObject);
+	}
+
+	public override function init(?x : Float, ?z : Float, ?tmxObj : TmxObject) {
 		// CDB parsed entry corresponding to this structure instance class name
 		if ( cdbEntry == null ) try {
 			eregClass.match('$this'.toLowerCase());
@@ -37,9 +44,7 @@ class Structure extends Interactive {
 		}
 		catch( Dynamic ) {}
 
-		super(x, y, tmxObject);
-
-		this.cdbEntry = cdbEntry;
+		super.init(x, z, tmxObj);
 
 		#if !headless
 		// Нажатие для того, чтобы сломать структуру
@@ -69,6 +74,29 @@ class Structure extends Interactive {
 			}
 			#end
 		}
+	}
+
+	public function offsetFootByTile() {
+		footY += (StructTile.polyPrim != null ? StructTile.polyPrim.getBounds().zSize / 2 - Level.inst.data.tileHeight : 0);
+	}
+
+	@:keep
+	override function customSerialize(ctx : Serializer) {
+		ctx.addString('$cdbEntry');
+		super.customSerialize(ctx);
+	}
+
+	@:keep
+	override function customUnserialize(ctx : Serializer) {
+		var cdbString = ctx.getString();
+		if ( cdbEntry == null ) {
+			try {
+				cdbEntry = Data.structures.resolve(cdbString).id;
+			}
+			catch( e:Dynamic ) {}
+		}
+		
+		super.customUnserialize(ctx);
 	}
 
 	public function applyItem(item : Item) {

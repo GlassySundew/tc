@@ -31,7 +31,7 @@ class Camera extends dn.Process {
 	// public var hei(get, never):Int;
 
 	public function new() {
-		super(Game.inst);
+		super(Main.inst);
 		x = y = 0;
 		dx = dy = 0;
 		updateCamera(M.round(x), M.round(y));
@@ -52,19 +52,12 @@ class Camera extends dn.Process {
 		}
 		s3dCam.target.x = (x);
 		s3dCam.target.z = (y);
-		s3dCam.pos = s3dCam.target.add(new Vector(0, -(w() * 1) / (2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * (Math.PI / 180))), 0.001));
+		s3dCam.pos = s3dCam.target.add(new Vector(0, -(w() * 1) / (2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * (Math.PI / 180))), -0.001));
 	}
 
 	public inline function stopTracking() {
 		target = null;
 	}
-
-	// function get_wid() {
-	// 	return M.ceil(Game.inst.w() / Const.SCALE);
-	// }
-	// function get_hei() {
-	// 	return M.ceil(Game.inst.h() / Const.SCALE);
-	// }f
 
 	public function recenter() {
 		if ( target != null ) {
@@ -91,32 +84,7 @@ class Camera extends dn.Process {
 
 	override function postUpdate() {
 		super.postUpdate();
-		// for (i in 0...9)
 		if ( !ui.Console.inst.hasFlag("scroll") ) {
-			// var level = Game.inst.level;
-			// var scroller = Game.inst.scroller;
-
-			// // Update scroller
-			// if (wid < level.wid * Const.GRID_WIDTH)
-			// 	scroller.x = -x + wid * 0.5;p
-			// else
-			// 	scroller.x = wid * 0.5 - level.wid * 0.5 * Const.GRID_WIDTH;
-			// if (hei < level.hei * Const.GRID_HEIGHT)
-			// 	scroller.y = -y + hei * 0.5;
-			// else
-			// 	scroller.y = hei * 0.5 - level.hei * 0.5 * Const.GRID_HEIGHT;
-
-			// // Clamp
-			// if (wid < level.wid * Const.GRID_WIDTH)
-			// 	scroller.x = M.fclamp(scroller.x, wid - level.wid * Const.GRID_WIDTH, 0);
-			// if (hei < level.hei * Const.GRID_HEIGHT)
-			// 	scroller.y = M.fclamp(scroller.y, hei - level.hei * Const.GRID_HEIGHT, 0);
-
-			// // Shakes
-			// if (cd.has("shaking")) {
-			// 	scroller.x += Math.cos(ftime * 1.16) * 1 * Const.SCALE * shakePower * cd.getRatio("shaking");
-			// 	scroller.y += Math.sin(0.3 + ftime * 1.33) * 1 * Const.SCALE * shakePower * cd.getRatio("shaking");
-			// }
 			if ( target != null ) {
 				yMult = (M.fabs(target.dx) > 0.001 && M.fabs(target.dy) > 0.001) ? .5 : 1;
 				var s = 0.006;
@@ -142,6 +110,14 @@ class Camera extends dn.Process {
 
 			// x = M.round(x);
 			// y = M.round(y / yMult) * yMult;
+		}
+	}
+
+	override function onDispose() {
+		super.onDispose();
+		if ( parallax != null ) {
+			parallax.remove();
+			parallax = null;
 		}
 	}
 

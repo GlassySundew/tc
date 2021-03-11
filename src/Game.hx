@@ -1,3 +1,4 @@
+import tools.Save;
 import tools.Settings;
 import Level.StructTile;
 import cherry.soup.EventSignal.EventSignal0;
@@ -13,8 +14,12 @@ import h3d.scene.Object;
 import hxd.Key;
 import ui.Hud;
 
-class Game extends Process implements GameAble {
+class Game extends Process implements GameAble implements hxbit.Serializable {
 	public static var inst : Game;
+
+	public var network(get, never) : Bool;
+
+	inline function get_network() return false;
 
 	public var lvlName : String;
 	public var ca : dn.heaps.Controller.ControllerAccess;
@@ -34,6 +39,10 @@ class Game extends Process implements GameAble {
 
 	public var execAfterLvlLoad : EventSignal0;
 
+	public var suspended : Bool = false;
+	public var pauseCycle : Bool = false;
+	public var save : Save;
+
 	public function new() {
 		super(Main.inst);
 
@@ -44,8 +53,10 @@ class Game extends Process implements GameAble {
 
 		createRootInLayers(Main.inst.root, Const.DP_BG);
 
+		save = new Save("save/" + (Settings.saveFiles[0] == null ? "autosave" : Settings.saveFiles[0]));
+
 		camera = new Camera();
-		startLevel("alphamap.tmx");
+		startLevel("ship_pascal.tmx");
 	}
 
 	public function onCdbReload() {}
@@ -53,13 +64,13 @@ class Game extends Process implements GameAble {
 	public function nextLevel() {
 		/*
 			if (level.data.getStr("nextLevel") != "")
-				startLevel(level.data.getStr("nextLevel"));
-			else {
-				var ogmoProj = new ogmo.Project(hxd.Res.map.ld45, false);
+					startLevel(level.data.getStr("nextLevel"));
+				else {
+					var ogmoProj = new ogmo.Project(hxd.Res.map.ld45, false);
 				if (ogmoProj.getLevelByName("level" + (level.lid + 1)) == null)
-					startLevel("level" + level.lid);
-				else
-					startLevel("level" + (level.lid + 1));
+				startLevel("level" + level.lid);
+			else
+				startLevel("level" + (level.lid + 1));
 		}*/
 	}
 
@@ -150,7 +161,7 @@ class Game extends Process implements GameAble {
 						if ( (tile.objectGroup != null && eregClass.match('$ent'.toLowerCase()))
 							&& (((eregClass.matched(1) == eregFileName.matched(1) || ent.spr.groupName == eregFileName.matched(1))
 								&& tile.objectGroup.objects.length > 0
-								|| (Std.is(ent, SpriteEntity)
+								|| (Std.isOfType(ent, SpriteEntity)
 									&& eregFileName.matched(1) == ent.spr.groupName))) /*&& ent.collisions.length == 0*/ ) {
 							var centerSet = false;
 							for (obj in tile.objectGroup.objects) { // Засовываем объекты для детекта коллизий по Entity
@@ -169,7 +180,7 @@ class Game extends Process implements GameAble {
 								function getCenterPivot() : h3d.Vector {
 									var pivotX = ((obj.x + xCent)) / ent.spr.tile.width;
 									var pivotY = ((obj.y + yCent)) / ent.spr.tile.height;
-									pivotX = (ent.tmxObj != null && ent.tmxObj.flippedHorizontally) ? 1 - pivotX : pivotX;
+									// pivotX = (ent.tmxObj != null && ent.tmxObj.flippedHorizontally) ? 1 - pivotX : pivotX;
 									pivotY = (ent.tmxObj != null && ent.tmxObj.flippedVertically) ? 1 - pivotY : pivotY;
 									return new h3d.Vector(pivotX, pivotY);
 								}
@@ -212,10 +223,10 @@ class Game extends Process implements GameAble {
 										poly.rotation = -obj.rotation;
 
 										// vertical flipping
-										if ( ent.tmxObj != null && ent.tmxObj.flippedHorizontally ) poly.scaleX = -1;
+										// if ( ent.tmxObj != null && ent.tmxObj.flippedHorizontally ) poly.scaleX = -1;
 										if ( ent.tmxObj != null && ent.tmxObj.flippedVertically ) poly.scaleY = -1;
 
-										var xOffset = poly.scaleX < 0 ? ent.spr.tile.width - obj.x : obj.x;
+										var xOffset = /*poly.scaleX < 0 ? ent.spr.tile.width - obj.x :*/ obj.x;
 										var yOffset = -obj.y;
 										ent.collisions.set(poly, {cent : new h3d.Vector(xCent, -yCent), offset : new h3d.Vector(xOffset, yOffset)});
 									case OTPoint:
@@ -244,9 +255,9 @@ class Game extends Process implements GameAble {
 							try
 								cast(ent, Interactive).rebuildInteract()
 							catch( e:Dynamic ) {}
-							if ( ent.tmxObj != null && ent.tmxObj.flippedHorizontally && ent.mesh.isLong ) ent.mesh.flipX();
+							// if ( ent.tmxObj != null && ent.tmxObj.flippedHorizontally && ent.mesh.isLong ) ent.mesh.flipX();
 
-							if ( Std.is(ent, SpriteEntity) && tile.properties.exists("interactable") ) {
+							if ( Std.isOfType(ent, SpriteEntity) && tile.properties.exists("interactable") ) {
 								cast(ent, SpriteEntity).interactable = tile.properties.getBool("interactable");
 							}
 						}
@@ -268,7 +279,9 @@ class Game extends Process implements GameAble {
 
 	override function onDispose() {
 		super.onDispose();
+		inst = null;
 
+		if ( camera != null ) camera.destroy();
 		for (e in Entity.ALL) e.destroy();
 		gc();
 	}
@@ -280,24 +293,14 @@ class Game extends Process implements GameAble {
 	override function update() {
 		super.update();
 
+		pauseCycle = false;
+
 		// Updates
 		for (e in Entity.ALL) if ( !e.destroyed ) e.preUpdate();
 		for (e in Entity.ALL) if ( !e.destroyed ) e.update();
 		for (e in Entity.ALL) if ( !e.destroyed ) e.postUpdate();
 		for (e in Entity.ALL) if ( !e.destroyed ) e.frameEnd();
 		gc();
-
-		if ( !ui.Console.inst.isActive() && !ui.Modal.hasAny() ) {
-			// Exit
-			if ( ca.isKeyboardPressed(Key.X) ) if ( !cd.hasSetS("exitWarn", 3) ) trace(Lang.t._("Press X again to exit.")); else {
-				#if( debug && hl )
-				hxd.System.exit();
-				#else
-				destroy();
-				#end
-			}
-			if ( ca.selectPressed() ) restartLevel();
-		}
 	}
 
 	public function showStrTiles() {
@@ -306,6 +309,40 @@ class Game extends Process implements GameAble {
 
 	public function hideStrTiles() {
 		for (i in structTiles) i.visible = false;
+	}
+
+	public function suspendGame() {
+		if ( suspended ) return;
+
+		suspended = true;
+		dn.heaps.slib.SpriteLib.DISABLE_ANIM_UPDATES = true;
+
+		// Pause other process
+		for (p in Process.ROOTS) if ( p != this ) p.pause();
+
+		// Create mask
+		root.visible = true;
+		root.removeChildren();
+	}
+
+	public function resumeGame() {
+		if ( !suspended ) return;
+		dn.heaps.slib.SpriteLib.DISABLE_ANIM_UPDATES = false;
+
+		delayer.addF(function() {
+			root.visible = false;
+			root.removeChildren();
+		}, 1);
+		suspended = false;
+
+		for (p in Process.ROOTS) if ( p != this ) p.resume();
+	}
+
+	public function toggleGamePause() {
+		if ( suspended ) {
+			resumeGame();
+		} else
+			suspendGame();
 	}
 }
 

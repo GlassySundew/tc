@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="2020.11.25" orientation="isometric" renderorder="right-down" compressionlevel="0" width="24" height="24" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="665" nextobjectid="8830">
+<map version="1.4" tiledversion="2020.11.25" orientation="isometric" renderorder="right-down" compressionlevel="0" width="24" height="24" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="665" nextobjectid="8831">
  <tileset firstgid="1" source="alpha.tsx"/>
  <tileset firstgid="64" source="colls.tsx"/>
  <layer id="54" name="proto" width="24" height="24" opacity="0.58">
@@ -55,16 +55,13 @@
   <object id="8829" x="192" y="312" width="24" height="24"/>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="8634" gid="66" x="288" y="264" width="48" height="48"/>
-  <object id="8635" gid="83" x="240" y="288" width="48" height="36"/>
-  <object id="8636" gid="83" x="240" y="264" width="48" height="36"/>
+  <object id="8634" gid="66" x="312" y="240" width="48" height="48"/>
+  <object id="8635" gid="83" x="288" y="288" width="48" height="36"/>
   <object id="8692" gid="2147483724" x="288" y="192" width="48" height="77">
    <properties>
     <property name="to" type="file" value="bridge.tmx"/>
    </properties>
   </object>
-  <object id="8696" gid="83" x="240" y="240" width="48" height="36"/>
-  <object id="8804" gid="83" x="240" y="216" width="48" height="36"/>
-  <object id="8805" gid="2147483731" x="264" y="216" width="48" height="36"/>
+  <object id="8830" gid="2147483731" x="240" y="264" width="48" height="36"/>
  </objectgroup>
 </map>

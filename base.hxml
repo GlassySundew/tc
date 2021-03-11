@@ -15,6 +15,7 @@
 -lib oauth
 -lib random
 
+-D heaps_enable_hl_mp3
 -cp src.helper
 --macro Helper.init()
 

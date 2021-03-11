@@ -4,11 +4,12 @@ import en.player.Player;
 import h2d.Flow;
 import h2d.Interactive;
 import h2d.Object;
-import ui.player.Dragable;
+import ui.Dragable;
 
 class Window extends dn.Process {
 	public static var ALL : Array<Window> = [];
 
+	public var dragable : Dragable;
 	public var win : Object;
 	/**backdround sprite**/
 	var spr : HSprite;
@@ -55,21 +56,25 @@ class Window extends dn.Process {
 	/**create dragable area based on config**/
 	function createDragable(layerConf : String) {
 		var dragableConf = uiConf.get(layerConf).getObjectByName("dragable");
-		var dragable = new Dragable(dragableConf.width, dragableConf.height, (deltaX : Float, deltaY : Float) -> {
+		dragable = new Dragable(dragableConf.width, dragableConf.height, (deltaX : Float, deltaY : Float) -> {
 			win.x += deltaX;
 			win.y += deltaY;
 
+			Player.inst.ui.add(win, Const.DP_UI);
 			clampInScreen();
 			bringOnTopOfALL();
 		}, win);
+		delayer.addF(() -> {
+			dragable.onDrag.dispatch(0, 0);
+		}, 1);
 		dragable.x = dragableConf.x;
 		dragable.y = dragableConf.y;
 	}
 
 	function recenter() {
 		if ( spr != null ) {
-			win.x = Std.int((getS2dScaledWid() - spr.tile.width) / 2);
-			win.y = Std.int((getS2dScaledHei() - spr.tile.height) / 2);
+			win.x = Std.int((wScaled - spr.tile.width) / 2);
+			win.y = Std.int((hScaled - spr.tile.height) / 2);
 		}
 	}
 
@@ -93,7 +98,7 @@ class Window extends dn.Process {
 	public function clearWindow() {
 		win.removeChildren();
 	}
-	
+
 	// TODO
 	public static function centrizeTwoWins(win1 : Window, win2 : Window) {
 		if ( centrizerFlow != null ) {
@@ -108,9 +113,9 @@ class Window extends dn.Process {
 		centrizerFlow.x -= (win1.win.getSize().xMax + win2.win.getSize().xMax) / 4;
 
 		if ( centrizerFlow.paddingLeft + centrizerFlow.x < 0 ) centrizerFlow.paddingLeft += M.iabs(centrizerFlow.paddingLeft + Std.int(centrizerFlow.x));
-		if ( centrizerFlow.paddingLeft + centrizerFlow.x + (win1.win.getSize().xMax + win2.win.getSize().xMax) > Util.getS2dScaledWid() ) {
+		if ( centrizerFlow.paddingLeft + centrizerFlow.x + (win1.win.getSize().xMax + win2.win.getSize().xMax) > Util.wScaled ) {
 			centrizerFlow.paddingLeft -= Std.int(centrizerFlow.paddingLeft + centrizerFlow.x + (win1.win.getSize().xMax + win2.win.getSize().xMax)
-				- Util.getS2dScaledWid());
+				- Util.wScaled);
 		}
 
 		centrizerFlow.addChild(win1.win);

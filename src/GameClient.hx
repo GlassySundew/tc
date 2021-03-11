@@ -1,30 +1,23 @@
-import tools.Settings;
-import Message.PlayerInit;
-import Message.MapLoad;
-import cherry.soup.EventSignal.EventSignal0;
 import Level.StructTile;
-import h3d.scene.Object;
-import dn.Rand;
-import h3d.pass.PassList;
-import ui.Hud;
-import en.player.Player;
+import Message.MapLoad;
+import Message.PlayerInit;
+import cherry.soup.EventSignal.EventSignal0;
 import differ.math.Vector;
 import differ.shapes.Circle;
 import differ.shapes.Polygon;
-import h3d.scene.Scene;
-import h3d.scene.Mesh;
-import h3d.mat.Texture;
-import h3d.scene.CameraController;
 import dn.Process;
-import hxd.Key;
+import en.player.Player;
 import format.tmx.Data;
-import format.tmx.*;
-import hxd.Res;
+import h3d.scene.CameraController;
+import tools.Settings;
 
 class GameClient extends Process implements GameAble {
-	// static var HOST = "0.0.0.0";
-	static var HOST = "78.24.222.152";
+	static var HOST = "0.0.0.0";
+	// static var HOST = "78.24.222.152";
 	static var PORT = 6676;
+	public var network(get, never) : Bool;
+
+	inline function get_network() return false;
 
 	public static var inst : GameClient;
 
@@ -174,7 +167,7 @@ class GameClient extends Process implements GameAble {
 						if ( (tile.objectGroup != null && eregClass.match('$ent'.toLowerCase()))
 							&& ((eregClass.matched(1) == eregFileName.matched(1)
 								&& tile.objectGroup.objects.length > 0
-								|| (Std.is(ent, SpriteEntity)
+								|| (Std.isOfType(ent, SpriteEntity)
 									&& eregFileName.matched(1) == ent.spr.groupName))) /*&& ent.collisions.length == 0*/ ) {
 							var centerSet = false;
 							for (obj in tile.objectGroup.objects) { // Засовываем объекты для детекта коллизий по Entity
@@ -278,7 +271,7 @@ class GameClient extends Process implements GameAble {
 								cast(ent, Interactive).rebuildInteract()
 							catch( e:Dynamic ) {}
 							if ( ent.tmxObj != null && ent.tmxObj.flippedVertically && ent.mesh.isLong ) ent.mesh.flipX();
-							if ( Std.is(ent, SpriteEntity) && tile.properties.exists("interactable") ) {
+							if ( Std.isOfType(ent, SpriteEntity) && tile.properties.exists("interactable") ) {
 								cast(ent, SpriteEntity).interactable = tile.properties.getBool("interactable");
 							}
 						}
@@ -314,17 +307,6 @@ class GameClient extends Process implements GameAble {
 		for (e in Entity.ALL) if ( !e.destroyed ) e.frameEnd();
 		gc();
 
-		if ( !ui.Console.inst.isActive() && !ui.Modal.hasAny() ) {
-			// Exit
-			if ( ca.isKeyboardPressed(Key.X) ) if ( !cd.hasSetS("exitWarn", 3) ) trace(Lang.t._("Press X again to exit.")); else {
-				#if( debug && hl )
-				hxd.System.exit();
-				#else
-				destroy();
-				#end
-			}
-			// if (ca.selectPressed()) restartLevel();
-		}
 		host.flush();
 	}
 

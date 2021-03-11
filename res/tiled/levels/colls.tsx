@@ -72,11 +72,11 @@
  <tile id="12">
   <image width="48" height="77" source="separated/structures/door.png"/>
   <objectgroup draworder="index" id="3">
-   <object id="4" name="center" x="20" y="62">
-    <point/>
-   </object>
    <object id="3" x="2" y="65">
     <polygon points="0,0 24,-12 30,-9 6,3"/>
+   </object>
+   <object id="5" name="center" x="19" y="62">
+    <point/>
    </object>
   </objectgroup>
  </tile>
@@ -139,7 +139,7 @@
    <object id="1" x="33" y="51" rotation="180">
     <polygon points="0,-9 24,3 30,0 6,-12"/>
    </object>
-   <object id="2" name="center" x="21" y="54">
+   <object id="2" name="center" x="21" y="56">
     <point/>
    </object>
   </objectgroup>
@@ -147,8 +147,11 @@
  <tile id="19">
   <image width="48" height="36" source="separated/structures/chest.png"/>
   <objectgroup draworder="index" id="3">
-   <object id="2" x="9" y="27">
-    <polygon points="0,0 13,6 32,-4 19,-10"/>
+   <object id="2" x="9" y="26">
+    <polygon points="0,0 13,6 33,-4 20,-10"/>
+   </object>
+   <object id="3" name="center" x="26" y="24">
+    <point/>
    </object>
   </objectgroup>
  </tile>

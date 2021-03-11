@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "tiled/levels/ui.tmx",
+    "activeFile": "tiled/levels/ship_pascal.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "tiled"
+        "tiled",
+        "."
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
@@ -522,11 +522,11 @@
             }
         },
         "tiled/levels/bridge.tmx": {
-            "scale": 1.5,
+            "scale": 8,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 1200,
-                "y": 584
+                "x": 1192,
+                "y": 495.375
             }
         },
         "tiled/levels/colls.tsx": {
@@ -573,19 +573,27 @@
             }
         },
         "tiled/levels/server_test.tmx": {
-            "scale": 3,
+            "scale": 1,
             "selectedLayer": 7,
             "viewCenter": {
-                "x": 656.5,
-                "y": 288.8333333333333
+                "x": 618,
+                "y": 180
+            }
+        },
+        "tiled/levels/ship_pascal.tmx": {
+            "scale": 4,
+            "selectedLayer": 7,
+            "viewCenter": {
+                "x": 616.25,
+                "y": 277.5
             }
         },
         "tiled/levels/ui.tmx": {
-            "scale": 3,
+            "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 513,
-                "y": 302.5
+                "x": 500,
+                "y": 499.99999999999994
             }
         },
         "tiled/levels/ui.tsx": {
@@ -604,7 +612,7 @@
     "map.tileWidth": 48,
     "map.width": 100,
     "openFiles": [
-        "tiled/levels/alphamap.tmx",
+        "tiled/levels/ship_pascal.tmx",
         "tiled/levels/bridge.tmx",
         "tiled/levels/alpha.tsx",
         "tiled/levels/colls.tsx",
@@ -617,18 +625,18 @@
     "project": "res.tiled-project",
     "property.type": "file",
     "recentFiles": [
-        "tiled/levels/alphamap.tmx",
-        "tiled/levels/bridge.tmx",
-        "tiled/levels/alpha.tsx",
-        "tiled/levels/colls.tsx",
         "tiled/levels/asteroid.tmx",
         "tiled/levels/rules/rules.tmx",
         "tiled/levels/rules/rules1.tmx",
         "tiled/levels/ui.tsx",
         "tiled/levels/ui.tmx",
+        "tiled/levels/colls.tsx",
+        "tiled/levels/alpha.tsx",
+        "tiled/levels/bridge.tmx",
+        "tiled/levels/ship_pascal.tmx",
+        "tiled/levels/alphamap.tmx",
         "tiled/levels/items.tsx",
-        "tiled/levels/server_test.tmx",
-        "tiled/levels/rules.tmx"
+        "tiled/levels/server_test.tmx"
     ],
     "resizeMap.removeObjects": true,
     "tileset.embedInMap": false,

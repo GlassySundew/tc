@@ -9,8 +9,12 @@ import format.tmx.Data;
 import format.tmx.*;
 import hxd.Res;
 
-class GameServer extends Process {
+class GameServer extends Process implements GameAble {
 	public static var inst : GameServer;
+
+	public var network(get, never) : Bool;
+
+	inline function get_network() return false;
 
 	public var lvlName : String;
 	public var level : Level;
@@ -132,7 +136,7 @@ class GameServer extends Process {
 						if ( (tile.objectGroup != null && eregClass.match('$ent'.toLowerCase()))
 							&& ((eregClass.matched(1) == eregFileName.matched(1)
 								&& tile.objectGroup.objects.length > 0
-								|| (Std.is(ent, SpriteEntity)
+								|| (Std.isOfType(ent, SpriteEntity)
 									&& eregFileName.matched(1) == ent.spr.groupName))) /*&& ent.collisions.length == 0*/ ) {
 							var centerSet = false;
 							for (obj in tile.objectGroup.objects) { // Засовываем объекты для детекта коллизий по Entity

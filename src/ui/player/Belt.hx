@@ -1,13 +1,11 @@
 package ui.player;
 
-import ui.InventoryGrid.InventoryCell;
-import h2d.RenderContext;
 import en.player.Player;
-import h3d.Vector;
 import h2d.Flow;
 import h2d.Object;
-import h2d.Font;
+import h2d.RenderContext;
 import h2d.domkit.Style;
+import ui.InventoryGrid.InventoryCell;
 
 class Belt extends Object {
 	var player(get, null) : Player;
@@ -17,9 +15,10 @@ class Belt extends Object {
 	var centerFlow : Flow;
 	var style : Style;
 
-	var beltSlots : Array<BeltCont> = [];
+	public var beltSlots : Array<BeltCont> = [];
 
 	public var selectedCell : BeltCont;
+	public var selectedCellNumber : Int = 0;
 	public var invGrid : Array<InventoryCell>;
 
 	public function new(invGrid : Array<InventoryCell>, ?parent : h2d.Object) {
@@ -63,6 +62,7 @@ class Belt extends Object {
 	public function selectCell(number : Int = 1) {
 		deselectCells();
 		if ( player.holdItem == null || !player.holdItem.isInCursor() ) {
+			selectedCellNumber = number;
 			var cell = beltSlots[number - 1];
 			cell.beltSlot.backgroundTile = h2d.Tile.fromColor(0x6bace6, 1, 1, .58);
 			cell.beltSlotNumber.color = Color.intToVector(0xbabac8);
@@ -80,8 +80,8 @@ class Belt extends Object {
 	}
 
 	override function sync(ctx : RenderContext) {
-		centerFlow.minWidth = Std.int(getS2dScaledWid());
-		centerFlow.minHeight = Std.int(getS2dScaledHei());
+		centerFlow.minWidth = Std.int(wScaled);
+		centerFlow.minHeight = Std.int(hScaled);
 		super.sync(ctx);
 	}
 

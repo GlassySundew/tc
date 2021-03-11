@@ -36,9 +36,7 @@ import h3d.scene.Mesh;
 	**/
 	public var collisions : Map<Shape, {cent : Vector, offset : Vector}>;
 
-	var level(get, never) : Level;
-
-	inline function get_level() return Game.inst.level;
+	public var level : Level;
 
 	public var destroyed(default, null) = false;
 	public var tmod(get, never) : Float;
@@ -145,8 +143,9 @@ import h3d.scene.Mesh;
 		init(x, z, tmxObj);
 	}
 
-	function init(?x : Float, ?z : Float, ?tmxObj : Null<TmxObject>) {
-		ALL.push(this);
+	public function init(?x : Float, ?z : Float, ?tmxObj : Null<TmxObject>) {
+		if ( !ALL.contains(this) ) ALL.push(this);
+
 		collisions = new Map<Shape, {cent : Vector, offset : Vector}>();
 		cd = new dn.Cooldown(Const.FPS);
 		tw = new Tweenie(Const.FPS);
@@ -171,15 +170,25 @@ import h3d.scene.Mesh;
 		// mesh.material.mainPass.enableLights = false;
 		mesh.material.mainPass.depth(false, Less);
 		#end
+
 		// TODO semi-transparent shadow overlapping
 		// var s = new h3d.mat.Stencil();
 		// s.setFunc(LessEqual, 0);
 		// s.setOp(Keep, DecrementWrap, Keep);
 		// mesh.material.mainPass.stencil = s;
+
 		if ( x != null && z != null ) setFeetPos(x, z);
 
 		if ( tmxObj != null && tmxObj.flippedVertically ) spr.scaleY = -1;
-		if ( tmxObj != null && tmxObj.flippedHorizontally ) spr.scaleX = -1;
+		if ( tmxObj != null && tmxObj.flippedHorizontally ) {
+			// spr.scaleX = -1;
+			// flippedX = true;
+			Main.inst.delayer.addF(() -> {
+				flipX();
+			}, 0);
+		}
+
+		level = Level.inst;
 	}
 
 	public function alive() {}
@@ -235,6 +244,7 @@ import h3d.scene.Mesh;
 	}
 	/**Flips spr.scaleX, all of collision objects, and sorting rectangle**/
 	public function flipX() {
+		flippedX = !flippedX;
 		checkCollisions();
 		if ( collisions != null ) {
 			for (collObj in collisions.keys()) {
@@ -247,17 +257,19 @@ import h3d.scene.Mesh;
 
 		for (i in collisions.keys()) {
 			i.scaleX *= -1;
-			collisions.get(i).offset.x = i.scaleX < 0 ? spr.tile.width - i.x + 1 : i.x;
+			// collisions.get(i).offset.x = i.scaleX < 0 ? spr.tile.width - i.x : i.x;
+			collisions.get(i).offset.x *= -1;
+			collisions.get(i).offset.x += spr.tile.width;
 		}
 
 		spr.scaleX *= -1;
 		spr.pivot.centerFactorX = 1 - spr.pivot.centerFactorX;
 
+		footX += M.round((spr.pivot.centerFactorX - .5) * spr.tile.width);
 		mesh.xOff *= -1;
-		mesh.flipX();
-		footX += ((spr.pivot.centerFactorX - .5) * spr.tile.width);
+		if ( mesh.isLong ) mesh.flipX();
+		// footX += (spr.scaleX < 0 ? ((1 + spr.pivot.centerFactorX) * -spr.tile.width * .5) : ((spr.pivot.centerFactorX - .5) * spr.tile.width));
 
-		flippedX = !flippedX;
 		try {
 			cast(this, Interactive).interact.scaleX = spr.scaleX;
 		}
@@ -294,6 +306,23 @@ import h3d.scene.Mesh;
 			destroyed = true;
 			GC.push(this);
 		}
+	}
+
+	@:keep
+	public function customSerialize(ctx : hxbit.Serializer) {
+		ctx.addString(spr.groupName);
+		ctx.addInt(spr.frame);
+		ctx.addBool(flippedX);
+	}
+
+	@:keep
+	public function customUnserialize(ctx : hxbit.Serializer) {
+		init();
+		if ( spr != null ) spr.set(ctx.getString(), ctx.getInt());
+
+		level.game.applyTmxObjOnEnt(this);
+		if ( ctx.getBool() ) flipX();
+		offsetFootByCenterReversed();
 	}
 
 	public function networkAllow(op : hxbit.NetworkSerializable.Operation, propId : Int, clientSer : hxbit.NetworkSerializable) : Bool {
@@ -335,6 +364,11 @@ import h3d.scene.Mesh;
 	public function offsetFootByCenter() {
 		footX += ((spr.pivot.centerFactorX - .5) * spr.tile.width);
 		footY -= (spr.pivot.centerFactorY) * spr.tile.height - spr.tile.height;
+	}
+
+	public function offsetFootByCenterReversed() {
+		footX -= ((spr.pivot.centerFactorX - .5) * spr.tile.width);
+		footY += (spr.pivot.centerFactorY) * spr.tile.height - spr.tile.height;
 	}
 
 	public function kill(by : Null<Entity>) {
@@ -398,7 +432,10 @@ import h3d.scene.Mesh;
 			}
 		}
 		return collided;
+		#else
+		return false;
 		#end
+
 		// footX = (collisions[0].x);
 		// footY = (collisions[0].y);
 	}

@@ -42,19 +42,17 @@ class Cursors {
 		var defalutCur = new CustomCursor(bmpMap.get(Default), 0, 0, 0);
 		var handCur = new CustomCursor(bmpMap.get(Button), 0, 6, 2);
 		hxd.System.setCursor = function(cur : hxd.Cursor) {
-			if ( cur == Default ) {
-				// // Pressed (idk how to set)
-				// var sprCursor = Assets.ui.getBitmap("cursor", 1);
-				// sprCursor.scale(cursorScale);
-				// var tex = new Texture(Std.int(sprCursor.tile.width * cursorScale), Std.int(sprCursor.tile.height * cursorScale), [Target]);
-				// sprCursor.drawTo(tex);
-				// var pixels = tex.capturePixels();
-				// cursors.push(uploadPixels(pixels, new BitmapData(Std.int(sprCursor.tile.width * cursorScale), Std.int(sprCursor.tile.height * cursorScale))));
-				hxd.System.setNativeCursor(Custom(defalutCur));
-			} else if ( cur == Button ) {
-				hxd.System.setNativeCursor(Custom(handCur));
-			} else if ( cur == Hide ) {} else {
-				hxd.System.setNativeCursor(cur);
+			switch( cur ) {
+				case Default:
+					hxd.System.setNativeCursor(Custom(defalutCur));
+				case Button:
+					hxd.System.setNativeCursor(Custom(handCur));
+				case Hide:
+					trace("hiding");
+				case Callback(f):
+					f();
+				default:
+					hxd.System.setNativeCursor(cur);
 			}
 		}
 	}

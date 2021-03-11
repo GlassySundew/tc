@@ -1,5 +1,6 @@
 package tools;
 
+import cdb.Types.TilePos;
 import format.tmx.Data.TmxLayer;
 import format.tmx.Data.TmxMap;
 import format.tmx.Data.TmxObject;
@@ -30,6 +31,10 @@ class Util {
 	/** Регулярка чтобы взять из абсолютного пути название файла без расширения .png **/
 	static var eregFileName = ~/\/([a-z_0-9]+)\./;
 
+	inline static function loadTileFromCdb(cdbTile : TilePos) : Tile {
+		return Res.load(cdbTile.file).toTile().sub(cdbTile.x * cdbTile.size, cdbTile.y * cdbTile.size, cdbTile.size, cdbTile.size);
+	}
+
 	inline static function checkPolyClockwise(points : Array<Dynamic>) {
 		var pts = points.copy();
 		var sum = .0;
@@ -55,9 +60,13 @@ class Util {
 		return new Vector(screenToIsoX(globalX, globalY), screenToIsoY(globalX, globalY));
 	}
 
-	inline static function getS2dScaledWid() return (Boot.inst.s2d.width / Const.SCALE);
+	public static var wScaled(get, never) : Int;
 
-	inline static function getS2dScaledHei() return (Boot.inst.s2d.height / Const.SCALE);
+	inline static function get_wScaled() return Std.int(Boot.inst.s2d.width / Const.SCALE);
+
+	public static var hScaled(get, never) : Int;
+
+	inline static function get_hScaled() return Std.int(Boot.inst.s2d.height / Const.SCALE);
 
 	inline static function getTileFromSeparatedTsx(tile : TmxTilesetTile) : Tile {
 		// #if pak
@@ -122,10 +131,9 @@ class Util {
 
 	static var entParent : Scene;
 
-	public static var uiConf:Map<String, TmxLayer>;
+	public static var uiConf : Map<String, TmxLayer>;
 
 	public static var inventoryCoordRatio : Vector = new Vector(-1, -1);
-	
 }
 
 class TmxMapExtender {

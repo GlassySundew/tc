@@ -45,9 +45,9 @@ import h2d.Interactive;
 		return amount = v;
 	}
 
-	inline public function isInSlot() : Bool return Std.is(parent, h2d.Interactive);
+	inline public function isInSlot() : Bool return Std.isOfType(parent, h2d.Interactive);
 
-	inline public function isInCursor() : Bool return Std.is(parent, Scene);
+	inline public function isInCursor() : Bool return Std.isOfType(parent, Scene);
 
 	public function isInBelt() : Bool {
 		if ( Player.inst != null ) {

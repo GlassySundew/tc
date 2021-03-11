@@ -1,9 +1,7 @@
 package en.items;
 
 import Level.StructTile;
-import ui.s3d.EventInteractive;
 import cherry.soup.EventSignal.EventSignal1;
-import cherry.soup.EventSignal.EventSignal0;
 import h2d.Object;
 
 class Blueprint extends Item {
@@ -24,33 +22,36 @@ class Blueprint extends Item {
 				}
 			}
 		}
-		
+
 		onStructTileMove.add((tile) -> {
 			if ( ghostStructure != null ) {
-				ghostStructure.setFeetPos(tile.x,
-					tile.z + (StructTile.polyPrim != null ? StructTile.polyPrim.getBounds().zSize / 2 - Level.inst.data.tileHeight : 0));
+				ghostStructure.setFeetPos(tile.x, tile.z);
 				ghostStructure.offsetFootByCenter();
+				ghostStructure.offsetFootByTile();
 			}
 		});
 		onStructurePlace.add((tile) -> {
 			if ( ghostStructure.canBePlaced ) {
 				amount--;
-				var ent = Structure.fromCdbEntry(Std.int(tile.x),
-					Std.int(tile.z + (StructTile.polyPrim != null ? StructTile.polyPrim.getBounds().zSize / 2 - Level.inst.data.tileHeight : 0)),
-					Data.blueprints.get(blueprintScheme).structureId);
+				var ent = Structure.fromCdbEntry(Std.int(tile.x), Std.int(tile.z), Data.blueprints.get(blueprintScheme).structureId);
 				Level.inst.game.applyTmxObjOnEnt(ent);
 				if ( ghostStructure.flippedX ) ent.flipX();
+				ent.offsetFootByTile();
 			}
 		});
-		
+
 		onPlayerHold.add(() -> {
+			#if !headless
 			Level.inst.game.showStrTiles();
 			ghostStructure = new StructureGhost(Data.blueprints.get(blueprintScheme).structureId);
+			#end
 		});
 
 		onPlayerRemove.add(() -> {
+			#if !headless
 			Level.inst.game.hideStrTiles();
 			ghostStructure.destroy();
+			#end
 		});
 	}
 }

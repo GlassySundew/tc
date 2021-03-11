@@ -1,36 +1,34 @@
-import ch3.scene.TileSprite;
-import en.items.Blueprint;
-import en.structures.Chest;
-import en.structures.hydroponics.Hydroponics;
-import ui.s3d.EventInteractive;
-import hxd.IndexBuffer;
-import h3d.scene.Interactive;
-import h3d.col.Bounds;
-import en.player.Player;
-import h3d.prim.Grid;
-import h3d.mat.Material;
-import ch3.prim.PlanePrim;
 import differ.shapes.Polygon;
-import h3d.scene.Mesh;
-import h3d.Vector;
-import h2d.Tile;
-import h2d.Bitmap;
-import hxd.Res;
-import h3d.col.Point;
-import h3d.mat.Texture;
-import tiled.TileLayerRenderer;
-import h3d.scene.Object;
-import h3d.scene.CameraController;
-import tools.CPoint;
+import dn.Process;
+import en.items.Blueprint;
+import en.objs.IsoTileSpr;
+import en.player.Player;
 import format.tmx.*;
 import format.tmx.Data;
+import h2d.Bitmap;
+import h2d.Tile;
+import h3d.Vector;
+import h3d.col.Bounds;
+import h3d.col.Point;
+import h3d.mat.Texture;
+import h3d.scene.Interactive;
+import h3d.scene.Object;
+import hxd.IndexBuffer;
+import hxd.Res;
+import tiled.TileLayerRenderer;
+import tools.CPoint;
+import ui.s3d.EventInteractive;
 /**
 	Level parses tmx entities maps, renders tie layers into mesh
 **/
 class Level extends dn.Process {
 	public var game(get, never) : GameAble;
 
-	function get_game() : GameAble return Game.inst != null ? Game.inst : GameClient.inst;
+	#if !headless
+	function get_game() : GameAble return (Game.inst != null) ? Game.inst : GameClient.inst;
+	#elseif headless
+	function get_game() : GameAble return GameServer.inst;
+	#end
 
 	public static var inst : Level;
 
@@ -54,7 +52,7 @@ class Level extends dn.Process {
 	public var entities : Array<TmxObject> = [];
 	public var walkable : Array<Polygon> = [];
 	public var ground : Texture;
-	public var obj : TileSprite;
+	public var obj : IsoTileSpr;
 
 	var layersByName : Map<String, TmxLayer> = new Map();
 	/**
@@ -69,7 +67,7 @@ class Level extends dn.Process {
 	public var cursorInteract : Interactive;
 
 	public function new(map : TmxMap) {
-		super(Game.inst);
+		super(cast(game, Process));
 		inst = this;
 		// data = map;
 		data = map;
@@ -117,11 +115,11 @@ class Level extends dn.Process {
 		}
 	}
 
-	function get_lid() {
-		var reg = ~/[A-Z\-_.]*([0-9]+)/gi;
-		if ( !reg.match(Game.inst.lvlName) ) return -1; else
-			return Std.parseInt(reg.matched(1));
-	}
+	// function get_lid() {
+	// 	var reg = ~/[A-Z\-_.]*([0-9]+)/gi;
+	// 	if ( !reg.match(Game.inst.lvlName) ) return -1; else
+	// 		return Std.parseInt(reg.matched(1));
+	// }
 
 	override function onDispose() {
 		super.onDispose();
@@ -163,11 +161,11 @@ class Level extends dn.Process {
 		ground = new h3d.mat.Texture(data.width * data.tileWidth, data.height * data.tileHeight, [Target]);
 		ground.filter = Nearest;
 
-		obj = new TileSprite(Tile.fromTexture(ground), false, Boot.inst.s3d);
+		obj = new IsoTileSpr(Tile.fromTexture(ground), false, Boot.inst.s3d);
 		obj.alwaysSync = false;
 		obj.rotate(0, 0, M.toRad(90));
 
-		@:privateAccess obj.plane.oy -= ground.height;
+		@:privateAccess obj.z += ground.height;
 		obj.material.shadows = false;
 		obj.material.mainPass.enableLights = false;
 		obj.material.mainPass.depth(false, LessEqual);
@@ -210,6 +208,7 @@ class Level extends dn.Process {
 				default:
 			}
 		}
+
 		// Хуйня чтобы получать 3d координаты курсора
 		{
 			var bounds = new Bounds();
@@ -338,6 +337,7 @@ private class InternalRender extends TileLayerRenderer {
 
 		// Это говнище должно быть visible только тогда, когда у игрока в holdItem есть blueprint
 		var ereg = ~/\/([a-z_0-9]+)\./; // regexp to take picture name between last / and . from picture path
+		#if !headless
 		if ( ereg.match(sourceTile.image.source)
 			&& StringTools.endsWith(ereg.matched(1),
 				"floor") ) Level.inst.game.structTiles.push(new StructTile(bmp.x + Level.inst.data.tileWidth / 2,
@@ -349,6 +349,7 @@ private class InternalRender extends TileLayerRenderer {
 
 		g.clear();
 		g.drawTile(0, 0, Tile.fromTexture(tex));
+		#end
 	}
 
 	override function renderIsoTiles(ox : Float, y : Float, tiles : Array<TmxTile>, width : Int, height : Int) {
@@ -391,6 +392,7 @@ class StructTile extends Object {
 
 	override function new(x : Float, y : Float, ?parent : Object) {
 		super(parent);
+		#if !headless
 		if ( polyPrim == null ) initPolygon();
 		tile = new EventInteractive(polyPrim.getCollider(), this);
 		tile.rotate(-0.01, 0, hxd.Math.degToRad(180));
@@ -411,7 +413,7 @@ class StructTile extends Object {
 				cast(Player.inst.holdItem, Blueprint).onStructurePlace.dispatch(this);
 			}
 		});
-
+		#end
 		#if debug
 		// var prim = new h3d.prim.Cube();
 
@@ -433,7 +435,7 @@ class StructTile extends Object {
 		#end
 	}
 
-	function initPolygon() {
+	public function initPolygon() {
 		var pts : Array<Point> = [];
 		pts.push(new Point(tileW / 2, 0, 0));
 		pts.push(new Point(0, 0, -tileH / 2));

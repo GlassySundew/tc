@@ -4,275 +4,282 @@ size: 1920, 640
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
-asteroi1
+asteroid0
   rotate: false
   xy: 0, 0
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-asteroi2
+asteroid1
   rotate: false
   xy: 160, 0
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-asteroi3
+asteroid2
   rotate: false
   xy: 320, 0
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-asteroid0
+asteroid3
   rotate: false
   xy: 480, 0
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-caret0
+body_selected
   rotate: false
   xy: 640, 0
-  size: 4, 10
-  orig: 4, 10
+  size: 32, 32
+  orig: 32, 32
   offset: 0, 0
   index: -1
-caret1
+caret0
   rotate: false
   xy: 800, 0
   size: 4, 10
   orig: 4, 10
   offset: 0, 0
   index: -1
-close_button_inventory0
+caret1
   rotate: false
   xy: 960, 0
-  size: 12, 12
-  orig: 12, 12
+  size: 4, 10
+  orig: 4, 10
   offset: 0, 0
   index: -1
-close_button_inventory1
+close_button_inventory0
   rotate: false
   xy: 1120, 0
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
-close_button_inventory2
+close_button_inventory1
   rotate: false
   xy: 1280, 0
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
-craft_but0
+close_button_inventory2
   rotate: false
   xy: 1440, 0
-  size: 16, 16
-  orig: 16, 16
+  size: 12, 12
+  orig: 12, 12
   offset: 0, 0
   index: -1
-craft_but1
+craft_but0
   rotate: false
   xy: 1600, 0
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-craft_but2
+craft_but1
   rotate: false
   xy: 1760, 0
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-crafting
+craft_but2
   rotate: false
   xy: 0, 160
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+crafting
+  rotate: false
+  xy: 160, 160
   size: 134, 127
   orig: 134, 127
   offset: 0, 0
   index: -1
 cursor0
   rotate: false
-  xy: 160, 160
+  xy: 320, 160
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cursor1
   rotate: false
-  xy: 320, 160
+  xy: 480, 160
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 cursor2
   rotate: false
-  xy: 480, 160
+  xy: 640, 160
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 discord0
   rotate: false
-  xy: 640, 160
+  xy: 800, 160
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 discord1
   rotate: false
-  xy: 800, 160
+  xy: 960, 160
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 discord2
   rotate: false
-  xy: 960, 160
+  xy: 1120, 160
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 health_caret
   rotate: false
-  xy: 1120, 160
+  xy: 1280, 160
   size: 3, 12
   orig: 3, 12
   offset: 0, 0
   index: -1
 health_line
   rotate: false
-  xy: 1280, 160
+  xy: 1440, 160
   size: 1, 12
   orig: 1, 12
   offset: 0, 0
   index: -1
 health_sign
   rotate: false
-  xy: 1440, 160
+  xy: 1600, 160
   size: 34, 20
   orig: 34, 20
   offset: 0, 0
   index: -1
 inventory
   rotate: false
-  xy: 1600, 160
+  xy: 1760, 160
   size: 114, 124
   orig: 114, 124
   offset: 0, 0
   index: -1
 keyboard_icon0
   rotate: false
-  xy: 1760, 160
+  xy: 0, 320
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 keyboard_icon1
   rotate: false
-  xy: 0, 320
+  xy: 160, 320
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 navigation
   rotate: false
-  xy: 160, 320
+  xy: 320, 320
   size: 160, 160
   orig: 160, 160
   offset: 0, 0
   index: -1
 oxygen_scale
   rotate: false
-  xy: 320, 320
+  xy: 480, 320
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 oxygen_sign
   rotate: false
-  xy: 480, 320
+  xy: 640, 320
   size: 34, 20
   orig: 34, 20
   offset: 0, 0
   index: -1
 recipe
   rotate: false
-  xy: 640, 320
+  xy: 800, 320
   size: 106, 20
   orig: 106, 20
   offset: 0, 0
   index: -1
 recipe_comp
   rotate: false
-  xy: 800, 320
+  xy: 960, 320
   size: 98, 20
   orig: 98, 20
   offset: 0, 0
   index: -1
 recipe_hint
   rotate: false
-  xy: 960, 320
+  xy: 1120, 320
   size: 104, 25
   orig: 104, 25
   offset: 0, 0
   index: -1
 travel_but0
   rotate: false
-  xy: 1120, 320
+  xy: 1280, 320
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 travel_but1
   rotate: false
-  xy: 1280, 320
+  xy: 1440, 320
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 twitter0
   rotate: false
-  xy: 1440, 320
+  xy: 1600, 320
   size: 36, 32
   orig: 36, 32
   offset: 0, 0
   index: -1
 twitter1
   rotate: false
-  xy: 1600, 320
+  xy: 1760, 320
   size: 36, 32
   orig: 36, 32
   offset: 0, 0
   index: -1
 twitter2
   rotate: false
-  xy: 1760, 320
+  xy: 0, 480
   size: 36, 32
   orig: 36, 32
   offset: 0, 0
   index: -1
 vk0
   rotate: false
-  xy: 0, 480
+  xy: 160, 480
   size: 42, 28
   orig: 42, 28
   offset: 0, 0
   index: -1
 vk1
   rotate: false
-  xy: 160, 480
+  xy: 320, 480
   size: 42, 28
   orig: 42, 28
   offset: 0, 0
   index: -1
 vk2
   rotate: false
-  xy: 320, 480
+  xy: 480, 480
   size: 42, 30
   orig: 42, 30
   offset: 0, 0

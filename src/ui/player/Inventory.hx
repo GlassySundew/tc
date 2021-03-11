@@ -36,11 +36,11 @@ class Inventory extends Window {
 	public var invGrid : CellGrid;
 	public var containmentEntity : Entity;
 
-	public function new( ?invGrid : CellGrid, ?parent : Object) {
+	public function new(?invGrid : CellGrid, ?parent : Object) {
 		spr = new HSprite(Assets.ui);
 		spr.set("inventory");
-		
-		super( parent);
+
+		super(parent);
 		ALL.push(this);
 		this.invGrid = invGrid;
 
@@ -61,13 +61,14 @@ class Inventory extends Window {
 		createCloseBut("inventory");
 		recenter();
 		toggleVisible();
+		bringOnTopOfALL();
 	}
 
 	public override function bringOnTopOfALL() {
 		super.bringOnTopOfALL();
 
-			ALL.remove(this);
-			ALL.unshift(this);
+		ALL.remove(this);
+		ALL.unshift(this);
 	}
 
 	override function toggleVisible() {

@@ -1,8 +1,8 @@
 package ui.player;
 
+import en.player.PlayerState.StatName;
 import h2d.Mask;
 import h2d.Object;
-import en.player.PlayerState.StatName;
 
 class StatView extends Object {
 	var stat:StatName;

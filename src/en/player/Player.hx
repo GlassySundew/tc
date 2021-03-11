@@ -1,28 +1,24 @@
 package en.player;
 
+import hxbit.Serializer;
+import ch3.scene.TileSprite;
 import en.items.Blueprint;
-import ui.InventoryGrid.CellGrid;
+import format.tmx.Data.TmxObject;
 import h2d.Tile;
 import h3d.mat.Texture;
-import ch3.scene.TileSprite;
-import h3d.scene.Mesh;
-import ui.TextLabel;
-import h2d.Text;
-import hxd.System;
 import hxbit.NetworkSerializable;
-import dn.Process;
-import h2d.Scene;
-import hxd.Window;
-import ui.player.PlayerUI;
-import ui.player.Inventory;
-import en.objs.IsoTileSpr;
 import hxd.Key;
-import en.items.GraviTool;
-import format.tmx.Data.TmxObject;
-import differ.Collision;
+import ui.InventoryGrid.CellGrid;
+import ui.PauseMenu;
+import ui.TextLabel;
+import ui.Window;
+import ui.player.Inventory;
+import ui.player.PlayerUI;
 
 class Player extends Entity {
 	public static var inst : Player;
+
+	public var state : PlayerState;
 
 	var nicknameMesh : TileSprite;
 
@@ -32,7 +28,7 @@ class Player extends Entity {
 	public var ui : PlayerUI;
 	public var invGrid : CellGrid;
 
-	var ca : dn.heaps.Controller.ControllerAccess;
+	public var ca : dn.heaps.Controller.ControllerAccess;
 
 	public var holdItem(default, set) : en.Item;
 
@@ -41,11 +37,10 @@ class Player extends Entity {
 		if ( v == null ) {
 			for (i in Inventory.ALL) i.invGrid.disableGrid();
 		}
-		if ( v != null ) {
+		if ( v != null && !v.isInBelt() ) {
 			v.onPlayerHold.dispatch();
 			Boot.inst.s2d.addChild(v);
 			v.scaleX = v.scaleY = 2;
-			// inventory.invGrid.enableGrid();
 		}
 		return holdItem = v;
 	}
@@ -56,26 +51,6 @@ class Player extends Entity {
 		inst = this;
 
 		super(x, z, tmxObj);
-	}
-
-	override function set_netX(v : Float) : Float {
-		if ( inst != this ) {
-			footX = v;
-		}
-		return super.set_netX(v);
-	}
-
-	override function set_netY(v : Float) : Float {
-		if ( inst != this ) {
-			footY = v;
-		}
-		return super.set_netY(v);
-	}
-
-	override public function networkAllow(op : hxbit.NetworkSerializable.Operation, propId : Int, clientSer : hxbit.NetworkSerializable) : Bool {
-		// trace(clientSer == this && this == inst);
-		// var player = cast(clientSer, Player);
-		return clientSer == this;
 	}
 
 	override function init(?x : Float, ?z : Float, ?tmxObj : TmxObject) {
@@ -103,7 +78,7 @@ class Player extends Entity {
 		#if !headless
 		// public var invGrid : InventoryGrid;
 
-		ui = new PlayerUI(Main.inst.root);
+		if ( inst == this ) ui = new PlayerUI(Main.inst.root);
 
 		mesh.isLong = true;
 		mesh.isoWidth = mesh.isoHeight = 0;
@@ -120,6 +95,35 @@ class Player extends Entity {
 		#if headless
 		enableReplication = true;
 		#end
+	}
+
+	override function set_netX(v : Float) : Float {
+		if ( inst != this ) {
+			footX = v;
+		}
+		return super.set_netX(v);
+	}
+
+	override function set_netY(v : Float) : Float {
+		if ( inst != this ) {
+			footY = v;
+		}
+		return super.set_netY(v);
+	}
+
+	override function customSerialize(ctx : Serializer) {
+		super.customSerialize(ctx);
+	}
+
+	override function customUnserialize(ctx : Serializer) {
+		super.customUnserialize(ctx);
+		trace(this);
+	}
+
+	override public function networkAllow(op : hxbit.NetworkSerializable.Operation, propId : Int, clientSer : hxbit.NetworkSerializable) : Bool {
+		// trace(clientSer == this && this == inst);
+		// var player = cast(clientSer, Player);
+		return clientSer == this;
 	}
 
 	override public function alive() {
@@ -170,14 +174,17 @@ class Player extends Entity {
 		#if !headless
 		inst = null;
 		ui.remove();
+
 		ui = null;
 		if ( nicknameMesh != null ) {
 			nicknameMesh.remove();
 			nicknameMesh = null;
 		}
+		holdItem = null;
 		#end
 	}
 
+	// multiplayer
 	function syncFrames() {
 		if ( sprFrame != null ) {
 			if ( spr.frame != sprFrame.frame || spr.groupName != sprFrame.group ) {
@@ -222,6 +229,7 @@ class Player extends Entity {
 
 	override function postUpdate() {
 		super.postUpdate();
+		#if !headless
 		if ( this == inst && !isLocked() && ui != null ) checkBeltInputs();
 		// if (Key.isPressed(Key.E)) {
 		// 	new FloatingItem(mesh.x, mesh.z, new GraviTool());
@@ -231,6 +239,7 @@ class Player extends Entity {
 				cast(holdItem, Blueprint).ghostStructure.flipX();
 			}
 		}
+		#end
 	}
 
 	override function checkCollisions() {
@@ -253,8 +262,33 @@ class Player extends Entity {
 		if ( Key.isPressed(Key.NUMBER_4) ) ui.belt.selectCell(4);
 		if ( Key.isPressed(Key.NUMBER_5) ) ui.belt.selectCell(5);
 
-		if ( ca.isKeyboardPressed(Key.MOUSE_WHEEL_DOWN) ) {}
-		if ( ca.isKeyboardPressed(Key.MOUSE_WHEEL_UP) ) {}
+		// Wheel scroll item selection
+		var cellToSelect = ui.belt.selectedCellNumber;
+		if ( ca.isKeyboardPressed(Key.MOUSE_WHEEL_DOWN) ) cellToSelect++;
+		if ( ca.isKeyboardPressed(Key.MOUSE_WHEEL_UP) ) cellToSelect--;
+		if ( cellToSelect != ui.belt.selectedCellNumber ) {
+			if ( cellToSelect < 1 ) cellToSelect = ui.belt.beltSlots.length;
+			if ( cellToSelect > ui.belt.beltSlots.length ) cellToSelect = 1;
+			ui.belt.selectCell(cellToSelect);
+		}
+
+		if ( ca.selectPressed() ) {
+			var hiddenTopWindow : Void -> Bool = () -> {
+				for (i in Window.ALL) {
+					if ( i.win.visible ) {
+						i.toggleVisible();
+						return true;
+					}
+				}
+				return false;
+			};
+
+			if ( !hiddenTopWindow() && !Game.inst.pauseCycle ) {
+				Game.inst.pause();
+				new PauseMenu();
+				Game.inst.pauseCycle = true;
+			}
+		}
 
 		if ( ca.yPressed() ) {
 			if ( holdItem != null && !holdItem.isDisposed ) {

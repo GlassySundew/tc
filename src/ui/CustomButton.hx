@@ -45,7 +45,7 @@ class CustomButton extends EventInteractive {
 
 	override public function addChildAt(s : Object, pos : Int) {
 		super.addChildAt(s, pos);
-		if ( Std.is(s, IButtonStateView) ) {
+		if ( Std.isOfType(s, IButtonStateView) ) {
 			var v : IButtonStateView = cast s;
 			if ( views.indexOf(v) == -1 ) views.push(v);
 		}

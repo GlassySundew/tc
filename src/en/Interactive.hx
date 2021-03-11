@@ -25,7 +25,7 @@ class Interactive extends Entity {
 		if ( !v ) {
 			turnOffHighlight();
 			if ( buttonIcon != null ) buttonIcon.dispose();
-			interact.cursor = Default;
+			if ( interact != null ) interact.cursor = Default;
 		}
 		return interactable = v;
 	}
@@ -47,6 +47,10 @@ class Interactive extends Entity {
 
 	function new(?x : Float = 0, ?z : Float = 0, ?tmxObj : TmxObject) {
 		super(x, z, tmxObj);
+	}
+
+	public override function init(?x : Float, ?z : Float, ?tmxObj : TmxObject) {
+		super.init(x, z, tmxObj);
 		if ( inv == null ) inv = new CellGrid(4, 4);
 		#if !headless
 		var pixels = Pixels.fromBytes(tex.capturePixels().bytes, Std.int(spr.tile.width), Std.int(spr.tile.height));
@@ -94,17 +98,21 @@ class Interactive extends Entity {
 	}
 
 	public function turnOnHighlight() {
-		spr.filter = filter;
-		filter.enable = true;
-		cd.setS("keyboardIconInit", .4);
-		cd.setS("interacted", Const.INFINITE);
+		if ( cd != null ) {
+			spr.filter = filter;
+			filter.enable = true;
+			cd.setS("keyboardIconInit", .4);
+			cd.setS("interacted", Const.INFINITE);
+		}
 	}
 
 	public function turnOffHighlight() {
-		cd.unset("interacted");
-		spr.filter = null;
-		filter.enable = false;
-		if ( buttonIcon != null ) buttonIcon.dispose();
+		if ( cd != null ) {
+			cd.unset("interacted");
+			spr.filter = null;
+			filter.enable = false;
+			if ( buttonIcon != null ) buttonIcon.dispose();
+		}
 	}
 
 	override function postUpdate() {
@@ -113,7 +121,6 @@ class Interactive extends Entity {
 		// }
 		// deactivate interactive if inventory is opened
 		updateInteract();
-		
 	}
 
 	function updateInteract() {
@@ -125,13 +132,13 @@ class Interactive extends Entity {
 
 	function updateKeyIcon() {
 		if ( !cd.has("keyboardIconInit") && cd.has("interacted") ) {
-			var pos = Boot.inst.s3d.camera.project(mesh.x, 0, mesh.z, getS2dScaledWid(), getS2dScaledHei());
+			var pos = Boot.inst.s3d.camera.project(mesh.x, 0, mesh.z, wScaled, hScaled);
 			cd.unset("interacted");
 			buttonIcon = new ButtonIcon(pos.x, pos.y);
 			tw.createS(buttonIcon.container.icon.alpha, 0 > 1, TEaseIn, .4);
 		}
 		if ( buttonIcon != null ) {
-			var pos = Boot.inst.s3d.camera.project(mesh.x, 0, mesh.z, getS2dScaledWid(), getS2dScaledHei());
+			var pos = Boot.inst.s3d.camera.project(mesh.x, 0, mesh.z, wScaled, hScaled);
 
 			buttonIcon.centerFlow.x = pos.x - 1;
 			buttonIcon.centerFlow.y = pos.y - 100 / Const.SCALE;
