@@ -17,7 +17,7 @@ import hxd.Res;
 import hxd.res.Any;
 import hxd.res.Loader;
 
-// using Util.LoaderExtender;
+using Util.LoaderExtender;
 
 @:publicFields
 @:expose
@@ -70,9 +70,9 @@ class Util {
 
 	inline static function getTileFromSeparatedTsx(tile : TmxTilesetTile) : Tile {
 		// #if pak
-		// return Res.loader.loadParentalFix(Const.LEVELS_PATH + tile.image.source).toTile();
+		return Res.loader.loadParentalFix(Const.LEVELS_PATH + tile.image.source).toTile();
 		// #else
-		return Res.loader.load(Const.LEVELS_PATH + tile.image.source).toTile();
+		// return Res.loader.load(Const.LEVELS_PATH + tile.image.source).toTile();
 		// #end
 	}
 
@@ -98,7 +98,7 @@ class Util {
 		var tsx = new Map();
 		var r = new Reader();
 		r.resolveTSX = getTsx(tsx, r);
-		var tmx = r.read(Xml.parse(Res.loader.load(Const.LEVELS_PATH + lvlName).entry.getText()));
+		var tmx = r.read(Xml.parse(Res.loader.load(Const.LEVELS_PATH + lvlName + (StringTools.endsWith(lvlName, ".tmx") ? "" : ".tmx")).entry.getText()));
 		return tmx;
 	}
 

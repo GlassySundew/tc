@@ -1,3 +1,5 @@
+import h3d.Engine;
+import hxd.Window;
 import h2d.Scene;
 import hxd.inspect.Inspector;
 
@@ -37,6 +39,7 @@ class Boot extends hxd.App {
 		#if( castle && hl && debug )
 		inspector = new hxd.inspect.Inspector(s3d);
 		#end
+
 	}
 
 	override function onResize() {
@@ -47,6 +50,7 @@ class Boot extends hxd.App {
 	var speed = 1.0;
 
 	override function update(deltaTime : Float) {
+
 		// Bullet time
 		#if debug
 		if ( hxd.Key.isPressed(hxd.Key.NUMPAD_SUB) ) speed = speed >= 1 ? 0.33 : 1;

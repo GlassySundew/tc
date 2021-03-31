@@ -59,8 +59,7 @@ class Window extends dn.Process {
 		dragable = new Dragable(dragableConf.width, dragableConf.height, (deltaX : Float, deltaY : Float) -> {
 			win.x += deltaX;
 			win.y += deltaY;
-
-			Player.inst.ui.add(win, Const.DP_UI);
+			if ( Player.inst != null ) Player.inst.ui.add(win, Const.DP_UI);
 			clampInScreen();
 			bringOnTopOfALL();
 		}, win);

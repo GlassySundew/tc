@@ -31,7 +31,7 @@ class Camera extends dn.Process {
 	// public var hei(get, never):Int;
 
 	public function new() {
-		super(Main.inst);
+		super(Game.inst);
 		x = y = 0;
 		dx = dy = 0;
 		updateCamera(M.round(x), M.round(y));

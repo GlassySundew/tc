@@ -1,4 +1,8 @@
+import haxe.Unserializer;
 import tools.Save;
+import ui.PauseMenu;
+import hxbit.Serializer;
+// import tools.Save;
 import tools.Settings;
 import Level.StructTile;
 import cherry.soup.EventSignal.EventSignal0;
@@ -41,7 +45,6 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 
 	public var suspended : Bool = false;
 	public var pauseCycle : Bool = false;
-	public var save : Save;
 
 	public function new() {
 		super(Main.inst);
@@ -53,10 +56,7 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 
 		createRootInLayers(Main.inst.root, Const.DP_BG);
 
-		save = new Save("save/" + (Settings.saveFiles[0] == null ? "autosave" : Settings.saveFiles[0]));
-
 		camera = new Camera();
-		startLevel("ship_pascal.tmx");
 	}
 
 	public function onCdbReload() {}
@@ -78,7 +78,23 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 		// startLevel(lvlName);
 	}
 
+	// по сути workaround, т.к. надо, чтобы тайлы сохранялись отдельно, вместо .tmx файла целиком
+	// public function loadLevel(resolvedMap:) {
+	// 	engine.clear(0, 1);
+	// }
+
 	public function startLevel(name : String) {
+		// var cachedLevel = Save.inst.getCachedLevelByName(name.split(".")[0]);
+		// if ( cachedLevel != null ) {
+		// Save.inst.spawnLevelFromCache(cachedLevel);
+		// } else {
+		tmxMap = resolveMap(name);
+		startLevelFromParsedTmx(tmxMap, name);
+		// }
+	}
+
+	public function startLevelFromParsedTmx(tmxMap : TmxMap, name : String) {
+		this.tmxMap = tmxMap;
 		engine.clear(0, 1);
 		execAfterLvlLoad = new EventSignal0();
 
@@ -87,10 +103,9 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 			for (e in Entity.ALL) e.destroy();
 			gc();
 		}
-		tmxMap = resolveMap(name);
 
 		level = new Level(tmxMap);
-		lvlName = name.split('.')[0];
+		level.lvlName = lvlName = name.split('.')[0];
 
 		// Entity spawning
 		CompileTime.importPackage("en");
@@ -130,23 +145,16 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 
 		player = Player.inst;
 
-		camera.target = player;
-		camera.recenter();
+		targetCameraOnPlayer();
 
 		delayer.addF(() -> {
 			hideStrTiles();
-		}, 1);
+		}, 2);
+	}
 
-		// System.openURL("https://pornreactor.cc");
-
-		// rect-obj position fix
-
-		// for (en in Entity.ALL)
-		// 	if (en.tmxObj != null)
-		// 		en.footY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
-
-		// new AxesHelper(Boot.inst.s3d);
-		// new GridHelper(Boot.inst.s3d, 10, 10);
+	public function targetCameraOnPlayer() {
+		camera.target = player;
+		camera.recenter();
 	}
 
 	public function applyTmxObjOnEnt(?ent : Null<Entity>) {
@@ -252,8 +260,9 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 									}
 								}
 							}
-							try
-								cast(ent, Interactive).rebuildInteract()
+							try {
+								cast(ent, Interactive).rebuildInteract();
+							}
 							catch( e:Dynamic ) {}
 							// if ( ent.tmxObj != null && ent.tmxObj.flippedHorizontally && ent.mesh.isLong ) ent.mesh.flipX();
 
@@ -270,7 +279,7 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 		execAfterLvlLoad.removeAll();
 	}
 
-	function gc() {
+	public function gc() {
 		if ( Entity.GC == null || Entity.GC.length == 0 ) return;
 
 		for (e in Entity.GC) e.dispose();
@@ -284,6 +293,8 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 		if ( camera != null ) camera.destroy();
 		for (e in Entity.ALL) e.destroy();
 		gc();
+
+		if ( PauseMenu.inst != null ) PauseMenu.inst.destroy();
 	}
 
 	public override function onResize() {

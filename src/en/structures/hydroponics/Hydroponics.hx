@@ -9,7 +9,6 @@ import en.objs.IsoTileSpr;
 import h3d.Vector;
 import format.tmx.Data.TmxObject;
 import hxd.Key in K;
-
 /** Использует inv как хранилище для растений **/
 class Hydroponics extends Structure {
 	public function new(?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : StructuresKind) {
@@ -24,10 +23,11 @@ class Hydroponics extends Structure {
 		interactable = true;
 
 		// inv.giveItem(new en.Item(axe));
-
-		// inv.giveItem(new en.Item(plant), this, true, false);
-		// inv.giveItem(new en.Item(plant), this, true, false);
-		// inv.giveItem(new en.Item(plant), this, true, false);
+		#if debug
+		inv.giveItem(new en.Item(plant), this, true, false);
+		inv.giveItem(new en.Item(plant), this, true, false);
+		inv.giveItem(new en.Item(plant), this, true, false);
+		#end
 
 		#if !headless
 		interact.onTextInput = function(e : Event) {

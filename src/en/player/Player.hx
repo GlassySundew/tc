@@ -22,7 +22,6 @@ class Player extends Entity {
 
 	var nicknameMesh : TileSprite;
 
-	@:s public var sprFrame : {group : String, frame : Int};
 
 	@:s public var nickname : String;
 	public var ui : PlayerUI;
@@ -116,8 +115,8 @@ class Player extends Entity {
 	}
 
 	override function customUnserialize(ctx : Serializer) {
+		if ( inst == null ) inst = this;
 		super.customUnserialize(ctx);
-		trace(this);
 	}
 
 	override public function networkAllow(op : hxbit.NetworkSerializable.Operation, propId : Int, clientSer : hxbit.NetworkSerializable) : Bool {
@@ -139,6 +138,7 @@ class Player extends Entity {
 
 			GameClient.inst.player = this;
 			GameClient.inst.host.self.ownerObject = this;
+			// жопа значит null
 			sprFrame = {group : "zhopa", frame : 0};
 		}
 		this.netX = netX;
@@ -169,17 +169,18 @@ class Player extends Entity {
 		ui.inventory.invGrid.enableGrid();
 	}
 
+	
 	override function dispose() {
 		super.dispose();
 		#if !headless
-		inst = null;
+		if ( inst == this ) inst = null;
 		ui.remove();
-
 		ui = null;
 		if ( nicknameMesh != null ) {
 			nicknameMesh.remove();
 			nicknameMesh = null;
 		}
+		holdItem.remove();
 		holdItem = null;
 		#end
 	}
@@ -282,11 +283,10 @@ class Player extends Entity {
 				}
 				return false;
 			};
-
 			if ( !hiddenTopWindow() && !Game.inst.pauseCycle ) {
 				Game.inst.pause();
-				new PauseMenu();
 				Game.inst.pauseCycle = true;
+				new PauseMenu();
 			}
 		}
 

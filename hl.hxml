@@ -1,8 +1,5 @@
 base.hxml
 
--lib hlsdl
-
-
 -main Boot
 
 -D windowSize=1280x720

@@ -1,5 +1,5 @@
 --
--- Файл сгенерирован с помощью SQLiteStudio v3.3.2 в Wed Mar 10 22:40:37 2021
+-- Файл сгенерирован с помощью SQLiteStudio v3.3.2 в Mon Mar 22 21:03:57 2021
 --
 -- Использованная кодировка текста: UTF-8
 --
@@ -8,21 +8,23 @@ BEGIN TRANSACTION;
 
 -- Таблица: entities
 CREATE TABLE entities (
-    id   INTEGER PRIMARY KEY AUTOINCREMENT
-                 NOT NULL
-                 UNIQUE,
-    name VARCHAR,
-    blob BLOB
+    id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    name     VARCHAR,
+    blob     BLOB,
+    level_id INTEGER,
+    FOREIGN KEY (
+        level_id
+    )
+    REFERENCES rooms (id) ON DELETE CASCADE
+                          ON UPDATE CASCADE
 );
 
 
 -- Таблица: rooms
 CREATE TABLE rooms (
-    id       INTEGER PRIMARY KEY AUTOINCREMENT
-                     NOT NULL
-                     UNIQUE,
-    name     VARCHAR,
-    entities         REFERENCES entities (name) 
+    id   INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR,
+    tmx  TEXT
 );
 
 

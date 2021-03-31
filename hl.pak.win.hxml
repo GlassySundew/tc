@@ -1,5 +1,4 @@
-hl.hxml
+hl.dx.hxml
 -hl redist/sdl_win/tc/hlboot.dat
-
 -D pak
 -D windows

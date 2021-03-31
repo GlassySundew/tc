@@ -34,7 +34,7 @@ class PlayerUI extends Layers {
 			}
 		}
 
-		parent.add(this, Const.DP_UI);
+		parent.add(this, Const.DP_BG);
 		inventory = new Inventory(Player.inst.invGrid, this);
 		inventory.containmentEntity = Player.inst;
 

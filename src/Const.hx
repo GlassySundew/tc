@@ -11,12 +11,11 @@ class Const {
 	public static var MELEE_REACH = 2;
 	public static var GRAB_REACH = 2;
 	public static var DEF_USE_RANGE = 40.;
- 
-	static var _uniq = 0;
-	public static var NEXT_UNIQ(get, never):Int;
 
-	static inline function get_NEXT_UNIQ()
-		return _uniq++;
+	static var _uniq = 0;
+	public static var NEXT_UNIQ(get, never) : Int;
+
+	static inline function get_NEXT_UNIQ() return _uniq++;
 
 	public static var INFINITE = 1. / 0.;
 
@@ -30,4 +29,5 @@ class Const {
 	public static var DP_MASK = _inc++;
 	public static var LEVELS_PATH = "tiled/levels/";
 	public static var ATLAS_PATH = "tiled/atlas/";
+	public static var SAVEFILE_EXT = ".zhopa";
 }

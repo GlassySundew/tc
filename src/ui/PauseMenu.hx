@@ -1,26 +1,32 @@
 package ui;
 
-import h2d.filter.Nothing;
-import h2d.filter.ColorMatrix;
-import h3d.Matrix;
+import h2d.Tile;
 import MainMenu.OptionsMenu;
 import MainMenu.TextButton;
-import h2d.Text;
-import h2d.Flow;
-import en.player.Player;
 import dn.Process;
+import en.player.Player;
+import h2d.Flow;
 import h2d.Graphics;
-import h2d.Tile;
 import h2d.Object;
+import h2d.Text;
+import h2d.filter.ColorMatrix;
+import h3d.Matrix;
 
 class PauseMenu extends Process {
+	public static var inst : PauseMenu;
 	var pauseContainer : Object;
 	var backgroundGraphics : Graphics;
 	var vertFlow : Flow;
 
 	public function new() {
 		super();
-		pauseContainer = new Object(Player.inst.ui);
+		if ( inst != null ) inst.destroy();
+		inst = this;
+
+		pauseContainer = new Object();
+
+		Main.inst.root.add(pauseContainer, Const.DP_UI);
+
 		backgroundGraphics = new Graphics(pauseContainer);
 
 		backgroundGraphics.beginFill(0xffffff);
@@ -38,6 +44,10 @@ class PauseMenu extends Process {
 			vertFlow.verticalAlign = Middle;
 			vertFlow.layout = Vertical;
 			vertFlow.verticalSpacing = 1;
+			vertFlow.fillHeight = true;
+			vertFlow.fillWidth = true;
+
+			vertFlow.backgroundTile = Tile.fromColor(0x000000, 1, 1, 0.5);
 
 			var mm = new Text(Assets.fontPixel, vertFlow);
 			mm.smooth = true;
@@ -50,19 +60,27 @@ class PauseMenu extends Process {
 				exit();
 			}, vertFlow);
 
-			new TextButton("save game", (e) -> {
-				Game.inst.save.saveGame();
+			var saveGame : Object = null;
+			saveGame = new TextButton("save game", (e) -> {
+				// Main.inst.save.saveGame();
+				var saveMan = new SaveManager(Save, pauseContainer);
+				saveMan.x = saveGame.x + saveGame.getSize().xMax + 20;
+				// saveMan.y = saveGame.y;
+			}, vertFlow);
+
+			var loadGame : Object = null;
+			loadGame = new TextButton("load game", (e) -> {
+				// exit();
+				// Main.inst.save.loadGame();
+				var loadMan = new SaveManager(Load, pauseContainer);
+				loadMan.x = loadGame.x + loadGame.getSize().xMax + 20;
+				// loadMan.y = loadGame.y;
+
+				// "save/" + (Settings.saveFiles[0] == null ? "autosave" : Settings.saveFiles[0])
 			}, vertFlow);
 
 			new TextButton("options", (e) -> {
-				var m = new Matrix();
-				m.identity();
-				m.colorGain(0x0, .7);
-				var cm = new ColorMatrix(m);
-				vertFlow.filter = cm;
-				var opts = new OptionsMenu(pauseContainer, () -> {
-					vertFlow.filter = null;
-				});
+				var opts = new OptionsMenu(pauseContainer);
 			}, vertFlow);
 
 			new TextButton("exit to main menu", (e) -> {
@@ -77,30 +95,32 @@ class PauseMenu extends Process {
 	}
 
 	function exit() {
-		Game.inst.resume();
-		Game.inst.pauseCycle = true;
 		destroy();
 	}
 
 	override function postUpdate() {
 		super.postUpdate();
 
-		if ( Player.inst.ca.selectPressed() && !Game.inst.pauseCycle ) {
+		if ( Player.inst != null && Player.inst.ca.selectPressed() && !Game.inst.pauseCycle ) {
 			exit();
 		}
-		Game.inst.pauseCycle = false;
+		if ( Game.inst != null ) Game.inst.pauseCycle = false;
 	}
 
 	override function onDispose() {
 		super.onDispose();
 		pauseContainer.remove();
+		if ( Game.inst != null ) {
+			Game.inst.pauseCycle = true;
+			Game.inst.resume();
+		}
 	}
 
 	override function onResize() {
 		super.onResize();
 		if ( vertFlow != null ) {
-			vertFlow.minWidth = wScaled;
-			vertFlow.minHeight = hScaled;
+			vertFlow.minWidth = vertFlow.maxWidth = wScaled;
+			vertFlow.minHeight = vertFlow.maxHeight = hScaled;
 			vertFlow.paddingTop = -Std.int(hScaled / 4);
 		}
 

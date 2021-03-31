@@ -1,8 +1,6 @@
 package ui;
 
-import tools.Save;
-import sys.db.Mysql;
-import sys.db.Sqlite;
+// import tools.Save;
 import UniformPoissonDisc.UniformPoissonDisk;
 import h2d.Bitmap;
 import h2d.Object;

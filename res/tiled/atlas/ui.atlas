@@ -1,6 +1,6 @@
 
 ui.png
-size: 1920, 640
+size: 1920, 800
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
@@ -144,142 +144,233 @@ discord2
   orig: 32, 32
   offset: 0, 0
   index: -1
-health_caret
+edit0
   rotate: false
   xy: 1280, 160
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+edit1
+  rotate: false
+  xy: 1440, 160
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+health_caret
+  rotate: false
+  xy: 1600, 160
   size: 3, 12
   orig: 3, 12
   offset: 0, 0
   index: -1
 health_line
   rotate: false
-  xy: 1440, 160
+  xy: 1760, 160
   size: 1, 12
   orig: 1, 12
   offset: 0, 0
   index: -1
 health_sign
   rotate: false
-  xy: 1600, 160
+  xy: 0, 320
   size: 34, 20
   orig: 34, 20
   offset: 0, 0
   index: -1
 inventory
   rotate: false
-  xy: 1760, 160
+  xy: 160, 320
   size: 114, 124
   orig: 114, 124
   offset: 0, 0
   index: -1
 keyboard_icon0
   rotate: false
-  xy: 0, 320
+  xy: 320, 320
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 keyboard_icon1
   rotate: false
-  xy: 160, 320
+  xy: 480, 320
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 navigation
   rotate: false
-  xy: 320, 320
+  xy: 640, 320
   size: 160, 160
   orig: 160, 160
   offset: 0, 0
   index: -1
+new0
+  rotate: false
+  xy: 800, 320
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+new1
+  rotate: false
+  xy: 960, 320
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+new2
+  rotate: false
+  xy: 1120, 320
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
 oxygen_scale
   rotate: false
-  xy: 480, 320
+  xy: 1280, 320
   size: 12, 12
   orig: 12, 12
   offset: 0, 0
   index: -1
 oxygen_sign
   rotate: false
-  xy: 640, 320
+  xy: 1440, 320
   size: 34, 20
   orig: 34, 20
   offset: 0, 0
   index: -1
 recipe
   rotate: false
-  xy: 800, 320
+  xy: 1600, 320
   size: 106, 20
   orig: 106, 20
   offset: 0, 0
   index: -1
 recipe_comp
   rotate: false
-  xy: 960, 320
+  xy: 1760, 320
   size: 98, 20
   orig: 98, 20
   offset: 0, 0
   index: -1
 recipe_hint
   rotate: false
-  xy: 1120, 320
+  xy: 0, 480
   size: 104, 25
   orig: 104, 25
   offset: 0, 0
   index: -1
+save0
+  rotate: false
+  xy: 160, 480
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+save1
+  rotate: false
+  xy: 320, 480
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+save2
+  rotate: false
+  xy: 480, 480
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+start0
+  rotate: false
+  xy: 640, 480
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+start1
+  rotate: false
+  xy: 800, 480
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+start2
+  rotate: false
+  xy: 960, 480
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+trash0
+  rotate: false
+  xy: 1120, 480
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+trash1
+  rotate: false
+  xy: 1280, 480
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
 travel_but0
   rotate: false
-  xy: 1280, 320
+  xy: 1440, 480
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 travel_but1
   rotate: false
-  xy: 1440, 320
+  xy: 1600, 480
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 twitter0
   rotate: false
-  xy: 1600, 320
+  xy: 1760, 480
   size: 36, 32
   orig: 36, 32
   offset: 0, 0
   index: -1
 twitter1
   rotate: false
-  xy: 1760, 320
+  xy: 0, 640
   size: 36, 32
   orig: 36, 32
   offset: 0, 0
   index: -1
 twitter2
   rotate: false
-  xy: 0, 480
+  xy: 160, 640
   size: 36, 32
   orig: 36, 32
   offset: 0, 0
   index: -1
 vk0
   rotate: false
-  xy: 160, 480
+  xy: 320, 640
   size: 42, 28
   orig: 42, 28
   offset: 0, 0
   index: -1
 vk1
   rotate: false
-  xy: 320, 480
+  xy: 480, 640
   size: 42, 28
   orig: 42, 28
   offset: 0, 0
   index: -1
 vk2
   rotate: false
-  xy: 480, 480
+  xy: 640, 640
   size: 42, 30
   orig: 42, 30
   offset: 0, 0

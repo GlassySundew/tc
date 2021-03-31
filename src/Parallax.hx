@@ -67,13 +67,15 @@ class Parallax extends Object {
 
 	override function sync(ctx : RenderContext) {
 		super.sync(ctx);
-		var deltaX = Level.inst.game.camera.x - cameraX;
-		var deltaY = Level.inst.game.camera.y - cameraY;
+		if ( Level.inst != null && Level.inst.game != null ) {
+			var deltaX = Level.inst.game.camera.x - cameraX;
+			var deltaY = Level.inst.game.camera.y - cameraY;
 
-		mesh.tile.scrollDiscrete(deltaX * parallaxEffect.x, deltaY * parallaxEffect.y);
-		mesh.tile = mesh.tile;
+			mesh.tile.scrollDiscrete(deltaX * parallaxEffect.x, deltaY * parallaxEffect.y);
+			mesh.tile = mesh.tile;
 
-		cameraX = Level.inst.game.camera.x;
-		cameraY = Level.inst.game.camera.y;
+			cameraX = Level.inst.game.camera.x;
+			cameraY = Level.inst.game.camera.y;
+		}
 	}
 }

@@ -1,3 +1,4 @@
+import ui.SecondaryMenu;
 import h2d.filter.Nothing;
 import tools.Settings;
 import ch2.ui.EventInteractive;
@@ -93,17 +94,11 @@ class MainMenu extends Process {
 		new TextButton("start demo (offline)", (_) -> {
 			destroy();
 			Main.inst.startGame();
+			Game.inst.startLevel("ship_pascal");
 		}, vertFlow);
 
 		new TextButton("options", (_) -> {
-			var m = new Matrix();
-			m.identity();
-			m.colorGain(0x0, .7);
-			var cm = new ColorMatrix(m);
-			parentFlow.filter = cm;
-			new OptionsMenu(root, () -> {
-				parentFlow.filter = null;
-			});
+			new OptionsMenu(root);
 		}, vertFlow);
 
 		new TextButton("exit", (_) -> {
@@ -128,15 +123,15 @@ class MainMenu extends Process {
 	override function onDispose() {
 		super.onDispose();
 		root.remove();
-			root.removeChildren();
-			this.destroy();
+		root.removeChildren();
+		this.destroy();
 	}
 }
 
 class TextButton extends ui.Button {
-	public function new(string : String, ?action : Event -> Void, ?color : Int, ?parent) {
+	public function new(string : String, ?action : Event -> Void, ?colorDef : Int = 0xffffff, ?colorPressed : Int = 0x45798d, ?parent) {
 		var text = new Text(Assets.fontPixel);
-		text.color = color != null ? Color.intToVector(color) : Color.intToVector(0xffffff);
+		text.color = Color.intToVector(colorDef);
 		text.smooth = true;
 		text.text = "  " + string;
 
@@ -147,7 +142,8 @@ class TextButton extends ui.Button {
 		text.text = "> " + string;
 		text.drawTo(tex1);
 
-		text.color = Color.intToVector(0x6b8fc2);
+		text.color = Color.intToVector(colorPressed);
+
 		var tex2 = new Texture(Std.int(text.textWidth), Std.int(text.textHeight), [Target]);
 		text.drawTo(tex2);
 		super([h2d.Tile.fromTexture(tex0), h2d.Tile.fromTexture(tex1), h2d.Tile.fromTexture(tex2)], parent);
@@ -155,23 +151,12 @@ class TextButton extends ui.Button {
 	}
 }
 
-class OptionsMenu extends Object {
+class OptionsMenu extends SecondaryMenu {
 	var vertFlow : Flow;
-
-	var onRemoveEvent : Void -> Void;
 	var nicknameInput : ui.TextInput;
 
-	public function new(?parent, ?onRemove : Void -> Void) {
+	public function new(?parent : Object) {
 		super(parent);
-		this.onRemoveEvent = onRemove;
-		var exitInteractive = new EventInteractive(Util.wScaled, Util.hScaled, this);
-
-		exitInteractive.onClickEvent.add((_) -> {
-			remove();
-			if ( onRemove != null ) onRemove();
-		});
-
-		exitInteractive.cursor = Default;
 
 		vertFlow = new Flow(this);
 
@@ -190,10 +175,10 @@ class OptionsMenu extends Object {
 		horFlow.verticalAlign = Top;
 
 		var nickname = new Text(Assets.fontPixel, horFlow);
-		nickname.text = "Nickname: ";
+		nickname.text = "username: ";
 
 		nicknameInput = new ui.TextInput(Assets.fontPixel, horFlow);
-		nicknameInput.text = Settings.nickname != null ? Settings.nickname : "Unnamed player";
+		nicknameInput.text = Settings.nickname != null ? Settings.nickname : "unnamed player";
 		nicknameInput.onFocusLost = function(e : Event) {
 			Settings.nickname = nicknameInput.text;
 			Settings.saveSettings();
@@ -208,7 +193,6 @@ class OptionsMenu extends Object {
 		// }
 	}
 
-
 	override function sync(ctx : RenderContext) {
 		vertFlow.minHeight = Std.int(Util.hScaled);
 		vertFlow.minWidth = Std.int(Util.wScaled);
@@ -217,7 +201,6 @@ class OptionsMenu extends Object {
 
 		if ( Main.inst.ca.isPressed(SELECT) ) {
 			remove();
-			if ( onRemoveEvent != null ) onRemoveEvent();
 		}
 	}
 

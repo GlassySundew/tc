@@ -1,6 +1,6 @@
 -debug
 -hl bin/game.hl
-hl.hxml
+hl.sdl.hxml
 
 -D linux
 # -D dispDepthBoxes

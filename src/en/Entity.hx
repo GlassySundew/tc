@@ -1,5 +1,9 @@
 package en;
 
+import haxe.Unserializer;
+import haxe.crypto.Base64;
+import haxe.io.Bytes;
+import haxe.Serializer;
 import hxd.System;
 import hxbit.NetworkSerializable;
 import hxbit.Serializable;
@@ -128,6 +132,8 @@ import h3d.scene.Mesh;
 	public var lastFootY : Float;
 	public var curFrame : Float = 0;
 
+	@:s public var sprFrame : {group : String, frame : Int};
+
 	private var rotAngle : Float = -0.01;
 	private var tex : Texture;
 
@@ -151,7 +157,9 @@ import h3d.scene.Mesh;
 		tw = new Tweenie(Const.FPS);
 
 		if ( spr == null ) throw "spr hasnt been initialised";
-
+		if ( spr != null && spr.groupName == null && sprFrame != null ) {
+			spr.set(sprFrame.group, sprFrame.frame);
+		}
 		this.tmxObj = tmxObj;
 
 		#if !headless
@@ -271,7 +279,8 @@ import h3d.scene.Mesh;
 		// footX += (spr.scaleX < 0 ? ((1 + spr.pivot.centerFactorX) * -spr.tile.width * .5) : ((spr.pivot.centerFactorX - .5) * spr.tile.width));
 
 		try {
-			cast(this, Interactive).interact.scaleX = spr.scaleX;
+			// cast(this, Interactive).interact.scaleX *= -1;
+			cast(this, Interactive).rebuildInteract();
 		}
 		catch( e:Dynamic ) {}
 	}
@@ -310,6 +319,7 @@ import h3d.scene.Mesh;
 
 	@:keep
 	public function customSerialize(ctx : hxbit.Serializer) {
+		ctx.addString(Base64.encode(Bytes.ofString(Serializer.run(tmxObj))));
 		ctx.addString(spr.groupName);
 		ctx.addInt(spr.frame);
 		ctx.addBool(flippedX);
@@ -317,11 +327,18 @@ import h3d.scene.Mesh;
 
 	@:keep
 	public function customUnserialize(ctx : hxbit.Serializer) {
+		tmxObj = Unserializer.run(Base64.decode(ctx.getString()).toString());
+
+		sprFrame = {
+			group : ctx.getString(),
+			frame : ctx.getInt()
+		};
 		init();
-		if ( spr != null ) spr.set(ctx.getString(), ctx.getInt());
 
 		level.game.applyTmxObjOnEnt(this);
-		if ( ctx.getBool() ) flipX();
+		if ( ctx.getBool() ) {
+			flipX();
+		}
 		offsetFootByCenterReversed();
 	}
 
@@ -344,6 +361,7 @@ import h3d.scene.Mesh;
 			mesh.primitive.dispose();
 			mesh.remove();
 		}
+
 		cd.destroy();
 		#if !headless
 		tex.dispose();
@@ -366,8 +384,15 @@ import h3d.scene.Mesh;
 		footY -= (spr.pivot.centerFactorY) * spr.tile.height - spr.tile.height;
 	}
 
+	// used by blueprints, to preview entities
 	public function offsetFootByCenterReversed() {
 		footX -= ((spr.pivot.centerFactorX - .5) * spr.tile.width);
+		footY += (spr.pivot.centerFactorY) * spr.tile.height - spr.tile.height;
+	}
+
+	// used by save manager, when saved objects are already offset by center
+	public function offsetFootByCenterYReversed() {
+		footX += ((spr.pivot.centerFactorX - .5) * spr.tile.width);
 		footY += (spr.pivot.centerFactorY) * spr.tile.height - spr.tile.height;
 	}
 

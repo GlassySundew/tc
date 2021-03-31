@@ -91,8 +91,9 @@ class Interactive extends Entity {
 	inline function isInPlayerRange() return distPx(player) <= useRange;
 
 	public function rebuildInteract() {
+		@:privateAccess polyPrim.translate(-polyPrim.translatedX, 0, -polyPrim.translatedZ);
 		interact.scaleX = spr.scaleX;
-		var facX = (tmxObj != null && tmxObj.flippedHorizontally) ? 1 - spr.pivot.centerFactorX : spr.pivot.centerFactorX;
+		var facX = ((tmxObj != null && tmxObj.flippedHorizontally) || flippedX) ? 1 - spr.pivot.centerFactorX : spr.pivot.centerFactorX;
 		polyPrim.translate(-spr.tile.width * facX, 0, -spr.tile.height * spr.pivot.centerFactorY);
 		interact.shape = polyPrim.getCollider();
 	}

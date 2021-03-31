@@ -39,6 +39,11 @@ class Server extends Process {
 		});
 	}
 
+	@:dox(show)
+	function loadAssets(onLoaded : Void -> Void) {
+		onLoaded();
+	}
+
 	function setup() {
 		loadAssets(function() {
 			mainLoop();
@@ -105,11 +110,6 @@ class Server extends Process {
 		log("Server Started");
 		host.makeAlive();
 		host.flush();
-	}
-
-	@:dox(show)
-	function loadAssets(onLoaded : Void -> Void) {
-		onLoaded();
 	}
 
 	public function log(s : String, ?pos : haxe.PosInfos) {

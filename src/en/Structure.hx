@@ -11,10 +11,8 @@ import hxd.Res;
 import format.tmx.*;
 
 class Structure extends Interactive {
-	public var cdbEntry : StructuresKind = null;
+	@:s public var cdbEntry : StructuresKind = null;
 	public var toBeCollidedAgainst = true;
-
-	public static var ALLplaceColliders = new Map<Structure, differ.shapes.Polygon>();
 
 	public function new(x : Float, y : Float, ?tmxObject : TmxObject, ?cdbEntry : StructuresKind) {
 		this.cdbEntry = cdbEntry;
@@ -36,7 +34,10 @@ class Structure extends Interactive {
 		if ( spr == null ) {
 			spr = new HSprite(Assets.structures, entParent);
 			eregClass.match('$this'.toLowerCase());
-			spr.set(eregClass.matched(1));
+			try {
+				spr.set(eregClass.matched(1));
+			}
+			catch( e:Dynamic ) {}
 		}
 
 		if ( cdbEntry == null ) try {
@@ -82,20 +83,11 @@ class Structure extends Interactive {
 
 	@:keep
 	override function customSerialize(ctx : Serializer) {
-		ctx.addString('$cdbEntry');
 		super.customSerialize(ctx);
 	}
 
 	@:keep
 	override function customUnserialize(ctx : Serializer) {
-		var cdbString = ctx.getString();
-		if ( cdbEntry == null ) {
-			try {
-				cdbEntry = Data.structures.resolve(cdbString).id;
-			}
-			catch( e:Dynamic ) {}
-		}
-		
 		super.customUnserialize(ctx);
 	}
 

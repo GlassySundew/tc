@@ -21,7 +21,6 @@ class Chest extends Structure {
 
 	public override function init(?x : Float, ?z : Float, ?tmxObj : TmxObject) {
 		super.init(x, z, tmxObj);
-
 		ca = Main.inst.controller.createAccess("chest");
 
 		initInv(uiConf.get("chest").getObjectByName("grid"));
@@ -41,13 +40,10 @@ class Chest extends Structure {
 				// Window.centrizeTwoWins(Player.inst.ui.inventory, inventory);
 			}
 		});
-		
 	}
 
 	override function postUpdate() {
 		super.postUpdate();
-		if ( Player.inst == null ) trace(Player.inst);
-		if ( cdbEntry == null ) trace(Player.inst);
 
 		if ( distPx(Player.inst) > Data.structures.get(cdbEntry).use_range
 			&& inventory.win.visible == true ) inventory.win.visible = false;

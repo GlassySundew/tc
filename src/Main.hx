@@ -1,5 +1,6 @@
 package;
 
+import tools.Save;
 import cherry.soup.EventSignal.EventSignal0;
 import dn.M;
 import dn.Process;
@@ -15,6 +16,7 @@ class Main extends Process {
 	public var controller : dn.heaps.Controller;
 	public var ca : dn.heaps.Controller.ControllerAccess;
 	public var onClose : EventSignal0;
+	public var save : Save;
 
 	public function new(s : h2d.Scene) {
 		super();
@@ -82,6 +84,7 @@ class Main extends Process {
 			onClose.dispatch();
 			return true;
 		}
+		save = new Save();
 
 		delayer.addF(start, 1);
 	}
@@ -94,6 +97,7 @@ class Main extends Process {
 		#end
 		#if debug
 		startGame();
+		Game.inst.startLevel("ship_pascal.tmx");
 		#else
 		// new Title();
 		#end
@@ -109,11 +113,10 @@ class Main extends Process {
 
 	public function startGame() {
 		if ( Game.inst != null ) {
+			Game.inst.destroy();
 			delayer.addF(function() {
-				Game.inst.destroy();
-			}, 1);
-
-			new Game();
+				new Game();
+			}, 2);
 		} else
 			new Game();
 	}
@@ -123,7 +126,7 @@ class Main extends Process {
 			GameClient.inst.destroy();
 			delayer.addF(function() {
 				new GameClient();
-			}, 0.1);
+			}, 2);
 		} else
 			new GameClient();
 	}

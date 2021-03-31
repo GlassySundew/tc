@@ -17,6 +17,7 @@ import hxd.IndexBuffer;
 import hxd.Res;
 import tiled.TileLayerRenderer;
 import tools.CPoint;
+import tools.Save;
 import ui.s3d.EventInteractive;
 /**
 	Level parses tmx entities maps, renders tie layers into mesh
@@ -48,6 +49,8 @@ class Level extends dn.Process {
 	var invalidatedColls = true;
 	var invalidated = true;
 
+	public var sqlId : Null<Int>;
+	public var lvlName : String;
 	public var data : TmxMap;
 	public var entities : Array<TmxObject> = [];
 	public var walkable : Array<Polygon> = [];
@@ -123,6 +126,8 @@ class Level extends dn.Process {
 
 	override function onDispose() {
 		super.onDispose();
+		// Save.inst.cacheLevel(this);
+
 		obj.remove();
 		obj.primitive.dispose();
 		cursorInteract.remove();
@@ -228,7 +233,7 @@ class Level extends dn.Process {
 	public function setWalkable(poly : TmxObject, ?points : Array<Dynamic>) { // setting obstacles as a differ polygon
 		var vertices : Array<differ.math.Vector> = [];
 		if ( points != null ) {
-			points.reverse();
+			checkPolyClockwise(points);
 			for (i in points) vertices.push(new differ.math.Vector(cartToIso(i.x, i.y).x, cartToIso(i.x, i.y).y));
 			walkable.push(new Polygon(cartToIsoLocal(poly.x, poly.y).x, cartToIsoLocal(poly.x, poly.y).y, vertices));
 		} else if ( poly.objectType == OTRectangle ) {
@@ -332,14 +337,13 @@ private class InternalRender extends TileLayerRenderer {
 			+ (tile.flippedDiagonally ? (tile.flippedVertically ? h2dTile.height : -h2dTile.width + h2dTile.height) : 0);
 
 		// Creating isometric(rombic) h3d.scene.Interactive on top of separated
-		// tiles that contain *floor at the end of their file name as a slots for
+		// tiles that contain *	 at the end of their file name as a slots for
 		// structures; can be visible only when choosing place for structure to build
 
 		// Это говнище должно быть visible только тогда, когда у игрока в holdItem есть blueprint
-		var ereg = ~/\/([a-z_0-9]+)\./; // regexp to take picture name between last / and . from picture path
 		#if !headless
-		if ( ereg.match(sourceTile.image.source)
-			&& StringTools.endsWith(ereg.matched(1),
+		if ( eregFileName.match(sourceTile.image.source)
+			&& StringTools.endsWith(eregFileName.matched(1),
 				"floor") ) Level.inst.game.structTiles.push(new StructTile(bmp.x + Level.inst.data.tileWidth / 2,
 				Level.inst.ground.height - bmp.y - Level.inst.data.tileHeight / 2, Boot.inst.s3d));
 		bmp.drawTo(tex);

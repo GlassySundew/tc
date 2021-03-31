@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="2020.11.25" orientation="isometric" renderorder="right-down" compressionlevel="0" width="50" height="50" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="50" nextobjectid="742">
+<map version="1.5" tiledversion="2021.02.15" orientation="isometric" renderorder="right-down" compressionlevel="0" width="50" height="50" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="52" nextobjectid="746">
  <tileset firstgid="1" source="alpha.tsx"/>
- <tileset firstgid="64" source="colls.tsx"/>
+ <tileset firstgid="112" source="colls.tsx"/>
  <layer id="33" name="ground" width="50" height="50" offsetx="0" offsety="4">
   <data encoding="base64" compression="zlib">
-   eAHt0jEKACAMA8D+xv//UBwKdnWLnCBYXJLTKosAAQIECBAgQIAAAQKZAisz9kh9OvQeF2FDd0h/kx963B36HPadxCVAgAABAgQIECBAgAABAgQIECBAgAABAs8CG6C5Ako=
+   eAHt0rEJACAMRcGM6P7TiEXA1jLfEwTLvItVDgECBAgQIECAAAECvwmskOCEjtPQd/JaumH6ThI67oZ+T/5bZidAgAABAgQIECBAgAABAgQIECBAgAABAi8CG2W2BQE=
   </data>
  </layer>
  <layer id="36" name="wallsAgri" width="50" height="50" visible="0" offsetx="-10" offsety="-1">
@@ -18,8 +18,8 @@
   </data>
  </layer>
  <objectgroup draworder="index" id="47" name="image">
-  <object id="677" gid="41" x="547" y="509" width="206" height="118"/>
-  <object id="715" gid="42" x="490" y="466" width="246" height="87"/>
+  <object id="743" gid="105" x="490.5" y="465.5" width="246" height="87"/>
+  <object id="744" gid="81" x="547" y="509" width="206" height="118"/>
  </objectgroup>
  <objectgroup id="34" name="obstacles" opacity="0.57">
   <object id="692" x="552" y="480">
@@ -44,19 +44,19 @@
   </object>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="718" gid="79" x="489" y="399" width="104" height="44">
+  <object id="718" gid="127" x="489" y="399" width="104" height="44">
    <properties>
     <property name="interactable" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="719" gid="78" x="529" y="409" width="60" height="50"/>
-  <object id="733" gid="81" x="504" y="504" width="48" height="66">
+  <object id="719" gid="126" x="529" y="409" width="60" height="50"/>
+  <object id="733" gid="129" x="504" y="504" width="48" height="66">
    <properties>
     <property name="to" type="file" value="ship_pascal.tmx"/>
    </properties>
   </object>
-  <object id="734" gid="66" x="504" y="456" width="48" height="48"/>
-  <object id="735" gid="80" x="502.5" y="409.5" width="48" height="45"/>
-  <object id="741" gid="77" x="583" y="491" width="114" height="134"/>
+  <object id="734" gid="114" x="504" y="456" width="48" height="48"/>
+  <object id="735" gid="128" x="502.5" y="409.5" width="48" height="45"/>
+  <object id="741" gid="125" x="583" y="491" width="114" height="134"/>
  </objectgroup>
 </map>

@@ -1,67 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="2020.11.25" orientation="isometric" renderorder="right-down" compressionlevel="0" width="24" height="24" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="665" nextobjectid="8831">
+<map version="1.5" tiledversion="2021.02.15" orientation="isometric" renderorder="right-down" compressionlevel="0" width="24" height="24" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="806" nextobjectid="13114">
  <tileset firstgid="1" source="alpha.tsx"/>
- <tileset firstgid="64" source="colls.tsx"/>
- <layer id="54" name="proto" width="24" height="24" opacity="0.58">
+ <tileset firstgid="112" source="colls.tsx"/>
+ <layer id="54" name="proto" width="24" height="24" visible="0" opacity="0.58">
   <data encoding="base64" compression="zlib">
-   eAHTZmBg0B7Fo2EwhNOAOtDt6JiaaRrdbBB/1HxEGIyGDyIsqJkuRs0aDdfRNEDbNAAAfO9gNQ==
-  </data>
- </layer>
- <layer id="33" name="ground" width="24" height="24" offsetx="0" offsety="4">
-  <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwtENAHeh8dExNH6GbDeJTE4yajz80h3r44PfdqOxoCIyGwECFAAAeOQVW
+   eAFzYmBgcBrFo2EwmgZwpoFgYNhgw9TKN9jMBomNmg8JA1qHD7XCedQc6qXZ0bAcDUt6pAEAs6WWfw==
   </data>
  </layer>
  <layer id="42" name="walls" width="24" height="24">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyFAuxCQBxotx8DQgI6pZSPQXJqCUfPxB+9o+OAPn1HZ0RAYDYHBGwIAUU8ECA==
+   eAFjYBgFoyEwGgKEQiAcqAAdZxDSRKR8BJHqyFEGdHMDOfqI1TMczE8n1rOj6kZDYDQEhlUIAAANpQY3
+  </data>
+ </layer>
+ <layer id="804" name="ground_bot" width="24" height="24">
+  <data encoding="base64" compression="zlib">
+   eAFjYBgFoyEwGgKDMQTCaOyoUfMRARwKZKLjEIT0KGs0BEZDYBiGAABW8gNW
+  </data>
+ </layer>
+ <layer id="33" name="ground" width="24" height="24">
+  <data encoding="base64" compression="zlib">
+   eAFjYBgFoyEwGgL4QiAPKBmMBePTQ4ocNrNBYtQCw9H8IGoFzqg5oyEwGgIjNgQA9t8J1Q==
   </data>
  </layer>
  <layer id="36" name="wallsAgri" width="24" height="24" visible="0" offsetx="-10" offsety="-1">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyGAGgJqDAwNqCKDlwd0K03BqPk0Dd5Rw0dDYDQERkNgwEIAAOVxAT8=
+   eAFjYBgFoyEwGgKjITAaAqMhMBoCoyEwskIAAAkAAAE=
   </data>
  </layer>
  <layer id="190" name="shadows" width="24" height="24">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwtEPACuh8SwaGBmRMTR8BzaUpGDUff/AO9fDB77tR2dEQGA2BgQoBAOnfBHU=
+   eAFjYBgFoyEwGgKjITAaAqMhMBoCoyEwskIAAAkAAAE=
+  </data>
+ </layer>
+ <layer id="805" name="light" width="24" height="24">
+  <data encoding="base64" compression="zlib">
+   eAFjYBgFIzUEsoEez0HDuVQKDKDZDVQyCqsxQHePmo81ZCCCwHikafjgsXpISeUPKdeOOnY0BEZDgJohAACgzgeU
   </data>
  </layer>
  <objectgroup id="47" name="image"/>
  <objectgroup id="34" name="obstacles">
-  <object id="8806" x="192" y="144" width="24" height="48"/>
-  <object id="8807" x="216" y="144" width="24" height="24"/>
-  <object id="8808" x="192" y="192" width="24" height="24"/>
-  <object id="8809" x="192" y="216" width="24" height="24"/>
-  <object id="8810" x="192" y="240" width="24" height="24"/>
-  <object id="8811" x="192" y="264" width="24" height="24"/>
-  <object id="8812" x="192" y="288" width="24" height="24"/>
-  <object id="8813" x="240" y="144" width="24" height="24"/>
-  <object id="8814" x="264" y="144" width="24" height="24"/>
-  <object id="8815" x="288" y="144" width="24" height="24"/>
-  <object id="8816" x="336" y="168" width="24" height="24"/>
-  <object id="8817" x="336" y="192" width="24" height="24"/>
-  <object id="8818" x="336" y="216" width="24" height="24"/>
-  <object id="8819" x="336" y="240" width="24" height="24"/>
-  <object id="8820" x="336" y="264" width="24" height="24"/>
-  <object id="8821" x="336" y="288" width="24" height="24"/>
-  <object id="8822" x="336" y="312" width="24" height="24"/>
-  <object id="8823" x="312" y="144" width="24" height="24"/>
-  <object id="8824" x="216" y="336" width="24" height="24"/>
-  <object id="8825" x="240" y="336" width="24" height="24"/>
-  <object id="8826" x="264" y="336" width="24" height="24"/>
-  <object id="8827" x="288" y="336" width="24" height="24"/>
-  <object id="8828" x="312" y="336" width="24" height="24"/>
-  <object id="8829" x="192" y="312" width="24" height="24"/>
+  <object id="13090" x="336" y="312" width="24" height="24"/>
+  <object id="13091" x="360" y="288" width="24" height="24"/>
+  <object id="13092" x="224.5" y="191.5">
+   <polygon points="-0.5,0.5 -8.5,0.5 -8.5,8.5"/>
+  </object>
+  <object id="13093" x="360" y="192" width="24" height="24"/>
+  <object id="13094" x="360" y="216" width="24" height="24"/>
+  <object id="13095" x="360" y="240" width="24" height="24"/>
+  <object id="13096" x="360" y="264" width="24" height="24"/>
+  <object id="13097" x="354" y="312">
+   <polygon points="0,0 6,0 6,-6"/>
+  </object>
+  <object id="13098" x="216" y="312" width="24" height="24"/>
+  <object id="13099" x="240" y="312" width="24" height="24"/>
+  <object id="13100" x="264" y="312" width="24" height="24"/>
+  <object id="13101" x="288" y="312" width="24" height="24"/>
+  <object id="13102" x="312" y="312" width="24" height="24"/>
+  <object id="13103" x="240" y="168" width="24" height="24"/>
+  <object id="13104" x="264" y="168" width="24" height="24"/>
+  <object id="13105" x="288" y="168" width="24" height="24"/>
+  <object id="13106" x="312" y="168" width="24" height="24"/>
+  <object id="13107" x="336" y="168" width="24" height="24"/>
+  <object id="13108" x="192" y="216" width="24" height="24"/>
+  <object id="13109" x="192" y="240" width="24" height="24"/>
+  <object id="13110" x="192" y="264" width="24" height="24"/>
+  <object id="13111" x="192" y="288" width="24" height="24"/>
+  <object id="13112" x="192" y="192" width="24" height="24"/>
+  <object id="13113" x="216" y="168" width="24" height="24"/>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="8634" gid="66" x="312" y="240" width="48" height="48"/>
-  <object id="8635" gid="83" x="288" y="288" width="48" height="36"/>
-  <object id="8692" gid="2147483724" x="288" y="192" width="48" height="77">
+  <object id="8692" gid="2147483772" x="288" y="216" width="48" height="77">
    <properties>
     <property name="to" type="file" value="bridge.tmx"/>
    </properties>
   </object>
-  <object id="8830" gid="2147483731" x="240" y="264" width="48" height="36"/>
+  <object id="8830" gid="2147483779" x="336" y="216" width="48" height="36"/>
+  <object id="8850" gid="114" x="288" y="216" width="48" height="48"/>
+  <object id="10814" x="290.5" y="263.5"/>
+  <object id="10906" gid="122" x="264" y="312" width="96" height="72"/>
  </objectgroup>
 </map>

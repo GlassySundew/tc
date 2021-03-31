@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.4" tiledversion="2020.11.25" name="colls" tilewidth="114" tileheight="134" tilecount="15" columns="10">
+<tileset version="1.5" tiledversion="2021.02.15" name="colls" tilewidth="114" tileheight="134" tilecount="15" columns="10">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="2">
   <image width="48" height="48" source="separated/player/player.png"/>
@@ -62,10 +62,10 @@
   </objectgroup>
  </tile>
  <tile id="10">
-  <image width="96" height="48" source="separated/structures/sleeping_pod.png"/>
+  <image width="96" height="72" source="separated/structures/sleeping_pod.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="48" y="43">
-    <polygon points="0,0 -15,-8 25,-28 40,-20"/>
+   <object id="1" x="16" y="57">
+    <polygon points="20,9 -15,-8 34,-32 68,-15"/>
    </object>
   </objectgroup>
  </tile>
@@ -149,9 +149,6 @@
   <objectgroup draworder="index" id="3">
    <object id="2" x="9" y="26">
     <polygon points="0,0 13,6 33,-4 20,-10"/>
-   </object>
-   <object id="3" name="center" x="26" y="24">
-    <point/>
    </object>
   </objectgroup>
  </tile>
