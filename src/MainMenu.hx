@@ -1,3 +1,4 @@
+import ui.SaveManager;
 import ui.SecondaryMenu;
 import h2d.filter.Nothing;
 import tools.Settings;
@@ -97,6 +98,16 @@ class MainMenu extends Process {
 			Game.inst.startLevel("ship_pascal");
 		}, vertFlow);
 
+		if ( saveFiles.length > 0 ) {
+			var loadGame : Object = null;
+			loadGame = new TextButton("load game", (_) -> {
+				var loadMan = new SaveManager(Load, () -> {
+					destroy();
+				}, vertFlow);
+				loadMan.x = loadGame.x + loadGame.getSize().xMax + 20;
+				vertFlow.getProperties(loadMan).isAbsolute = true;
+			}, vertFlow);
+		}
 		new TextButton("options", (_) -> {
 			new OptionsMenu(root);
 		}, vertFlow);
@@ -106,7 +117,6 @@ class MainMenu extends Process {
 		}, vertFlow);
 
 		// var but1 = new TextButton("Multiplayer", () -> {}, vertFlow);
-
 		Boot.inst.engine.backgroundColor = 0x000000;
 		onResize();
 	}

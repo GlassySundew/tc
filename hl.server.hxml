@@ -2,7 +2,7 @@ base.hxml
 
 -hl bin/server.hl
 
--D hl-ver=1.12.0
+
 -D linux
 -D headless
 

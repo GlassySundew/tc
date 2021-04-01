@@ -150,6 +150,7 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 		delayer.addF(() -> {
 			hideStrTiles();
 		}, 2);
+		return level;
 	}
 
 	public function targetCameraOnPlayer() {

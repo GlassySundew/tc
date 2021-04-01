@@ -257,6 +257,8 @@ import h2d.Interactive;
 			interactive.y = -spr.tile.height / 2;
 
 			if ( isInCursor() ) {
+				visible = !Game.inst.isPaused();
+
 				x = Boot.inst.s2d.mouseX + 13 * scaleX;
 				y = Boot.inst.s2d.mouseY + 13 * scaleY;
 			}

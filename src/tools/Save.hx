@@ -19,7 +19,7 @@ typedef CachedLevel = {
 	public var sqlId : Int;
 }
 
-class CachedEntity {
+typedef CachedEntity = {
 	// basically just a class name, i.e. en.player.Player
 	public var name : String;
 	public var blob : String;
@@ -42,10 +42,12 @@ class Save {
 		inst = this;
 
 		sqlite = Sqlite.open("");
+		// sqlite.request("attach database save/");
+
 		// trace(sqlite.request("select sqlite_version()").next());
 	}
 
-	public static function fillDbWithScheme(sqlite : Connection, ?table : String) {
+	public function fillDbWithScheme(?table : String = "") {
 		var standardStr : String;
 		File.load("res/save_str.sql", (data) -> {
 			standardStr = data.toString();
@@ -53,26 +55,26 @@ class Save {
 
 		for (i in standardStr.split(";")) {
 			try {
-				sqlite.request(StringTools.replace(i, ";", ""));
-			}
-			catch( e:Dynamic ) {
+				sqlite.request(StringTools.replace(StringTools.replace(i, "CREATE TABLE ", 'CREATE TABLE ${table}.'), ";", ""));
+			} catch( e:Dynamic ) {
 				#if debug
 				trace(e);
 				#end
 			}
 		}
-		sqlite.request("PRAGMA journal_mode = WAL");
-		sqlite.request("PRAGMA read_uncommitted=1");
+		// sqlite.request("PRAGMA journal_mode = WAL");
+		// sqlite.request("PRAGMA read_uncommitted=1");
 	}
 
 	public function makeFreshSave(fileName : String) {
-		var tempCon = Sqlite.open(SAVEPATH + fileName + Const.SAVEFILE_EXT);
-		tools.Save.fillDbWithScheme(tempCon);
-		tempCon.close();
+		sqlite.request('attach ${sqlite.quote(SAVEPATH + fileName + Const.SAVEFILE_EXT)} as new');
+		fillDbWithScheme("new");
+		sqlite.request("detach 'new'");
+		trace("making new");
 	}
 
 	public function getLevelByName(name : String) : CachedLevel {
-		var query = sqlite.request('select * from rooms where name=${name}');
+		var query = sqlite.request('select * from maindb.rooms where name=${name}');
 		return query.hasNext() ? query.next() : null;
 	}
 
@@ -88,6 +90,19 @@ class Save {
 		FileSystem.rename(file1 + ".swap", file2);
 	}
 
+	function reattachMainFrom(file : String) {
+		try sqlite.rollback() catch( e:Dynamic )
+			#if debug
+			trace(e);
+			#end
+		try sqlite.request("detach maindb") catch( e:Dynamic )
+			#if debug
+			trace(e);
+			#end
+
+		sqlite.request('attach database ${sqlite.quote(SAVEPATH + file + Const.SAVEFILE_EXT)} as maindb');
+	}
+
 	public function saveGame(fileName : String) {
 		if ( currentFile != null ) {
 			if ( currentFile != fileName ) {
@@ -96,36 +111,35 @@ class Save {
 				File.delete(SAVEPATH + fileName + Const.SAVEFILE_EXT);
 				// сохраняем копию текущего несохранённого файла, чтобы потом подменить
 				sys.io.File.copy(filePath, SAVEPATH + fileName + Const.SAVEFILE_EXT);
-				sqlite.commit();
+				try sqlite.commit() catch( e:Dynamic ) {}
 				swapFiles(filePath, SAVEPATH + fileName + Const.SAVEFILE_EXT);
-				sqlite.close();
-				sqlite = Sqlite.open(SAVEPATH + fileName + Const.SAVEFILE_EXT);
+				reattachMainFrom(fileName);
+				sqlite.startTransaction();
 			}
 		} else {
-			trace("nulling");
-			
-			sqlite.close();
-			sqlite = Sqlite.open(SAVEPATH + fileName + Const.SAVEFILE_EXT);
+			// try sqlite.rollback() catch( e:Dynamic ) {}
+			reattachMainFrom(fileName);
 			sqlite.startTransaction();
 		}
 		saveLevel(Level.inst);
 		sqlite.commit();
-
+		sqlite.request("PRAGMA foreign_keys=on");
 		currentFile = fileName;
 		sqlite.startTransaction();
 	}
 
 	public function saveLevel(level : Level) {
 		// single-player only, exclude with compiler flag in multiplayer
-		sqlite.request("delete from entities where name like '%.Player'");
-		sqlite.request('delete from rooms where name=${sqlite.quote(level.lvlName)}');
+		sqlite.request('delete from maindb.rooms where name=${sqlite.quote(level.lvlName)}');
+		sqlite.request("delete from maindb.entities where name like '%.Player'");
 
-		sqlite.request('insert into rooms (name, tmx) values(
+		level.data.layers.remove(level.getLayerByName('entities'));
+
+		sqlite.request('insert into maindb.rooms (name, tmx) values(
 			${sqlite.quote(level.lvlName)},
 			${sqlite.quote(Base64.encode(Bytes.ofString(haxe.Serializer.run(level.data))))}
 		)');
 		level.sqlId = sqlite.lastInsertId();
-
 		for (i in Entity.ALL) {
 			if ( i.level.sqlId == level.sqlId ) {
 				saveEntity(i);
@@ -138,46 +152,38 @@ class Save {
 		var s = new hxbit.Serializer();
 		var bytes = s.serialize(entity);
 
-		sqlite.request('insert into entities (name, blob, level_id) values(
+		sqlite.request('insert into maindb.entities (name, blob, level_id) values(
 			${sqlite.quote(Std.string(entity))},
 			${sqlite.quote(Base64.encode(bytes))},
 			${entity.level.sqlId}
 		)');
 	}
 
-	function dropAll() {
-		// sqlite.request("PRAGMA writable_schema = 1");
-		// sqlite.request("delete from :memory: where type in ('table', 'index', 'trigger')");
-		// sqlite.request("PRAGMA writable_schema = 0");
-		// sqlite.request("vacuum");
-		// sqlite.request("pragma integrity_check");
-		sqlite.close();
-	}
-
 	// only singleplayer or server-side
 	public function loadGame(fileName : String) {
-		try
-			sqlite.rollback()
+		try sqlite.rollback()
 		catch( e:Dynamic ) {}
 
-		sqlite.close();
-		sqlite = Sqlite.open(SAVEPATH + fileName + Const.SAVEFILE_EXT);
-
+		if ( fileName != currentFile ) reattachMainFrom(fileName);
 		Main.inst.startGame();
 
 		Main.inst.delayer.addF(() -> {
 			// singleplayer player select
-			var playerEntry = sqlite.request('select * from entities where name=${sqlite.quote("en.player.Player")}');
+			var playerEntry = sqlite.request('select * from maindb.entities where name=${sqlite.quote("en.player.Player")}');
 			if ( playerEntry.length > 1 ) throw "save system malfunction, more than one player entries in single player mode";
-			loadLevel(sqlite.request('select * from rooms where id = ${playerEntry.next().level_id}').next());
+			var temp = sqlite.request('select id ${sqlite.quote('sqlId')}, * from maindb.rooms where id = ${playerEntry.next().level_id}').next();
+
+			loadLevel(temp);
+			sqlite.request("PRAGMA foreign_keys=on");
 			sqlite.startTransaction();
 			currentFile = fileName;
 		}, 2);
 	}
 
 	public function loadLevel(level : CachedLevel) {
-		Game.inst.startLevelFromParsedTmx(Unserializer.run(Base64.decode(level.tmx).toString()), level.name);
-		var entities = sqlite.request('select * from entities where level_id = ${level.sqlId}');
+		Game.inst.startLevelFromParsedTmx(Unserializer.run(Base64.decode(level.tmx).toString()), level.name).sqlId = Std.int(level.sqlId);
+
+		var entities = sqlite.request('select * from maindb.entities where level_id = ${level.sqlId}');
 		if ( entities.hasNext() ) for (i in entities) loadEntity(i);
 
 		Game.inst.player = Player.inst;

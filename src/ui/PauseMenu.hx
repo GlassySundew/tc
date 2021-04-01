@@ -114,6 +114,7 @@ class PauseMenu extends Process {
 			Game.inst.pauseCycle = true;
 			Game.inst.resume();
 		}
+			
 	}
 
 	override function onResize() {

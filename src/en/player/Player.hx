@@ -22,7 +22,6 @@ class Player extends Entity {
 
 	var nicknameMesh : TileSprite;
 
-
 	@:s public var nickname : String;
 	public var ui : PlayerUI;
 	public var invGrid : CellGrid;

@@ -1,12 +1,11 @@
 package ui;
 
-import sys.db.Sqlite;
-import h2d.RenderContext;
 import MainMenu.TextButton;
 import dn.Process;
 import h2d.Bitmap;
 import h2d.Flow;
 import h2d.Object;
+import h2d.RenderContext;
 import h2d.ScaleGrid;
 import h2d.Text;
 import h2d.Tile;
@@ -36,17 +35,21 @@ class SaveManager extends SecondaryMenu {
 
 	public var entries : Array<SaveEntry> = [];
 
+	public static var colWidth : Int = 300;
+
 	var sliderBack : Bitmap;
 	var backgroundScroll : EventInteractive;
 	var grid : ScaleGrid;
 	var slider : VerticalSlider;
 	var areaBarFlow : Flow;
+	var onLoad : () -> Void;
 
-	public function new(mode : Mode, ?parent : Object) {
+	public function new(mode : Mode, ?onLoad : () -> Void, ?parent : Object) {
 		super(parent);
 		this.mode = mode;
 		if ( inst != null ) inst.remove();
 		inst = this;
+		this.onLoad = onLoad;
 
 		refreshSaves();
 		var generalFlow = new Flow(this);
@@ -67,7 +70,7 @@ class SaveManager extends SecondaryMenu {
 		areaBarFlow.enableInteractive = true;
 		areaBarFlow.overflow = Limit;
 
-		scrollArea = new FixedScrollArea(Std.int(400 / 2), 0, 16, areaBarFlow);
+		scrollArea = new FixedScrollArea(colWidth, 0, 16, areaBarFlow);
 		scrollArea.height = Std.int(hScaled - y - 20);
 		backgroundScroll = new EventInteractive(0, 0, scrollArea);
 
@@ -137,12 +140,23 @@ class SaveManager extends SecondaryMenu {
 		for (e in entries) e.selected = false;
 		e.selected = true;
 	}
+
+	override function onRemove() {
+		super.onRemove();
+		for (i in entries) i.destroy();
+		onLoad();
+	}
 }
 
 class SaveEntry extends Process {
 	var horflow : Flow;
 	var utilityFlow : Flow;
 	var dialog : Dialog;
+
+	function set_dialog(v : Dialog) {
+		if ( dialog != null ) dialog.remove();
+		return v;
+	}
 
 	public var selected(default, set) : Bool = false;
 
@@ -211,7 +225,7 @@ class SaveEntry extends Process {
 		utilityFlow.visible = false;
 		utilityFlow.horizontalAlign = Right;
 		utilityFlow.scale(.5);
-		utilityFlow.minWidth = utilityFlow.maxWidth = 400;
+		utilityFlow.minWidth = Std.int(SaveManager.colWidth * Const.UI_SCALE);
 
 		var edit0 = new HSprite(Assets.ui, "edit0");
 		var edit1 = new HSprite(Assets.ui, "edit1");
@@ -324,7 +338,6 @@ class NewSaveDialog extends Dialog {
 			mode = New(textInput.text);
 			try {
 				tools.Save.inst.makeFreshSave(textInput.text);
-				
 			}
 			catch( e:Dynamic ) {
 				var errorText = new Text(Assets.fontPixel, generalFlow);

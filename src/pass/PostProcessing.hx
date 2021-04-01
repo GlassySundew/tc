@@ -15,7 +15,7 @@ class PostProcessingShader extends h3d.shader.ScreenShader {
 		@param var tsize : Vec2;
 		@param var h : Float;
 		@param var opacity : Float;
-		@param var scanlinesOpt : Float = 2;
+		@param var scanlinesOpt : Float = 2.5;
 		function curve(uv : Vec2) : Vec2 {
 			uv = (uv - 0.5) * 2.0;
 			uv *= 1.1;
@@ -82,7 +82,7 @@ class PostProcessingShader extends h3d.shader.ScreenShader {
 			color *= vig;
 
 			// scanlines
-			color -= sin(uv.y * tsize.y * PI) * 0.014 * scanlinesOpt;
+			color -= sin(uv.y * tsize.y * PI + PI) * 0.014 * scanlinesOpt;
 
 			output.color = vec4(color, 1.0);
 		}
