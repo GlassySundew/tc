@@ -1,24 +1,8 @@
 package ui.player;
 
-import ui.InventoryGrid.CellGrid;
-import ui.s2d.EventInteractive;
-import format.tmx.Data.TmxLayer;
-import en.items.Scepter;
 import en.player.Player;
-import h2d.RenderContext;
 import h2d.Object;
-import en.items.GraviTool;
-import ui.player.Belt;
-import hxd.Event;
-import h2d.Tile;
-import h3d.mat.Texture;
-import hxd.res.Resource;
-import domkit.Macros;
-import h2d.domkit.Style;
-import h2d.Flow;
-import haxe.io.Bytes;
-import h2d.Bitmap;
-import h2d.ScaleGrid;
+import ui.InventoryGrid.CellGrid;
 /**
 	Формочки для Player, визуализация InventoryGrid
 **/
@@ -62,6 +46,8 @@ class Inventory extends Window {
 		recenter();
 		toggleVisible();
 		bringOnTopOfALL();
+
+		
 	}
 
 	public override function bringOnTopOfALL() {

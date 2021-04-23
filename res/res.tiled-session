@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "tiled/levels/bridge.tmx",
+    "activeFile": "tiled/levels/asteroid.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "tiled",
-        "."
+        ".",
+        "tiled"
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
@@ -514,19 +514,19 @@
             }
         },
         "tiled/levels/asteroid.tmx": {
-            "scale": 4,
+            "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 2499,
-                "y": 1089
+                "x": 3109.333333333333,
+                "y": 871
             }
         },
         "tiled/levels/bridge.tmx": {
-            "scale": 5.5,
-            "selectedLayer": 3,
+            "scale": 3,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 1214.3636363636365,
-                "y": 463
+                "x": 1307.3333333333333,
+                "y": 477.16666666666663
             }
         },
         "tiled/levels/colls.tsx": {
@@ -581,11 +581,11 @@
             }
         },
         "tiled/levels/ship_pascal.tmx": {
-            "scale": 3,
-            "selectedLayer": 8,
+            "scale": 2,
+            "selectedLayer": 9,
             "viewCenter": {
                 "x": 675,
-                "y": 176.66666666666666
+                "y": 176.5
             }
         },
         "tiled/levels/ui.tmx": {
@@ -624,17 +624,17 @@
         "tiled/levels/asteroid.tmx"
     ],
     "project": "res.tiled-project",
-    "property.type": "file",
+    "property.type": "object",
     "recentFiles": [
         "tiled/levels/ship_pascal.tmx",
-        "tiled/levels/asteroid.tmx",
-        "tiled/levels/rules/rules.tmx",
-        "tiled/levels/rules/rules1.tmx",
-        "tiled/levels/ui.tsx",
-        "tiled/levels/ui.tmx",
-        "tiled/levels/colls.tsx",
-        "tiled/levels/alpha.tsx",
         "tiled/levels/bridge.tmx",
+        "tiled/levels/alpha.tsx",
+        "tiled/levels/colls.tsx",
+        "tiled/levels/ui.tmx",
+        "tiled/levels/ui.tsx",
+        "tiled/levels/rules/rules1.tmx",
+        "tiled/levels/rules/rules.tmx",
+        "tiled/levels/asteroid.tmx",
         "tiled/levels/alphamap.tmx",
         "tiled/levels/items.tsx",
         "tiled/levels/server_test.tmx"

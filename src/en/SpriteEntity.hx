@@ -20,6 +20,8 @@ class SpriteEntity extends Structure {
 			spr.set(sprFrame.group);
 		}
 		super.init(x, z, tmxObj);
+		// mesh.isLong=true;
+		// mesh.isoHeight=mesh.isoWidth=0;
 		if ( tmxObj != null && tmxObj.properties.exists("interactable") ) {
 			interactable = tmxObj.properties.getBool("interactable");
 		}

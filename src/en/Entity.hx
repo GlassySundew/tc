@@ -1,5 +1,6 @@
 package en;
 
+import ui.InventoryGrid.CellGrid;
 import haxe.Unserializer;
 import haxe.crypto.Base64;
 import haxe.io.Bytes;
@@ -122,6 +123,8 @@ import h3d.scene.Mesh;
 
 	inline function get_tmxTile() return Tools.getTileByGid(Level.inst.data, tmxObj.objectType.getParameters()[0]);
 
+	public var sqlId : Null<Int>;
+
 	public var tmxObj : TmxObject;
 	public var colorAdd : h3d.Vector;
 	public var spr : HSprite;
@@ -143,6 +146,8 @@ import h3d.scene.Mesh;
 
 	public static var isoCoefficient = 1.2;
 
+	public var invGrid : CellGrid;
+
 	var debugLabel : Null<h2d.Text>;
 
 	public function new(?x : Float = 0, ?z : Float = 0, ?tmxObj : Null<TmxObject>) {
@@ -156,11 +161,11 @@ import h3d.scene.Mesh;
 		cd = new dn.Cooldown(Const.FPS);
 		tw = new Tweenie(Const.FPS);
 
-		if ( spr == null ) throw "spr hasnt been initialised";
+		if ( spr == null ) throw "spr hasnt been initialised in " + this;
 		if ( spr != null && spr.groupName == null && sprFrame != null ) {
 			spr.set(sprFrame.group, sprFrame.frame);
 		}
-		this.tmxObj = tmxObj;
+		if ( this.tmxObj == null && tmxObj != null ) this.tmxObj = tmxObj;
 
 		#if !headless
 		spr.colorAdd = colorAdd = new h3d.Vector();
@@ -319,15 +324,37 @@ import h3d.scene.Mesh;
 
 	@:keep
 	public function customSerialize(ctx : hxbit.Serializer) {
-		ctx.addString(Base64.encode(Bytes.ofString(Serializer.run(tmxObj))));
+		if ( tmxObj != null ) ctx.addString(Base64.encode(Bytes.ofString(Serializer.run(tmxObj)))); else
+			ctx.addString("");
+
 		ctx.addString(spr.groupName);
 		ctx.addInt(spr.frame);
 		ctx.addBool(flippedX);
+
+		// items inventory
+		if ( invGrid != null ) {
+			ctx.addInt(invGrid.grid.length);
+			ctx.addInt(invGrid.grid[0].length);
+			for (i in invGrid.grid) for (j in i) {
+				if ( j.item != null ) {
+					ctx.addString(Std.string(j.item.cdbEntry));
+					ctx.addInt(j.item.amount);
+				} else {
+					ctx.addString("null");
+					ctx.addInt(0);
+				}
+			}
+		} else {
+			ctx.addInt(0);
+			ctx.addInt(0);
+		}
 	}
 
 	@:keep
 	public function customUnserialize(ctx : hxbit.Serializer) {
-		tmxObj = Unserializer.run(Base64.decode(ctx.getString()).toString());
+		// tmx object
+		var tmxUnser = ctx.getString();
+		if ( tmxUnser != "" ) tmxObj = Unserializer.run(Base64.decode(tmxUnser).toString());
 
 		sprFrame = {
 			group : ctx.getString(),
@@ -340,6 +367,22 @@ import h3d.scene.Mesh;
 			flipX();
 		}
 		offsetFootByCenterReversed();
+
+		// items inventory
+		var invHeight = ctx.getInt();
+		var invWidth = ctx.getInt();
+		if ( invGrid == null && invHeight > 0 && invWidth > 0 ) invGrid = new CellGrid(invWidth, invHeight);
+
+		for (i in 0...invHeight) for (j in 0...invWidth) {
+			var itemString = ctx.getString();
+			var itemAmount = ctx.getInt();
+			if ( itemString != "null" ) {
+				var item = Item.fromCdbEntry(Data.items.resolve(itemString).id, itemAmount);
+				item.containerEntity = this;
+
+				invGrid.grid[i][j].item = item;
+			}
+		}
 	}
 
 	public function networkAllow(op : hxbit.NetworkSerializable.Operation, propId : Int, clientSer : hxbit.NetworkSerializable) : Bool {
@@ -362,7 +405,7 @@ import h3d.scene.Mesh;
 			mesh.remove();
 		}
 
-		cd.destroy();
+		// cd.destroy();
 		#if !headless
 		tex.dispose();
 		#end

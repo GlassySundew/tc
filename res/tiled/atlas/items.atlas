@@ -1,6 +1,6 @@
 
 items.png
-size: 64, 32
+size: 80, 32
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
@@ -53,9 +53,16 @@ seaweed
   orig: 16, 16
   offset: 0, 0
   index: -1
-shadow
+seeds_seaweed
   rotate: false
   xy: 48, 0
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+shadow
+  rotate: false
+  xy: 64, 16
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

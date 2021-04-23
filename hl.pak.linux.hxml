@@ -1,5 +1,5 @@
 hl.sdl.hxml
--hl redist/sdl_linux/tc/hlboot.dat
+-hl redist/sdl_linux/hlboot.dat
 
 -D pak
 -D linux

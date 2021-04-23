@@ -1,5 +1,6 @@
 package ui;
 
+import hxd.Event;
 import h2d.RenderContext;
 import h2d.ScaleGrid;
 import ui.s2d.EventInteractive;
@@ -78,14 +79,16 @@ class VerticalSlider extends EventInteractive {
 				onChange();
 				var scene = scene;
 				value = getValue(e.relY);
-				startCapture(function(e) {
+				var capture = (e : Event) -> {
 					if ( this.scene != scene || e.kind == ERelease ) {
 						scene.stopCapture();
 						return;
 					}
 					value = getValue(e.relY);
 					onChange();
-				});
+				}
+				capture(e);
+				startCapture(capture);
 			default:
 		}
 	}

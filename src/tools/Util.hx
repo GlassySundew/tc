@@ -32,7 +32,7 @@ class Util {
 	static var eregFileName = ~/\/([a-z_0-9]+)\./;
 
 	inline static function loadTileFromCdb(cdbTile : TilePos) : Tile {
-		return Res.load(cdbTile.file).toTile().sub(cdbTile.x * cdbTile.size, cdbTile.y * cdbTile.size, cdbTile.size, cdbTile.size);
+		return Res.loader.loadParentalFix(cdbTile.file).toTile().sub(cdbTile.x * cdbTile.size, cdbTile.y * cdbTile.size, cdbTile.size, cdbTile.size);
 	}
 
 	inline static function checkPolyClockwise(points : Array<Dynamic>) {
@@ -205,9 +205,7 @@ class SocketHostExtender {
 class LoaderExtender {
 	// unsafe crutch, removes ../ from path, use only if you you have link to the folder upper in dir
 	public static function loadParentalFix(loader : Loader, path : String) : Any {
-		if ( StringTools.contains(path, "../") ) {
-			path = StringTools.replace(path, "../", "");
-		}
+		while( StringTools.contains(path, "../") )path = StringTools.replace(path, "../", "");
 		return new Any(loader, loader.fs.get(path));
 	}
 }

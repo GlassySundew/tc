@@ -84,12 +84,30 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 	// }
 
 	public function startLevel(name : String) {
-		// var cachedLevel = Save.inst.getCachedLevelByName(name.split(".")[0]);
+		// var cachedLevel = Save.inst.getLevelByName(name.split(".")[0]);
 		// if ( cachedLevel != null ) {
 		// Save.inst.spawnLevelFromCache(cachedLevel);
 		// } else {
-		tmxMap = resolveMap(name);
-		startLevelFromParsedTmx(tmxMap, name);
+
+		if ( level != null ) {
+			var cachedLevel = Save.inst.saveLevel(level);
+		}
+
+		var levelFromCache = Save.inst.loadLevelByName(name.split(".")[0]);
+		if ( levelFromCache == null ) {
+			tmxMap = resolveMap(name);
+			startLevelFromParsedTmx(tmxMap, name);
+
+			var cachedPlayer = Save.inst.playerSavedOn(level);
+			if ( cachedPlayer != null ) {
+				Save.inst.loadEntity(cachedPlayer);
+				player = Player.inst;
+				targetCameraOnPlayer();
+			}
+		} else {
+			level = levelFromCache;
+		}
+
 		// }
 	}
 
@@ -100,12 +118,17 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 
 		if ( level != null ) {
 			level.destroy();
-			for (e in Entity.ALL) e.destroy();
+			for (e in Entity.ALL) {
+				e.destroy();
+			}
 			gc();
 		}
 
 		level = new Level(tmxMap);
 		level.lvlName = lvlName = name.split('.')[0];
+
+		// получаем sql id для уровня
+		Save.inst.bringPlayerToLevel(Save.inst.saveLevel(level));
 
 		// Entity spawning
 		CompileTime.importPackage("en");
@@ -129,6 +152,7 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 					return;
 				}
 			}
+			// если не найдено подходящего класса, то спавним spriteEntity, который является просто спрайтом
 			switch( e.objectType ) {
 				case OTTile(gid):
 					var source = Tools.getTileByGid(tmxMap, gid).image.source;
@@ -139,17 +163,24 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 				default:
 			}
 		}
-		for (e in level.entities) searchAndSpawnEnt(e);
+		// Загрузка игрока при переходе в другую локацию
+		var cachedPlayer = Save.inst.playerSavedOn(level);
+
+		if ( cachedPlayer != null ) {
+			for (e in level.entities) if ( e.name != "player" ) searchAndSpawnEnt(e);
+			// Save.inst.loadEntity(cachedPlayer);
+		} else
+			for (e in level.entities) searchAndSpawnEnt(e);
 
 		applyTmxObjOnEnt();
 
 		player = Player.inst;
-
 		targetCameraOnPlayer();
 
 		delayer.addF(() -> {
 			hideStrTiles();
 		}, 2);
+
 		return level;
 	}
 
@@ -289,6 +320,11 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 
 	override function onDispose() {
 		super.onDispose();
+		if ( Player.inst != null ) {
+			Player.inst.saveSettings();
+		}
+		Settings.saveSettings();
+
 		inst = null;
 
 		if ( camera != null ) camera.destroy();

@@ -1,5 +1,6 @@
 package ui;
 
+import cherry.soup.EventSignal.EventSignal1;
 import MainMenu.TextButton;
 import dn.Process;
 import h2d.Bitmap;
@@ -102,7 +103,7 @@ class SaveManager extends SecondaryMenu {
 	}
 
 	function displaySaveEntries() {
-		for (i in saveFiles) {
+		for (i in params.saveFiles) {
 			var e = new SaveEntry(i, mode, saveEntriesFlow);
 			entries.push(e);
 		}
@@ -144,7 +145,7 @@ class SaveManager extends SecondaryMenu {
 	override function onRemove() {
 		super.onRemove();
 		for (i in entries) i.destroy();
-		onLoad();
+		if ( onLoad != null ) onLoad();
 	}
 }
 
@@ -281,16 +282,18 @@ class SaveEntry extends Process {
 }
 
 class Dialog extends SecondaryMenu {
-	var activateEvent : Event -> Void;
+	var activateEvent : EventSignal1<Event>;
 
 	public function new(activateEvent : Event -> Void, mode : Mode, ?parent : Object) {
 		super(parent);
-		this.activateEvent = (e) -> {
+		this.activateEvent = new EventSignal1<Event>();
+
+		this.activateEvent.add((e) -> {
 			activateEvent(e);
 			refreshSaves();
-			SaveManager.inst.refreshEntries();
+			if ( SaveManager.inst != null ) SaveManager.inst.refreshEntries();
 			remove();
-		};
+		});
 	}
 
 	override function sync(ctx : RenderContext) {
@@ -304,6 +307,8 @@ class NewSaveDialog extends Dialog {
 	var buttonsFlow : Flow;
 	var generalFlow : Flow;
 
+	public var textInput : TextInput;
+
 	public function new(activateEvent : Event -> Void, mode : Mode, ?parent : Object) {
 		super(activateEvent, mode, parent);
 		generalFlow = new Flow(this);
@@ -316,10 +321,10 @@ class NewSaveDialog extends Dialog {
 		var dialogText = new Text(Assets.fontPixel, dialogFlow);
 		dialogText.text = 'Enter new save name: ';
 
-		var textInput = new TextInput(Assets.fontPixel, dialogFlow);
+		 textInput = new TextInput(Assets.fontPixel, dialogFlow);
 
 		textInput.onKeyDown = function(e) {
-			if ( e.keyCode == Key.ENTER ) this.activateEvent(e);
+			if ( e.keyCode == Key.ENTER ) this.activateEvent.dispatch(e);
 		}
 
 		buttonsFlow = new Flow(generalFlow);
@@ -329,27 +334,29 @@ class NewSaveDialog extends Dialog {
 		buttonsFlow.minWidth = generalFlow.outerWidth;
 
 		var newSaveCount = 0;
-		for (i in saveFiles) {
+		for (i in params.saveFiles) {
 			if ( StringTools.startsWith(i, "new_save") ) newSaveCount++;
 		}
 		textInput.text = "new_save" + newSaveCount;
 
-		this.activateEvent = (e) -> {
+		this.activateEvent.add((e) -> {
 			mode = New(textInput.text);
 			try {
 				tools.Save.inst.makeFreshSave(textInput.text);
+				// tools.Save.inst.saveGame(textInput.text);
 			}
 			catch( e:Dynamic ) {
 				var errorText = new Text(Assets.fontPixel, generalFlow);
 				errorText.text = '$e'.split(":")[1];
 			}
 			refreshSaves();
-			SaveManager.inst.refreshEntries();
+			if ( SaveManager.inst != null ) SaveManager.inst.refreshEntries();
+
 			remove();
-		}
+		});
 
 		var yesBut = new TextButton("ok", (e) -> {
-			this.activateEvent(e);
+			this.activateEvent.dispatch(e);
 		}, buttonsFlow);
 		var noBut = new TextButton("cancel", (e) -> {
 			remove();
@@ -387,10 +394,10 @@ class RenameDialog extends Dialog {
 		buttonsFlow.minWidth = generalFlow.outerWidth;
 
 		textInput.text = name;
-		textInput.onKeyDown = function(e) if ( e.keyCode == Key.ENTER ) this.activateEvent(e);
+		textInput.onKeyDown = function(e) if ( e.keyCode == Key.ENTER ) this.activateEvent.dispatch(e);
 
 		var yesBut = new TextButton("ok", (e) -> {
-			this.activateEvent(e);
+			this.activateEvent.dispatch(e);
 		}, buttonsFlow);
 		var noBut = new TextButton("cancel", (e) -> {
 			remove();

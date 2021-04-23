@@ -64,7 +64,7 @@ class NavigationTargetsGen extends Object {
 	}
 
 	var jumpReach = 65;
-
+	
 	public function initAsteroidField() {
 		var poissonMap = new UniformPoissonDisk(new Point(0, 0));
 		var sampledPoints = poissonMap.sample(new Point(-100, -100), new Point(100, 100), (p : Point) -> {

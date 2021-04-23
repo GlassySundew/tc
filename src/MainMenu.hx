@@ -29,10 +29,9 @@ class MainMenu extends Process {
 
 		this.parents2d = parent;
 
-		createRootInLayers(Main.inst.root, Const.DP_BG);
 		parentFlow = new Object();
 
-		root.add(parentFlow, Const.DP_BG);
+		Main.inst.root.add(parentFlow, Const.DP_BG);
 
 		vertFlow = new Flow(parentFlow);
 		socialFlow = new Flow(parentFlow);
@@ -92,13 +91,25 @@ class MainMenu extends Process {
 			Main.inst.startGameClient();
 		}, vertFlow);
 
-		new TextButton("start demo (offline)", (_) -> {
-			destroy();
-			Main.inst.startGame();
-			Game.inst.startLevel("ship_pascal");
+		var newGame : TextButton = null;
+		newGame = new TextButton("new game", (_) -> {
+			var dialog : NewSaveDialog = null;
+			dialog = new NewSaveDialog((e) -> {
+				Main.inst.startGame();
+				Game.inst.startLevel("ship_pascal.tmx");
+				tools.Save.inst.saveGame(dialog.textInput.text);
+				destroy();
+			}, Save, Main.inst.root);
+			Main.inst.root.add(dialog, Const.DP_UI + 2);
+			dialog.x = parentFlow.x;
+			dialog.y = newGame.y;
+
+			// destroy();
+			// Main.inst.startGame();
+			// Game.inst.startLevel("ship_pascal");
 		}, vertFlow);
 
-		if ( saveFiles.length > 0 ) {
+		if ( params.saveFiles.length > 0 ) {
 			var loadGame : Object = null;
 			loadGame = new TextButton("load game", (_) -> {
 				var loadMan = new SaveManager(Load, () -> {
@@ -109,7 +120,7 @@ class MainMenu extends Process {
 			}, vertFlow);
 		}
 		new TextButton("options", (_) -> {
-			new OptionsMenu(root);
+			new OptionsMenu(parentFlow);
 		}, vertFlow);
 
 		new TextButton("exit", (_) -> {
@@ -132,9 +143,7 @@ class MainMenu extends Process {
 
 	override function onDispose() {
 		super.onDispose();
-		root.remove();
-		root.removeChildren();
-		this.destroy();
+		parentFlow.remove();
 	}
 }
 
@@ -188,9 +197,9 @@ class OptionsMenu extends SecondaryMenu {
 		nickname.text = "username: ";
 
 		nicknameInput = new ui.TextInput(Assets.fontPixel, horFlow);
-		nicknameInput.text = Settings.nickname != null ? Settings.nickname : "unnamed player";
+		nicknameInput.text = Settings.params.nickname;
 		nicknameInput.onFocusLost = function(e : Event) {
-			Settings.nickname = nicknameInput.text;
+			Settings.params.nickname = nicknameInput.text;
 			Settings.saveSettings();
 		}
 

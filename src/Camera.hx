@@ -52,7 +52,7 @@ class Camera extends dn.Process {
 		}
 		s3dCam.target.x = (x);
 		s3dCam.target.z = (y);
-		s3dCam.pos = s3dCam.target.add(new Vector(0, -(w() * 1) / (2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * (Math.PI / 180))), -0.001));
+		s3dCam.pos = s3dCam.target.add(new Vector(0, -(w() * 1) / (2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * (Math.PI / 180))), -0.01));
 	}
 
 	public inline function stopTracking() {

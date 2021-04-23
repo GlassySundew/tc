@@ -1,24 +1,18 @@
 package en;
 
-import en.player.Player;
-import h3d.scene.Object;
-import h3d.Vector;
-import shader.PolyDedepther;
-import h3d.mat.Pass;
 import en.objs.IsoTileSpr;
-import h3d.mat.Material;
-import h2d.Tile;
-import hxGeomAlgo.HxPoint;
-import h3d.col.Point;
+import en.player.Player;
+import format.tmx.Data.TmxObject;
 import h2d.Bitmap;
-import hxd.BitmapData;
-import hxd.Res;
+import h3d.Vector;
+import h3d.col.Point;
+import h3d.mat.Material;
 import h3d.mat.Texture;
 import h3d.prim.UV;
-import h3d.prim.Polygon;
-import hxd.IndexBuffer;
 import h3d.scene.Mesh;
-import format.tmx.Data.TmxObject;
+import h3d.scene.Object;
+import hxGeomAlgo.HxPoint;
+import shader.PolyDedepther;
 
 class FloatingItem extends Interactive {
 	var item : en.Item;

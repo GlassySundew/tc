@@ -222,6 +222,15 @@
 					"damage": 0
 				},
 				{
+					"id": "seeds_seaweed",
+					"atlas_name": "seeds_seaweed",
+					"display_name": "Seaweed seeds",
+					"cat": 1,
+					"stack": 2,
+					"can_hit": false,
+					"damage": 0
+				},
+				{
 					"id": "axe",
 					"atlas_name": "fireaxe",
 					"display_name": "Fireaxe",
@@ -372,6 +381,55 @@
 							"amount": 3
 						}
 					]
+				},
+				{
+					"id": "",
+					"name": "",
+					"item_icon": "iron",
+					"ingreds": [],
+					"result": []
+				},
+				{
+					"id": "",
+					"name": "",
+					"item_icon": "iron",
+					"ingreds": [],
+					"result": []
+				},
+				{
+					"id": "",
+					"name": "",
+					"item_icon": "iron",
+					"ingreds": [],
+					"result": []
+				},
+				{
+					"id": "",
+					"name": "",
+					"item_icon": "iron",
+					"ingreds": [],
+					"result": []
+				},
+				{
+					"id": "",
+					"name": "",
+					"item_icon": "iron",
+					"ingreds": [],
+					"result": []
+				},
+				{
+					"id": "",
+					"name": "",
+					"item_icon": "iron",
+					"ingreds": [],
+					"result": []
+				},
+				{
+					"id": "",
+					"name": "",
+					"item_icon": "iron",
+					"ingreds": [],
+					"result": []
 				}
 			],
 			"separators": [],
@@ -388,27 +446,23 @@
 				},
 				{
 					"typeStr": "14",
-					"name": "img",
-					"kind": null,
-					"editor": {
-						"categories": null
-					}
+					"name": "img"
 				}
 			],
 			"lines": [
 				{
 					"id": "asteroid0",
 					"img": {
-						"file": "../../../../../../../../../../../..//home/glassysundew/Projects/tc/res/tiled/atlas/ui.png",
+						"file": "tiled/atlas/ui.png",
 						"size": 32,
-						"x": 0,
+						"x": 10,
 						"y": 0
 					}
 				},
 				{
 					"id": "asteroid1",
 					"img": {
-						"file": "../../../../../../../../../../../..//home/glassysundew/Projects/tc/res/tiled/atlas/ui.png",
+						"file": "tiled/atlas/ui.png",
 						"size": 32,
 						"x": 5,
 						"y": 0
@@ -417,18 +471,18 @@
 				{
 					"id": "asteroid2",
 					"img": {
-						"file": "../../../../../../../../../../../..//home/glassysundew/Projects/tc/res/tiled/atlas/ui.png",
+						"file": "tiled/atlas/ui.png",
 						"size": 32,
-						"x": 10,
+						"x": 15,
 						"y": 0
 					}
 				},
 				{
 					"id": "asteroid3",
 					"img": {
-						"file": "../../../../../../../../../../../..//home/glassysundew/Projects/tc/res/tiled/atlas/ui.png",
+						"file": "tiled/atlas/ui.png",
 						"size": 32,
-						"x": 15,
+						"x": 0,
 						"y": 0
 					}
 				}

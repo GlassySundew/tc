@@ -71,7 +71,7 @@ limitMemory=false
 useIndexes=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:separated/items/door.png,type:Input,regionName:null},{path:separated/items/emerald.png,type:Input,regionName:null},{path:separated/items/fireaxe.png,type:Input,regionName:null},{path:separated/items/hydroponics.png,type:Input,regionName:null},{path:separated/items/item_gravity_manipulator.png,type:Input,regionName:null},{path:separated/items/item_iron_ore.png,type:Input,regionName:null},{path:separated/items/seaweed.png,type:Input,regionName:null},{path:separated/items/shadow.png,type:Input,regionName:null}]
+inputFiles=[{path:separated/items/door.png,type:Input,regionName:null},{path:separated/items/emerald.png,type:Input,regionName:null},{path:separated/items/fireaxe.png,type:Input,regionName:null},{path:separated/items/hydroponics.png,type:Input,regionName:null},{path:separated/items/item_gravity_manipulator.png,type:Input,regionName:null},{path:separated/items/item_iron_ore.png,type:Input,regionName:null},{path:separated/items/seaweed.png,type:Input,regionName:null},{path:separated/items/seeds_seaweed.png,type:Input,regionName:null},{path:separated/items/shadow.png,type:Input,regionName:null}]
 
 
 ---

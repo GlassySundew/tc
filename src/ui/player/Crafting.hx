@@ -45,6 +45,7 @@ class Crafting extends Window {
 			scrollable.scrollBy(0, e.wheelDelta);
 			slider.value = scrollable.scrollY;
 		};
+		
 		slider.onWheelEvent.add(scrollVoid);
 
 		scrollable = new FixedScrollArea(Std.int(recipeConf.width), Std.int(recipeConf.height), win);

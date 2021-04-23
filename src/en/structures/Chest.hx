@@ -17,6 +17,13 @@ class Chest extends Structure {
 
 	public function new(?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : StructuresKind) {
 		super(x, z, tmxObj, cdbEntry);
+		// adding items from props only when first loaded (with no serialization)
+		for (i in tmxObj.properties.keys()) {
+			var split = i.split(":");
+			if ( split.length > 1 && split[0] == "items" ) {
+				invGrid.giveItem(Item.fromCdbEntry(Data.items.resolve(split[1]).id), this);
+			}
+		}
 	}
 
 	public override function init(?x : Float, ?z : Float, ?tmxObj : TmxObject) {
@@ -25,10 +32,8 @@ class Chest extends Structure {
 
 		initInv(uiConf.get("chest").getObjectByName("grid"));
 
-		inv.giveItem(Item.fromCdbEntry(axe), this);
-
 		#if !headless
-		inventory = new ChestWin(inv, Level.inst.game.root);
+		inventory = new ChestWin(invGrid, Level.inst.game.root);
 		inventory.containmentEntity = this;
 		#end
 
@@ -45,7 +50,8 @@ class Chest extends Structure {
 	override function postUpdate() {
 		super.postUpdate();
 
-		if ( distPx(Player.inst) > Data.structures.get(cdbEntry).use_range
+		if ( Player.inst != null
+			&& distPx(Player.inst) > Data.structures.get(cdbEntry).use_range
 			&& inventory.win.visible == true ) inventory.win.visible = false;
 	}
 
@@ -60,8 +66,8 @@ class ChestWin extends Inventory {
 		super(invGrid, parent);
 
 		dragable.onDrag.add((x, y) -> {
-			Settings.chestCoordRatio.x = win.x / Main.inst.w();
-			Settings.chestCoordRatio.y = win.y / Main.inst.h();
+			Settings.params.chestCoordRatio.x = win.x / Main.inst.w();
+			Settings.params.chestCoordRatio.y = win.y / Main.inst.h();
 		});
 
 		headingLabel.textLabel.labelTxt.text = "Chest";
@@ -69,8 +75,9 @@ class ChestWin extends Inventory {
 	}
 
 	override function toggleVisible() {
-		win.x = Settings.chestCoordRatio.toString() == new Vector(-1, -1).toString() ? win.x : Settings.chestCoordRatio.x * Main.inst.w();
-		win.y = Settings.chestCoordRatio.toString() == new Vector(-1, -1).toString() ? win.y : Settings.chestCoordRatio.y * Main.inst.h();
+		win.x = Settings.params.chestCoordRatio.toString() == new Vector(-1, -1).toString() ? win.x : Settings.params.chestCoordRatio.x * Main.inst.w();
+		win.y = Settings.params.chestCoordRatio.toString() == new Vector(-1, -1).toString() ? win.y : Settings.params.chestCoordRatio.y * Main.inst.h();
+
 		super.toggleVisible();
 	}
 }

@@ -1,4 +1,5 @@
 hl.dx.hxml
--hl redist/sdl_win/tc/hlboot.dat
+-hl redist/dx_win/hlboot.dat
 -D pak
 -D windows
+-debug

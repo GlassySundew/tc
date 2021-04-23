@@ -91,6 +91,19 @@ class Structure extends Interactive {
 		super.customUnserialize(ctx);
 	}
 
+	function dropAllItems(?angle : Float, ?power : Float) {
+		if ( invGrid != null ) {
+			for (i in invGrid.grid) {
+				for (j in i) {
+					if ( j.item != null ) {
+						j.item = dropItem(j.item, angle == null ? Math.random() * M.toRad(360) : angle,
+							power == null ? Math.random() * .03 * 48 + .01 : power);
+					}
+				}
+			}
+		}
+	}
+
 	public function applyItem(item : Item) {
 		emitDestroyItem(item);
 		if ( Data.items.get(item.cdbEntry).can_hit ) {
@@ -139,12 +152,12 @@ class Structure extends Interactive {
 	}
 
 	function initInv(gridConf : TmxObject) {
-		inv = new CellGrid(gridConf.properties.getInt("width"), gridConf.properties.getInt("height"), gridConf.properties.getInt("tileWidth"),
-			gridConf.properties.getInt("tileHeight"));
+		if ( invGrid == null ) invGrid = new CellGrid(gridConf.properties.getInt("width"), gridConf.properties.getInt("height"),
+			gridConf.properties.getInt("tileWidth"), gridConf.properties.getInt("tileHeight"));
 
-		for (j in 0...inv.grid.length) {
-			for (i in 0...inv.grid[j].length) {
-				var tempInter = inv.grid[j][i];
+		for (j in 0...invGrid.grid.length) {
+			for (i in 0...invGrid.grid[j].length) {
+				var tempInter = invGrid.grid[j][i];
 				tempInter.inter.x = gridConf.x + i * (gridConf.properties.getInt("tileWidth") + gridConf.properties.getInt("gapX"));
 				tempInter.inter.y = gridConf.y + j * (gridConf.properties.getInt("tileHeight") + gridConf.properties.getInt("gapY"));
 			}

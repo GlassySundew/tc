@@ -64,7 +64,8 @@ class Belt extends Object {
 		if ( player.holdItem == null || !player.holdItem.isInCursor() ) {
 			selectedCellNumber = number;
 			var cell = beltSlots[number - 1];
-			cell.beltSlot.backgroundTile = h2d.Tile.fromColor(0x6bace6, 1, 1, .58);
+
+			cell.backgroundColor = 0x6bace6;
 			cell.beltSlotNumber.color = Color.intToVector(0xbabac8);
 			cell.paddingBottom = 10;
 
@@ -76,6 +77,8 @@ class Belt extends Object {
 		for (i in beltSlots) {
 			style.addObject(i);
 			i.paddingBottom = 0;
+			//   background: #494e55;
+			i.backgroundColor = 0x3a494e55;
 		}
 	}
 

@@ -3,4 +3,6 @@
 hl.sdl.hxml
 
 -D linux
+
 # -D dispDepthBoxes
+# -D sqlite_debug_verbose

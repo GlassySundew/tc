@@ -4,19 +4,19 @@ beltCont {
   scale: 0.5;
 }
 
-.beltSlot {
-  min-width: 52;
-  min-height: 52;
+.outlineColor {
+}
 
-
-  background: #494e55;
+.backgroundHolder {
+  min-width: 46;
+  min-height: 46;
 }
 
 .hotkeyContainer {
   position: absolute;
   align: top left;
-  padding-left: 8;
-
+  padding-left: 3;
+  padding-top: -3;
 }
 
 .beltSlotNumber {
@@ -27,5 +27,5 @@ beltCont {
   position: absolute;
   align: middle middle;
 
-  scale:2;
+  scale: 2;
 }

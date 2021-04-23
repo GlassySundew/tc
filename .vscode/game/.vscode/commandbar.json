@@ -1,7 +1,7 @@
 {
-  "skipTerminateQuickPick": true,
+  "skipTerminateQuickPick": false,
   "skipSwitchToOutput": false,
-  "skipErrorMessage": true,
+  "skipErrorMessage": false,
   "commands": [
     {
       "text": "Debug HL",
@@ -26,7 +26,8 @@
       "color": "orange",
       "command": "cd ../../ && hl bin/game.hl",
       "alignment": "right",
-      "skipTerminateQuickPick": false,
+      "skipErrorMessage": true,
+      "skipTerminateQuickPick": true,
       "priority": -11
     },
 

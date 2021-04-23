@@ -243,7 +243,6 @@ import h2d.Interactive;
 	}
 
 	override function sync(ctx : RenderContext) {
-		super.sync(ctx);
 		if ( spr != null ) {
 			amountLabel.paddingLeft = 16 - amountLabel.innerWidth;
 			if ( textLabel != null ) {
@@ -277,6 +276,7 @@ import h2d.Interactive;
 				}
 			}
 		}
+		super.sync(ctx);
 	}
 
 	public static function fromCdbEntry(cdbEntry : ItemsKind, ?amount : Int = 1, ?parent : Object) {

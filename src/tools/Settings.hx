@@ -1,5 +1,6 @@
 package tools;
 
+import Sys.SysError;
 import hxd.File;
 import h3d.Vector;
 import haxe.io.Path;
@@ -13,50 +14,52 @@ class Settings {
 		// #end
 		// "/.config/TotalCondemn/settings"
 		"save" + "/"
+
 	// ])
 	;
-	public static var nickname : String;
-	public static var fullscreen : Bool;
-	public static var inventoryCoordRatio : Vector = new Vector(-1, -1);
-	public static var chestCoordRatio : Vector = new Vector(-1, -1);
-	public static var saveFiles : Array<String> = [];
+	public static var params = {
+		nickname : "unnamed player",
+		fullscreen : false,
+		inventoryCoordRatio : new Vector(-1, -1),
+		inventoryVisible : false,
+		chestCoordRatio : new Vector(-1, -1),
+		saveFiles : [],
+	};
 
 	public static function saveSettings() {
 		#if hl
 		sys.FileSystem.createDirectory(Path.directory((SAVEPATH + "settings")));
 		#end
 
-		hxd.Save.save({
-			nickname : nickname,
-			fullscreen : fullscreen,
-			inventoryCoordRatio : inventoryCoordRatio,
-			chestCoordRatio : chestCoordRatio,
-			saveFiles : saveFiles,
-		}, SAVEPATH + "settings");
+		hxd.Save.save(params, SAVEPATH + "settings");
 	}
 
 	public static function loadSettings() {
-		var data = hxd.Save.load(null, SAVEPATH + "settings");
+		#if hl
+		sys.FileSystem.createDirectory(Path.directory((SAVEPATH + "settings")));
+		#end
+
+		var data = hxd.Save.load(params, SAVEPATH + "settings");
 		if ( data != null ) {
-			nickname = data.nickname;
-			fullscreen = data.fullscreen;
-			inventoryCoordRatio = data.inventoryCoordRatio != null ? data.inventoryCoordRatio : inventoryCoordRatio;
-			chestCoordRatio = data.chestCoordRatio != null ? data.chestCoordRatio : chestCoordRatio;
-			saveFiles = saveFiles;
+			params = data;
 		} else
 			sys.FileSystem.createDirectory(Path.directory((SAVEPATH + "settings")));
 		refreshSaves();
 	}
 
 	public static function refreshSaves() {
-		var fileList = File.listDirectory(SAVEPATH);
-		for (i in saveFiles) if ( !fileList.contains(i + Const.SAVEFILE_EXT) ) saveFiles.remove(i);
+		var fileList : Array<String> = [];
+		try {
+			fileList = File.listDirectory(SAVEPATH);
+		} catch( e:SysError ) {}
+		
+		for (i in params.saveFiles) if ( !fileList.contains(i + Const.SAVEFILE_EXT) ) params.saveFiles.remove(i);
 
 		for (i in fileList) {
 			var saveFile = i.split(".")[0];
 
-			if ( !StringTools.startsWith(i, ".") && StringTools.endsWith(i, Const.SAVEFILE_EXT) && !saveFiles.contains(saveFile) ) {
-				saveFiles.push(saveFile);
+			if ( !StringTools.startsWith(i, ".") && StringTools.endsWith(i, Const.SAVEFILE_EXT) && !params.saveFiles.contains(saveFile) ) {
+				params.saveFiles.push(saveFile);
 			}
 		}
 	}

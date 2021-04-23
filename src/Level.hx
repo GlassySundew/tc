@@ -126,7 +126,6 @@ class Level extends dn.Process {
 
 	override function onDispose() {
 		super.onDispose();
-		// Save.inst.cacheLevel(this);
 
 		obj.remove();
 		obj.primitive.dispose();

@@ -1,3 +1,7 @@
+import ui.PauseMenu;
+import MainMenu.TextButton;
+import h2d.Text;
+import h2d.Flow;
 import Level.StructTile;
 import Message.MapLoad;
 import Message.PlayerInit;
@@ -12,9 +16,10 @@ import h3d.scene.CameraController;
 import tools.Settings;
 
 class GameClient extends Process implements GameAble {
-	static var HOST = "0.0.0.0";
-	// static var HOST = "78.24.222.152";
+	// static var HOST = "0.0.0.0";
+	static var HOST = "78.24.222.152";
 	static var PORT = 6676;
+
 	public var network(get, never) : Bool;
 
 	inline function get_network() return false;
@@ -57,12 +62,22 @@ class GameClient extends Process implements GameAble {
 		uid = 1 + Std.random(1000);
 		host.connect(HOST, PORT, function(b) {
 			if ( !b ) {
+				var infoFlow = new Flow(Boot.inst.s2d);
+				infoFlow.verticalAlign = Middle;
+				var textInfo = new Text(Assets.fontPixel, infoFlow);
+				textInfo.text = "Server is down, stay tuned... ";
+				var mainMenuBut = new TextButton("return back to menu", (e) -> {
+					destroy();
+					new MainMenu(Boot.inst.s2d);
+					infoFlow.remove();
+				}, infoFlow);
+
 				trace("Failed to connect to server");
 				return;
 			}
 			trace("Connected to server");
 
-			host.sendTypedMessage(new PlayerInit(uid, Settings.nickname));
+			host.sendTypedMessage(new PlayerInit(uid, Settings.params.nickname));
 
 			// sys.thread.Thread.create(() -> {
 			// 	while( true ) {
@@ -293,8 +308,13 @@ class GameClient extends Process implements GameAble {
 	override function onDispose() {
 		super.onDispose();
 
+		inst = null;
+
+		if ( camera != null ) camera.destroy();
 		for (e in Entity.ALL) e.destroy();
 		gc();
+
+		if ( PauseMenu.inst != null ) PauseMenu.inst.destroy();
 	}
 
 	override function update() {

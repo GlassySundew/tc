@@ -17,7 +17,7 @@ class Door extends Structure {
 	public override function init(?x : Float, ?z : Float, ?tmxObj : TmxObject) {
 		super.init(x, z, tmxObj);
 		if ( tmxObj != null && tmxObj.properties.exists("to") ) leadsTo = tmxObj.properties.getString("to");
-
+		
 		interact.onTextInputEvent.add((e : Event) -> {
 			if ( Key.isPressed(Key.E) ) {
 				turnOffHighlight();
@@ -27,33 +27,34 @@ class Door extends Structure {
 					var curLvl = castedG.lvlName;
 
 					castedG.startLevel(leadsTo);
-					var door = findDoor(curLvl);
-					if ( door != null ) {
-						player.setFeetPos(door.footX, door.footY);
-						castedG.camera.recenter();
-					}
+					Main.inst.delayer.addF(() -> {
+						var door = findDoor(curLvl);
+						if ( door != null ) {
+							player.setFeetPos(door.footX, door.footY);
+							castedG.camera.recenter();
+						}
+					}, 4);
 				}
 			}
 		});
 	}
 
-	@:keep
-	override function customSerialize(ctx : Serializer) {
-		super.customSerialize(ctx);
-	}
+	// @:keep
+	// override function customSerialize(ctx : Serializer) {
+	// 	super.customSerialize(ctx);
+	// }
 
-	@:keep
-	override function customUnserialize(ctx : Serializer) {
-		super.customUnserialize(ctx);
-	}
+	// @:keep
+	// override function customUnserialize(ctx : Serializer) {
+	// 	super.customUnserialize(ctx);
+	// }
 
 	function findDoor(to : String) : Entity {
 		for (e in Entity.ALL) {
-			
-			if ( e.isOfType(en.structures.Door)
-				&& e.tmxObj.properties.exists("to")
-				&& e.tmxObj.properties.getFile("to").split(".")[0] == to ) {
-				return e;
+			if ( e.isOfType(en.structures.Door) ) {
+				if ( e.tmxObj != null && e.tmxObj.properties.exists("to") && e.tmxObj.properties.getFile("to").split(".")[0] == to ) {
+					return e;
+				}
 			}
 		}
 		#if debug
@@ -64,7 +65,6 @@ class Door extends Structure {
 
 	override function postUpdate() {
 		super.postUpdate();
-
 		// mesh.z += 1 / Camera.ppu;
 	}
 }

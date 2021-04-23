@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="2021.02.15" orientation="isometric" renderorder="right-down" compressionlevel="0" width="24" height="24" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="806" nextobjectid="13114">
+<map version="1.5" tiledversion="2021.03.23" orientation="isometric" renderorder="right-down" compressionlevel="0" width="24" height="24" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="806" nextobjectid="13114">
  <tileset firstgid="1" source="alpha.tsx"/>
  <tileset firstgid="112" source="colls.tsx"/>
  <layer id="54" name="proto" width="24" height="24" visible="0" opacity="0.58">
@@ -74,7 +74,11 @@
     <property name="to" type="file" value="bridge.tmx"/>
    </properties>
   </object>
-  <object id="8830" gid="2147483779" x="336" y="216" width="48" height="36"/>
+  <object id="8830" gid="2147483779" x="336" y="216" width="48" height="36">
+   <properties>
+    <property name="items:seeds_seaweed" type="int" value="3"/>
+   </properties>
+  </object>
   <object id="8850" gid="114" x="288" y="216" width="48" height="48"/>
   <object id="10814" x="290.5" y="263.5"/>
   <object id="10906" gid="122" x="264" y="312" width="96" height="72"/>

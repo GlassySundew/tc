@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.5" tiledversion="2021.02.15" name="colls" tilewidth="114" tileheight="134" tilecount="15" columns="10">
+<tileset version="1.5" tiledversion="2021.03.23" name="colls" tilewidth="114" tileheight="134" tilecount="15" columns="10">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="2">
   <image width="48" height="48" source="separated/player/player.png"/>
@@ -86,7 +86,7 @@
   </properties>
   <image width="114" height="134" source="separated/structures/bridge_wall.png"/>
   <objectgroup draworder="index" id="3">
-   <object id="7" name="center" x="14" y="130">
+   <object id="8" name="center" x="0" y="134">
     <point/>
    </object>
   </objectgroup>

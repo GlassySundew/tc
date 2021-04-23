@@ -38,10 +38,12 @@ class PlayerUI extends Layers {
 		inventory = new Inventory(Player.inst.invGrid, this);
 		inventory.containmentEntity = Player.inst;
 
-		inventory.win.x = Settings.inventoryCoordRatio.toString() == new Vector(-1,
-			-1).toString() ? inventory.win.x : Settings.inventoryCoordRatio.x * Main.inst.w();
-		inventory.win.y = Settings.inventoryCoordRatio.toString() == new Vector(-1,
-			-1).toString() ? inventory.win.y : Settings.inventoryCoordRatio.y * Main.inst.h();
+		inventory.win.x = Settings.params.inventoryCoordRatio.toString() == new Vector(-1,
+			-1).toString() ? inventory.win.x : Settings.params.inventoryCoordRatio.x * Main.inst.w();
+		inventory.win.y = Settings.params.inventoryCoordRatio.toString() == new Vector(-1,
+			-1).toString() ? inventory.win.y : Settings.params.inventoryCoordRatio.y * Main.inst.h();
+
+		if ( Settings.params.inventoryVisible ) inventory.toggleVisible();
 
 		// Освобождаем последний ряд для Belt
 		for (i in inventory.invGrid.grid[inventory.invGrid.grid.length - 1]) i.remove();

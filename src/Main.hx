@@ -68,17 +68,17 @@ class Main extends Process {
 		controller.bind(SELECT, Key.ESCAPE);
 
 		onClose = new EventSignal0();
+		
 		Settings.loadSettings();
 
 		onClose.add(() -> {
 			if ( Player.inst != null ) {
-				Settings.inventoryCoordRatio.x = Player.inst.ui.inventory.win.x / w();
-				Settings.inventoryCoordRatio.y = Player.inst.ui.inventory.win.y / h();
+				Player.inst.saveSettings();
 			}
 			Settings.saveSettings();
 		});
 
-		if ( Settings.fullscreen ) toggleFullscreen();
+		if ( Settings.params.fullscreen ) toggleFullscreen();
 
 		@:privateAccess engine.window.onClose = function() {
 			onClose.dispatch();
@@ -91,23 +91,21 @@ class Main extends Process {
 
 	function start() {
 		// Music
-		#if !debug
+		// #if !debug
 		Assets.playMusic();
 		new MainMenu(Boot.inst.s2d);
-		#end
-		#if debug
-		startGame();
-		Game.inst.startLevel("ship_pascal.tmx");
-		#else
-		// new Title();
-		#end
+		// #end
+		// #if debug
+		// startGame();
+		// Game.inst.startLevel("ship_pascal.tmx");
+		// #end
 	}
 
 	public function toggleFullscreen() {
 		#if hl
 		var s = hxd.Window.getInstance();
 		s.displayMode = s.displayMode == Fullscreen ? Windowed : Fullscreen;
-		Settings.fullscreen = s.displayMode == Fullscreen;
+		Settings.params.fullscreen = s.displayMode == Fullscreen;
 		#end
 	}
 

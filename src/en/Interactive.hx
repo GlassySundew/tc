@@ -43,7 +43,6 @@ class Interactive extends Entity {
 	var points : Array<HxPoint>;
 	var iconParent : Object;
 
-	var inv : CellGrid;
 
 	function new(?x : Float = 0, ?z : Float = 0, ?tmxObj : TmxObject) {
 		super(x, z, tmxObj);
@@ -51,7 +50,6 @@ class Interactive extends Entity {
 
 	public override function init(?x : Float, ?z : Float, ?tmxObj : TmxObject) {
 		super.init(x, z, tmxObj);
-		if ( inv == null ) inv = new CellGrid(4, 4);
 		#if !headless
 		var pixels = Pixels.fromBytes(tex.capturePixels().bytes, Std.int(spr.tile.width), Std.int(spr.tile.height));
 		points = new MarchingSquares(pixels).march();
@@ -155,15 +153,7 @@ class Interactive extends Entity {
 		throw "Not part of this array";
 	}
 
-	function dropAllItems(?angle : Float, ?power : Float) {
-		for (i in inv.grid) {
-			for (j in i) {
-				if ( j.item != null ) {
-					j.item = dropItem(j.item, angle == null ? Math.random() * M.toRad(360) : angle, power == null ? Math.random() * .03 * 48 + .01 : power);
-				}
-			}
-		}
-	}
+	
 
 	override function dispose() {
 		interact.visible = false;

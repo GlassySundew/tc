@@ -24,9 +24,9 @@ class Player extends Entity {
 
 	@:s public var nickname : String;
 	public var ui : PlayerUI;
-	public var invGrid : CellGrid;
 
 	public var ca : dn.heaps.Controller.ControllerAccess;
+	public var itemsManager : dn.heaps.Controller.ControllerAccess;
 
 	public var holdItem(default, set) : en.Item;
 
@@ -55,6 +55,7 @@ class Player extends Entity {
 		spr = new HSprite(Assets.player, entParent);
 		#if !headless
 		ca = Main.inst.controller.createAccess("player");
+		itemsManager = Main.inst.controller.createAccess("playerItemsManager");
 		#end
 
 		var direcs = [
@@ -79,7 +80,7 @@ class Player extends Entity {
 		if ( inst == this ) ui = new PlayerUI(Main.inst.root);
 
 		mesh.isLong = true;
-		mesh.isoWidth = mesh.isoHeight = 0;
+		mesh.isoWidth = mesh.isoHeight = 0.1;
 
 		#if dispDepthBoxes
 		mesh.renewDebugPts();
@@ -93,6 +94,16 @@ class Player extends Entity {
 		#if headless
 		enableReplication = true;
 		#end
+	}
+
+	/* записывает настройки  */
+	public function saveSettings() {
+		if ( inst == this ) {
+			Settings.params.inventoryCoordRatio.x = Player.inst.ui.inventory.win.x / Main.inst.w();
+			Settings.params.inventoryCoordRatio.y = Player.inst.ui.inventory.win.y / Main.inst.h();
+
+			Settings.params.inventoryVisible = ui.inventory.win.visible;
+		}
 	}
 
 	override function set_netX(v : Float) : Float {
@@ -111,11 +122,31 @@ class Player extends Entity {
 
 	override function customSerialize(ctx : Serializer) {
 		super.customSerialize(ctx);
+
+		// holditem
+		if ( holdItem != null ) {
+			ctx.addString(Std.string(holdItem.cdbEntry));
+			ctx.addInt(holdItem.amount);
+		} else {
+			ctx.addString("null");
+			ctx.addInt(0);
+		}
 	}
 
 	override function customUnserialize(ctx : Serializer) {
 		if ( inst == null ) inst = this;
+
 		super.customUnserialize(ctx);
+
+		// holditem
+		var holdItemCdb = ctx.getString();
+		var holdItemAmt = ctx.getInt();
+
+		if ( holdItemCdb != "null" ) {
+			var item = Item.fromCdbEntry(Data.items.resolve(holdItemCdb).id, holdItemAmt);
+			item.containerEntity = this;
+			holdItem = item;
+		}
 	}
 
 	override public function networkAllow(op : hxbit.NetworkSerializable.Operation, propId : Int, clientSer : hxbit.NetworkSerializable) : Bool {
@@ -137,8 +168,7 @@ class Player extends Entity {
 
 			GameClient.inst.player = this;
 			GameClient.inst.host.self.ownerObject = this;
-			// жопа значит null
-			sprFrame = {group : "zhopa", frame : 0};
+			sprFrame = {group : "null", frame : 0};
 		}
 		this.netX = netX;
 		this.netY = netY;
@@ -168,11 +198,13 @@ class Player extends Entity {
 		ui.inventory.invGrid.enableGrid();
 	}
 
-	
 	override function dispose() {
 		super.dispose();
 		#if !headless
-		if ( inst == this ) inst = null;
+		if ( inst == this ) {
+			saveSettings();
+			inst = null;
+		}
 		ui.remove();
 		ui = null;
 		if ( nicknameMesh != null ) {
@@ -188,7 +220,7 @@ class Player extends Entity {
 	function syncFrames() {
 		if ( sprFrame != null ) {
 			if ( spr.frame != sprFrame.frame || spr.groupName != sprFrame.group ) {
-				if ( this == inst ) sprFrame = {group : spr.groupName, frame : spr.frame}; else if ( sprFrame == null ) sprFrame = {group : "zhopa", frame : 0}
+				if ( this == inst ) sprFrame = {group : spr.groupName, frame : spr.frame}; else if ( sprFrame == null ) sprFrame = {group : "null", frame : 0}
 				else
 					spr.set(sprFrame.group, sprFrame.frame);
 			}
@@ -197,6 +229,7 @@ class Player extends Entity {
 
 	override public function update() {
 		super.update();
+
 		#if !headless
 		if ( inst == this ) {
 			var leftDist = M.dist(0, 0, ca.lxValue(), ca.lyValue());

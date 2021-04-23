@@ -32,8 +32,10 @@ class Parallax extends Object {
 		mesh.material.mainPass.depth(false, LessEqual);
 
 		Main.inst.delayer.addF(() -> {
-			cameraX = Level.inst.game.camera.x;
-			cameraY = Level.inst.game.camera.y;
+			if ( Level.inst != null ) {
+				cameraX = Level.inst.game.camera.x;
+				cameraY = Level.inst.game.camera.y;
+			}
 		}, 1);
 		mesh.scale(.5);
 		mesh.alwaysSync = true;
