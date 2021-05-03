@@ -491,13 +491,6 @@
 			"props": {}
 		},
 		{
-			"name": "test",
-			"columns": [],
-			"lines": [],
-			"separators": [],
-			"props": {}
-		},
-		{
 			"name": "recipes@result",
 			"props": {
 				"hide": true

@@ -525,8 +525,8 @@
             "scale": 3,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 1307.3333333333333,
-                "y": 477.16666666666663
+                "x": 1200,
+                "y": 584.3333333333333
             }
         },
         "tiled/levels/colls.tsx": {
@@ -584,8 +584,8 @@
             "scale": 2,
             "selectedLayer": 9,
             "viewCenter": {
-                "x": 675,
-                "y": 176.5
+                "x": 654.5,
+                "y": 226.25
             }
         },
         "tiled/levels/ui.tmx": {

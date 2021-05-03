@@ -41,6 +41,11 @@ class Main extends Process {
 			}, 0.2);
 		});
 		#end
+		Boot.inst.renderer = new CustomRenderer();
+		Boot.inst.s3d.renderer = Boot.inst.renderer;
+		Boot.inst.renderer.depthColorMap = hxd.Res.gradients.test.toTexture();
+		Boot.inst.renderer.enableFXAA = false;
+		Boot.inst.renderer.enableSao = false;
 
 		Assets.init();
 		Cursors.init();
@@ -68,7 +73,7 @@ class Main extends Process {
 		controller.bind(SELECT, Key.ESCAPE);
 
 		onClose = new EventSignal0();
-		
+
 		Settings.loadSettings();
 
 		onClose.add(() -> {

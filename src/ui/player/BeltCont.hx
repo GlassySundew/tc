@@ -39,7 +39,6 @@ class BeltCont extends h2d.Flow implements h2d.domkit.Object {
 		super(parent);
 		initComponent();
 		outline = new Outline(2);
-
 		backgroundHolder.filter = outline;
 	}
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="2021.02.15" orientation="isometric" renderorder="right-up" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#afafaf" nextlayerid="61" nextobjectid="113">
+<map version="1.5" tiledversion="2021.03.23" orientation="isometric" renderorder="right-up" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#afafaf" nextlayerid="61" nextobjectid="113">
  <properties>
   <property name="DeleteTiles" type="bool" value="true"/>
   <property name="NoOverlappingRules" type="bool" value="true"/>

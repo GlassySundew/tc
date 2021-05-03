@@ -1,3 +1,4 @@
+import dn.Process;
 import h3d.col.Bounds;
 import h3d.Vector;
 
@@ -30,8 +31,8 @@ class Camera extends dn.Process {
 	// public var wid(get, never):Int;
 	// public var hei(get, never):Int;
 
-	public function new() {
-		super(Game.inst);
+	public function new(?parent : Process) {
+		super(parent == null ? Game.inst : parent);
 		x = y = 0;
 		dx = dy = 0;
 		updateCamera(M.round(x), M.round(y));

@@ -22,13 +22,8 @@ class Boot extends hxd.App {
 
 		inst = this;
 		entParent = new Scene();
-		new Main(s2d);
 
-		renderer = new CustomRenderer();
-		s3d.renderer = renderer;
-		renderer.depthColorMap = hxd.Res.gradients.test.toTexture();
-		renderer.enableFXAA = false;
-		renderer.enableSao = false;
+		new Main(s2d);
 
 		// s2d.scaleMode = AutoZoom(640, 360, true);
 		// s2d.scaleMode = LetterBox(640, 360, true, Center, Center);
@@ -39,7 +34,6 @@ class Boot extends hxd.App {
 		#if( castle && hl && debug )
 		inspector = new hxd.inspect.Inspector(s3d);
 		#end
-
 	}
 
 	override function onResize() {
