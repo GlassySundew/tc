@@ -1,5 +1,6 @@
 package;
 
+import mapgen.AutoMap;
 import tools.Save;
 import cherry.soup.EventSignal.EventSignal0;
 import dn.M;
@@ -96,14 +97,17 @@ class Main extends Process {
 
 	function start() {
 		// Music
-		// #if !debug
-		Assets.playMusic();
+		#if !debug
+		// Assets.playMusic();
+		#end
+		#if debug
 		new MainMenu(Boot.inst.s2d);
-		// #end
-		// #if debug
+		var autoMapper = new AutoMap(resolveMap("rules/rules.tmx"));
+
+		// var extracted = extractTiles()
 		// startGame();
 		// Game.inst.startLevel("ship_pascal.tmx");
-		// #end
+		#end
 	}
 
 	public function toggleFullscreen() {

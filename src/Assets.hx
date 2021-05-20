@@ -65,7 +65,7 @@ class Assets {
 	}
 
 	public static function playMusic() {
-		trace("Playing music");
+		// trace("Playing music");
 		// music.play(true);
 	}
 

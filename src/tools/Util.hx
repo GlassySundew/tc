@@ -1,12 +1,8 @@
 package tools;
 
 import cdb.Types.TilePos;
-import format.tmx.Data.TmxLayer;
-import format.tmx.Data.TmxMap;
-import format.tmx.Data.TmxObject;
-import format.tmx.Data.TmxPoint;
-import format.tmx.Data.TmxTileset;
-import format.tmx.Data.TmxTilesetTile;
+import format.tmx.*;
+import format.tmx.Data;
 import format.tmx.Reader;
 import h2d.Flow;
 import h2d.Scene;
@@ -88,7 +84,7 @@ class Util {
 		return (name : String) -> {
 			var cached : TmxTileset = tsx.get(name);
 			if ( cached != null ) return cached;
-			cached = r.readTSX(Xml.parse(Res.loader.load(Const.LEVELS_PATH + name).entry.getText()));
+			cached = r.readTSX(Xml.parse(Res.loader.loadParentalFix(Const.LEVELS_PATH + name).entry.getText()));
 			tsx.set(name, cached);
 			return cached;
 		}
@@ -134,6 +130,7 @@ class Util {
 	public static var uiConf : Map<String, TmxLayer>;
 
 	public static var inventoryCoordRatio : Vector = new Vector(-1, -1);
+	
 }
 
 class TmxMapExtender {

@@ -1,0 +1,6 @@
+hl.sdl.hxml
+-hl redist/sdl_mac/hlboot.dat
+
+-D pak
+-D mac
+

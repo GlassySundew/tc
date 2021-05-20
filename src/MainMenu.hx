@@ -1,3 +1,4 @@
+import h2d.filter.Bloom;
 import h3d.Matrix;
 import h2d.filter.ColorMatrix;
 import dn.Process;
@@ -25,7 +26,7 @@ class MainMenu extends Process {
 	var parents2d : Object;
 	var blackOverlay : Bitmap;
 
-	public function new(?parent : Object) {
+	public function new( ?parent : Object ) {
 		super(Main.inst);
 
 		this.parents2d = parent;
@@ -98,7 +99,7 @@ class MainMenu extends Process {
 
 		var disco = new Button([disco0.tile, disco1.tile, disco2.tile], socialFlow);
 		disco.scale(.5);
-		disco.onClickEvent.add((_) -> {
+		disco.onClickEvent.add(( _ ) -> {
 			System.openURL("https://discord.gg/8v2DFd6");
 		});
 
@@ -108,7 +109,7 @@ class MainMenu extends Process {
 
 		var twitter = new Button([twitter0.tile, twitter1.tile, twitter2.tile], socialFlow);
 		twitter.scale(.5);
-		twitter.onClickEvent.add((_) -> {
+		twitter.onClickEvent.add(( _ ) -> {
 			System.openURL("https://twitter.com/GlassySundew");
 		});
 
@@ -120,8 +121,8 @@ class MainMenu extends Process {
 
 		var vk = new Button([vk0.tile, vk1.tile, vk2.tile], socialFlow);
 		vk.scale(.5);
-		vk.onClickEvent.add((_) -> {
-			System.openURL("https://vk.com/glassysundewartz");
+		vk.onClickEvent.add(( _ ) -> {
+			System.openURL("https://vk.com/totalcondemn");
 		});
 
 		vertFlow.paddingLeft = 10;
@@ -136,15 +137,15 @@ class MainMenu extends Process {
 
 		vertFlow.addSpacing(10);
 
-		new TextButton("login", (_) -> {
+		new TextButton("login", ( _ ) -> {
 			destroy();
 			Main.inst.startGameClient();
 		}, vertFlow);
 
 		var newGame : TextButton = null;
-		newGame = new TextButton("new game", (_) -> {
+		newGame = new TextButton("new game", ( _ ) -> {
 			var dialog : NewSaveDialog = null;
-			dialog = new NewSaveDialog((e) -> {
+			dialog = new NewSaveDialog(( e ) -> {
 				Main.inst.startGame();
 				Game.inst.startLevel("ship_pascal.tmx");
 				tools.Save.inst.saveGame(dialog.textInput.text);
@@ -161,7 +162,7 @@ class MainMenu extends Process {
 
 		if ( params.saveFiles.length > 0 ) {
 			var loadGame : Object = null;
-			loadGame = new TextButton("load game", (_) -> {
+			loadGame = new TextButton("load game", ( _ ) -> {
 				var loadMan = new SaveManager(Load, () -> {
 					destroy();
 				}, vertFlow);
@@ -169,11 +170,11 @@ class MainMenu extends Process {
 				vertFlow.getProperties(loadMan).isAbsolute = true;
 			}, vertFlow);
 		}
-		new TextButton("options", (_) -> {
+		new TextButton("options", ( _ ) -> {
 			new OptionsMenu(parentFlow);
 		}, vertFlow);
 
-		new TextButton("exit", (_) -> {
+		new TextButton("exit", ( _ ) -> {
 			System.exit();
 		}, vertFlow);
 
@@ -211,7 +212,7 @@ class MainMenu extends Process {
 }
 
 class TextButton extends ui.Button {
-	public function new(string : String, ?action : Event -> Void, ?colorDef : Int = 0xffffff, ?colorPressed : Int = 0x45798d, ?parent) {
+	public function new( string : String, ?action : Event -> Void, ?colorDef : Int = 0xffffff, ?colorPressed : Int = 0x45798d, ?parent ) {
 		var text = new Text(Assets.fontPixel);
 		text.color = Color.intToVector(colorDef);
 		text.smooth = true;
@@ -229,7 +230,7 @@ class TextButton extends ui.Button {
 		var tex2 = new Texture(Std.int(text.textWidth), Std.int(text.textHeight), [Target]);
 		text.drawTo(tex2);
 		super([h2d.Tile.fromTexture(tex0), h2d.Tile.fromTexture(tex1), h2d.Tile.fromTexture(tex2)], parent);
-		onClickEvent.add(action != null ? action : (_) -> {});
+		onClickEvent.add(action != null ? action : ( _ ) -> {});
 	}
 }
 
@@ -237,7 +238,7 @@ class OptionsMenu extends SecondaryMenu {
 	var vertFlow : Flow;
 	var nicknameInput : ui.TextInput;
 
-	public function new(?parent : Object) {
+	public function new( ?parent : Object ) {
 		super(parent);
 
 		vertFlow = new Flow(this);
@@ -261,7 +262,7 @@ class OptionsMenu extends SecondaryMenu {
 
 		nicknameInput = new ui.TextInput(Assets.fontPixel, horFlow);
 		nicknameInput.text = Settings.params.nickname;
-		nicknameInput.onFocusLost = function(e : Event) {
+		nicknameInput.onFocusLost = function ( e : Event ) {
 			Settings.params.nickname = nicknameInput.text;
 			Settings.saveSettings();
 		}
@@ -275,7 +276,7 @@ class OptionsMenu extends SecondaryMenu {
 		// }
 	}
 
-	override function sync(ctx : RenderContext) {
+	override function sync( ctx : RenderContext ) {
 		vertFlow.minHeight = Std.int(Util.hScaled);
 		vertFlow.minWidth = Std.int(Util.wScaled);
 		vertFlow.paddingTop = -Std.int(Util.hScaled / 4);

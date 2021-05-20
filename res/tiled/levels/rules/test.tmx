@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.5" tiledversion="1.6.0" orientation="isometric" renderorder="right-up" width="12" height="12" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#a4a4a4" nextlayerid="6" nextobjectid="1">
+ <tileset firstgid="1" source="../alpha.tsx"/>
+ <layer id="1" name="regions_input" width="12" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAvcCJDPQwPBvWjABUAAMalApU=
+  </data>
+ </layer>
+ <layer id="4" name="input_proto" width="12" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYCAfOEExrdUTq8eJgXQ9yHpHAekAAAd7Axk=
+  </data>
+ </layer>
+ <layer id="2" name="regions_output" width="12" height="12" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAfcKKDelrbMQpQAQD4hwFL
+  </data>
+ </layer>
+ <layer id="5" name="output_zhopa" width="12" height="12" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJxjYBjcwIlGakcBdQAAzWgAhQ==
+  </data>
+ </layer>
+</map>

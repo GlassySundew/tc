@@ -58,18 +58,20 @@ class GameClient extends Process implements GameAble {
 
 		event = new hxd.WaitEvent();
 		host = new hxd.net.SocketHost();
-		host.setLogger(function(msg) trace(msg));
+		host.setLogger(function ( msg ) trace(msg));
 		uid = 1 + Std.random(1000);
-		host.connect(HOST, PORT, function(b) {
+		host.connect(HOST, PORT, function ( b ) {
 			if ( !b ) {
 				var infoFlow = new Flow(Boot.inst.s2d);
 				infoFlow.verticalAlign = Middle;
 				var textInfo = new Text(Assets.fontPixel, infoFlow);
 				textInfo.text = "Server is down, stay tuned... ";
-				var mainMenuBut = new TextButton("return back to menu", (e) -> {
+				var mainMenuBut : TextButton = null;
+				mainMenuBut = new TextButton("return back to menu", ( e ) -> {
+					mainMenuBut.cursor = Default;
+					infoFlow.remove();
 					destroy();
 					new MainMenu(Boot.inst.s2d);
-					infoFlow.remove();
 				}, infoFlow);
 
 				trace("Failed to connect to server");
@@ -91,7 +93,7 @@ class GameClient extends Process implements GameAble {
 			// 	}
 			// });
 		});
-		host.onTypedMessage((c, msg : Message) -> {
+		host.onTypedMessage(( c, msg : Message ) -> {
 			switch( msg.type ) {
 				case mapLoad:
 					var map = cast(msg, MapLoad);
@@ -111,7 +113,7 @@ class GameClient extends Process implements GameAble {
 		// 	}
 		// }
 
-		host.onUnregister = function(o) {};
+		host.onUnregister = function ( o ) {};
 
 		if ( player != null ) {}
 
@@ -127,10 +129,10 @@ class GameClient extends Process implements GameAble {
 		});
 	}
 
-	public function loadMap(tmx : TmxMap) {
+	public function loadMap( tmx : TmxMap ) {
 		if ( level != null ) {
 			level.destroy();
-			for (e in Entity.ALL) e.destroy();
+			for ( e in Entity.ALL ) e.destroy();
 			gc();
 		}
 		tmxMap = tmx;
@@ -170,22 +172,22 @@ class GameClient extends Process implements GameAble {
 		camera.recenter();
 	}
 
-	public function applyTmxObjOnEnt(?ent : Null<Entity>) {
+	public function applyTmxObjOnEnt( ?ent : Null<Entity> ) {
 		// если ent не определён, то на все Entity из массива ALL будут добавлены TmxObject из тайлсета с названием colls
 		// parsing collision objects from 'colls' tileset
-		for (tileset in tmxMap.tilesets) {
+		for ( tileset in tmxMap.tilesets ) {
 			var ereg = ~/(^[^.]*)+/; // regexp to take tileset name
-			if ( ereg.match(tileset.source) && ereg.matched(1) == 'colls' ) for (tile in tileset.tiles) {
+			if ( ereg.match(tileset.source) && ereg.matched(1) == 'colls' ) for ( tile in tileset.tiles ) {
 				if ( eregFileName.match(tile.image.source) ) {
 					var ents = ent != null ? [ent] : Entity.ALL;
-					for (ent in ents) {
+					for ( ent in ents ) {
 						if ( (tile.objectGroup != null && eregClass.match('$ent'.toLowerCase()))
 							&& ((eregClass.matched(1) == eregFileName.matched(1)
 								&& tile.objectGroup.objects.length > 0
 								|| (Std.isOfType(ent, SpriteEntity)
 									&& eregFileName.matched(1) == ent.spr.groupName))) /*&& ent.collisions.length == 0*/ ) {
 							var centerSet = false;
-							for (obj in tile.objectGroup.objects) { // Засовываем объекты для детекта коллизий по Entity
+							for ( obj in tile.objectGroup.objects ) { // Засовываем объекты для детекта коллизий по Entity
 								var params = {
 									x : M.round(obj.x) + ent.footX,
 									y : M.round(obj.y) + ent.footY,
@@ -230,13 +232,13 @@ class GameClient extends Process implements GameAble {
 									case OTPolygon(points):
 										var pts = checkPolyClockwise(points);
 										var verts : Array<Vector> = [];
-										for (i in pts) {
+										for ( i in pts ) {
 											verts.push(new Vector((i.x), (-i.y)));
 										}
 										var yArr = verts.copy();
-										yArr.sort(function(a, b) return (a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0));
+										yArr.sort(function ( a, b ) return (a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0));
 										var xArr = verts.copy();
-										xArr.sort(function(a, b) return (a.x < b.x) ? -1 : ((a.x > b.x) ? 1 : 0));
+										xArr.sort(function ( a, b ) return (a.x < b.x) ? -1 : ((a.x > b.x) ? 1 : 0));
 
 										// xCent и yCent - половины ширины и высоты неповёрнутого полигона соответственно
 										xCent = M.round((xArr[xArr.length - 1].x + xArr[0].x) * .5);
@@ -301,7 +303,7 @@ class GameClient extends Process implements GameAble {
 	function gc() {
 		if ( Entity.GC == null || Entity.GC.length == 0 ) return;
 
-		for (e in Entity.GC) e.dispose();
+		for ( e in Entity.GC ) e.dispose();
 		Entity.GC = [];
 	}
 
@@ -311,7 +313,7 @@ class GameClient extends Process implements GameAble {
 		inst = null;
 
 		if ( camera != null ) camera.destroy();
-		for (e in Entity.ALL) e.destroy();
+		for ( e in Entity.ALL ) e.destroy();
 		gc();
 
 		if ( PauseMenu.inst != null ) PauseMenu.inst.destroy();
@@ -321,20 +323,20 @@ class GameClient extends Process implements GameAble {
 		super.update();
 
 		// Updates
-		for (e in Entity.ALL) if ( !e.destroyed ) e.preUpdate();
-		for (e in Entity.ALL) if ( !e.destroyed ) e.update();
-		for (e in Entity.ALL) if ( !e.destroyed ) e.postUpdate();
-		for (e in Entity.ALL) if ( !e.destroyed ) e.frameEnd();
+		for ( e in Entity.ALL ) if ( !e.destroyed ) e.preUpdate();
+		for ( e in Entity.ALL ) if ( !e.destroyed ) e.update();
+		for ( e in Entity.ALL ) if ( !e.destroyed ) e.postUpdate();
+		for ( e in Entity.ALL ) if ( !e.destroyed ) e.frameEnd();
 		gc();
 
 		host.flush();
 	}
 
 	public function showStrTiles() {
-		for (i in structTiles) i.visible = true;
+		for ( i in structTiles ) i.visible = true;
 	}
 
 	public function hideStrTiles() {
-		for (i in structTiles) i.visible = false;
+		for ( i in structTiles ) i.visible = false;
 	}
 }

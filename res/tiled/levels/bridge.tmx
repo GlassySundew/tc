@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="2021.03.23" orientation="isometric" renderorder="right-down" compressionlevel="0" width="50" height="50" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="52" nextobjectid="755">
+<map version="1.5" tiledversion="1.6.0" orientation="isometric" renderorder="right-down" compressionlevel="0" width="50" height="50" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="55" nextobjectid="755">
  <tileset firstgid="1" source="alpha.tsx"/>
  <tileset firstgid="112" source="colls.tsx"/>
  <layer id="33" name="ground" width="50" height="50" offsetx="0" offsety="4">

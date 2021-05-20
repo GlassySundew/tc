@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "tiled/levels/asteroid.tmx",
+    "activeFile": "tiled/levels/rules/rules.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "tiled"
+        "tiled",
+        "."
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
@@ -517,13 +517,13 @@
             "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 3109.333333333333,
-                "y": 871
+                "x": 2498.6666666666665,
+                "y": 1088.6666666666665
             }
         },
         "tiled/levels/bridge.tmx": {
             "scale": 3,
-            "selectedLayer": 5,
+            "selectedLayer": 3,
             "viewCenter": {
                 "x": 1200,
                 "y": 584.3333333333333
@@ -544,6 +544,14 @@
             "scaleInDock": 1,
             "scaleInEditor": 16
         },
+        "tiled/levels/nothing.tmx": {
+            "scale": 0.25,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1820,
+                "y": 1066
+            }
+        },
         "tiled/levels/rules.tmx": {
             "scale": 4,
             "selectedLayer": 3,
@@ -557,11 +565,11 @@
             "scaleInDock": 1
         },
         "tiled/levels/rules/rules.tmx": {
-            "scale": 2,
+            "scale": 0.33,
             "selectedLayer": 7,
             "viewCenter": {
-                "x": 2400,
-                "y": 1089
+                "x": 1345.4545454545453,
+                "y": 515.1515151515151
             }
         },
         "tiled/levels/rules/rules1.tmx": {
@@ -570,6 +578,14 @@
             "viewCenter": {
                 "x": 2400,
                 "y": 1200
+            }
+        },
+        "tiled/levels/rules/test.tmx": {
+            "scale": 2,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 336.5,
+                "y": 97.25
             }
         },
         "tiled/levels/server_test.tmx": {
@@ -582,18 +598,18 @@
         },
         "tiled/levels/ship_pascal.tmx": {
             "scale": 2,
-            "selectedLayer": 9,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 654.5,
-                "y": 226.25
+                "x": 675,
+                "y": 176.5
             }
         },
         "tiled/levels/ui.tmx": {
-            "scale": 1.5,
+            "scale": 1,
             "selectedLayer": 4,
             "viewCenter": {
                 "x": 500,
-                "y": 499.99999999999994
+                "y": 500
             }
         },
         "tiled/levels/ui.tsx": {
@@ -619,25 +635,24 @@
         "tiled/levels/colls.tsx",
         "tiled/levels/ui.tmx",
         "tiled/levels/ui.tsx",
-        "tiled/levels/rules/rules1.tmx",
         "tiled/levels/rules/rules.tmx",
         "tiled/levels/asteroid.tmx"
     ],
     "project": "res.tiled-project",
     "property.type": "object",
     "recentFiles": [
+        "tiled/levels/nothing.tmx",
         "tiled/levels/ship_pascal.tmx",
         "tiled/levels/bridge.tmx",
         "tiled/levels/alpha.tsx",
         "tiled/levels/colls.tsx",
         "tiled/levels/ui.tmx",
         "tiled/levels/ui.tsx",
-        "tiled/levels/rules/rules1.tmx",
-        "tiled/levels/rules/rules.tmx",
         "tiled/levels/asteroid.tmx",
+        "tiled/levels/rules/rules.tmx",
+        "tiled/levels/rules/rules1.tmx",
         "tiled/levels/alphamap.tmx",
-        "tiled/levels/items.tsx",
-        "tiled/levels/server_test.tmx"
+        "tiled/levels/items.tsx"
     ],
     "resizeMap.removeObjects": true,
     "tileset.embedInMap": false,
