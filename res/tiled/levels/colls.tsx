@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.5" tiledversion="2021.03.23" name="colls" tilewidth="114" tileheight="134" tilecount="15" columns="10">
+<tileset version="1.5" tiledversion="1.7.1" name="colls" tilewidth="114" tileheight="134" tilecount="15" columns="10" backgroundcolor="#171717">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="2">
   <image width="48" height="48" source="separated/player/player.png"/>
@@ -153,13 +153,13 @@
   </objectgroup>
  </tile>
  <tile id="20">
-  <image width="48" height="48" source="separated/structures/teleport.png"/>
+  <image width="48" height="36" source="separated/structures/teleport.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="11" y="37">
-    <polygon points="0,0 13,6 26,0 13,-7"/>
-   </object>
-   <object id="2" name="center" x="24" y="38">
+   <object id="2" name="center" x="24" y="24">
     <point/>
+   </object>
+   <object id="3" x="24" y="31">
+    <polygon points="0,0 -17,-9 0,-17 17,-8"/>
    </object>
   </objectgroup>
  </tile>

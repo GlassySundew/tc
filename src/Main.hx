@@ -1,6 +1,5 @@
 package;
 
-import mapgen.AutoMap;
 import tools.Save;
 import cherry.soup.EventSignal.EventSignal0;
 import dn.M;
@@ -19,7 +18,7 @@ class Main extends Process {
 	public var onClose : EventSignal0;
 	public var save : Save;
 
-	public function new(s : h2d.Scene) {
+	public function new( s : h2d.Scene ) {
 		super();
 		inst = this;
 		createRoot(s);
@@ -33,10 +32,10 @@ class Main extends Process {
 
 		hxd.res.Resource.LIVE_UPDATE = true;
 		#if debug
-		hxd.Res.data.watch(function() {
+		hxd.Res.data.watch(function () {
 			delayer.cancelById("cdb");
 			//
-			delayer.addS("cdb", function() {
+			delayer.addS("cdb", function () {
 				Data.load(hxd.Res.data.entry.getBytes().toString());
 				if ( Game.inst != null ) Game.inst.onCdbReload();
 			}, 0.2);
@@ -53,7 +52,7 @@ class Main extends Process {
 		Lang.init("en");
 
 		uiConf = resolveMap("ui.tmx").getLayersByName();
-		for (i in uiConf) i.localBy(i.getObjectByName("window"));
+		for ( i in uiConf ) i.localBy(i.getObjectByName("window"));
 
 		Data.load(hxd.Res.data.entry.getText());
 
@@ -86,7 +85,7 @@ class Main extends Process {
 
 		if ( Settings.params.fullscreen ) toggleFullscreen();
 
-		@:privateAccess engine.window.onClose = function() {
+		@:privateAccess engine.window.onClose = function () {
 			onClose.dispatch();
 			return true;
 		}
@@ -102,11 +101,14 @@ class Main extends Process {
 		#end
 		#if debug
 		new MainMenu(Boot.inst.s2d);
-		var autoMapper = new AutoMap(resolveMap("rules/rules.tmx"));
 
-		// var extracted = extractTiles()
+		// var autoMapper = new mapgen.AutoMap(resolveMap("rules/rules.tmx"));
+		// var applicableMap = autoMapper.applyRulesToMap(resolveMap("test.tmx"));
+
 		// startGame();
-		// Game.inst.startLevel("ship_pascal.tmx");
+		// Game.inst.startLevel("bridge.tmx");
+
+		// Game.inst.startLevelFromParsedTmx(applicableMap, "test.tmx");
 		#end
 	}
 
@@ -121,7 +123,7 @@ class Main extends Process {
 	public function startGame() {
 		if ( Game.inst != null ) {
 			Game.inst.destroy();
-			delayer.addF(function() {
+			delayer.addF(function () {
 				new Game();
 			}, 2);
 		} else
@@ -131,7 +133,7 @@ class Main extends Process {
 	public function startGameClient() {
 		if ( GameClient.inst != null ) {
 			GameClient.inst.destroy();
-			delayer.addF(function() {
+			delayer.addF(function () {
 				new GameClient();
 			}, 2);
 		} else

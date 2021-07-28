@@ -12,11 +12,11 @@ import ch3.scene.TileSprite;
 class IsoTileSpr extends TileSprite {
 	public var isoWidth(default, set) : Float;
 
-	inline function set_isoWidth(v : Float) return isoWidth = isLong ? v : throw "set isLong before setting iso width/height";
+	inline function set_isoWidth( v : Float ) return isoWidth = isLong ? v : throw "set isLong before setting iso width/height";
 
 	public var isoHeight(default, set) : Float;
 
-	inline function set_isoHeight(v : Float) return isoHeight = isLong ? v : throw "set isLong before setting iso width/height";
+	inline function set_isoHeight( v : Float ) return isoHeight = isLong ? v : throw "set isLong before setting iso width/height";
 
 	public var verts(get, null) : Dynamic;
 
@@ -44,10 +44,10 @@ class IsoTileSpr extends TileSprite {
 
 	var pts : Array<Point> = [];
 
-	public function new(tile : Tile, ppu : Float = 1, faceCamera : Bool = true, ?parent : Object) {
+	public function new( tile : Tile, ppu : Float = 1, faceCamera : Bool = true, ?parent : Object ) {
 		super(tile, ppu, faceCamera, parent);
 
-		#if( debug && dispDepthBoxes )
+		#if( debug && depth_debug )
 		pts.push(new Point(verts.right.x, 0, verts.right.z));
 		pts.push(new Point(verts.down.x, 0, verts.down.z));
 		pts.push(new Point(verts.left.x, 0, verts.left.z));
@@ -63,11 +63,13 @@ class IsoTileSpr extends TileSprite {
 		idx.push(2);
 		idx.push(3);
 		idx.push(0);
+
 		polyPrim = new Polygon(pts, idx);
 		polyPrim.addUVs();
 		polyPrim.addNormals();
 
 		isoDebugMesh = new Mesh(polyPrim, this);
+		isoDebugMesh.y = 1;
 		isoDebugMesh.rotate(0, 0, M.toRad(-90));
 		isoDebugMesh.material.color.setColor(0xffffff);
 		isoDebugMesh.material.shadows = false;
@@ -77,7 +79,7 @@ class IsoTileSpr extends TileSprite {
 	}
 
 	public function renewDebugPts() {
-		#if( debug && dispDepthBoxes )
+		#if( debug && depth_debug )
 		pts = [];
 		pts.push(new Point(getIsoVerts().right.x + xOff, 0, getIsoVerts().right.y + yOff));
 		pts.push(new Point(getIsoVerts().down.x + xOff, 0, getIsoVerts().down.y + yOff));

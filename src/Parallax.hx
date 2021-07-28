@@ -18,7 +18,7 @@ class Parallax extends Object {
 
 	public var parallaxEffect = new Vector(.5, .5);
 
-	public function new(?parent : Object) {
+	public function new( ?parent : Object ) {
 		super(parent);
 		drawer = new HSprite(Assets.env);
 
@@ -32,11 +32,11 @@ class Parallax extends Object {
 		mesh.material.mainPass.depth(false, LessEqual);
 
 		Main.inst.delayer.addF(() -> {
-			if ( Level.inst != null ) {
-				cameraX = Level.inst.game.camera.x;
-				cameraY = Level.inst.game.camera.y;
+			if ( Game.inst != null ) {
+				cameraX = Game.inst.camera.x;
+				cameraY = Game.inst.camera.y;
 			}
-		}, 1);
+		}, 2);
 		mesh.scale(.5);
 		mesh.alwaysSync = true;
 	}
@@ -48,7 +48,7 @@ class Parallax extends Object {
 		tex.filter = Nearest;
 		var tileGroup = new h2d.TileGroup(drawer.tile);
 
-		for (i in 0...Std.int(Random.int(200, 300) * Main.inst.h() / 720)) {
+		for ( i in 0...Std.int(Random.int(100, 200) * Main.inst.h() / 720) ) {
 			drawer.set(Assets.env, Random.fromArray([
 				"red_star_big",
 				"blue_star_big",
@@ -67,7 +67,7 @@ class Parallax extends Object {
 		}
 	}
 
-	override function sync(ctx : RenderContext) {
+	override function sync( ctx : RenderContext ) {
 		super.sync(ctx);
 		if ( Level.inst != null && Level.inst.game != null ) {
 			var deltaX = Level.inst.game.camera.x - cameraX;

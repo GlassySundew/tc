@@ -16,8 +16,8 @@ import h2d.Bitmap;
 import h2d.Object;
 import h2d.Interactive;
 
-@:keep class Item extends Object {
-	public var ent : Entity;
+@:keep class Item extends Object  {
+	 public var ent : Entity;
 	public var spr : HSprite;
 	public var interactive : EventInteractive;
 	public var cdbEntry : Data.ItemsKind;

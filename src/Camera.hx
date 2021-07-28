@@ -124,6 +124,6 @@ class Camera extends dn.Process {
 
 	override function onResize() {
 		super.onResize();
-		if ( parallax != null ) parallax.drawParallax();
+		if ( parallax != null ){ parallax.drawParallax();}
 	}
 }

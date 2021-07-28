@@ -4,5 +4,6 @@ hl.sdl.hxml
 
 -D linux
 
-# -D dispDepthBoxes
+# -D depth_debug
+-D colliders_debug
 # -D sqlite_debug_verbose

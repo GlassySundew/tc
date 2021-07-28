@@ -69,7 +69,7 @@ class Structure extends Interactive {
 				mesh.isoWidth = Data.structures.get(cdbEntry).isoWidth;
 				mesh.isoHeight = Data.structures.get(cdbEntry).isoHeight;
 
-				#if dispDepthBoxes
+				#if depth_debug
 				mesh.renewDebugPts();
 				#end
 			}

@@ -148,7 +148,9 @@ class MainMenu extends Process {
 			dialog = new NewSaveDialog(( e ) -> {
 				Main.inst.startGame();
 				Game.inst.startLevel("ship_pascal.tmx");
-				tools.Save.inst.saveGame(dialog.textInput.text);
+				Main.inst.delayer.addF(() -> {
+					tools.Save.inst.saveGame(dialog.textInput.text);
+				}, 1);
 				destroy();
 			}, Save, Main.inst.root);
 			Main.inst.root.add(dialog, Const.DP_UI + 2);
@@ -165,9 +167,9 @@ class MainMenu extends Process {
 			loadGame = new TextButton("load game", ( _ ) -> {
 				var loadMan = new SaveManager(Load, () -> {
 					destroy();
-				}, vertFlow);
+				}, parentFlow);
 				loadMan.x = loadGame.x + loadGame.getSize().xMax + 20;
-				vertFlow.getProperties(loadMan).isAbsolute = true;
+				parentFlow.getProperties(loadMan).isAbsolute = true;
 			}, vertFlow);
 		}
 		new TextButton("options", ( _ ) -> {

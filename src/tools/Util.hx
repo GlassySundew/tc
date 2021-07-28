@@ -133,9 +133,40 @@ class Util {
 	
 }
 
+class ReverseIterator {
+	var end:Int;
+	var i:Int;
+  
+	public inline function new(start:Int, end:Int) {
+	  this.i = start;
+	  this.end = end;
+	}
+  
+	public inline function hasNext() return i >= end;
+	public inline function next() return i--;
+  }
+  
+  class ReverseArrayKeyValueIterator<T> {
+    final arr:Array<T>;
+    var i:Int;
+
+    public inline function new(arr:Array<T>) {
+        this.arr = arr;
+        this.i = this.arr.length - 1; 
+    }
+
+    public inline function hasNext() return i > -1;
+    public inline function next() {
+        return {value: arr[i], key: i--};
+    }
+
+    public static inline function reversedKeyValues<T>(arr:Array<T>) {
+        return new ReverseArrayKeyValueIterator(arr);
+    }
+}
 class TmxMapExtender {
 	public static function getLayersByName(tmxMap : TmxMap) : Map<String, TmxLayer> {
-		var map : Map<String, TmxLayer> = new Map();
+		var map : Map<String, TmxLayer> = [];
 		for (i in tmxMap.layers) {
 			var name : String = 'null';
 			switch( i ) {

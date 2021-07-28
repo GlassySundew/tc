@@ -84,9 +84,9 @@ class PauseMenu extends Process {
 			}, vertFlow);
 
 			new TextButton("exit to main menu", (e) -> {
-				exit();
 				Game.inst.destroy();
 				new MainMenu(Boot.inst.s2d);
+				exit();
 			}, vertFlow);
 
 			onResize();

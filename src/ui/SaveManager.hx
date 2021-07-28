@@ -20,7 +20,7 @@ import ui.s2d.EventInteractive;
 enum Mode {
 	Save;
 	Load;
-	New(name : String);
+	New( name : String );
 }
 
 class SaveManager extends SecondaryMenu {
@@ -43,9 +43,10 @@ class SaveManager extends SecondaryMenu {
 	var grid : ScaleGrid;
 	var slider : VerticalSlider;
 	var areaBarFlow : Flow;
-	var onLoad : () -> Void;
 
-	public function new(mode : Mode, ?onLoad : () -> Void, ?parent : Object) {
+	public var onLoad : () -> Void;
+
+	public function new( mode : Mode, ?onLoad : () -> Void, ?parent : Object ) {
 		super(parent);
 		this.mode = mode;
 		if ( inst != null ) inst.remove();
@@ -85,7 +86,7 @@ class SaveManager extends SecondaryMenu {
 
 		grid = new ScaleGrid(Tile.fromColor(0x8f8f8f, 1, 1, 1), 1, 1, 1, 1, this);
 		slider = new VerticalSlider(10, scrollArea.height, grid, sliderBack);
-		scrollVoid = (e : Event) -> {
+		scrollVoid = ( e : Event ) -> {
 			scrollArea.scrollBy(0, e.wheelDelta);
 			slider.value = scrollArea.scrollY;
 		};
@@ -96,14 +97,14 @@ class SaveManager extends SecondaryMenu {
 	}
 
 	public function refreshEntries() {
-		for (e in entries) e.destroy();
+		for ( e in entries ) e.destroy();
 		entries = [];
 		saveEntriesFlow.removeChildren();
 		displaySaveEntries();
 	}
 
 	function displaySaveEntries() {
-		for (i in params.saveFiles) {
+		for ( i in params.saveFiles ) {
 			var e = new SaveEntry(i, mode, saveEntriesFlow);
 			entries.push(e);
 		}
@@ -137,15 +138,15 @@ class SaveManager extends SecondaryMenu {
 		areaBarFlow.maxWidth = areaBarFlow.outerWidth;
 	}
 
-	public function selectEntry(e : SaveEntry) {
-		for (e in entries) e.selected = false;
+	public function selectEntry( e : SaveEntry ) {
+		for ( e in entries ) e.selected = false;
 		e.selected = true;
 	}
 
 	override function onRemove() {
 		super.onRemove();
-		for (i in entries) i.destroy();
-		if ( onLoad != null ) onLoad();
+		for ( i in entries ) i.destroy();
+		// if ( onLoad != null ) onLoad();
 	}
 }
 
@@ -154,7 +155,7 @@ class SaveEntry extends Process {
 	var utilityFlow : Flow;
 	var dialog : Dialog;
 
-	function set_dialog(v : Dialog) {
+	function set_dialog( v : Dialog ) {
 		if ( dialog != null ) dialog.remove();
 		return v;
 	}
@@ -163,7 +164,7 @@ class SaveEntry extends Process {
 
 	var thisObject : Object;
 
-	function set_selected(v : Bool) {
+	function set_selected( v : Bool ) {
 		if ( v ) {
 			horflow.backgroundTile = Tile.fromColor(0x454545, 1, 1, .9);
 			utilityFlow.visible = true;
@@ -174,26 +175,27 @@ class SaveEntry extends Process {
 		return selected = v;
 	}
 
-	public function new(name : String, mode : Mode, ?parent : Object) {
+	public function new( name : String, mode : Mode, ?parent : Object ) {
 		super(Main.inst);
 		thisObject = new Object(parent);
 
-		var syncDialog = (dialog : SecondaryMenu) -> {
+		var syncDialog = ( dialog : SecondaryMenu ) -> {
 			Main.inst.root.add(dialog, Const.DP_UI + 2);
 			dialog.x = SaveManager.inst.x;
 			dialog.y = thisObject.y - SaveManager.inst.scrollArea.scrollY + thisObject.getSize().height;
 		}
 		// save/load file
 		var activateEntry = null;
-		activateEntry = (e : Event) -> {
+		activateEntry = ( e : Event ) -> {
 			switch( mode ) {
 				case Save:
 					tools.Save.inst.saveGame(name);
 				case Load:
 					SaveManager.inst.remove();
+					if ( SaveManager.inst.onLoad != null ) SaveManager.inst.onLoad();
 					tools.Save.inst.loadGame(name);
 				case New(name):
-					dialog = new NewSaveDialog((e) -> {}, mode, Main.inst.root);
+					dialog = new NewSaveDialog(( e ) -> {}, mode, Main.inst.root);
 					syncDialog(dialog);
 			}
 		};
@@ -210,7 +212,7 @@ class SaveEntry extends Process {
 
 		interactive.cursor = Button;
 		interactive.onWheel = SaveManager.scrollVoid;
-		interactive.onClick = function(e) {
+		interactive.onClick = function ( e ) {
 			SaveManager.inst.selectEntry(this);
 			if ( selected ) if ( cd.has("doubleClick") ) {
 				activateEntry(e);
@@ -255,22 +257,26 @@ class SaveEntry extends Process {
 		switch mode {
 			case Save | Load:
 				var edit = new Button([edit0.tile, edit1.tile, edit0.tile], utilityFlow);
-				edit.onClickEvent.add((e) -> {
+				edit.onClickEvent.add(( e ) -> {
 					dialog = new RenameDialog(name, activateEntry, mode, Main.inst.root);
 					syncDialog(dialog);
 				});
 
 				var delete = new Button([delete0.tile, delete1.tile, delete0.tile], utilityFlow);
-				delete.onClickEvent.add((e) -> {
+				delete.onClickEvent.add(( e ) -> {
 					dialog = new DeleteDialog(name, activateEntry, mode, Main.inst.root);
 					syncDialog(dialog);
 				});
 			case New(_):
-				start.onClickEvent.add((e) -> {}, 0);
+				start.onClickEvent.add(( e ) -> {}, 0);
 		}
 
-		interactive.width = horflow.innerWidth;
-		interactive.height = horflow.innerHeight;
+		try {
+			interactive.width = horflow.innerWidth;
+			interactive.height = horflow.innerHeight;
+		} catch( e:Dynamic ) {
+			trace("some untrackable bug");
+		}
 	}
 
 	override function onDispose() {
@@ -284,11 +290,11 @@ class SaveEntry extends Process {
 class Dialog extends SecondaryMenu {
 	var activateEvent : EventSignal1<Event>;
 
-	public function new(activateEvent : Event -> Void, mode : Mode, ?parent : Object) {
+	public function new( activateEvent : Event -> Void, mode : Mode, ?parent : Object ) {
 		super(parent);
 		this.activateEvent = new EventSignal1<Event>();
 
-		this.activateEvent.add((e) -> {
+		this.activateEvent.add(( e ) -> {
 			activateEvent(e);
 			refreshSaves();
 			if ( SaveManager.inst != null ) SaveManager.inst.refreshEntries();
@@ -296,7 +302,7 @@ class Dialog extends SecondaryMenu {
 		});
 	}
 
-	override function sync(ctx : RenderContext) {
+	override function sync( ctx : RenderContext ) {
 		super.sync(ctx);
 		x = hxd.Math.clamp(x, 0, wScaled - getSize().width - 1);
 		y = hxd.Math.clamp(y, 0, hScaled - getSize().height - 1);
@@ -309,7 +315,7 @@ class NewSaveDialog extends Dialog {
 
 	public var textInput : TextInput;
 
-	public function new(activateEvent : Event -> Void, mode : Mode, ?parent : Object) {
+	public function new( activateEvent : Event -> Void, mode : Mode, ?parent : Object ) {
 		super(activateEvent, mode, parent);
 		generalFlow = new Flow(this);
 		generalFlow.layout = Vertical;
@@ -321,9 +327,9 @@ class NewSaveDialog extends Dialog {
 		var dialogText = new Text(Assets.fontPixel, dialogFlow);
 		dialogText.text = 'Enter new save name: ';
 
-		 textInput = new TextInput(Assets.fontPixel, dialogFlow);
+		textInput = new TextInput(Assets.fontPixel, dialogFlow);
 
-		textInput.onKeyDown = function(e) {
+		textInput.onKeyDown = function ( e ) {
 			if ( e.keyCode == Key.ENTER ) this.activateEvent.dispatch(e);
 		}
 
@@ -334,12 +340,12 @@ class NewSaveDialog extends Dialog {
 		buttonsFlow.minWidth = generalFlow.outerWidth;
 
 		var newSaveCount = 0;
-		for (i in params.saveFiles) {
+		for ( i in params.saveFiles ) {
 			if ( StringTools.startsWith(i, "new_save") ) newSaveCount++;
 		}
 		textInput.text = "new_save" + newSaveCount;
 
-		this.activateEvent.add((e) -> {
+		this.activateEvent.add(( e ) -> {
 			mode = New(textInput.text);
 			try {
 				tools.Save.inst.makeFreshSave(textInput.text);
@@ -355,10 +361,10 @@ class NewSaveDialog extends Dialog {
 			remove();
 		});
 
-		var yesBut = new TextButton("ok", (e) -> {
+		var yesBut = new TextButton("ok", ( e ) -> {
 			this.activateEvent.dispatch(e);
 		}, buttonsFlow);
-		var noBut = new TextButton("cancel", (e) -> {
+		var noBut = new TextButton("cancel", ( e ) -> {
 			remove();
 		}, buttonsFlow);
 
@@ -366,13 +372,13 @@ class NewSaveDialog extends Dialog {
 		generalFlow.minHeight = generalFlow.innerHeight;
 	}
 
-	override function sync(ctx : RenderContext) {
+	override function sync( ctx : RenderContext ) {
 		super.sync(ctx);
 	}
 }
 
 class RenameDialog extends Dialog {
-	public function new(name : String, activateEvent : Event -> Void, mode : Mode, ?parent : Object) {
+	public function new( name : String, activateEvent : Event -> Void, mode : Mode, ?parent : Object ) {
 		super(activateEvent, mode, parent);
 
 		var generalFlow = new Flow(this);
@@ -394,19 +400,19 @@ class RenameDialog extends Dialog {
 		buttonsFlow.minWidth = generalFlow.outerWidth;
 
 		textInput.text = name;
-		textInput.onKeyDown = function(e) if ( e.keyCode == Key.ENTER ) this.activateEvent.dispatch(e);
+		textInput.onKeyDown = function ( e ) if ( e.keyCode == Key.ENTER ) this.activateEvent.dispatch(e);
 
-		var yesBut = new TextButton("ok", (e) -> {
+		var yesBut = new TextButton("ok", ( e ) -> {
 			this.activateEvent.dispatch(e);
 		}, buttonsFlow);
-		var noBut = new TextButton("cancel", (e) -> {
+		var noBut = new TextButton("cancel", ( e ) -> {
 			remove();
 		}, buttonsFlow);
 	}
 }
 
 class DeleteDialog extends Dialog {
-	public function new(name : String, activateEvent : Event -> Void, mode : Mode, ?parent : Object) {
+	public function new( name : String, activateEvent : Event -> Void, mode : Mode, ?parent : Object ) {
 		super(activateEvent, mode, parent);
 
 		var dialogFlow = new Flow(this);
@@ -415,13 +421,13 @@ class DeleteDialog extends Dialog {
 
 		var deleteText = new TextLabel('Are you sure?', Assets.fontPixel, dialogFlow);
 
-		var yesBut = new TextButton("yes", (e) -> {
+		var yesBut = new TextButton("yes", ( e ) -> {
 			remove();
 			File.delete(Settings.SAVEPATH + name + Const.SAVEFILE_EXT);
 			refreshSaves();
 			SaveManager.inst.refreshEntries();
 		}, 0xbe3434, 0x6d2a45, dialogFlow);
-		var noBut = new TextButton("no", (e) -> {
+		var noBut = new TextButton("no", ( e ) -> {
 			remove();
 		}, dialogFlow);
 	}

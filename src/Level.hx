@@ -1,3 +1,4 @@
+import h3d.scene.Mesh;
 import differ.shapes.Polygon;
 import dn.Process;
 import en.items.Blueprint;
@@ -35,7 +36,7 @@ class Level extends dn.Process {
 
 	// public var fx(get, never):Fx;
 
-	public inline function getLayerByName(id : String) return layersByName.get(id);
+	public inline function getLayerByName( id : String ) return layersByName.get(id);
 
 	public var wid(get, never) : Int;
 
@@ -46,7 +47,6 @@ class Level extends dn.Process {
 	inline function get_hei() return M.ceil(data.height * data.tileHeight);
 
 	//	public var lid(get, never):Int;
-	var invalidatedColls = true;
 	var invalidated = true;
 
 	public var sqlId : Null<Int>;
@@ -69,7 +69,7 @@ class Level extends dn.Process {
 
 	public var cursorInteract : Interactive;
 
-	public function new(map : TmxMap) {
+	public function new( map : TmxMap ) {
 		super(cast(game, Process));
 		inst = this;
 		// data = map;
@@ -81,22 +81,21 @@ class Level extends dn.Process {
 		Boot.inst.s3d.camera.setFovX(70, Boot.inst.s3d.camera.screenRatio);
 		#end
 
-		for (layer in data.layers) {
+		for ( layer in data.layers ) {
 			var name : String = 'null';
 			switch( layer ) {
 				case LObjectGroup(ol):
 					name = ol.name;
-					for (obj in ol.objects) {
-						switch( obj.objectType ) {
-							case OTPolygon(points):
-								var pts = checkPolyClockwise(points);
-								// pts.reverse();
-
-								if ( ol.name == 'obstacles' ) setWalkable(obj, pts);
-							case OTRectangle:
-								if ( ol.name == 'obstacles' ) setWalkable(obj);
-
-							default:
+					for ( obj in ol.objects ) {
+						if ( ol.name == 'obstacles' ) {
+							switch( obj.objectType ) {
+								case OTPolygon(points):
+									var pts = checkPolyClockwise(points);
+									setWalkable(obj, pts);
+								case OTRectangle:
+									setWalkable(obj);
+								default:
+							}
 						}
 						if ( map.orientation == Isometric ) {
 							// Если Entity никак не назван на карте - то ему присваивается имя его картинки без расширения
@@ -132,7 +131,7 @@ class Level extends dn.Process {
 		cursorInteract.remove();
 		ground.dispose();
 
-		for (i in walkable) i.destroy();
+		for ( i in walkable ) i.destroy();
 		walkable = null;
 		data = null;
 		obj = null;
@@ -140,20 +139,20 @@ class Level extends dn.Process {
 		layersByName = null;
 	}
 
-	public function getEntities(id : String) {
+	public function getEntities( id : String ) {
 		var a = [];
-		for (e in entities) if ( e.name == id ) a.push(e);
+		for ( e in entities ) if ( e.name == id ) a.push(e);
 		return a;
 	}
 
-	public function getEntityPts(id : String) {
+	public function getEntityPts( id : String ) {
 		var a = [];
-		for (e in entities) if ( e.name == id ) a.push(new CPoint((e.x), (e.y)));
+		for ( e in entities ) if ( e.name == id ) a.push(new CPoint((e.x), (e.y)));
 		return a;
 	}
 
-	public function getEntityPt(id : String) {
-		for (e in entities) if ( e.name == id ) return new CPoint((e.x), (e.y));
+	public function getEntityPt( id : String ) {
+		for ( e in entities ) if ( e.name == id ) return new CPoint((e.x), (e.y));
 		return null;
 	}
 
@@ -175,7 +174,7 @@ class Level extends dn.Process {
 		obj.material.mainPass.depth(false, LessEqual);
 		obj.material.mainPass.setBlendMode(Alpha);
 
-		for (e in data.layers) {
+		for ( e in data.layers ) {
 			switch( e ) {
 				case LTileLayer(layer):
 					if ( layer.visible && layer.name != "proto" ) {
@@ -190,7 +189,7 @@ class Level extends dn.Process {
 		if ( imageLayer != null ) {
 			switch( imageLayer ) {
 				case LObjectGroup(ol):
-					for (obj in ol.objects) {
+					for ( obj in ol.objects ) {
 						var isoX = 0., isoY = 0.;
 						if ( data.orientation == Isometric ) {
 							// все объекты в распаршенных слоях уже с конвертированными координатами
@@ -222,18 +221,49 @@ class Level extends dn.Process {
 			cursorInteract = new h3d.scene.Interactive(bounds, Boot.inst.s3d);
 			cursorInteract.priority = -10;
 			cursorInteract.cursor = Default;
-			cursorInteract.onMove = function(e : hxd.Event) {
+			cursorInteract.onMove = function ( e : hxd.Event ) {
 				cursX = e.relX;
 				cursY = e.relZ;
 			}
 		}
+
+		#if colliders_debug
+		for ( i in walkable ) {
+			var pts : Array<Point> = [];
+			for ( pt in i.vertices ) {
+				pts.push(new Point(pt.x, 0, pt.y));
+			}
+			var idx = new IndexBuffer();
+			for ( i in 1...pts.length - 1 ) {
+				idx.push(0);
+				idx.push(i);
+				idx.push(i + 1);
+			}
+
+			var polyPrim = new h3d.prim.Polygon(pts, idx);
+			polyPrim.addUVs();
+			polyPrim.addNormals();
+
+			var isoDebugMesh = new Mesh(polyPrim, Boot.inst.s3d);
+			isoDebugMesh.rotate(M.toRad(180), 0, 0);
+			isoDebugMesh.material.color.setColor(0x361bcc);
+			isoDebugMesh.material.shadows = false;
+			isoDebugMesh.material.mainPass.wireframe = true;
+			isoDebugMesh.material.mainPass.depth(true, Less);
+
+			isoDebugMesh.y = .25;
+			isoDebugMesh.x = i.x;
+			isoDebugMesh.z = i.y;
+		}
+		#end
 	}
 
-	public function setWalkable(poly : TmxObject, ?points : Array<Dynamic>) { // setting obstacles as a differ polygon
+	public function setWalkable( poly : TmxObject, ?points : Array<Dynamic> ) { // setting obstacles as a differ polygon
 		var vertices : Array<differ.math.Vector> = [];
+
 		if ( points != null ) {
 			checkPolyClockwise(points);
-			for (i in points) vertices.push(new differ.math.Vector(cartToIso(i.x, i.y).x, cartToIso(i.x, i.y).y));
+			for ( i in points ) vertices.push(new differ.math.Vector(cartToIso(i.x, i.y).x, cartToIso(i.x, i.y).y));
 			walkable.push(new Polygon(cartToIsoLocal(poly.x, poly.y).x, cartToIsoLocal(poly.x, poly.y).y, vertices));
 		} else if ( poly.objectType == OTRectangle ) {
 			vertices.push(new differ.math.Vector(cartToIso(poly.width, 0).x, cartToIso(poly.width, 0).y));
@@ -256,13 +286,13 @@ class Level extends dn.Process {
 		#end
 	}
 
-	public inline function cartToIsoLocal(x : Float, y : Float) : Vector return new Vector(wid * .5 + cartToIso(x, y).x, hei - cartToIso(x, y).y);
+	public inline function cartToIsoLocal( x : Float, y : Float ) : Vector return new Vector(wid * .5 + cartToIso(x, y).x, hei - cartToIso(x, y).y);
 }
 
 class LayerRender extends h2d.Object {
 	public var render : InternalRender;
 
-	public function new(map : TmxMap, layer : TmxTileLayer) {
+	public function new( map : TmxMap, layer : TmxTileLayer ) {
 		super();
 		render = new InternalRender(map, layer);
 		render.g = new h2d.Graphics();
@@ -280,7 +310,7 @@ private class InternalRender extends TileLayerRenderer {
 
 	private var uv : Point = new Point();
 
-	override function renderOrthoTile(x : Float, y : Float, tile : TmxTile, tileset : TmxTileset) : Void {
+	override function renderOrthoTile( x : Float, y : Float, tile : TmxTile, tileset : TmxTileset ) : Void {
 		if ( tileset == null ) return;
 
 		if ( tileset.image == null ) {
@@ -313,7 +343,7 @@ private class InternalRender extends TileLayerRenderer {
 		h2dTile = null;
 	}
 
-	function renderOrthoTileFromImageColl(x : Float, y : Float, tile : TmxTile, tileset : TmxTileset) : Void {
+	function renderOrthoTileFromImageColl( x : Float, y : Float, tile : TmxTile, tileset : TmxTileset ) : Void {
 		var sourceTile = getTileSource(tile.gid, tileset);
 		var h2dTile = getTileFromSeparatedTsx(sourceTile);
 
@@ -355,7 +385,7 @@ private class InternalRender extends TileLayerRenderer {
 		#end
 	}
 
-	override function renderIsoTiles(ox : Float, y : Float, tiles : Array<TmxTile>, width : Int, height : Int) {
+	override function renderIsoTiles( ox : Float, y : Float, tiles : Array<TmxTile>, width : Int, height : Int ) {
 		var i : Int = 0;
 		var ix : Int = 0;
 		var iy : Int = 0;
@@ -393,7 +423,7 @@ class StructTile extends Object {
 	public static var tileW : Int = 44;
 	public static var tileH : Int = 20;
 
-	override function new(x : Float, y : Float, ?parent : Object) {
+	override function new( x : Float, y : Float, ?parent : Object ) {
 		super(parent);
 		#if !headless
 		if ( polyPrim == null ) initPolygon();
@@ -405,7 +435,7 @@ class StructTile extends Object {
 		this.z = y;
 		this.y = 0;
 
-		tile.onMoveEvent.add((event) -> {
+		tile.onMoveEvent.add(( event ) -> {
 			if ( Player.inst != null && Player.inst.holdItem != null && Std.isOfType(Player.inst.holdItem, Blueprint) ) {
 				cast(Player.inst.holdItem, Blueprint).onStructTileMove.dispatch(this);
 			}

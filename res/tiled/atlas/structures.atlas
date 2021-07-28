@@ -27,7 +27,7 @@ back_door0
   index: -1
 back_door1
   rotate: false
-  xy: 300, 115
+  xy: 300, 176
   size: 48, 66
   orig: 48, 66
   offset: 0, 0
@@ -41,28 +41,28 @@ back_door10
   index: -1
 back_door11
   rotate: false
-  xy: 400, 251
+  xy: 350, 115
   size: 48, 66
   orig: 48, 66
   offset: 0, 0
   index: -1
 back_door12
   rotate: false
-  xy: 300, 251
+  xy: 398, 326
   size: 48, 66
   orig: 48, 66
   offset: 0, 0
   index: -1
 back_door13
   rotate: false
-  xy: 300, 47
+  xy: 300, 40
   size: 48, 66
   orig: 48, 66
   offset: 0, 0
   index: -1
 back_door14
   rotate: false
-  xy: 350, 183
+  xy: 300, 108
   size: 48, 66
   orig: 48, 66
   offset: 0, 0
@@ -76,14 +76,14 @@ back_door15
   index: -1
 back_door16
   rotate: false
-  xy: 400, 115
+  xy: 400, 122
   size: 48, 66
   orig: 48, 66
   offset: 0, 0
   index: -1
 back_door17
   rotate: false
-  xy: 300, 183
+  xy: 250, 176
   size: 48, 66
   orig: 48, 66
   offset: 0, 0
@@ -97,14 +97,14 @@ back_door2
   index: -1
 back_door3
   rotate: false
-  xy: 400, 183
+  xy: 400, 190
   size: 48, 66
   orig: 48, 66
   offset: 0, 0
   index: -1
 back_door4
   rotate: false
-  xy: 250, 108
+  xy: 398, 258
   size: 48, 66
   orig: 48, 66
   offset: 0, 0
@@ -118,14 +118,14 @@ back_door5
   index: -1
 back_door6
   rotate: false
-  xy: 350, 115
+  xy: 350, 183
   size: 48, 66
   orig: 48, 66
   offset: 0, 0
   index: -1
 back_door7
   rotate: false
-  xy: 250, 176
+  xy: 348, 251
   size: 48, 66
   orig: 48, 66
   offset: 0, 0
@@ -139,7 +139,7 @@ back_door8
   index: -1
 back_door9
   rotate: false
-  xy: 350, 251
+  xy: 250, 108
   size: 48, 66
   orig: 48, 66
   offset: 0, 0
@@ -188,14 +188,14 @@ door
   index: -1
 door1
   rotate: false
-  xy: 348, 319
+  xy: 298, 319
   size: 48, 73
   orig: 48, 73
   offset: 0, 0
   index: -1
 door10
   rotate: false
-  xy: 398, 319
+  xy: 298, 244
   size: 48, 73
   orig: 48, 73
   offset: 0, 0
@@ -216,7 +216,7 @@ door12
   index: -1
 door13
   rotate: false
-  xy: 298, 319
+  xy: 248, 244
   size: 48, 73
   orig: 48, 73
   offset: 0, 0
@@ -237,7 +237,7 @@ door15
   index: -1
 door16
   rotate: false
-  xy: 200, 178
+  xy: 200, 140
   size: 48, 73
   orig: 48, 73
   offset: 0, 0
@@ -265,7 +265,7 @@ door3
   index: -1
 door4
   rotate: false
-  xy: 200, 103
+  xy: 200, 65
   size: 48, 73
   orig: 48, 73
   offset: 0, 0
@@ -279,7 +279,7 @@ door5
   index: -1
 door6
   rotate: false
-  xy: 250, 244
+  xy: 348, 319
   size: 48, 73
   orig: 48, 73
   offset: 0, 0
@@ -349,7 +349,7 @@ navigation_console
   index: -1
 pcgmw
   rotate: false
-  xy: 200, 53
+  xy: 112, 13
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
@@ -363,8 +363,8 @@ sleeping_pod
   index: -1
 teleport
   rotate: false
-  xy: 112, 13
-  size: 48, 48
-  orig: 48, 48
+  xy: 198, 215
+  size: 48, 36
+  orig: 48, 36
   offset: 0, 0
   index: -1

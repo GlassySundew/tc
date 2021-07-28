@@ -17,7 +17,7 @@ class Console extends h2d.Console {
 	var flags : Map<String, Bool>;
 	#end
 
-	public function new(f : h2d.Font, p : h2d.Object) {
+	public function new( f : h2d.Font, p : h2d.Object ) {
 		super(f, p);
 		logTxt = new h2d.HtmlText(f, this);
 		logTxt.x = 2;
@@ -40,11 +40,11 @@ class Console extends h2d.Console {
 
 		#if debug
 		flags = new Map();
-		this.addCommand("set", [{name : "k", t : AString}], function(k : String) {
+		this.addCommand("set", [{name : "k", t : AString}], function ( k : String ) {
 			setFlag(k, true);
 			log("+ " + k, 0x80FF00);
 		});
-		this.addCommand("unset", [{name : "k", t : AString, opt : true}], function(?k : String) {
+		this.addCommand("unset", [{name : "k", t : AString, opt : true}], function ( ?k : String ) {
 			if ( k == null ) {
 				log("Reset all.", 0xFF0000);
 				flags = new Map();
@@ -57,33 +57,33 @@ class Console extends h2d.Console {
 		this.addCommand("giveItem", [
 			{name : "item", t : AString, opt : false},
 			{name : "amount", t : AInt, opt : true}
-		], function(?k : Data.ItemsKind, ?amount : Int = 1) {
+		], function ( ?k : Data.ItemsKind, ?amount : Int = 1 ) {
 			if ( Data.items.get(k) != null ) {
 				var newItem = Item.fromCdbEntry(k, amount);
 				Game.inst.player.ui.inventory.invGrid.giveItem(newItem, Game.inst.player, false);
 			}
 		});
 
-		this.addCommand("connect", [], function(?k : String) {
+		this.addCommand("connect", [], function ( ?k : String ) {
 			// (new Connect());
 		});
 
-		this.addCommand("hud", [], function(?k : String) {
+		this.addCommand("hud", [], function ( ?k : String ) {
 			Player.inst.ui.visible = !Player.inst.ui.visible;
 		});
 
 		this.addAlias("+", "set");
 		this.addAlias("-", "unset");
-		this.addCommand("untarget", [], function(?k : String) {
+		this.addCommand("untarget", [], function ( ?k : String ) {
 			game.camera.stopTracking();
 			new h3d.scene.CameraController(Boot.inst.s3d).loadFromCamera();
 			Level.inst.cursorInteract.visible = false;
 		});
-		this.addCommand("loadlvl", [{name : "k", t : AString}], function(?k : String) {
-			Game.inst.startLevel(k + ".tmx");
+		this.addCommand("loadlvl", [{name : "k", t : AString}], function ( name : String, ?manual : Bool = true ) {
+			Game.inst.startLevel(name + ".tmx", manual);
 		});
 		var pp : Bool = true;
-		this.addCommand("pp", [], function(?k : String) {
+		this.addCommand("pp", [], function ( ?k : String ) {
 			if ( pp ) {
 				Boot.inst.s3d.renderer = h3d.mat.MaterialSetup.current.createRenderer();
 				pp = false;
@@ -100,25 +100,25 @@ class Console extends h2d.Console {
 	}
 
 	#if debug
-	public function setFlag(k : String, v) return flags.set(k, v);
+	public function setFlag( k : String, v ) return flags.set(k, v);
 
-	public function hasFlag(k : String) return flags.get(k) == true;
+	public function hasFlag( k : String ) return flags.get(k) == true;
 	#else
-	public function hasFlag(k : String) return false;
+	public function hasFlag( k : String ) return false;
 	#end
 
-	override public function addAlias(name, command) {
+	override public function addAlias( name, command ) {
 		aliases.set("/" + name, command);
 	}
 
-	override function addCommand(name : String, ?help : String, args : Array<ConsoleArgDesc>, callb : Dynamic) {
+	override function addCommand( name : String, ?help : String, args : Array<ConsoleArgDesc>, callb : Dynamic ) {
 		commands.set("/" + name, {help : help == null ? "" : help, args : args, callb : callb});
 	}
 
 	// override function runCommand(commandLine:String) {
 	// 	handleCommand(commandLine.split("/")[0]);
 	// }
-	override function handleCommand(command : String) {
+	override function handleCommand( command : String ) {
 		command = StringTools.trim(command);
 		// if( command.charCodeAt(0) == "/".code ) command = command.substr(1);
 		if ( command == "" ) {
@@ -134,7 +134,7 @@ class Console extends h2d.Console {
 		var c = '';
 		var i = 0;
 
-		function readString(endChar : String) {
+		function readString( endChar : String ) {
 			var string = '';
 
 			while( i < command.length ) {
@@ -194,7 +194,7 @@ class Console extends h2d.Console {
 			return;
 		}
 		var vargs = new Array<Dynamic>();
-		for (i in 0...cmd.args.length) {
+		for ( i in 0...cmd.args.length ) {
 			var a = cmd.args[i];
 			var v = args[i + 1];
 			if ( v == null ) {
@@ -233,7 +233,7 @@ class Console extends h2d.Console {
 					vargs.push(cmd.args.length == 1 ? StringTools.trim(command.substr(args[0].length)) : v);
 				case AEnum(values):
 					var found = false;
-					for (v2 in values) if ( v == v2 ) {
+					for ( v2 in values ) if ( v == v2 ) {
 						found = true;
 						vargs.push(v2);
 					}
@@ -251,10 +251,10 @@ class Console extends h2d.Console {
 		}
 	}
 
-	override function showHelp(?command : String) {
+	override function showHelp( ?command : String ) {
 		var all;
 		if ( command == null ) {
-			all = Lambda.array({iterator : function() return commands.keys()});
+			all = Lambda.array({iterator : function () return commands.keys()});
 			all.sort(Reflect.compare);
 			all.remove("/help");
 			all.push("/help");
@@ -263,11 +263,11 @@ class Console extends h2d.Console {
 			if ( !commands.exists(command) ) throw 'Command not found "$command"';
 			all = [command];
 		}
-		for (cmdName in all) {
+		for ( cmdName in all ) {
 			var c = commands.get(cmdName);
 			var str = cmdName;
-			for (a in aliases.keys()) if ( aliases.get(a) == cmdName ) str += "|" + a;
-			for (a in c.args) {
+			for ( a in aliases.keys() ) if ( aliases.get(a) == cmdName ) str += "|" + a;
+			for ( a in c.args ) {
 				var astr = a.name;
 				switch( a.t ) {
 					case AInt, AFloat:
@@ -292,7 +292,7 @@ class Console extends h2d.Console {
 		logTxt.alpha = 1;
 	}
 
-	override function sync(ctx : h2d.RenderContext) {
+	override function sync( ctx : h2d.RenderContext ) {
 		var scene = ctx.scene;
 		if ( scene != null ) {
 			x = 0;

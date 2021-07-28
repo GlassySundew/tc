@@ -208,7 +208,7 @@ class GameClient extends Process implements GameAble {
 									if ( obj.name == "center" ) {
 										ent.mesh.xOff = -(pivotX - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
 										ent.mesh.yOff = (pivotY - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
-										#if dispDepthBoxes
+										#if depth_debug
 										ent.mesh.renewDebugPts();
 										#end
 									}
@@ -279,7 +279,7 @@ class GameClient extends Process implements GameAble {
 									pivotX = (ent.tmxObj != null && ent.tmxObj.flippedVertically) ? 1 - pivotX : pivotX;
 									ent.mesh.xOff = (pivotX - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
 									ent.mesh.yOff = -(pivotY - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
-									#if dispDepthBoxes
+									#if depth_debug
 									ent.mesh.renewDebugPts();
 									#end
 								}

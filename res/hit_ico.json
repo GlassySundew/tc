@@ -5,7 +5,7 @@
 		{
 			"sortMode": 0,
 			"emitMode": 5,
-			"texture": "../../../../../../../../../../../..//home/glassysundew/Projects/tc/res/tiled/separated/items/fireaxe.png",
+			"texture": "tiled/separated/items/fireaxe.png",
 			"colorGradient": null,
 			"animationRepeat": 0,
 			"clipBounds": false,

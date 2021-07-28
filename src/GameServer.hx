@@ -223,7 +223,7 @@ class GameServer extends Process implements GameAble {
 									var pivotX = ((obj.x + xCent)) / ent.spr.tile.width;
 									var pivotY = ((obj.y + yCent)) / ent.spr.tile.height;
 									pivotX = (ent.tmxObj != null && ent.tmxObj.flippedVertically) ? 1 - pivotX : pivotX;
-									#if dispDepthBoxes
+									#if depth_debug
 									#end
 								}
 							}

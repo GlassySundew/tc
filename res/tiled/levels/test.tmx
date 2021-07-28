@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.5" tiledversion="1.7.1" orientation="isometric" renderorder="right-up" width="20" height="22" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#191919" nextlayerid="1520" nextobjectid="4429">
+ <tileset firstgid="1" source="alpha.tsx"/>
+ <tileset firstgid="113" source="colls.tsx"/>
+ <layer id="1" name="proto" width="20" height="22">
+  <data encoding="base64" compression="zlib">
+   eJxjYBj8oICKeNS8oWGeGwE80OZhM5PS8CPVrKEcv6PmjZqHyzxqAgCviZor
+  </data>
+ </layer>
+ <layer id="1513" name="ground" width="20" height="22">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2DwAW8GhgZ3IO0GxOi0FxnmAfU0APU2eALZHkDsCRUD2UOOeQwQ94DdyECmm7C5kRL3jIJRMApQAQBw0Qo9
+  </data>
+ </layer>
+ <layer id="1514" name="ground_bot" width="20" height="22">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUkApcGRgaBspu50Fong/EnAYXIPalglmUmgFzCwMVzBoFQxcAAOj2Bdk=
+  </data>
+ </layer>
+ <objectgroup id="40" name="entities">
+  <object id="79" gid="115" x="284" y="232" width="48" height="48"/>
+ </objectgroup>
+ <objectgroup id="1516" name="obstacles">
+  <object id="4408" x="288" y="240" width="24" height="24"/>
+  <object id="4409" x="312" y="240" width="24" height="24"/>
+  <object id="4410" x="168" y="288" width="24" height="24"/>
+  <object id="4411" x="192" y="288" width="24" height="24"/>
+  <object id="4412" x="216" y="288" width="24" height="24"/>
+  <object id="4413" x="336" y="192" width="24" height="24"/>
+  <object id="4414" x="336" y="216" width="24" height="24"/>
+  <object id="4415" x="264" y="240" width="24" height="24"/>
+  <object id="4416" x="240" y="264" width="24" height="24"/>
+  <object id="4417" x="120" y="192" width="24" height="24"/>
+  <object id="4418" x="120" y="216" width="24" height="24"/>
+  <object id="4419" x="144" y="240" width="24" height="24"/>
+  <object id="4420" x="144" y="264" width="24" height="24"/>
+  <object id="4421" x="144" y="168" width="24" height="24"/>
+  <object id="4422" x="168" y="168" width="24" height="24"/>
+  <object id="4423" x="192" y="168" width="24" height="24"/>
+  <object id="4424" x="216" y="168" width="24" height="24"/>
+  <object id="4425" x="240" y="168" width="24" height="24"/>
+  <object id="4426" x="264" y="168" width="24" height="24"/>
+  <object id="4427" x="288" y="168" width="24" height="24"/>
+  <object id="4428" x="312" y="168" width="24" height="24"/>
+ </objectgroup>
+</map>

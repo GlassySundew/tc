@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.5" tiledversion="2021.02.15" name="alpha" tilewidth="246" tileheight="133" tilecount="44" columns="0" backgroundcolor="#2b2b2b">
+<tileset version="1.5" tiledversion="1.7.1" name="alpha" tilewidth="246" tileheight="133" tilecount="45" columns="0" backgroundcolor="#171717">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="63">
   <image width="68" height="106" source="../separated/env/agro_wall.png"/>
@@ -132,5 +132,11 @@
  </tile>
  <tile id="110">
   <image width="96" height="120" source="separated/env/inner_wall_duo_dark.png"/>
+ </tile>
+ <tile id="111">
+  <properties>
+   <property name="type" value="void"/>
+  </properties>
+  <image width="48" height="24" source="../separated/env/void.png"/>
  </tile>
 </tileset>

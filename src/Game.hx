@@ -1,9 +1,3 @@
-import haxe.Unserializer;
-import tools.Save;
-import ui.PauseMenu;
-import hxbit.Serializer;
-// import tools.Save;
-import tools.Settings;
 import Level.StructTile;
 import cherry.soup.EventSignal.EventSignal0;
 import differ.math.Vector;
@@ -15,8 +9,13 @@ import format.tmx.*;
 import format.tmx.Data;
 import h3d.scene.CameraController;
 import h3d.scene.Object;
-import hxd.Key;
+import hxbit.Serializer;
+import tools.Save;
+import tools.Settings;
 import ui.Hud;
+import ui.PauseMenu;
+
+// import tools.Save;
 
 class Game extends Process implements GameAble implements hxbit.Serializable {
 	public static var inst : Game;
@@ -83,20 +82,20 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 	// 	engine.clear(0, 1);
 	// }
 
-	public function startLevel(name : String) {
-		// var cachedLevel = Save.inst.getLevelByName(name.split(".")[0]);
-		// if ( cachedLevel != null ) {
-		// Save.inst.spawnLevelFromCache(cachedLevel);
-		// } else {
+	public function startLevel( name : String, ?manual : Bool = false ) {
+
+		// tmxMap = resolveMap(name);
+		// startLevelFromParsedTmx(tmxMap, name);
 
 		if ( level != null ) {
 			var cachedLevel = Save.inst.saveLevel(level);
 		}
 
 		var levelFromCache = Save.inst.loadLevelByName(name.split(".")[0]);
+
 		if ( levelFromCache == null ) {
 			tmxMap = resolveMap(name);
-			startLevelFromParsedTmx(tmxMap, name);
+			startLevelFromParsedTmx(tmxMap, name, manual);
 
 			var cachedPlayer = Save.inst.playerSavedOn(level);
 			if ( cachedPlayer != null ) {
@@ -107,18 +106,16 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 		} else {
 			level = levelFromCache;
 		}
-
-		// }
 	}
 
-	public function startLevelFromParsedTmx(tmxMap : TmxMap, name : String) {
+	public function startLevelFromParsedTmx( tmxMap : TmxMap, name : String, ?manual : Bool = false ) {
 		this.tmxMap = tmxMap;
 		engine.clear(0, 1);
 		execAfterLvlLoad = new EventSignal0();
 
 		if ( level != null ) {
 			level.destroy();
-			for (e in Entity.ALL) {
+			for ( e in Entity.ALL ) {
 				e.destroy();
 			}
 			gc();
@@ -135,7 +132,7 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 		var entClasses = (CompileTime.getAllClasses(Entity));
 
 		// Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity and puts name into spr group if not found
-		function searchAndSpawnEnt(e : TmxObject) {
+		function searchAndSpawnEnt( e : TmxObject ) {
 			var isoX = 0., isoY = 0.;
 			if ( tmxMap.orientation == Isometric ) {
 				// все объекты в распаршенных слоях уже с конвертированными координатами
@@ -145,7 +142,7 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 			}
 
 			// Парсим все классы - наследники en.Entity и спавним их
-			for (eClass in entClasses) {
+			for ( eClass in entClasses ) {
 				eregCompTimeClass.match('$eClass'.toLowerCase());
 				if ( eregCompTimeClass.match('$eClass'.toLowerCase()) && eregCompTimeClass.matched(1) == e.name ) {
 					Type.createInstance(eClass, [isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, e]);
@@ -167,11 +164,19 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 		var cachedPlayer = Save.inst.playerSavedOn(level);
 
 		if ( cachedPlayer != null ) {
-			for (e in level.entities) if ( e.name != "player" ) searchAndSpawnEnt(e);
+			for ( e in level.entities ) if ( manual || e.name != "player" ) searchAndSpawnEnt(e);
 			// Save.inst.loadEntity(cachedPlayer);
 		} else
-			for (e in level.entities) searchAndSpawnEnt(e);
+			for ( e in level.entities ) searchAndSpawnEnt(e);
 
+		// if ( manual && Player.inst != null ) {
+		// 	trace("zhopa
+		// 	");
+
+		// 	var playerObj = level.entities.filter(e -> e.name == "player")[0];
+		// 	Player.inst.footX = playerObj.x;
+		// 	Player.inst.footY = playerObj.y;
+		// }
 		applyTmxObjOnEnt();
 
 		player = Player.inst;
@@ -189,22 +194,22 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 		camera.recenter();
 	}
 
-	public function applyTmxObjOnEnt(?ent : Null<Entity>) {
+	public function applyTmxObjOnEnt( ?ent : Null<Entity> ) {
 		// если ent не определён, то на все Entity из массива ALL будут добавлены TmxObject из тайлсета с названием colls
 		// parsing collision objects from 'colls' tileset
-		for (tileset in tmxMap.tilesets) {
+		for ( tileset in tmxMap.tilesets ) {
 			var ereg = ~/(^[^.]*)+/; // regexp to take tileset name
-			if ( ereg.match(tileset.source) && ereg.matched(1) == 'colls' ) for (tile in tileset.tiles) {
+			if ( ereg.match(tileset.source) && ereg.matched(1) == 'colls' ) for ( tile in tileset.tiles ) {
 				if ( eregFileName.match(tile.image.source) ) {
 					var ents = ent != null ? [ent] : Entity.ALL;
-					for (ent in ents) {
+					for ( ent in ents ) {
 						if ( (tile.objectGroup != null && eregClass.match('$ent'.toLowerCase()))
 							&& (((eregClass.matched(1) == eregFileName.matched(1) || ent.spr.groupName == eregFileName.matched(1))
 								&& tile.objectGroup.objects.length > 0
 								|| (Std.isOfType(ent, SpriteEntity)
 									&& eregFileName.matched(1) == ent.spr.groupName))) /*&& ent.collisions.length == 0*/ ) {
 							var centerSet = false;
-							for (obj in tile.objectGroup.objects) { // Засовываем объекты для детекта коллизий по Entity
+							for ( obj in tile.objectGroup.objects ) { // Засовываем объекты для детекта коллизий по Entity
 								var params = {
 									x : M.round(obj.x) + ent.footX,
 									y : M.round(obj.y) + ent.footY,
@@ -230,7 +235,7 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 									if ( obj.name == "center" ) {
 										ent.mesh.xOff = -(center.x - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
 										ent.mesh.yOff = (center.y - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
-										#if dispDepthBoxes
+										#if depth_debug
 										ent.mesh.renewDebugPts();
 										#end
 									}
@@ -244,12 +249,12 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 										xCent = M.round(obj.width / 2);
 										yCent = M.round(obj.height / 2);
 										ent.collisions.set(shape,
-											{cent : new h3d.Vector(xCent, yCent), offset : new h3d.Vector(obj.x + xCent, -obj.y - yCent)});
+											{ cent : new h3d.Vector(xCent, yCent), offset : new h3d.Vector(obj.x + xCent, -obj.y - yCent) });
 									case OTRectangle:
 										// Точка парсится как OTRectangle, точка с названием center будет обозначать центр
 
 										ent.collisions.set(Polygon.rectangle(params.x, params.y, params.width, params.height),
-											{cent : new h3d.Vector(), offset : new h3d.Vector()});
+											{ cent : new h3d.Vector(), offset : new h3d.Vector() });
 									case OTPolygon(points):
 										var cents = getProjectedDifferPolygonRect(obj, points);
 										xCent = cents.x;
@@ -257,7 +262,7 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 
 										var pts = checkPolyClockwise(points);
 										var verts : Array<Vector> = [];
-										for (i in pts) verts.push(new Vector((i.x), (-i.y)));
+										for ( i in pts ) verts.push(new Vector((i.x), (-i.y)));
 
 										var poly = new Polygon(0, 0, verts);
 										poly.rotation = -obj.rotation;
@@ -268,7 +273,7 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 
 										var xOffset = /*poly.scaleX < 0 ? ent.spr.tile.width - obj.x :*/ obj.x;
 										var yOffset = -obj.y;
-										ent.collisions.set(poly, {cent : new h3d.Vector(xCent, -yCent), offset : new h3d.Vector(xOffset, yOffset)});
+										ent.collisions.set(poly, { cent : new h3d.Vector(xCent, -yCent), offset : new h3d.Vector(xOffset, yOffset) });
 									case OTPoint:
 										if ( obj.name == "center" ) {
 											if ( centerSet ) unsetCenter();
@@ -314,7 +319,7 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 	public function gc() {
 		if ( Entity.GC == null || Entity.GC.length == 0 ) return;
 
-		for (e in Entity.GC) e.dispose();
+		for ( e in Entity.GC ) e.dispose();
 		Entity.GC = [];
 	}
 
@@ -328,7 +333,7 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 		inst = null;
 
 		if ( camera != null ) camera.destroy();
-		for (e in Entity.ALL) e.destroy();
+		for ( e in Entity.ALL ) e.destroy();
 		gc();
 
 		if ( PauseMenu.inst != null ) PauseMenu.inst.destroy();
@@ -344,19 +349,19 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 		pauseCycle = false;
 
 		// Updates
-		for (e in Entity.ALL) if ( !e.destroyed ) e.preUpdate();
-		for (e in Entity.ALL) if ( !e.destroyed ) e.update();
-		for (e in Entity.ALL) if ( !e.destroyed ) e.postUpdate();
-		for (e in Entity.ALL) if ( !e.destroyed ) e.frameEnd();
+		for ( e in Entity.ALL ) if ( !e.destroyed ) e.preUpdate();
+		for ( e in Entity.ALL ) if ( !e.destroyed ) e.update();
+		for ( e in Entity.ALL ) if ( !e.destroyed ) e.postUpdate();
+		for ( e in Entity.ALL ) if ( !e.destroyed ) e.frameEnd();
 		gc();
 	}
 
 	public function showStrTiles() {
-		for (i in structTiles) i.visible = true;
+		for ( i in structTiles ) i.visible = true;
 	}
 
 	public function hideStrTiles() {
-		for (i in structTiles) i.visible = false;
+		for ( i in structTiles ) i.visible = false;
 	}
 
 	public function suspendGame() {
@@ -366,7 +371,7 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 		dn.heaps.slib.SpriteLib.DISABLE_ANIM_UPDATES = true;
 
 		// Pause other process
-		for (p in Process.ROOTS) if ( p != this ) p.pause();
+		for ( p in Process.ROOTS ) if ( p != this ) p.pause();
 
 		// Create mask
 		root.visible = true;
@@ -377,13 +382,13 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 		if ( !suspended ) return;
 		dn.heaps.slib.SpriteLib.DISABLE_ANIM_UPDATES = false;
 
-		delayer.addF(function() {
+		delayer.addF(function () {
 			root.visible = false;
 			root.removeChildren();
 		}, 1);
 		suspended = false;
 
-		for (p in Process.ROOTS) if ( p != this ) p.resume();
+		for ( p in Process.ROOTS ) if ( p != this ) p.resume();
 	}
 
 	public function toggleGamePause() {
@@ -395,7 +400,7 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 }
 
 class AxesHelper extends h3d.scene.Graphics {
-	public function new(?parent : h3d.scene.Object, size = 2.0, colorX = 0xEB304D, colorY = 0x7FC309, colorZ = 0x288DF9, lineWidth = 2.0) {
+	public function new( ?parent : h3d.scene.Object, size = 2.0, colorX = 0xEB304D, colorY = 0x7FC309, colorZ = 0x288DF9, lineWidth = 2.0 ) {
 		super(parent);
 
 		material.props = h3d.mat.MaterialSetup.current.getDefaults("ui");
@@ -416,7 +421,7 @@ class AxesHelper extends h3d.scene.Graphics {
 }
 
 class GridHelper extends h3d.scene.Graphics {
-	public function new(?parent : Object, size = 10.0, divisions = 10, color1 = 0x444444, color2 = 0x888888, lineWidth = 1.0) {
+	public function new( ?parent : Object, size = 10.0, divisions = 10, color1 = 0x444444, color2 = 0x888888, lineWidth = 1.0 ) {
 		super(parent);
 
 		material.props = h3d.mat.MaterialSetup.current.getDefaults("ui");
@@ -426,7 +431,7 @@ class GridHelper extends h3d.scene.Graphics {
 		var hsize = size / 2;
 		var csize = size / divisions;
 		var center = divisions / 2;
-		for (i in 0...divisions + 1) {
+		for ( i in 0...divisions + 1 ) {
 			var p = i * csize;
 			setColor((i != 0 && i != divisions && i % center == 0) ? color2 : color1);
 			moveTo(-hsize + p, -hsize, 0);

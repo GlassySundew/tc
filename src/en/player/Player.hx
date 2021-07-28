@@ -82,7 +82,7 @@ class Player extends Entity {
 		mesh.isLong = true;
 		mesh.isoWidth = mesh.isoHeight = 0.1;
 
-		#if dispDepthBoxes
+		#if depth_debug
 		mesh.renewDebugPts();
 		#end
 		#end
