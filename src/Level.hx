@@ -24,12 +24,12 @@ import ui.s3d.EventInteractive;
 	Level parses tmx entities maps, renders tie layers into mesh
 **/
 class Level extends dn.Process {
-	public var game(get, never) : GameAble;
+	public var game(get, never) : IGame;
 
 	#if !headless
-	function get_game() : GameAble return (Game.inst != null) ? Game.inst : GameClient.inst;
+	function get_game() : IGame return (Game.inst != null) ? Game.inst : GameClient.inst;
 	#elseif headless
-	function get_game() : GameAble return GameServer.inst;
+	function get_game() : IGame return GameServer.inst;
 	#end
 
 	public static var inst : Level;
@@ -102,7 +102,9 @@ class Level extends dn.Process {
 							if ( obj.name == "" ) {
 								switch( obj.objectType ) {
 									case OTTile(gid):
-										if ( eregFileName.match(Tools.getTileByGid(data, gid).image.source) ) obj.name = eregFileName.matched(1);
+										var objGid = Tools.getTileByGid(data, gid);
+										if ( objGid != null
+											&& eregFileName.match(objGid.image.source) ) obj.name = eregFileName.matched(1);
 									default:
 								}
 							}
@@ -177,7 +179,7 @@ class Level extends dn.Process {
 		for ( e in data.layers ) {
 			switch( e ) {
 				case LTileLayer(layer):
-					if ( layer.visible && layer.name != "proto" ) {
+					if ( layer.visible #if !display_proto && layer.name != "proto" #end ) {
 						layerRenderer = new LayerRender(data, layer);
 						layerRenderer.render.g.drawTo(ground);
 					}
@@ -244,16 +246,16 @@ class Level extends dn.Process {
 			polyPrim.addUVs();
 			polyPrim.addNormals();
 
-			var isoDebugMesh = new Mesh(polyPrim, Boot.inst.s3d);
-			isoDebugMesh.rotate(M.toRad(180), 0, 0);
+			var isoDebugMesh = new Mesh(polyPrim, obj);
+			isoDebugMesh.rotate(0, M.toRad(180), M.toRad(90));
 			isoDebugMesh.material.color.setColor(0x361bcc);
 			isoDebugMesh.material.shadows = false;
 			isoDebugMesh.material.mainPass.wireframe = true;
 			isoDebugMesh.material.mainPass.depth(true, Less);
 
-			isoDebugMesh.y = .25;
-			isoDebugMesh.x = i.x;
-			isoDebugMesh.z = i.y;
+			isoDebugMesh.y = -i.x;
+			isoDebugMesh.x = .25;
+			isoDebugMesh.z = i.y - ground.height;
 		}
 		#end
 	}

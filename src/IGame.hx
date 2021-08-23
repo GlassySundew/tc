@@ -1,7 +1,7 @@
 import h2d.Layers;
 import Level.StructTile;
 
-interface GameAble {
+interface IGame {
 	#if !headless
 	public var structTiles : Array<StructTile>;
 	public var camera : Camera;

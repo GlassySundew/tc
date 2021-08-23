@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.5" tiledversion="1.7.1" name="colls" tilewidth="114" tileheight="134" tilecount="15" columns="10" backgroundcolor="#171717">
+<tileset version="1.5" tiledversion="1.7.1" name="entities" tilewidth="114" tileheight="134" tilecount="15" columns="10" backgroundcolor="#171717">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="2">
   <image width="48" height="48" source="separated/player/player.png"/>
@@ -7,7 +7,7 @@
    <object id="6" x="18" y="32" width="11" height="6">
     <ellipse/>
    </object>
-   <object id="7" name="center" x="24" y="35">
+   <object id="7" name="center" x="23" y="35">
     <point/>
    </object>
   </objectgroup>
@@ -17,9 +17,9 @@
    <property name="highlight" type="color" value="#ffffffff"/>
   </properties>
   <image width="48" height="48" source="separated/structures/pcgmw.png"/>
-  <objectgroup draworder="index" id="3">
-   <object id="113" x="9" y="36">
-    <polygon points="1,0 15,7 29,0 15,-7"/>
+  <objectgroup draworder="index" id="2">
+   <object id="114" x="24" y="43">
+    <polygon points="0,0 -14,-7 0,-14 14,-7"/>
    </object>
   </objectgroup>
  </tile>
@@ -147,8 +147,8 @@
  <tile id="19">
   <image width="48" height="36" source="separated/structures/chest.png"/>
   <objectgroup draworder="index" id="3">
-   <object id="2" x="9" y="26">
-    <polygon points="0,0 13,6 33,-4 20,-10"/>
+   <object id="4" x="21" y="31">
+    <polygon points="0,0 20,-10 8,-16 -12,-6"/>
    </object>
   </objectgroup>
  </tile>
@@ -158,8 +158,8 @@
    <object id="2" name="center" x="24" y="24">
     <point/>
    </object>
-   <object id="3" x="24" y="31">
-    <polygon points="0,0 -17,-9 0,-17 17,-8"/>
+   <object id="4" x="24" y="29">
+    <polygon points="0,0 -13,-6.5 0,-13 13,-6.5"/>
    </object>
   </objectgroup>
  </tile>

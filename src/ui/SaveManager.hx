@@ -275,6 +275,7 @@ class SaveEntry extends Process {
 			interactive.width = horflow.innerWidth;
 			interactive.height = horflow.innerHeight;
 		} catch( e:Dynamic ) {
+			destroy();
 			trace("some untrackable bug");
 		}
 	}

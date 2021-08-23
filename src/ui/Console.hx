@@ -9,9 +9,9 @@ import dn.Lib;
 class Console extends h2d.Console {
 	public static var inst : Console;
 
-	public var game(get, never) : GameAble;
+	public var game(get, never) : IGame;
 
-	function get_game() : GameAble return Game.inst != null ? Game.inst : GameClient.inst;
+	function get_game() : IGame return Game.inst != null ? Game.inst : GameClient.inst;
 
 	#if debug
 	var flags : Map<String, Bool>;
@@ -36,8 +36,8 @@ class Console extends h2d.Console {
 		h2d.Console.HIDE_LOG_TIMEOUT = 30;
 		#end
 		// Lib.redirectTracesToH2dConsole(this);
+		
 		// Debug flags
-
 		#if debug
 		flags = new Map();
 		this.addCommand("set", [{name : "k", t : AString}], function ( k : String ) {

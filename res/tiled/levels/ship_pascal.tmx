@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.6.0" orientation="isometric" renderorder="right-down" compressionlevel="0" width="23" height="24" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="807" nextobjectid="14226">
+<map version="1.5" tiledversion="1.7.1" orientation="isometric" renderorder="right-down" compressionlevel="0" width="23" height="24" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="807" nextobjectid="14250">
  <tileset firstgid="1" source="alpha.tsx"/>
- <tileset firstgid="113" source="colls.tsx"/>
+ <tileset firstgid="113" source="entities.tsx"/>
  <layer id="54" name="proto" width="23" height="24" opacity="0.58">
   <data encoding="base64" compression="zlib">
    eAFzYmBgcBrFo2EwiNNAAdBt+DAl6RdkbjAODJIbNRs1fAZ7mNAqnVCSDkb1UpaPRsNv5IYfAFjtlPs=

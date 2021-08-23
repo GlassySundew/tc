@@ -9,7 +9,7 @@ import format.tmx.Data;
 import format.tmx.*;
 import hxd.Res;
 
-class GameServer extends Process implements GameAble {
+class GameServer extends Process implements IGame {
 	public static var inst : GameServer;
 
 	public var network(get, never) : Bool;

@@ -1,18 +1,14 @@
 package tools;
 
-import hxd.Res;
-import haxe.CallStack;
-import sys.FileSystem;
-import hl.uv.Stream;
-import haxe.ds.Map;
-import haxe.io.Bytes;
+import haxe.crypto.Base64;
 import en.player.Player;
 import haxe.Unserializer;
-import haxe.crypto.Base64;
+import haxe.io.Bytes;
 import hxbit.Serializer;
 import hxd.File;
+import hxd.Res;
+import sys.FileSystem;
 import sys.db.Connection;
-import sys.db.ResultSet;
 import sys.db.Sqlite;
 
 typedef CachedLevel = {
@@ -23,7 +19,7 @@ typedef CachedLevel = {
 
 typedef CachedEntity = {
 	public var id : Int;
-	// basically just a class name, i.e. 'en.player.Player'
+	/** basically just a class name, i.e. 'en.player.Player' **/
 	public var name : String;
 	public var blob : String;
 	public var level_id : Null<Int>;

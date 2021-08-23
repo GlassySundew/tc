@@ -4,12 +4,16 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
+
         {
             "name": "HashLink (launch)",
             "request": "launch",
             "type": "hl",
+            "hxml": "../hl.debug.hxml",
             "cwd": "${workspaceFolder}",
             "preLaunchTask": {
+
                 "type": "haxe",
                 "args": "active configuration"
             }

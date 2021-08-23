@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.4" tiledversion="2020.11.25" orientation="isometric" renderorder="right-down" compressionlevel="0" width="24" height="24" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#bababa" nextlayerid="433" nextobjectid="7875">
  <tileset firstgid="1" source="alpha.tsx"/>
- <tileset firstgid="64" source="colls.tsx"/>
+ <tileset firstgid="64" source="entities.tsx"/>
  <layer id="54" name="proto" width="24" height="24" opacity="0.58">
   <data encoding="base64" compression="zlib">
    eAHTZmBg0B7Fo2EwhNOAOtDtyJja6RnZbBB71HzUMBjq4UPt+Bw1DzV9jIbHaHgM1jQAAEmuYGE=

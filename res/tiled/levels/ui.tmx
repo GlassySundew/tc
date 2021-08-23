@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.5" tiledversion="2021.02.15" orientation="orthogonal" renderorder="right-down" width="1000" height="1000" tilewidth="1" tileheight="1" infinite="0" backgroundcolor="#333b3f" nextlayerid="11" nextobjectid="67">
  <tileset firstgid="1" source="ui.tsx"/>
- <tileset firstgid="11" source="colls.tsx"/>
+ <tileset firstgid="11" source="entities.tsx"/>
  <objectgroup draworder="index" id="5" name="hz che eto"/>
  <objectgroup draworder="index" id="2" name="inventory">
   <object id="21" name="window" gid="2" x="140" y="348" width="114" height="124"/>

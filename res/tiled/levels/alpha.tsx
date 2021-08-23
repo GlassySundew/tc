@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.5" tiledversion="1.7.1" name="alpha" tilewidth="246" tileheight="133" tilecount="45" columns="0" backgroundcolor="#171717">
+<tileset version="1.5" tiledversion="1.7.2" name="alpha" tilewidth="246" tileheight="133" tilecount="53" columns="0" backgroundcolor="#171717">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="63">
   <image width="68" height="106" source="../separated/env/agro_wall.png"/>
@@ -115,9 +115,6 @@
  <tile id="104">
   <image width="246" height="87" source="../separated/env/walls_bridge.png"/>
  </tile>
- <tile id="105">
-  <image width="48" height="24" source="../separated/env/asteroid_bot_cut1_center.png"/>
- </tile>
  <tile id="106">
   <image width="48" height="36" source="../separated/env/light_left.png"/>
  </tile>
@@ -138,5 +135,56 @@
    <property name="type" value="void"/>
   </properties>
   <image width="48" height="24" source="../separated/env/void.png"/>
+ </tile>
+ <tile id="114">
+  <properties>
+   <property name="way" value="east"/>
+  </properties>
+  <image width="46" height="24" source="../separated/env/east.png"/>
+ </tile>
+ <tile id="115">
+  <image width="96" height="120" source="../separated/env/inner_wall_duo_dark.png"/>
+ </tile>
+ <tile id="116">
+  <properties>
+   <property name="way" value="north"/>
+  </properties>
+  <image width="46" height="24" source="../separated/env/north.png"/>
+ </tile>
+ <tile id="117">
+  <properties>
+   <property name="way" value="north-east"/>
+  </properties>
+  <image width="46" height="24" source="../separated/env/north-east.png"/>
+ </tile>
+ <tile id="118">
+  <properties>
+   <property name="way" value="north-west"/>
+  </properties>
+  <image width="46" height="24" source="../separated/env/north-west.png"/>
+ </tile>
+ <tile id="122">
+  <properties>
+   <property name="way" value="south"/>
+  </properties>
+  <image width="46" height="24" source="../separated/env/south.png"/>
+ </tile>
+ <tile id="123">
+  <properties>
+   <property name="way" value="south-east"/>
+  </properties>
+  <image width="46" height="24" source="../separated/env/south-east.png"/>
+ </tile>
+ <tile id="124">
+  <properties>
+   <property name="way" value="south-west"/>
+  </properties>
+  <image width="46" height="24" source="../separated/env/south-west.png"/>
+ </tile>
+ <tile id="125">
+  <properties>
+   <property name="way" value="west"/>
+  </properties>
+  <image width="46" height="24" source="../separated/env/west.png"/>
  </tile>
 </tileset>

@@ -17,7 +17,7 @@ import ui.PauseMenu;
 
 // import tools.Save;
 
-class Game extends Process implements GameAble implements hxbit.Serializable {
+class Game extends Process implements IGame implements hxbit.Serializable {
 	public static var inst : Game;
 
 	public var network(get, never) : Bool;
@@ -152,10 +152,13 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 			// если не найдено подходящего класса, то спавним spriteEntity, который является просто спрайтом
 			switch( e.objectType ) {
 				case OTTile(gid):
-					var source = Tools.getTileByGid(tmxMap, gid).image.source;
-					if ( eregFileName.match(source) ) {
-						new SpriteEntity(isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, eregFileName.matched(1), e);
-						return;
+					var objGid = Tools.getTileByGid(tmxMap, gid);
+					if ( objGid != null ) {
+						var source = objGid.image.source;
+						if ( eregFileName.match(source) ) {
+							new SpriteEntity(isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, eregFileName.matched(1), e);
+							return;
+						}
 					}
 				default:
 			}
@@ -198,8 +201,7 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 		// если ent не определён, то на все Entity из массива ALL будут добавлены TmxObject из тайлсета с названием colls
 		// parsing collision objects from 'colls' tileset
 		for ( tileset in tmxMap.tilesets ) {
-			var ereg = ~/(^[^.]*)+/; // regexp to take tileset name
-			if ( ereg.match(tileset.source) && ereg.matched(1) == 'colls' ) for ( tile in tileset.tiles ) {
+			if ( StringTools.contains(tileset.source, "entities") ) for ( tile in tileset.tiles ) {
 				if ( eregFileName.match(tile.image.source) ) {
 					var ents = ent != null ? [ent] : Entity.ALL;
 					for ( ent in ents ) {
@@ -209,6 +211,7 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 								|| (Std.isOfType(ent, SpriteEntity)
 									&& eregFileName.matched(1) == ent.spr.groupName))) /*&& ent.collisions.length == 0*/ ) {
 							var centerSet = false;
+
 							for ( obj in tile.objectGroup.objects ) { // Засовываем объекты для детекта коллизий по Entity
 								var params = {
 									x : M.round(obj.x) + ent.footX,
@@ -242,6 +245,7 @@ class Game extends Process implements GameAble implements hxbit.Serializable {
 
 									ent.spr.setCenterRatio(center.x, center.y);
 								}
+
 								switch( obj.objectType ) {
 									case OTEllipse:
 										var shape = new differ.shapes.Circle(0, 0, params.width / 2);

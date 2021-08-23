@@ -1,3 +1,7 @@
+
 ./rules/rules.tmx
+#./rules/random.tmx
+
+
 #./rules/rules1.tmx
 

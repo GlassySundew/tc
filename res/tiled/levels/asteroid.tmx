@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.1" orientation="isometric" renderorder="right-down" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1e1e1e" nextlayerid="9651" nextobjectid="242171">
+<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-down" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1e1e1e" nextlayerid="9705" nextobjectid="242495">
  <tileset firstgid="1" source="alpha.tsx"/>
- <tileset firstgid="113" source="colls.tsx"/>
- <layer id="5" name="proto" width="100" height="100" visible="0" opacity="0.61">
+ <tileset firstgid="127" source="entities.tsx"/>
+ <layer id="5" name="proto" width="100" height="100" opacity="0.61">
   <data encoding="base64" compression="zlib">
    eJzt1rEJACAMRNFM5zzuX4mtYJ1D34NbIL9JFQAAAAAAAAAvmpfRY99+HNOjjx5Z9MiiRxY9svivAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOAfC1TGDxk=
   </data>
  </layer>
  <layer id="3679" name="ground_bot" width="100" height="100">
   <data encoding="base64" compression="zlib">
-   eJzt0bENACAIAEF209adHF0bCzs7MLlLCC3hIwAAAAAAAAAAAN607AO46FGLHrXoUYseufb/Z99z9sg+CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD6wAFYXBKs=
+   eJzt06ENACAMRUF2A8tOjA4GgcO1hLuk/icvLQUAAAAAAAAAAOBOjR7AQY9c9MhFj1xa9IDPrX8Y+1aL0aMHAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAMmV5sEqw==
   </data>
  </layer>
  <layer id="3967" name="ground" width="100" height="100">
   <data encoding="base64" compression="zlib">
-   eJzt1bENwCAMBEBPRwIsxeg4IjMAxZ30cvvNyxEAAAAAAAAAwA49Yjx5S6adLkPUzPvffrgLaxf2cQ/7uEtuYnw/pK0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALDBBErgB7M=
+   eJzt0bENACAMA0FPlwKWYnSgYwKguJOstJE+AQAAAAAAAABu6Mmodffa62dIHdPjPT3+osdfVoNxDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACyZTggee
   </data>
  </layer>
  <objectgroup id="47" name="obstacles" visible="0">
-  <object id="242153" x="600" y="600" width="24" height="24"/>
-  <object id="242154" x="624" y="600" width="24" height="24"/>
-  <object id="242155" x="648" y="600" width="24" height="24"/>
-  <object id="242156" x="672" y="600" width="24" height="24"/>
-  <object id="242157" x="696" y="480" width="24" height="24"/>
-  <object id="242158" x="696" y="504" width="24" height="24"/>
-  <object id="242159" x="696" y="528" width="24" height="24"/>
-  <object id="242160" x="696" y="552" width="24" height="24"/>
-  <object id="242161" x="696" y="576" width="24" height="24"/>
-  <object id="242162" x="576" y="480" width="24" height="24"/>
-  <object id="242163" x="576" y="504" width="24" height="24"/>
-  <object id="242164" x="576" y="528" width="24" height="24"/>
-  <object id="242165" x="576" y="552" width="24" height="24"/>
-  <object id="242166" x="576" y="576" width="24" height="24"/>
-  <object id="242167" x="600" y="456" width="24" height="24"/>
-  <object id="242168" x="624" y="456" width="24" height="24"/>
-  <object id="242169" x="648" y="456" width="24" height="24"/>
-  <object id="242170" x="672" y="456" width="24" height="24"/>
+  <object id="242477" x="600" y="600" width="24" height="24"/>
+  <object id="242478" x="624" y="600" width="24" height="24"/>
+  <object id="242479" x="648" y="600" width="24" height="24"/>
+  <object id="242480" x="672" y="600" width="24" height="24"/>
+  <object id="242481" x="696" y="480" width="24" height="24"/>
+  <object id="242482" x="696" y="504" width="24" height="24"/>
+  <object id="242483" x="696" y="528" width="24" height="24"/>
+  <object id="242484" x="696" y="552" width="24" height="24"/>
+  <object id="242485" x="696" y="576" width="24" height="24"/>
+  <object id="242486" x="576" y="480" width="24" height="24"/>
+  <object id="242487" x="576" y="504" width="24" height="24"/>
+  <object id="242488" x="576" y="528" width="24" height="24"/>
+  <object id="242489" x="576" y="552" width="24" height="24"/>
+  <object id="242490" x="576" y="576" width="24" height="24"/>
+  <object id="242491" x="600" y="456" width="24" height="24"/>
+  <object id="242492" x="624" y="456" width="24" height="24"/>
+  <object id="242493" x="648" y="456" width="24" height="24"/>
+  <object id="242494" x="672" y="456" width="24" height="24"/>
  </objectgroup>
  <objectgroup id="3407" name="entities">
-  <object id="35497" gid="115" x="528" y="120" width="32" height="32"/>
+  <object id="35497" gid="129" x="528" y="120" width="32" height="32"/>
  </objectgroup>
 </map>

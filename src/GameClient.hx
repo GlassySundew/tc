@@ -15,7 +15,7 @@ import format.tmx.Data;
 import h3d.scene.CameraController;
 import tools.Settings;
 
-class GameClient extends Process implements GameAble {
+class GameClient extends Process implements IGame {
 	// static var HOST = "0.0.0.0";
 	static var HOST = "78.24.222.152";
 	static var PORT = 6676;

@@ -1,5 +1,6 @@
 package;
 
+import mapgen.MapGen;
 import tools.Save;
 import cherry.soup.EventSignal.EventSignal0;
 import dn.M;
@@ -51,7 +52,7 @@ class Main extends Process {
 		Cursors.init();
 		Lang.init("en");
 
-		uiConf = resolveMap("ui.tmx").getLayersByName();
+		uiConf = resolveMap("ui.tmx").mapLayersByName();
 		for ( i in uiConf ) i.localBy(i.getObjectByName("window"));
 
 		Data.load(hxd.Res.data.entry.getText());
@@ -100,15 +101,28 @@ class Main extends Process {
 		// Assets.playMusic();
 		#end
 		#if debug
-		new MainMenu(Boot.inst.s2d);
+		// new MainMenu(Boot.inst.s2d);
 
-		// var autoMapper = new mapgen.AutoMap(resolveMap("rules/rules.tmx"));
-		// var applicableMap = autoMapper.applyRulesToMap(resolveMap("test.tmx"));
+		var autoMapper = new mapgen.AutoMap("res/tiled/levels/rules.txt");
+		
+		var mapGen = new MapGen(resolveMap('procgen/asteroids.tmx'), autoMapper);
+		
+		var applicableMap = autoMapper.applyRulesToMap(mapGen.generate(50, 50, 100, 5, 15));
+		for ( i in applicableMap.layers ) {
+			switch i {
+				case LTileLayer(layer):
+					trace(layer.name);
+				case LObjectGroup(group):
+					trace(group.name);
+				default:
+			}
+		}
 
-		// startGame();
+		startGame();
+
 		// Game.inst.startLevel("bridge.tmx");
+		Game.inst.startLevelFromParsedTmx(autoMapper.applyRulesToMap(applicableMap), "asteroids.tmx");
 
-		// Game.inst.startLevelFromParsedTmx(applicableMap, "test.tmx");
 		#end
 	}
 

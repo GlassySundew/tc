@@ -21,20 +21,23 @@ class Util {
 	/**Regex to get class name provided by CompileTime libs, i.e. en.$Entity -> Entity **/
 	static var eregCompTimeClass = ~/\$([a-z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
 
+	/** regex to match automapping random rules **/
+	static var eregAutoMapLayer = ~/(?:output|input)([0-9]*)_([a-z]+)$/gi;
+
 	/** Regex to get '$this' class name i.e. en.Entity -> Entity **/
 	static var eregClass = ~/\.([a-z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
 
 	/** Регулярка чтобы взять из абсолютного пути название файла без расширения .png **/
 	static var eregFileName = ~/\/([a-z_0-9]+)\./;
 
-	inline static function loadTileFromCdb(cdbTile : TilePos) : Tile {
+	inline static function loadTileFromCdb( cdbTile : TilePos ) : Tile {
 		return Res.loader.loadParentalFix(cdbTile.file).toTile().sub(cdbTile.x * cdbTile.size, cdbTile.y * cdbTile.size, cdbTile.size, cdbTile.size);
 	}
 
-	inline static function checkPolyClockwise(points : Array<Dynamic>) {
+	inline static function checkPolyClockwise( points : Array<Dynamic> ) {
 		var pts = points.copy();
 		var sum = .0;
-		for (i in 0...pts.length) {
+		for ( i in 0...pts.length ) {
 			var actualItpp = (i >= pts.length - 1) ? 0 : i + 1;
 			sum += (pts[actualItpp].x - pts[i].x) * (pts[actualItpp].y + pts[i].y);
 		}
@@ -42,17 +45,17 @@ class Util {
 		return pts;
 	}
 
-	inline static function cartToIso(x : Float, y : Float) : Vector return new Vector((x - y), (x + y) / 2);
+	inline static function cartToIso( x : Float, y : Float ) : Vector return new Vector((x - y), (x + y) / 2);
 
-	inline static function screenToIsoX(globalX : Float, globalY : Float) {
+	inline static function screenToIsoX( globalX : Float, globalY : Float ) {
 		return globalX + globalY;
 	}
 
-	inline static function screenToIsoY(globalX : Float, globalY : Float) {
+	inline static function screenToIsoY( globalX : Float, globalY : Float ) {
 		return globalY - globalX / 2;
 	}
 
-	inline static function screenToIso(globalX : Float, globalY : Float) {
+	inline static function screenToIso( globalX : Float, globalY : Float ) {
 		return new Vector(screenToIsoX(globalX, globalY), screenToIsoY(globalX, globalY));
 	}
 
@@ -64,7 +67,7 @@ class Util {
 
 	inline static function get_hScaled() return Std.int(Boot.inst.s2d.height / Const.SCALE);
 
-	inline static function getTileFromSeparatedTsx(tile : TmxTilesetTile) : Tile {
+	inline static function getTileFromSeparatedTsx( tile : TmxTilesetTile ) : Tile {
 		// #if pak
 		return Res.loader.loadParentalFix(Const.LEVELS_PATH + tile.image.source).toTile();
 		// #else
@@ -72,16 +75,16 @@ class Util {
 		// #end
 	}
 
-	inline static function getTileSource(gid : Int, tileset : TmxTileset) : TmxTilesetTile {
+	inline static function getTileSource( gid : Int, tileset : TmxTileset ) : TmxTilesetTile {
 		var fixedGId = gid - tileset.firstGID;
 		// фикс на непоследовательные id тайлов
-		for (i in 0...tileset.tiles.length) if ( tileset.tiles[i].id == fixedGId && fixedGId > i ) while( fixedGId > i )
+		for ( i in 0...tileset.tiles.length ) if ( tileset.tiles[i].id == fixedGId && fixedGId > i ) while( fixedGId > i )
 			fixedGId--;
 		return (tileset.tiles[fixedGId]);
 	}
 
-	inline static function getTsx(tsx : Map<String, TmxTileset>, r : Reader) : String -> TmxTileset {
-		return (name : String) -> {
+	inline static function getTsx( tsx : Map<String, TmxTileset>, r : Reader ) : String -> TmxTileset {
+		return ( name : String ) -> {
 			var cached : TmxTileset = tsx.get(name);
 			if ( cached != null ) return cached;
 			cached = r.readTSX(Xml.parse(Res.loader.loadParentalFix(Const.LEVELS_PATH + name).entry.getText()));
@@ -89,8 +92,8 @@ class Util {
 			return cached;
 		}
 	}
-
-	inline static function resolveMap(lvlName : String) {
+	
+	inline static function resolveMap( lvlName : String ) {
 		var tsx = new Map();
 		var r = new Reader();
 		r.resolveTSX = getTsx(tsx, r);
@@ -98,15 +101,18 @@ class Util {
 		return tmx;
 	}
 
-	inline static function getProjectedDifferPolygonRect(?obj : TmxObject, points : Array<TmxPoint>) : Vector {
+
+	inline static function emptyTiles(map:TmxMap) return [for ( i in 0...(map.height * map.width) ) new TmxTile(0)];
+
+	inline static function getProjectedDifferPolygonRect( ?obj : TmxObject, points : Array<TmxPoint> ) : Vector {
 		var pts = checkPolyClockwise(points);
 		var verts : Array<Vector> = [];
-		for (i in pts) verts.push(new Vector((i.x), (-i.y)));
+		for ( i in pts ) verts.push(new Vector((i.x), (-i.y)));
 
 		var yArr = verts.copy();
-		yArr.sort(function(a, b) return (a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0));
+		yArr.sort(function ( a, b ) return (a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0));
 		var xArr = verts.copy();
-		xArr.sort(function(a, b) return (a.x < b.x) ? -1 : ((a.x > b.x) ? 1 : 0));
+		xArr.sort(function ( a, b ) return (a.x < b.x) ? -1 : ((a.x > b.x) ? 1 : 0));
 
 		// xCent и yCent - половины ширины и высоты неповёрнутого полигона соответственно
 		var xCent : Float = M.round((xArr[xArr.length - 1].x + xArr[0].x) * .5);
@@ -130,44 +136,58 @@ class Util {
 	public static var uiConf : Map<String, TmxLayer>;
 
 	public static var inventoryCoordRatio : Vector = new Vector(-1, -1);
-	
 }
 
 class ReverseIterator {
-	var end:Int;
-	var i:Int;
-  
-	public inline function new(start:Int, end:Int) {
-	  this.i = start;
-	  this.end = end;
+	var end : Int;
+	var i : Int;
+
+	public inline function new( start : Int, end : Int ) {
+		this.i = start;
+		this.end = end;
 	}
-  
+
 	public inline function hasNext() return i >= end;
+
 	public inline function next() return i--;
-  }
-  
-  class ReverseArrayKeyValueIterator<T> {
-    final arr:Array<T>;
-    var i:Int;
-
-    public inline function new(arr:Array<T>) {
-        this.arr = arr;
-        this.i = this.arr.length - 1; 
-    }
-
-    public inline function hasNext() return i > -1;
-    public inline function next() {
-        return {value: arr[i], key: i--};
-    }
-
-    public static inline function reversedKeyValues<T>(arr:Array<T>) {
-        return new ReverseArrayKeyValueIterator(arr);
-    }
 }
+
+class ReverseArrayKeyValueIterator<T> {
+	final arr : Array<T>;
+	var i : Int;
+
+	public inline function new( arr : Array<T> ) {
+		this.arr = arr;
+		this.i = this.arr.length - 1;
+	}
+
+	public inline function hasNext() return i > -1;
+
+	public inline function next() {
+		return { value : arr[i], key : i-- };
+	}
+
+	public static inline function reversedKeyValues<T>( arr : Array<T> ) {
+		return new ReverseArrayKeyValueIterator(arr);
+	}
+}
+
 class TmxMapExtender {
-	public static function getLayersByName(tmxMap : TmxMap) : Map<String, TmxLayer> {
+	public static function getLayersByName(  map : TmxMap , name : String) : Array<TmxLayer> {
+		return map.layers.filter(layer -> switch layer {
+			case LTileLayer(layer):
+				layer.name == name;
+			case LObjectGroup(group):
+				group.name == name;
+			case LImageLayer(layer):
+				layer.name == name;
+			case LGroup(group):
+				group.name == name;
+		});
+	}
+	public static function mapLayersByName( tmxMap : TmxMap ) : Map<String, TmxLayer> {
 		var map : Map<String, TmxLayer> = [];
-		for (i in tmxMap.layers) {
+		for ( i in tmxMap.layers ) {
 			var name : String = 'null';
 			switch( i ) {
 				case LObjectGroup(group):
@@ -183,10 +203,10 @@ class TmxMapExtender {
 }
 
 class TmxLayerExtender {
-	public static function getObjectByName(tmxLayer : TmxLayer, name : String) : TmxObject {
+	public static function getObjectByName( tmxLayer : TmxLayer, name : String ) : TmxObject {
 		switch( tmxLayer ) {
 			case LObjectGroup(group):
-				for (i in group.objects) {
+				for ( i in group.objects ) {
 					if ( i.name == name ) return i;
 				}
 			default:
@@ -194,17 +214,17 @@ class TmxLayerExtender {
 		return null;
 	}
 	/** Localises all objects of this layer to be local to certain object of this layer **/
-	public static function localBy(tmxLayer : TmxLayer, target : TmxObject) {
+	public static function localBy( tmxLayer : TmxLayer, target : TmxObject ) {
 		switch( tmxLayer ) {
 			case LObjectGroup(group):
 				// Checking if the object belongs to the layer
 				var tempCheck = null;
-				for (i in group.objects) if ( target == i ) tempCheck = i;
+				for ( i in group.objects ) if ( target == i ) tempCheck = i;
 				if ( tempCheck == null ) return null;
 				// Offsetting every single object in the layer except for the target one
 				var offsetX = -target.width / 2 + target.x + 1;
 				var offsetY = -target.height + target.y + 1;
-				for (i in group.objects) {
+				for ( i in group.objects ) {
 					if ( i != target ) {
 						i.x -= offsetX;
 						i.y -= offsetY;
@@ -222,24 +242,26 @@ class TmxLayerExtender {
 	}
 }
 
-class SocketHostExtender {
-	public static function sendTypedMessage(sHost : hxd.net.SocketHost, msg : Message, ?to : NetworkClient) sHost.sendMessage(msg, to);
 
-	public static dynamic function onTypedMessage(sHost : hxd.net.SocketHost, onMessage : NetworkClient -> Message -> Void) {
+
+class SocketHostExtender {
+	public static function sendTypedMessage( sHost : hxd.net.SocketHost, msg : Message, ?to : NetworkClient ) sHost.sendMessage(msg, to);
+
+	public static dynamic function onTypedMessage( sHost : hxd.net.SocketHost, onMessage : NetworkClient -> Message -> Void ) {
 		sHost.onMessage = onMessage;
 	}
 }
 
 class LoaderExtender {
 	// unsafe crutch, removes ../ from path, use only if you you have link to the folder upper in dir
-	public static function loadParentalFix(loader : Loader, path : String) : Any {
+	public static function loadParentalFix( loader : Loader, path : String ) : Any {
 		while( StringTools.contains(path, "../") )path = StringTools.replace(path, "../", "");
 		return new Any(loader, loader.fs.get(path));
 	}
 }
 
 class FlowExtender {
-	public static function center(flow : Flow) {
+	public static function center( flow : Flow ) {
 		flow.paddingLeft = -flow.innerWidth >> 1;
 		flow.paddingTop = -flow.innerHeight >> 1;
 	}
