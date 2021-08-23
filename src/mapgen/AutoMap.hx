@@ -30,7 +30,7 @@ enum TmxGeneratable {
 **/
 class AutoMap {
 	public var rules : Map<{regions_input : CoordinatedIsland, regions_output : CoordinatedIsland },
-		{ inputs : Array<Map<String, Array<TmxGeneratable>>>, outputs : Array<Map<String, Array<TmxGeneratable>>> }> = [];
+		{ inputs : Map<String, Array<TmxGeneratable>>, outputs : Map<String, Array<TmxGeneratable>> }> = [];
 
 	var layersByName : Map<String, TmxLayer>;
 	/** rulemap **/
@@ -43,7 +43,6 @@ class AutoMap {
 
 		for ( i in ruleFiles.split('\n') ) {
 			if ( i != "" && !StringTools.startsWith(i, "//") && !StringTools.startsWith(i, "#") ) {
-				trace(i, i == "");
 				ruleMaps.push(resolveMap(StringTools.replace(i, "./", "")));
 			}
 		}
@@ -64,19 +63,30 @@ class AutoMap {
 
 			compileRules(cast(Type.enumParameters(regions_input)[0]), cast(Type.enumParameters(regions_output)[0]), inputs, outputs, ruleMap);
 
-			debugRules();
+			// debugRules();
 		}
 	}
 
 	function debugRules() {
 		for ( regions => puts in rules ) {
-			trace(regions);
-			for ( inputIndex => input in puts.inputs ) {
-				trace(inputIndex, input);
+			for ( region in regions.regions_input ) {
+				trace("reg input" + region);
 			}
-			for ( outputIndex => outputs in puts.outputs ) {
-				trace(outputIndex, outputs);
-				
+			for ( region in regions.regions_output ) {
+				trace("reg output" + region);
+			}
+
+			for ( inputIndex => input in puts.inputs ) {
+				trace(inputIndex);
+				for ( tile in input ) {
+					trace(tile);
+				}
+			}
+			for ( outputIndex => output in puts.outputs ) {
+				trace(outputIndex);
+				for ( tile in output ) {
+					trace(tile);
+				}
 			}
 			trace('=========================================');
 		}
@@ -126,7 +136,7 @@ class AutoMap {
 			var appliedTiles : Array<{x : Int, y : Int }> = [];
 
 			function applyRuleToLayer( rule : { regions_input : CoordinatedIsland, regions_output : CoordinatedIsland },
-					outputs : Array<Map<String, Array<TmxGeneratable>>>, layer : TmxTileLayer, layerTile0x : Int, layerTile0y : Int ) {
+					outputs : Map<String, Array<TmxGeneratable>>, layer : TmxTileLayer, layerTile0x : Int, layerTile0y : Int ) {
 
 				function createLayerIfNotExistsByName( name : String, type : TmxGeneratable ) {
 					var layerByName = map.getLayersByName(name)[0];
@@ -144,6 +154,7 @@ class AutoMap {
 						map.height, map.width, 1, true, 0xffffff, new TmxProperties()));
 
 					if ( layerByName == null ) {
+
 						layerByName = switch type {
 							case TileGeneratable(tile): newTileLayer();
 							case ObjectGeneratable(object): newObjectLayer();
@@ -193,134 +204,127 @@ class AutoMap {
 					return result;
 				}
 
-				for ( output in outputs.reversedKeyValues() ) {
-					for ( layerName => outputGeneratable in output.value ) {
-						if ( outputGeneratable.length > 0 ) {
+				for ( layerName => outputGeneratable in outputs ) {
+					if ( outputGeneratable.length > 0 ) {
 
-							// random distribution, here we make a choice
-							var randomCheck = layerName.split("%random%");
-							if ( randomCheck[1] != null && randomCheck[1] != "" ) {
-								var pool : Map<String, Array<TmxGeneratable>> = [];
-								var rawPool = [];
-								for ( output in outputs ) {
-									for ( layerName => outputGeneratable in output ) {
-										if ( layerName.split("%random%")[1] != "" )
-											pool[layerName] = pool[layerName] == null ? extractRandom(outputGeneratable) : pool[layerName].concat((extractRandom(outputGeneratable)));
+						// random distribution, here we make a choice
+						var randomCheck = layerName.split("%random%");
+						if ( randomCheck[1] != null && randomCheck[1] != "" ) {
+							var pool : Map<String, Array<TmxGeneratable>> = [];
+							var rawPool = [];
+							for ( layerName => outputGeneratable in outputs ) {
+								if ( layerName.split("%random%")[1] != "" )
+									pool[layerName] = pool[layerName] == null ? extractRandom(outputGeneratable) : pool[layerName].concat((extractRandom(outputGeneratable)));
+							}
+							for ( value in pool ) rawPool.push(value);
+
+							outputGeneratable = std.Random.fromArray(rawPool);
+							layerName = randomCheck[0];
+						}
+
+						var currentLayer = createLayerIfNotExistsByName(StringTools.replace(layerName, "output_", ""), outputGeneratable[0]);
+
+						switch currentLayer {
+							case LTileLayer(layer):
+								// первый тайл в output хранилище
+								var params = Type.enumParameters(outputGeneratable[0])[0];
+								var rule0x = params.x;
+								var rule0y = params.y;
+								for ( i in outputGeneratable ) {
+									switch i {
+										case TileGeneratable(tile):
+
+											if ( tile.tile.gid != 0 ) {
+												var x = tile.x - rule0x + layerTile0x + rule.regions_output[0].x - rule.regions_input[0].x;
+												var y = tile.y - rule0y + layerTile0y + rule.regions_output[0].y - rule.regions_input[0].y;
+
+												if ( layer.data.tiles[x + y * map.width].gid != 0 || deleteTiles ) {
+													if ( noOverlappingRules ) appliedTiles.push({ x : x, y : y });
+													layer.data.tiles[x + y * map.width] = tile.tile;
+												}
+											}
+										default:
+											throw "Guaranteed to be tile layer but its not";
 									}
 								}
-								for ( key => value in pool ) rawPool.push(value);
+							case LObjectGroup(group):
 
-								outputGeneratable = std.Random.fromArray(rawPool);
-								layerName = randomCheck[0];
-							}
-
-							var currentLayer = createLayerIfNotExistsByName(StringTools.replace(layerName, "output_", ""), outputGeneratable[0]);
-
-							switch currentLayer {
-								case LTileLayer(layer):
-									// первый тайл в output хранилище
-									var params = Type.enumParameters(outputGeneratable[0])[0];
-									var rule0x = params.x;
-									var rule0y = params.y;
-									for ( i in outputGeneratable ) {
-										switch i {
-											case TileGeneratable(tile):
-
-												if ( tile.tile.gid != 0 ) {
-													var x = tile.x - rule0x + layerTile0x + rule.regions_output[0].x - rule.regions_input[0].x;
-													var y = tile.y - rule0y + layerTile0y + rule.regions_output[0].y - rule.regions_input[0].y;
-
-													if ( layer.data.tiles[x + y * map.width].gid != 0 || deleteTiles ) {
-														if ( noOverlappingRules ) appliedTiles.push({ x : x, y : y });
-														layer.data.tiles[x + y * map.width] = tile.tile;
-													}
-												}
-											default:
-												throw "Guaranteed to be tile layer but its not";
-										}
+								for ( i in outputGeneratable ) {
+									switch i {
+										case ObjectGeneratable(object):
+											if ( object != null ) {
+												// creating new TmxObject
+												group.objects.push({
+													id : object.id,
+													name : object.name,
+													type : object.type,
+													x : object.x % map.tileHeight + (M.floor(object.x / map.tileHeight) - rule.regions_input[0].x
+														+ layerTile0x) * map.tileHeight,
+													y : object.y % map.tileHeight + (M.floor(object.y / map.tileHeight) - rule.regions_input[0].y
+														+ layerTile0y) * map.tileHeight,
+													width : object.width,
+													height : object.height,
+													rotation : object.rotation,
+													visible : object.visible,
+													objectType : object.objectType,
+													properties : object.properties,
+													flippedHorizontally : object.flippedHorizontally,
+													flippedVertically : object.flippedVertically,
+													template : object.template,
+												});
+											}
+										default:
+											throw "Guaranteed to be object layer but its not";
 									}
-								case LObjectGroup(group):
-
-									for ( i in outputGeneratable ) {
-										switch i {
-											case ObjectGeneratable(object):
-												if ( object != null ) {
-													// creating new TmxObject
-													group.objects.push({
-														id : object.id,
-														name : object.name,
-														type : object.type,
-														x : object.x % map.tileHeight + (M.floor(object.x / map.tileHeight)
-															- rule.regions_input[0].x + layerTile0x) * map.tileHeight,
-														y : object.y % map.tileHeight + (M.floor(object.y / map.tileHeight)
-															- rule.regions_input[0].y + layerTile0y) * map.tileHeight,
-														width : object.width,
-														height : object.height,
-														rotation : object.rotation,
-														visible : object.visible,
-														objectType : object.objectType,
-														properties : object.properties,
-														flippedHorizontally : object.flippedHorizontally,
-														flippedVertically : object.flippedVertically,
-														template : object.template,
-													});
-												}
-											default:
-												throw "Guaranteed to be object layer but its not";
-										}
-									}
-								default:
-							}
+								}
+							default:
 						}
 					}
 				}
 			}
 
 			function isOverlapping( rule : { regions_input : CoordinatedIsland, regions_output : CoordinatedIsland },
-					outputs : Array<Map<String, Array<TmxGeneratable>>>, layerTile0x : Int, layerTile0y : Int ) : Bool {
+					outputs : Map<String, Array<TmxGeneratable>>, layerTile0x : Int, layerTile0y : Int ) : Bool {
 				for ( output in outputs ) {
-					for ( outputName => outputTiles in output ) {
-						for ( outputTileI => outputTile in outputTiles ) {
-							var params = Type.enumParameters(outputTiles[0])[0];
-							var rule0x = params.x;
-							var rule0y = params.y;
-							switch outputTile {
-								case TileGeneratable(tile):
-									if ( appliedTiles.contains({
-										x : (tile.x - rule0x + layerTile0x + rule.regions_output[0].x - rule.regions_input[0].x),
-										y : (tile.y - rule0y + layerTile0y + rule.regions_output[0].y - rule.regions_input[0].y)
-									}) ) return true;
-								default:
-							}
+					for ( outputTileI => outputTile in output ) {
+						var params = Type.enumParameters(output[0])[0];
+						var rule0x = params.x;
+						var rule0y = params.y;
+						switch outputTile {
+							case TileGeneratable(tile):
+								if ( appliedTiles.contains({
+									x : (tile.x - rule0x + layerTile0x + rule.regions_output[0].x - rule.regions_input[0].x),
+									y : (tile.y - rule0y + layerTile0y + rule.regions_output[0].y - rule.regions_input[0].y)
+								}) ) return true;
+							default:
 						}
 					}
 				}
 				return false;
 			}
 
+
 			for ( layerTo in map.layers ) {
 				switch( layerTo ) {
 					case LTileLayer(tileLayerTo):
 						for ( region => rule in rules ) {
-							for ( inputs in rule.inputs ) {
-								for ( layerName => inputTilesFrom in inputs ) { // rule
-									if ( StringTools.endsWith(layerName, tileLayerTo.name) ) {
-										var extractedLayerTo = extractFromLayer(layerTo, ruleMap);
-										for ( iTo => tileTo in tileLayerTo.data.tiles ) { // appliable layer
-											if ( tileTo.gid != 0 ) {
-												var layerTile0x = Std.int(iTo % map.width);
-												var layerTile0y = Std.int(iTo / map.width);
-												if ( ruleMatchesOnLayer(inputTilesFrom, extractedLayerTo, layerTile0x, layerTile0y)
-													&& !(noOverlappingRules
-														&& !isOverlapping(region, rule.outputs, layerTile0x, layerTile0y)) ) {
-													applyRuleToLayer(region, rule.outputs, tileLayerTo, layerTile0x, layerTile0y);
-												}
+							for ( layerName => inputTilesFrom in rule.inputs ) { // rule
+								if ( StringTools.endsWith(layerName, tileLayerTo.name) ) {
+									var extractedLayerTo = extractFromLayer(layerTo, ruleMap);
+									for ( iTo => tileTo in tileLayerTo.data.tiles ) { // appliable layer
+										if ( tileTo.gid != 0 ) {
+											var layerTile0x = Std.int(iTo % map.width);
+											var layerTile0y = Std.int(iTo / map.width);
+											if ( ruleMatchesOnLayer(inputTilesFrom, extractedLayerTo, layerTile0x, layerTile0y)
+												&& !(noOverlappingRules
+													&& !isOverlapping(region, rule.outputs, layerTile0x, layerTile0y)) ) {
+												applyRuleToLayer(region, rule.outputs, tileLayerTo, layerTile0x, layerTile0y);
 											}
 										}
 									}
 								}
-								if ( noOverlappingRules ) appliedTiles = [];
 							}
+							if ( noOverlappingRules ) appliedTiles = [];
 						}
 					default:
 				}
@@ -470,18 +474,12 @@ class AutoMap {
 
 		function generateRules( regions_input : Array<CoordinatedIsland>, regions_output : Array<CoordinatedIsland>, inputs : Map<String, TmxCoordinated>,
 				outputs : Map<String, TmxCoordinated> ) {
-			function getRuleByName( name : String, rule : Array<Map<String, Array<TmxGeneratable>>> ) : Array<TmxGeneratable> {
-				for ( i in rule ) {
-					var result = i.get(name);
-					if ( result != null ) return result;
-				}
-				return null;
-			}
-			function createRuleIfNotExistsAndAdd( generatable : TmxGeneratable, name : String, to : Array<Map<String, Array<TmxGeneratable>>> ) {
-				var outputRuleByName = getRuleByName(name, to);
+
+			function createRuleIfNotExistsAndAdd( generatable : TmxGeneratable, name : String, to : Map<String, Array<TmxGeneratable>> ) {
+				var outputRuleByName = to[name];
 
 				if ( outputRuleByName == null ) {
-					to.push([name => [generatable]]);
+					to[name] = [generatable];
 				} else if ( !outputRuleByName.contains(generatable) ) {
 					outputRuleByName.push(generatable);
 				}
@@ -489,8 +487,7 @@ class AutoMap {
 			// TODO
 			var randomedLayers = [];
 
-			function fillLayerWith( object : TmxCoordinated, regionTile : CoordinatedTile, whereTo : Array<Map<String, Array<TmxGeneratable>>>,
-					layerName : String ) {
+			function fillLayerWith( object : TmxCoordinated, regionTile : CoordinatedTile, whereTo : Map<String, Array<TmxGeneratable>>, layerName : String ) {
 				// random check
 				var randomMatched = false;
 				if ( eregAutoMapLayer.match(layerName) && eregAutoMapLayer.matched(1) != "" ) {
@@ -563,9 +560,9 @@ class AutoMap {
 				fillLayerWith(output, regionTile, put.outputs, outputName);
 			}
 
-			for ( region => put in rules ) for ( output in put.outputs ) for ( outputName => i in output ) {
-				if ( isLayerNull(i) ) {
-					// output.remove(outputName);
+			for ( region => put in rules ) for ( outputName => output in put.outputs ) {
+				if ( isLayerNull(output) ) {
+					put.outputs.remove(outputName);
 				}
 			}
 		}

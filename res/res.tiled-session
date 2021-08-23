@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "tiled/levels/rules/rules.tmx",
+    "activeFile": "tiled/levels/rules/random.tmx",
     "automapping.whileDrawing": false,
     "expandedProjectPaths": [
         ".",
@@ -531,8 +531,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 2563.5,
-                "y": 612
+                "x": 2400,
+                "y": 1199.75
             }
         },
         "tiled/levels/bridge.tmx": {
@@ -595,16 +595,16 @@
             "scale": 4,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 2415,
-                "y": 57
+                "x": 2400,
+                "y": 1088.875
             }
         },
         "tiled/levels/rules/rules.tmx": {
-            "scale": 2,
+            "scale": 0.75,
             "selectedLayer": 8,
             "viewCenter": {
-                "x": 1760,
-                "y": 319.5
+                "x": 1502.6666666666665,
+                "y": 590
             }
         },
         "tiled/levels/rules/rules1.tmx": {
@@ -739,8 +739,8 @@
             "scale": 0.5,
             "selectedLayer": -1,
             "viewCenter": {
-                "x": 2328,
-                "y": 688
+                "x": 2400,
+                "y": 1199
             }
         },
         "tiled/levels/ui.tmx": {
@@ -775,6 +775,7 @@
         "tiled/levels/ui.tsx",
         "tiled/levels/entities.tsx",
         "tiled/levels/rules/rules.tmx",
+        "tiled/levels/rules/random.tmx",
         "tiled/levels/asteroid.tmx",
         "tiled/levels/test.tmx",
         "tiled/levels/procgen/asteroids.tmx"
@@ -782,18 +783,18 @@
     "project": "res.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "/home/glassysundew/Projects/heaps examples/examples/desert.tsx",
-        "/home/glassysundew/Projects/heaps examples/examples/desert.tmx",
         "tiled/levels/ship_pascal.tmx",
         "tiled/levels/bridge.tmx",
         "tiled/levels/alpha.tsx",
         "tiled/levels/ui.tmx",
         "tiled/levels/ui.tsx",
         "tiled/levels/entities.tsx",
+        "tiled/levels/rules/rules.tmx",
         "tiled/levels/procgen/asteroids.tmx",
         "tiled/levels/test.tmx",
         "tiled/levels/asteroid.tmx",
-        "tiled/levels/rules/rules.tmx"
+        "tiled/levels/rules/random.tmx",
+        "/home/glassysundew/Projects/heaps examples/examples/desert.tsx"
     ],
     "resizeMap.removeObjects": true,
     "tileset.embedInMap": false,

@@ -121,7 +121,7 @@ class Main extends Process {
 		startGame();
 
 		// Game.inst.startLevel("bridge.tmx");
-		Game.inst.startLevelFromParsedTmx(autoMapper.applyRulesToMap(applicableMap), "asteroids.tmx");
+		Game.inst.startLevelFromParsedTmx(applicableMap, "asteroids.tmx");
 
 		#end
 	}
