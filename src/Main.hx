@@ -106,22 +106,22 @@ class Main extends Process {
 		var autoMapper = new mapgen.AutoMap("res/tiled/levels/rules.txt");
 		
 		var mapGen = new MapGen(resolveMap('procgen/asteroids.tmx'), autoMapper);
-		
-		var applicableMap = autoMapper.applyRulesToMap(mapGen.generate(50, 50, 100, 5, 15));
-		for ( i in applicableMap.layers ) {
-			switch i {
-				case LTileLayer(layer):
-					trace(layer.name);
-				case LObjectGroup(group):
-					trace(group.name);
-				default:
-			}
-		}
+		// mapGen.generate(50, 50, 100, 5, 15)
+		var applicableMap = autoMapper.applyRulesToMap(resolveMap('test.tmx'));
+		// for ( i in applicableMap.layers ) {
+		// 	switch i {
+		// 		case LTileLayer(layer):
+		// 			trace(layer.name);
+		// 		case LObjectGroup(group):
+		// 			trace(group.name);
+		// 		default:
+		// 	}
+		// }
 
 		startGame();
 
 		// Game.inst.startLevel("bridge.tmx");
-		Game.inst.startLevelFromParsedTmx(applicableMap, "asteroids.tmx");
+		Game.inst.startLevelFromParsedTmx(applicableMap, "test.tmx");
 
 		#end
 	}

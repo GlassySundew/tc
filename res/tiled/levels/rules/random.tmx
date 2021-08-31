@@ -1,42 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-up" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#141414" nextlayerid="11" nextobjectid="1">
+<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-up" width="100" height="99" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#141414" nextlayerid="13" nextobjectid="1">
  <properties>
   <property name="DeleteTiles" type="bool" value="false"/>
  </properties>
  <tileset firstgid="1" source="../alpha.tsx"/>
- <layer id="2" name="regions_input" width="100" height="100">
+ <layer id="2" name="regions_input" width="100" height="99">
   <data encoding="base64" compression="zlib">
-   eJzt0UENAAAIA7Fpw78oPohYQpucgktoMxcd/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAXxZWoQEJ
+   eJzt0QENAAAIwKBns38oa7gJFaiauGLyAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADfLHV5AMc=
   </data>
  </layer>
- <layer id="3" name="regions_output" width="100" height="100">
+ <layer id="3" name="regions_output" width="100" height="99">
   <data encoding="base64" compression="zlib">
-   eJztzgENAAAIA6Bns38oY9xNSEDCNdMOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8tn7wAEM=
+   eJztzjEBAAAIA6Bls38oW0wPSEDCN3MdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACqFhZAAEM=
   </data>
  </layer>
- <layer id="4" name="input_proto" width="100" height="100" opacity="0.75">
+ <layer id="4" name="input_proto" width="100" height="99" opacity="0.75">
   <data encoding="base64" compression="zlib">
-   eJzt0UENAAAIA7Gpw78kPohYQpucgktoMxcd/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAXxb1SAEZ
+   eJztzjEBAAAIA6Cls38kW0wPSEDCN3MdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACqFnrOAEc=
   </data>
  </layer>
- <layer id="5" name="output1_ground" width="100" height="100">
+ <layer id="11" name="inputnot_proto" width="100" height="99" opacity="0.8">
   <data encoding="base64" compression="zlib">
-   eJztzgENAAAIA6Cns38kY9xNSEDCNdMOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8tum+AEc=
+   eJzt0UENAAAIAKGLbP+XNdyEClRNXOECAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP5ZS9kA4Q==
   </data>
  </layer>
- <layer id="6" name="output2_ground" width="100" height="100">
+ <layer id="5" name="output1_ground" width="100" height="99" visible="0">
   <data encoding="base64" compression="zlib">
-   eJztzgENAAAIA6C3s38jY9xNSEDCNdMOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8toR5AEg=
+   eJztzjEBAAAIA6Cls38kW0wPSEDCN3MdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACqFnrOAEc=
   </data>
  </layer>
- <layer id="7" name="output3_ground" width="100" height="100">
+ <layer id="6" name="output2_ground" width="100" height="99" visible="0">
   <data encoding="base64" compression="zlib">
-   eJztzgENAAAIA6DHs38iY9xNSEDCNdMOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8th80AEk=
+   eJztzjEBAAAIA6C1s38jW0wPSEDCN3MdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACqFhP5AEg=
   </data>
  </layer>
- <layer id="8" name="output4_ground" width="100" height="100">
+ <layer id="7" name="output3_ground" width="100" height="99" visible="0">
   <data encoding="base64" compression="zlib">
-   eJztzgENAAAIA6DXs38hY9xNSEDCNdMOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8trngAEo=
+   eJztzjEBAAAIA6DFs38iW0wPSEDCN3MdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACqFq0VAEk=
+  </data>
+ </layer>
+ <layer id="8" name="output4_ground" width="100" height="99" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJztzjEBAAAIA6DVs38hW0wPSEDCN3MdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACqFkZAAEo=
   </data>
  </layer>
 </map>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.5" tiledversion="1.7.2" name="alpha" tilewidth="246" tileheight="133" tilecount="53" columns="0" backgroundcolor="#171717">
+<tileset version="1.5" tiledversion="1.7.2" name="alpha" tilewidth="246" tileheight="133" tilecount="66" columns="0" backgroundcolor="#171717">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="63">
   <image width="68" height="106" source="../separated/env/agro_wall.png"/>
@@ -16,10 +16,10 @@
  <tile id="67">
   <image width="48" height="96" source="../separated/env/asteroid_bot1.png"/>
  </tile>
- <tile id="68">
-  <image width="48" height="24" source="../separated/env/asteroid_bot_cut1.png"/>
- </tile>
  <tile id="69">
+  <properties>
+   <property name="type" value="ground"/>
+  </properties>
   <image width="48" height="24" source="../separated/env/asteroid_cen0.png"/>
  </tile>
  <tile id="70">
@@ -41,9 +41,12 @@
   <image width="48" height="96" source="../separated/env/asteroid_mid_inward.png"/>
  </tile>
  <tile id="76">
-  <image width="48" height="120" source="../separated/env/asteroid_mid_outward.png"/>
+  <image width="48" height="85" source="../separated/env/asteroid_mid_outward.png"/>
  </tile>
  <tile id="79">
+  <properties>
+   <property name="type" value="ground"/>
+  </properties>
   <image width="48" height="30" source="../separated/env/floor.png"/>
  </tile>
  <tile id="80">
@@ -53,6 +56,9 @@
   <image width="48" height="24" source="../separated/env/inner_corner_floor.png"/>
  </tile>
  <tile id="82">
+  <properties>
+   <property name="type" value="ground"/>
+  </properties>
   <image width="48" height="24" source="../separated/env/inner_floor.png"/>
  </tile>
  <tile id="83">
@@ -186,5 +192,47 @@
    <property name="way" value="west"/>
   </properties>
   <image width="46" height="24" source="../separated/env/west.png"/>
+ </tile>
+ <tile id="135">
+  <image width="48" height="24" source="../separated/env/asteroid_top_edge0.png"/>
+ </tile>
+ <tile id="136">
+  <image width="48" height="24" source="../separated/env/asteroid_top_edge1.png"/>
+ </tile>
+ <tile id="137">
+  <image width="48" height="24" source="../separated/env/asteroid_top_edge2.png"/>
+ </tile>
+ <tile id="138">
+  <image width="48" height="24" source="../separated/env/asteroid_top_edge3.png"/>
+ </tile>
+ <tile id="139">
+  <image width="48" height="24" source="../separated/env/asteroid_top_edge4.png"/>
+ </tile>
+ <tile id="140">
+  <image width="5" height="5" source="../separated/env/blue_star_big.png"/>
+ </tile>
+ <tile id="141">
+  <image width="3" height="3" source="../separated/env/blue_star_small.png"/>
+ </tile>
+ <tile id="142">
+  <image width="5" height="5" source="../separated/env/red_star_big.png"/>
+ </tile>
+ <tile id="143">
+  <image width="3" height="3" source="../separated/env/red_star_small.png"/>
+ </tile>
+ <tile id="144">
+  <image width="5" height="5" source="../separated/env/yellow_star_big.png"/>
+ </tile>
+ <tile id="145">
+  <image width="3" height="3" source="../separated/env/yellow_star_small.png"/>
+ </tile>
+ <tile id="147">
+  <image width="48" height="24" source="../separated/env/asteroid_top_edge5.png"/>
+ </tile>
+ <tile id="148">
+  <image width="48" height="96" source="../separated/env/asteroid_bot_edge0.png"/>
+ </tile>
+ <tile id="149">
+  <image width="49" height="96" source="../separated/env/asteroid_mid_edge0.png"/>
  </tile>
 </tileset>

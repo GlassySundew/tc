@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-up" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#191919" nextlayerid="3066" nextobjectid="37347">
+<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-up" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#191919" nextlayerid="3843" nextobjectid="48531">
  <tileset firstgid="1" source="alpha.tsx"/>
+ <tileset firstgid="151" source="entities.tsx"/>
+ <layer id="3097" name="proto" width="100" height="100">
+  <data encoding="base64" compression="zlib">
+   eJzt2EFuwjAQQFFOx3m4/6qLthKgxBnH4zDI70lRK0Ghzc/YNI/b7fZIPBiT2UKPcXrUsnde73/H8/f3xvP1yNFqsXXoMVdPi0iXrN9jVWd6ZO85W2vkqrPXu15l97hi9r5J9DzNngk9fn26R8+xgqNr9/lrxgzo0RbpMWNNOvPaK/hED+vavtnnJrutHtfMxfvjIzP1za6aifd7YXvttlroMWc+Wuf47P1LPcZ6nGmnR+ycRderaI+99zp6rh79123vz4zMywr2evw/lt1jbw4ir7OCKj0ixwqyerSuefe54lp/+0iPzM9VK/VoyVibjmao53mri6w/vZ+RIz3Mx7aja/j5/5CRfSHabHUj5zFj/9bjVcb1ntlldXrUcsWeoEe/q3oQ07M2uf7n690r3J+ay3zUkrUf65FDj1r0+B4a1KJHLXrUokctetSiRy161KJHLXoAAAAAAAAAAAAAAAAAAAAAAAAAAEC+Hw6JgY0=
+  </data>
+ </layer>
+ <objectgroup id="3104" name="entities">
+  <object id="48530" gid="153" x="648" y="456" width="48" height="48"/>
+ </objectgroup>
 </map>

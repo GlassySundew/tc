@@ -22,7 +22,10 @@ class Util {
 	static var eregCompTimeClass = ~/\$([a-z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
 
 	/** regex to match automapping random rules **/
-	static var eregAutoMapLayer = ~/(?:output|input)([0-9]*)_([a-z]+)$/gi;
+	static var eregAutoMapRandomLayer = ~/(?:output|input)([0-9]+)_([a-z]+)$/gi;
+
+	/** regex to match automapping inputnot rules **/
+	static var eregAutoMapInputNotLayer = ~/(?:input)not_([a-z]+)$/gi;
 
 	/** Regex to get '$this' class name i.e. en.Entity -> Entity **/
 	static var eregClass = ~/\.([a-z_0-9]+)+$/gi; // regexp to remove 'en.' prefix

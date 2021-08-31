@@ -31,8 +31,8 @@ typedef GenSample = {
 class MapGen {
 	var sampleMap : TmxMap;
 	var autoMapper : AutoMap;
-	var groundTile : Int;
-	var voidTile : Int;
+	var groundTiles : Array<Int> = [];
+	var voidTiles : Array<Int> = [];
 
 	var roomList : Array<{x : Int, y : Int, sample : Null<GenSample> }> = [];
 
@@ -40,17 +40,23 @@ class MapGen {
 	/**
 		parses map and creates genearting configuration
 		@param map config for map generating behaviour
-		@param autoTiler is for autotiling generated result
+		@param autoTiler for autotiling generated result
 	**/
 	public function new( sampleMap : TmxMap, autoMapper : AutoMap ) {
 		this.sampleMap = sampleMap;
 		this.autoMapper = autoMapper;
 
 		// looking up for void and ground tiles
-		for ( i in sampleMap.tilesets ) {}
-
-		groundTile = sampleMap.properties.getInt('ground_tile') + 1;
-		voidTile = sampleMap.properties.getInt('void_tile') + 1;
+		for ( tileset in sampleMap.tilesets ) {
+			for ( tile in tileset.tiles ) {
+				if ( tile.properties.exists('type') ) switch tile.properties.getString('type') {
+					case "void":
+						voidTiles.push(tile.id + tileset.firstGID);
+					case "ground":
+						groundTiles.push(tile.id + tileset.firstGID);
+				}
+			}
+		}
 
 		for ( i in sampleMap.layers ) {
 			switch i {
@@ -71,8 +77,8 @@ class MapGen {
 						switch i {
 							case LTileLayer(layer):
 								for ( tilei => tile in layer.data.tiles ) {
-									if ( tile.gid != 0
-										&& (tilei % sampleMap.width) < lowestTile.x && M.floor(tilei / sampleMap.width) < lowestTile.y ) {
+									if ( (tile.gid != 0
+										&& (tilei % sampleMap.width) < lowestTile.x && M.floor(tilei / sampleMap.width) < lowestTile.y) ) {
 										// pushing this very tile to storage
 										lowestTile.x = tilei % sampleMap.width;
 										lowestTile.y = M.floor(tilei / sampleMap.width);
@@ -88,6 +94,7 @@ class MapGen {
 							case LTileLayer(layer):
 								for ( tilei => tile in layer.data.tiles ) {
 									if ( tile.gid != 0 ) {
+
 										var tileID = Std.int(tilei % sampleMap.width
 											- lowestTile.x
 											+ (M.floor(tilei / sampleMap.width) - lowestTile.y) * sampleMap.width);
@@ -100,6 +107,20 @@ class MapGen {
 								for ( i in group.objects ) {
 									i.x -= lowestTile.x * sampleMap.tileHeight;
 									i.y -= lowestTile.y * sampleMap.tileHeight;
+								}
+							default:
+						}
+					}
+
+					for ( layer in group.layers ) {
+						switch layer {
+							case LTileLayer(tileLayer):
+								for ( tilei => tile in tileLayer.data.tiles ) {
+									if ( tile.gid != 0
+										&& voidTiles.contains(tile.gid)
+										&& findGroundAroundVoid(tilei, tileLayer.data.tiles, [], sampleMap).length == 0 ) {
+										tileLayer.data.tiles[tilei] = new TmxTile(0);
+									}
 								}
 							default:
 						}
@@ -218,7 +239,7 @@ class MapGen {
 				}
 			}
 
-			// if ( placingResult ) for ( i in findPossibleExits(newMidstSample, sampleMap) ) {
+			// if ( placingResult ) for ( i in findPossibleExits(newMidstSample.source, sampleMap) ) {
 			// 	switch map.getLayersByName("proto")[0] {
 			// 		case LTileLayer(layer):
 			// 			layer.data.tiles[i.x + placingX + (i.y + placingY) * map.width].gid = 115;
@@ -236,13 +257,6 @@ class MapGen {
 			if ( roomList.length >= mrooms ) failed = fail;
 		}
 
-		// for ( i in map.tilesets.filter(tileset -> tileset.name == "alpha")[0].tiles ) for ( i in startingRoom.source.layers ) {
-		// 	switch i {
-		// 		case LTileLayer(layer):
-
-		// 		default:
-		// 	}
-		// }
 		return map;
 	}
 
@@ -252,7 +266,7 @@ class MapGen {
 			switch i {
 				case LTileLayer(layer):
 					for ( tilei => tile in layer.data.tiles ) {
-						if ( tile.gid != 0 ) {
+						if ( tile.gid != 0 && !voidTiles.contains(tile.gid) ) {
 							var x = (tilei) % sampleMap.width;
 							var y = M.floor(tilei / sampleMap.width);
 
@@ -263,9 +277,32 @@ class MapGen {
 				default:
 			}
 		}
-		// result.x++;
-		// result.y++;
 		return result;
+	}
+
+	function findGroundAroundVoid( id : Int, tiles : Array<TmxTile>, result : Array<{x : Int, y : Int, ?towards : Array<Towards> }>,
+			map : TmxMap ) : Array<Null<Int>> {
+		var x = id % map.width;
+		var y = M.floor(id / map.width);
+		var grounds : Array<Null<Int>> = [];
+
+		var coords = [];
+		coords.push(x - 1 + (y - 1) * map.width);
+		coords.push(x + (y - 1) * map.width);
+		coords.push(x + 1 + (y - 1) * map.width);
+		coords.push(x - 1 + (y) * map.width);
+
+		coords.push(x + 1 + (y) * map.width);
+		coords.push(x - 1 + (y + 1) * map.width);
+		coords.push(x + (y + 1) * map.width);
+		coords.push(x + 1 + (y + 1) * map.width);
+
+		for ( i in coords ) try {
+			if ( result.filter(f -> (f.x == i % map.width && f.y == M.floor(i / map.width))).length == 0
+				&& groundTiles.contains(tiles[i].gid) ) grounds.push(i);
+		} catch( e:Dynamic ) {}
+
+		return grounds;
 	}
 	/** 
 		Подразумевается, что выходы ищутся в основном логическом слое - proto
@@ -282,30 +319,6 @@ class MapGen {
 					if ( group.name == "entities" ) for ( i in group.objects ) ents.push(i);
 				default:
 			}
-		}
-
-		function findGroundAroundVoid( id : Int, tiles : Array<TmxTile> ) : Array<Null<Int>> {
-			var x = id % map.width;
-			var y = M.floor(id / map.width);
-			var grounds : Array<Null<Int>> = [];
-
-			var coords = [];
-			coords.push(x - 1 + (y - 1) * map.width);
-			coords.push(x + (y - 1) * map.width);
-			coords.push(x + 1 + (y - 1) * map.width);
-			coords.push(x - 1 + (y) * map.width);
-
-			coords.push(x + 1 + (y) * map.width);
-			coords.push(x - 1 + (y + 1) * map.width);
-			coords.push(x + (y + 1) * map.width);
-			coords.push(x + 1 + (y + 1) * map.width);
-
-			for ( i in coords ) try {
-				if ( result.filter(f -> (f.x == i % map.width && f.y == M.floor(i / map.width))).length == 0
-					&& tiles[i].gid == groundTile ) grounds.push(i);
-			} catch( e:Dynamic ) {}
-
-			return grounds;
 		}
 
 		// Важно: работает только с теми сущностями, которые расположены внизу своего спрайта
@@ -335,7 +348,7 @@ class MapGen {
 			coords.push(x + (y + 1) * map.width);
 
 			for ( i => coord in coords ) {
-				if ( tiles[coord].gid == voidTile ) {
+				if ( voidTiles.contains(tiles[coord].gid) ) {
 					result.push(switch i {
 						case 0: North;
 						case 1: West;
@@ -352,8 +365,8 @@ class MapGen {
 			switch i {
 				case LTileLayer(layer):
 					for ( tilei => tile in layer.data.tiles ) {
-						if ( tile.gid == voidTile ) {
-							var grounds = findGroundAroundVoid(tilei, layer.data.tiles);
+						if ( voidTiles.contains(tile.gid) ) {
+							var grounds = findGroundAroundVoid(tilei, layer.data.tiles, result, map);
 							for ( ground in grounds ) if ( ground != null && isNotOccupiedByAnEntity(ground, ents, map) ) {
 								var facings = determineFacings(ground, layer.data.tiles);
 								if ( facings.length > 0 ) result.push({
@@ -404,13 +417,13 @@ class MapGen {
 			if ( x < 0 || y < 0 || x + sampleSize.x > to.width || y + sampleSize.y > to.height ) return false;
 			for ( sampleLayer in sample.source.layers ) {
 				switch sampleLayer {
-					case LTileLayer(layer):
-						var toLayer = toLayersByName[layer.name];
-						if ( toLayer != null ) {
-							switch toLayer {
+					case LTileLayer(layerFrom):
+						var layerTo = toLayersByName[layerFrom.name];
+						if ( layerTo != null ) {
+							switch layerTo {
 								case LTileLayer(extractedTolayer):
-									for ( tileI => tile in layer.data.tiles ) {
-										if ( tile.gid != 0 ) {
+									for ( tileI => tileFrom in layerFrom.data.tiles ) {
+										if ( tileFrom.gid != 0 ) {
 											var lookupTile = extractedTolayer.data.tiles[
 												Std.int((tileI) % sampleMap.width
 													+ x
@@ -418,7 +431,7 @@ class MapGen {
 													+ (M.floor(tileI / sampleMap.width)) * sampleMap.width
 													+ (M.floor(tileI / sampleMap.width)) * (to.width - sampleMap.width))
 											];
-											if ( lookupTile.gid != 0 && lookupTile.gid != voidTile ) {
+											if ( lookupTile.gid != 0 && !voidTiles.contains(lookupTile.gid) ) {
 												return false;
 											}
 										}
@@ -439,15 +452,15 @@ class MapGen {
 					case LTileLayer(layer):
 						var applyTo = cast(Type.enumParameters(createLayerIfNotExistsByName(layer.name, LTileLayer(null)))[0], TmxTileLayer);
 
-						for ( tileI => tile in layer.data.tiles ) {
-							if ( tile.gid != 0 ) {
-								applyTo.data.tiles[
-									Std.int((tileI) % sampleMap.width
-										+ x
-										+ (to.width * y)
-										+ (M.floor(tileI / sampleMap.width)) * sampleMap.width
-										+ (M.floor(tileI / sampleMap.width)) * (to.width - sampleMap.width))
-								] = tile;
+						for ( tileI => tileFrom in layer.data.tiles ) {
+							if ( tileFrom.gid != 0 ) {
+								var idTo = Std.int((tileI) % sampleMap.width
+									+ x
+									+ (to.width * y)
+									+ (M.floor(tileI / sampleMap.width)) * sampleMap.width
+									+ (M.floor(tileI / sampleMap.width)) * (to.width - sampleMap.width));
+								// if ( (applyTo.data.tiles[idTo].gid == 0) )
+								applyTo.data.tiles[idTo] = tileFrom;
 							}
 						}
 					case LObjectGroup(group):

@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-up" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="64" nextobjectid="166">
- <properties>
-  <property name="ground_tile" type="int" value="69"/>
-  <property name="void_tile" type="int" value="111"/>
- </properties>
  <tileset firstgid="1" source="../alpha.tsx"/>
  <tileset firstgid="127" source="../entities.tsx"/>
  <group id="2" name="start0">
@@ -61,13 +57,13 @@
  <group id="61" name="midst1">
   <layer id="63" name="proto" width="100" height="100">
    <data encoding="base64" compression="zlib">
-   eJzt2MEJwCAQRUGrs570fwo5CDkkels/OAPbgI9FsTUAAAAA3q7FUOs58/4zetTTI8usx2iiS51VD3tSS48semQZ94MeOfTIMtsR76s9vpposZf/EgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4AQ3Lwci1w==
+   eJzt16ERACEMRUGqox76V6cwDJxMvtidSQN5JhkDAAAAAPKtx1Bv734eo0mPWwtN+vz12E2oo0cWPbLokeV1X+nRx82bx08IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAtQ9iPBwB
   </data>
   </layer>
   <objectgroup id="62" name="entities">
-   <object id="142" gid="132" x="48" y="360" width="48" height="36"/>
-   <object id="143" gid="132" x="48" y="384" width="48" height="36"/>
-   <object id="144" gid="132" x="72" y="384" width="48" height="36"/>
+   <object id="142" gid="132" x="120" y="360" width="48" height="36"/>
+   <object id="143" gid="132" x="120" y="384" width="48" height="36"/>
+   <object id="144" gid="132" x="144" y="384" width="48" height="36"/>
    <object id="145" gid="131" x="96" y="336" width="48" height="36"/>
    <object id="146" gid="131" x="120" y="336" width="48" height="36"/>
    <object id="147" gid="131" x="168" y="336" width="48" height="36"/>
@@ -78,7 +74,7 @@
  <group id="53" name="end0">
   <layer id="54" name="proto" width="100" height="100">
    <data encoding="base64" compression="zlib">
-   eJzt1TEKwCAMQNGczvN4/6kUHIK2q1F4DzK4+gmJAAAAAAAAAAAAAACAM/Sfocb7921MT29NauQe82iyX96JFmsfTfb7auCW1LETZ8k33E7U0wEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOAOD4QlEt8=
+   eJzt1TEKwDAIQFFPl/Pk/lMpdJCkdNQU3gOHrPmIEQAAAAAAAAAAAAAAcIb5MdS7/308M9Nbkx65xzqa1Ms7MWLvo0e9twbuSB87cZb1huvRSwcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIB/uADjaBQv
   </data>
   </layer>
   <objectgroup id="56" name="entities"/>
