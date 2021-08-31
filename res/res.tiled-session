@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "tiled/levels/rules/random.tmx",
+    "activeFile": "tiled/levels/asteroid.tmx",
     "automapping.whileDrawing": false,
     "expandedProjectPaths": [
         ".",
@@ -517,7 +517,7 @@
         "tiled/levels/alpha.tsx": {
             "dynamicWrapping": true,
             "scaleInDock": 0.25,
-            "scaleInEditor": 0.5
+            "scaleInEditor": 0.75
         },
         "tiled/levels/alphamap.tmx": {
             "scale": 2,
@@ -528,19 +528,19 @@
             }
         },
         "tiled/levels/asteroid.tmx": {
-            "scale": 2,
+            "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 2400,
-                "y": 1199.75
+                "x": 3117,
+                "y": 914
             }
         },
         "tiled/levels/bridge.tmx": {
-            "scale": 0.75,
-            "selectedLayer": 4,
+            "scale": 5.5,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 1200,
-                "y": 583.3333333333333
+                "y": 584.4545454545455
             }
         },
         "tiled/levels/colls.tsx": {
@@ -572,11 +572,11 @@
             }
         },
         "tiled/levels/procgen/asteroids.tmx": {
-            "scale": 1,
+            "scale": 1.5,
             "selectedLayer": 12,
             "viewCenter": {
                 "x": 2400,
-                "y": 1088.5
+                "y": 1089
             }
         },
         "tiled/levels/rules.tmx": {
@@ -592,19 +592,19 @@
             "scaleInDock": 1
         },
         "tiled/levels/rules/random.tmx": {
-            "scale": 4,
+            "scale": 5.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 2400,
-                "y": 1088.875
+                "x": 2388,
+                "y": 1083
             }
         },
         "tiled/levels/rules/rules.tmx": {
-            "scale": 0.75,
-            "selectedLayer": 8,
+            "scale": 0.5,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 1502.6666666666665,
-                "y": 590
+                "x": 2400,
+                "y": 1089
             }
         },
         "tiled/levels/rules/rules1.tmx": {
@@ -728,19 +728,19 @@
             }
         },
         "tiled/levels/ship_pascal.tmx": {
-            "scale": 2,
+            "scale": 3,
             "selectedLayer": 8,
             "viewCenter": {
                 "x": 663,
-                "y": 170.75
+                "y": 170.83333333333331
             }
         },
         "tiled/levels/test.tmx": {
-            "scale": 0.5,
-            "selectedLayer": -1,
+            "scale": 2,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 2400,
-                "y": 1199
+                "y": 1088.75
             }
         },
         "tiled/levels/ui.tmx": {
@@ -754,7 +754,7 @@
         "tiled/levels/ui.tsx": {
             "dynamicWrapping": true,
             "scaleInDock": 0.5,
-            "scaleInEditor": 0.5
+            "scaleInEditor": 0.75
         }
     },
     "last.imagePath": "/home/glassysundew/Projects/tc/res/tiled/separated/env",
@@ -781,7 +781,7 @@
         "tiled/levels/procgen/asteroids.tmx"
     ],
     "project": "res.tiled-project",
-    "property.type": "bool",
+    "property.type": "string",
     "recentFiles": [
         "tiled/levels/ship_pascal.tmx",
         "tiled/levels/bridge.tmx",
@@ -790,13 +790,14 @@
         "tiled/levels/ui.tsx",
         "tiled/levels/entities.tsx",
         "tiled/levels/rules/rules.tmx",
+        "tiled/levels/rules/random.tmx",
         "tiled/levels/procgen/asteroids.tmx",
         "tiled/levels/test.tmx",
         "tiled/levels/asteroid.tmx",
-        "tiled/levels/rules/random.tmx",
         "/home/glassysundew/Projects/heaps examples/examples/desert.tsx"
     ],
     "resizeMap.removeObjects": true,
+    "textEdit.monospace": true,
     "tileset.embedInMap": false,
     "tileset.lastUsedFormat": "tsx",
     "tileset.margin": 0,
