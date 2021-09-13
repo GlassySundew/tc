@@ -4,13 +4,13 @@ import h2d.Flow;
 import h2d.Object;
 import h2d.RenderContext;
 import h2d.Tile;
-import ui.s2d.EventInteractive;
+import ch2.ui.EventInteractive;
 
 class SecondaryMenu extends Object {
 	var exitInteractive : EventInteractive;
 	var overlayFlow : Flow;
 
-	public function new(?parent : Object) {
+	public function new( ?parent : Object ) {
 		super(parent);
 		overlayFlow = new Flow();
 		@:privateAccess parent.addChildAt(overlayFlow, parent.children.length - 1);
@@ -21,7 +21,7 @@ class SecondaryMenu extends Object {
 
 		exitInteractive = new EventInteractive(Util.wScaled, Util.hScaled, overlayFlow);
 
-		exitInteractive.onClickEvent.add((_) -> {
+		exitInteractive.onClickEvent.add(( _ ) -> {
 			remove();
 		});
 		exitInteractive.cursor = Default;
@@ -32,7 +32,7 @@ class SecondaryMenu extends Object {
 		catch( e:Dynamic ) {}
 	}
 
-	override function sync(ctx : RenderContext) {
+	override function sync( ctx : RenderContext ) {
 		super.sync(ctx);
 		overlayFlow.x = -parent.x;
 		overlayFlow.y = -parent.y;

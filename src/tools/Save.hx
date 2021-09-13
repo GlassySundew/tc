@@ -1,5 +1,6 @@
 package tools;
 
+import hx.concurrent.executor.Executor;
 import haxe.crypto.Base64;
 import en.player.Player;
 import haxe.Unserializer;
@@ -98,6 +99,17 @@ class Save {
 		}
 	}
 
+	public function disconnect() {
+		try {
+			rollbackChanges();
+			sqlite.request("detach maindb");
+		} catch( e:Dynamic ) {
+			#if debug
+			trace("error on detach: " + e);
+			#end
+		}
+	}
+
 	public function isDbLocatedInMemory( db : String ) : Bool {
 		for ( i in sqlite.request("PRAGMA database_list") ) {
 			if ( i.name == db && i.file == "" ) return true;
@@ -131,7 +143,9 @@ class Save {
 
 	public function makeFreshSave( fileName : String ) {
 		if ( isDbLocatedInMemory("maindb") ) {
-			try sqlite.request("detach maindb") catch( e:Dynamic ) {
+			try {
+				sqlite.request("detach maindb");
+			} catch( e:Dynamic ) {
 				#if debug
 				trace("error on detach: " + e);
 				#end
@@ -143,13 +157,26 @@ class Save {
 		fillDbWithScheme(sqliteNew, "new");
 		sqliteNew.close();
 
+		sqlite.close();
+		sqlite = Sqlite.open(fileName);
+
 		reattachMainFrom(fileName);
 	}
 
 	public function bakSave( fileName : String ) {
 		// deleting old bak
 		if ( File.exists(SAVEPATH + fileName + Const.SAVEFILE_EXT + ".bak") ) File.delete(SAVEPATH + fileName + Const.SAVEFILE_EXT + ".bak");
-		sys.io.File.copy(SAVEPATH + fileName + Const.SAVEFILE_EXT, SAVEPATH + fileName + Const.SAVEFILE_EXT + '.bak');
+
+		var executor = Executor.create(1);
+		var task = () -> {
+			var i = 0;
+			while( !File.exists(SAVEPATH + fileName + Const.SAVEFILE_EXT) ) {
+				haxe.Timer.delay(() -> i++, 200);
+				if ( i > 10 ) return;
+			};
+			sys.io.File.copy(SAVEPATH + fileName + Const.SAVEFILE_EXT, SAVEPATH + fileName + Const.SAVEFILE_EXT + '.bak');
+		}
+		executor.submit(task, ONCE(0));
 	}
 
 	public function swapFiles( file1 : String, file2 : String ) {
@@ -163,6 +190,7 @@ class Save {
 
 	function reattachMainFrom( file : String ) {
 		rollbackChanges();
+
 		try sqlite.request("detach maindb") catch( e:Dynamic ) {
 			#if debug
 			trace("error on detach: " + e);
@@ -175,6 +203,7 @@ class Save {
 	public function saveGame( fileName : String ) {
 		var targetFilePath = SAVEPATH + fileName + Const.SAVEFILE_EXT;
 		if ( isDbLocatedInMemory("maindb") ) {
+			// legacy thingy
 			// backing target file
 			if ( File.exists(targetFilePath) ) {
 				bakSave(fileName);
@@ -184,21 +213,20 @@ class Save {
 			commitChanges();
 			sqlite.request('vacuum maindb into ${sqlite.quote(targetFilePath)}');
 			startTransaction();
-		} else if ( currentFile != null ) {
-			if ( currentFile != fileName ) {
-				// целевой файл бекапится, а потом удаляется нахуй
-				bakSave(fileName);
-				File.delete(targetFilePath);
-				// сохраняем копию текущего несохранённого файла, чтобы потом подменить
-				sys.io.File.copy(currentFilePath, targetFilePath);
-				try sqlite.commit() catch( e:Dynamic ) {}
-				swapFiles(currentFilePath, targetFilePath);
-				reattachMainFrom(fileName);
-				startTransaction();
-			}
+		} else if ( currentFile != null && currentFile == fileName ) {
+			// целевой файл бекапится, а потом удаляется
+			bakSave(fileName);
+			File.delete(targetFilePath);
+			// сохраняем копию текущего несохранённого файла, чтобы потом подменить
+			sys.io.File.copy(currentFilePath, targetFilePath);
+			try sqlite.commit() catch( e:Dynamic ) {}
+			swapFiles(currentFilePath, targetFilePath);
+			reattachMainFrom(fileName);
+			startTransaction();
 		} else {
 			// сейв в тот же самый файл
 			// try sqlite.rollback() catch( e:Dynamic ) {}
+
 			reattachMainFrom(fileName);
 			startTransaction();
 		}

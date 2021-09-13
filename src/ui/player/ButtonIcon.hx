@@ -21,7 +21,7 @@ class ButtonIcon extends Object {
 		this.y = y;
 		centerFlow = new h2d.Flow(this);
 		centerFlow.setScale(1 / Const.SCALE);
-		Main.inst.root.add(centerFlow, Const.DP_UI);
+		Game.inst.root.add(centerFlow, Const.DP_UI);
 
 		buttonSpr = Assets.ui.h_getAndPlay("keyboard_icon", 99999, false, this);
 		buttonSpr.anim.setSpeed(0.025 * Game.inst.tmod);

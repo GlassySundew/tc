@@ -482,7 +482,7 @@
 					"img": {
 						"file": "tiled/atlas/ui.png",
 						"size": 32,
-						"x": 0,
+						"x": 20,
 						"y": 0
 					}
 				}

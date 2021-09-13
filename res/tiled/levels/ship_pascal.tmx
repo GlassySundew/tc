@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-down" compressionlevel="0" width="23" height="24" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="807" nextobjectid="14250">
+<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-down" compressionlevel="0" width="23" height="24" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="807" nextobjectid="14251">
  <tileset firstgid="1" source="alpha.tsx"/>
- <tileset firstgid="127" source="entities.tsx"/>
- <layer id="54" name="proto" width="23" height="24" opacity="0.58">
+ <tileset firstgid="151" source="entities.tsx"/>
+ <layer id="54" name="proto" width="23" height="24" visible="0" opacity="0.58">
   <data encoding="base64" compression="zlib">
    eAFzYmBgcBrFo2EwiNNAAdBt+DAl6RdkbjAODJIbNRs1fAZ7mNAqnVCSDkb1UpaPRsNv5IYfAFjtlPs=
   </data>
  </layer>
- <layer id="42" name="walls" width="23" height="24" visible="0">
+ <layer id="42" name="walls" width="23" height="24">
   <data encoding="base64" compression="zlib">
    eAFjYBgFoyEwGgLhwCBAxxlUCJYIKpiBzQigWxuwiVNDbCibnU6NABg1YzQERkNgUIQAALgbBjc=
   </data>
  </layer>
- <layer id="804" name="ground_bot" width="23" height="24" visible="0">
+ <layer id="804" name="ground_bot" width="23" height="24">
   <data encoding="base64" compression="zlib">
    eAFjYBgFoyEwGgL0DoEwGlo40s0OBYYtOg6hYXiPGj0aAqMhQJsQAAC2dwNW
   </data>
  </layer>
- <layer id="33" name="ground" width="23" height="24" visible="0">
+ <layer id="33" name="ground" width="23" height="24">
   <data encoding="base64" compression="zlib">
    eAFjYBgFoyEwskMgD+j9YCyYGqGCzVyQGDXAcDI7iBoBMmrGaAiMhsCwCgEAzyEJ1Q==
   </data>
@@ -27,7 +27,7 @@
    eAFjYBgFoyEwGgKjITAaAqMhMBoCoyEwuEIAAAigAAE=
   </data>
  </layer>
- <layer id="190" name="shadows" width="23" height="24" visible="0">
+ <layer id="190" name="shadows" width="23" height="24">
   <data encoding="base64" compression="zlib">
    eAFjYBgFoyEwGgKjITAaAqMhMBoCoyEwuEIAAAigAAE=
   </data>
@@ -69,17 +69,13 @@
   <object id="14145" x="216" y="168" width="24" height="24"/>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="8692" gid="2147483787" x="288" y="216" width="48" height="77">
+  <object id="8692" gid="2147483811" x="288" y="216" width="48" height="77">
    <properties>
     <property name="to" type="file" value="bridge.tmx"/>
    </properties>
   </object>
-  <object id="8830" gid="2147483794" x="336" y="216" width="48" height="36">
-   <properties>
-    <property name="items:seeds_seaweed" type="int" value="3"/>
-   </properties>
-  </object>
-  <object id="8850" gid="129" x="288" y="216" width="48" height="48"/>
-  <object id="10906" gid="137" x="264" y="312" width="96" height="72"/>
+  <object id="8850" gid="153" x="288" y="216" width="48" height="48"/>
+  <object id="10906" gid="161" x="264" y="312" width="96" height="72"/>
+  <object id="14250" gid="170" x="336" y="216" width="48" height="36"/>
  </objectgroup>
 </map>

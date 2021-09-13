@@ -92,7 +92,6 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 		}
 
 		var levelFromCache = Save.inst.loadLevelByName(name.split(".")[0]);
-
 		if ( levelFromCache == null ) {
 			tmxMap = resolveMap(name);
 			startLevelFromParsedTmx(tmxMap, name, manual);

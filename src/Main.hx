@@ -28,10 +28,10 @@ class Main extends Process {
 		#if( hl && pak )
 		hxd.Res.initPak();
 		#elseif( hl )
+		hxd.res.Resource.LIVE_UPDATE = true;
 		hxd.Res.initLocal();
 		#end
 
-		hxd.res.Resource.LIVE_UPDATE = true;
 		#if debug
 		hxd.Res.data.watch(function () {
 			delayer.cancelById("cdb");
@@ -52,8 +52,12 @@ class Main extends Process {
 		Cursors.init();
 		Lang.init("en");
 
-		uiConf = resolveMap("ui.tmx").mapLayersByName();
-		for ( i in uiConf ) i.localBy(i.getObjectByName("window"));
+		uiMap = resolveMap("ui.tmx");
+		uiConf = uiMap.mapLayersByName();
+		for ( i in uiConf ) {
+			var window = i.getObjectByName("window");
+			if ( window != null ) i.localBy(window);
+		}
 
 		Data.load(hxd.Res.data.entry.getText());
 
@@ -101,28 +105,20 @@ class Main extends Process {
 		// Assets.playMusic();
 		#end
 		#if debug
-		// new MainMenu(Boot.inst.s2d);
+		new MainMenu(Boot.inst.s2d);
 
-		var autoMapper = new mapgen.AutoMap("res/tiled/levels/rules.txt");
-		
-		var mapGen = new MapGen(resolveMap('procgen/asteroids.tmx'), autoMapper);
+		// var autoMapper = new mapgen.AutoMap("res/tiled/levels/rules.txt");
+
+		// var mapGen = new MapGen(resolveMap('procgen/asteroids.tmx'), autoMapper);
 		// mapGen.generate(50, 50, 100, 5, 15)
-		var applicableMap = autoMapper.applyRulesToMap(resolveMap('test.tmx'));
-		// for ( i in applicableMap.layers ) {
-		// 	switch i {
-		// 		case LTileLayer(layer):
-		// 			trace(layer.name);
-		// 		case LObjectGroup(group):
-		// 			trace(group.name);
-		// 		default:
-		// 	}
-		// }
+		// var applicableMap = autoMapper.applyRulesToMap(resolveMap('test.tmx'));
 
-		startGame();
+		// startGame();
 
 		// Game.inst.startLevel("bridge.tmx");
-		Game.inst.startLevelFromParsedTmx(applicableMap, "test.tmx");
-
+		// Game.inst.startLevelFromParsedTmx(applicableMap, "test.tmx");
+		#else
+		new MainMenu(Boot.inst.s2d);
 		#end
 	}
 

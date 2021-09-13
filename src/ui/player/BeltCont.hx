@@ -15,23 +15,17 @@ class BeltCont extends h2d.Flow implements h2d.domkit.Object {
 				<flow class="backgroundHolder" public id="backgroundHolder" />
 				<flow class="itemContainer" public id="itemContainer" />
 				<flow class="hotkeyContainer">
-				<text
-					class="beltSlotNumber"
-					public
-					id="beltSlotNumber"
-					text={Std.string(slotNumber)}
-					font={font}
-				/>
+					<text class="beltSlotNumber" public id="beltSlotNumber" text={Std.string(slotNumber)} font={font} />
 				</flow>
 			</flow>
 		</beltCont>;
-
 	var outline : Outline;
 	public var backgroundColor(default, set) : Int;
 
 	function set_backgroundColor(v : Int) {
 		outline.color = v;
-		backgroundHolder.backgroundTile = h2d.Tile.fromColor(v, 1, 1, .58);
+		var alpha = Color.getAlpha(v);
+		backgroundHolder.backgroundTile = h2d.Tile.fromColor(v, 1, 1, alpha / 255);
 		return v;
 	}
 

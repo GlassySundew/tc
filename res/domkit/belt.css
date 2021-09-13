@@ -4,9 +4,6 @@ beltCont {
   scale: 0.5;
 }
 
-.outlineColor {
-}
-
 .backgroundHolder {
   min-width: 46;
   min-height: 46;
@@ -20,7 +17,7 @@ beltCont {
 }
 
 .beltSlotNumber {
-  color: rgba(180, 175, 175, 0.863);
+  color: rgba(172, 170, 170, 0.858);
 }
 
 .itemContainer {

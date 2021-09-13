@@ -1,0 +1,15 @@
+
+.slots_holder {
+  margin: 9;
+  margin-top: 5;
+  align: top left;
+}
+
+.inv_cell {
+  margin: 1;
+}
+
+.grid_interactive {
+  position: absolute;
+}
+

@@ -1,5 +1,6 @@
 package en.structures;
 
+import ui.InventoryComp;
 import hxd.System;
 import en.player.Player;
 import format.tmx.Data.TmxObject;
@@ -15,10 +16,10 @@ class Chest extends Structure {
 
 	var ca : dn.heaps.Controller.ControllerAccess;
 
-	public function new(?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : StructuresKind) {
+	public function new( ?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : StructuresKind ) {
 		super(x, z, tmxObj, cdbEntry);
 		// adding items from props only when first loaded (with no serialization)
-		for (i in tmxObj.properties.keys()) {
+		for ( i in tmxObj.properties.keys() ) {
 			var split = i.split(":");
 			if ( split.length > 1 && split[0] == "items" ) {
 				invGrid.giveItem(Item.fromCdbEntry(Data.items.resolve(split[1]).id), this);
@@ -26,22 +27,21 @@ class Chest extends Structure {
 		}
 	}
 
-	public override function init(?x : Float, ?z : Float, ?tmxObj : TmxObject) {
+	public override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
 		super.init(x, z, tmxObj);
 		ca = Main.inst.controller.createAccess("chest");
 
 		initInv(uiConf.get("chest").getObjectByName("grid"));
 
 		#if !headless
-		inventory = new ChestWin(invGrid, Level.inst.game.root);
+		inventory = new ChestWin(invGrid, Player.inst.ui);
 		inventory.containmentEntity = this;
 		#end
 
-		interact.onTextInputEvent.add((e : Event) -> {
+		interact.onTextInputEvent.add(( e : Event ) -> {
 			if ( ca.aPressed() ) {
 				Player.inst.ui.inventory.win.visible = true;
 				inventory.toggleVisible();
-				inventory.bringOnTopOfALL();
 				// Window.centrizeTwoWins(Player.inst.ui.inventory, inventory);
 			}
 		});
@@ -52,6 +52,7 @@ class Chest extends Structure {
 
 		if ( Player.inst != null
 			&& distPx(Player.inst) > Data.structures.get(cdbEntry).use_range
+			&& inventory != null
 			&& inventory.win.visible == true ) inventory.win.visible = false;
 	}
 
@@ -62,16 +63,15 @@ class Chest extends Structure {
 }
 
 class ChestWin extends Inventory {
-	public function new(?invGrid : CellGrid, ?parent : Object) {
-		super(invGrid, parent);
+	public function new( ?invGrid : CellGrid, ?parent : Object ) {
+		super(false, invGrid, parent);
 
-		dragable.onDrag.add((x, y) -> {
+		windowComp.window.onDrag.add(( x, y ) -> {
 			Settings.params.chestCoordRatio.x = win.x / Main.inst.w();
 			Settings.params.chestCoordRatio.y = win.y / Main.inst.h();
 		});
-
-		headingLabel.textLabel.labelTxt.text = "Chest";
-		headingLabel.center();
+		
+		windowComp.window.windowLabel.labelTxt.text = "Chest";
 	}
 
 	override function toggleVisible() {

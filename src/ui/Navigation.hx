@@ -13,14 +13,12 @@ class Navigation extends Window {
 	var ca : dn.heaps.Controller.ControllerAccess;
 	var navArea : FixedScrollArea;
 
-	public function new(?parent : Object) {
-		spr = new HSprite(Assets.ui);
-		spr.set("navigation");
+	public function new( ?parent : Object ) {
 		super(parent);
 
-		var textLabel = new ui.TextLabel("Navigation console", Assets.fontPixel, win);
+		var textLabel = new ui.TextLabelComp("Navigation console", Assets.fontPixel, win);
 		textLabel.scale(.5);
-		textLabel.x = spr.tile.width / 2;
+		textLabel.x = win.getSize().width / 2;
 
 		textLabel.center();
 		textLabel.paddingTop += Std.int(textLabel.labelTxt.textHeight) + 3;
@@ -48,9 +46,6 @@ class Navigation extends Window {
 
 		navArea.scrollTo(asteroidField.x - navArea.width / 2, asteroidField.y - navArea.height / 2);
 
-		createDragable("navigation");
-		createCloseBut("navigation");
-
 		recenter();
 		toggleVisible();
 	}
@@ -59,20 +54,20 @@ class Navigation extends Window {
 class NavigationTargetsGen extends Object {
 	public var targets : Array<NavigationTarget> = [];
 
-	public function new(?parent : Object) {
+	public function new( ?parent : Object ) {
 		super(parent);
 	}
 
 	var jumpReach = 65;
-	
+
 	public function initAsteroidField() {
 		var poissonMap = new UniformPoissonDisk(new Point(0, 0));
-		var sampledPoints = poissonMap.sample(new Point(-100, -100), new Point(100, 100), (p : Point) -> {
+		var sampledPoints = poissonMap.sample(new Point(-100, -100), new Point(100, 100), ( p : Point ) -> {
 			var dist = jumpReach * Math.random();
 			return M.fclamp(dist, jumpReach * 0.75, jumpReach);
 		}, jumpReach * 1.25);
 
-		for (i in sampledPoints) {
+		for ( i in sampledPoints ) {
 			var target = new NavigationTarget(Random.fromArray([asteroid0, asteroid1, asteroid2, asteroid3]), this);
 			target.setPosition(i.x, i.y);
 			targets.push(target);
@@ -88,7 +83,7 @@ class NavigationTarget extends Object {
 
 	function get_tile() return loadTileFromCdb(Data.navigation_targets.get(cdbEntry).img);
 
-	public function new(cdbEntry : Navigation_targetsKind, ?parent : Object) {
+	public function new( cdbEntry : Navigation_targetsKind, ?parent : Object ) {
 		super(parent);
 		this.cdbEntry = cdbEntry;
 

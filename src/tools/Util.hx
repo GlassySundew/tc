@@ -1,5 +1,7 @@
 package tools;
 
+import hxd.res.Resource;
+import ui.WindowComp.WindowCompI;
 import cdb.Types.TilePos;
 import format.tmx.*;
 import format.tmx.Data;
@@ -23,10 +25,8 @@ class Util {
 
 	/** regex to match automapping random rules **/
 	static var eregAutoMapRandomLayer = ~/(?:output|input)([0-9]+)_([a-z]+)$/gi;
-
 	/** regex to match automapping inputnot rules **/
 	static var eregAutoMapInputNotLayer = ~/(?:input)not_([a-z]+)$/gi;
-
 	/** Regex to get '$this' class name i.e. en.Entity -> Entity **/
 	static var eregClass = ~/\.([a-z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
 
@@ -95,7 +95,7 @@ class Util {
 			return cached;
 		}
 	}
-	
+
 	inline static function resolveMap( lvlName : String ) {
 		var tsx = new Map();
 		var r = new Reader();
@@ -104,8 +104,7 @@ class Util {
 		return tmx;
 	}
 
-
-	inline static function emptyTiles(map:TmxMap) return [for ( i in 0...(map.height * map.width) ) new TmxTile(0)];
+	inline static function emptyTiles( map : TmxMap ) return [for ( i in 0...(map.height * map.width) ) new TmxTile(0)];
 
 	inline static function getProjectedDifferPolygonRect( ?obj : TmxObject, points : Array<TmxPoint> ) : Vector {
 		var pts = checkPolyClockwise(points);
@@ -136,6 +135,7 @@ class Util {
 
 	static var entParent : Scene;
 
+	public static var uiMap : TmxMap;
 	public static var uiConf : Map<String, TmxLayer>;
 
 	public static var inventoryCoordRatio : Vector = new Vector(-1, -1);
@@ -176,7 +176,7 @@ class ReverseArrayKeyValueIterator<T> {
 }
 
 class TmxMapExtender {
-	public static function getLayersByName(  map : TmxMap , name : String) : Array<TmxLayer> {
+	public static function getLayersByName( map : TmxMap, name : String ) : Array<TmxLayer> {
 		return map.layers.filter(layer -> switch layer {
 			case LTileLayer(layer):
 				layer.name == name;
@@ -188,6 +188,7 @@ class TmxMapExtender {
 				group.name == name;
 		});
 	}
+
 	public static function mapLayersByName( tmxMap : TmxMap ) : Map<String, TmxLayer> {
 		var map : Map<String, TmxLayer> = [];
 		for ( i in tmxMap.layers ) {
@@ -220,23 +221,17 @@ class TmxLayerExtender {
 	public static function localBy( tmxLayer : TmxLayer, target : TmxObject ) {
 		switch( tmxLayer ) {
 			case LObjectGroup(group):
-				// Checking if the object belongs to the layer
-				var tempCheck = null;
-				for ( i in group.objects ) if ( target == i ) tempCheck = i;
-				if ( tempCheck == null ) return null;
-				// Offsetting every single object in the layer except for the target one
+				// Offsetting every single object in the layer
 				var offsetX = -target.width / 2 + target.x + 1;
 				var offsetY = -target.height + target.y + 1;
 				for ( i in group.objects ) {
-					if ( i != target ) {
-						i.x -= offsetX;
-						i.y -= offsetY;
-						switch( i.objectType ) {
-							case OTTile(gid):
-								i.x -= i.width / 2 - 1;
-								i.y -= i.height - 1;
-							default:
-						}
+					i.x -= offsetX;
+					i.y -= offsetY;
+					switch( i.objectType ) {
+						case OTTile(gid):
+							i.x -= i.width / 2 - 1;
+							i.y -= i.height - 1;
+						default:
 					}
 				}
 			default:
@@ -244,8 +239,6 @@ class TmxLayerExtender {
 		return null;
 	}
 }
-
-
 
 class SocketHostExtender {
 	public static function sendTypedMessage( sHost : hxd.net.SocketHost, msg : Message, ?to : NetworkClient ) sHost.sendMessage(msg, to);

@@ -21,7 +21,7 @@ class Belt extends Object {
 	public var selectedCellNumber : Int = 0;
 	public var invGrid : Array<InventoryCell>;
 
-	public function new(invGrid : Array<InventoryCell>, ?parent : h2d.Object) {
+	public function new( invGrid : Array<InventoryCell>, ?parent : h2d.Object ) {
 		super(parent);
 		this.invGrid = invGrid;
 		centerFlow = new h2d.Flow(this);
@@ -30,7 +30,7 @@ class Belt extends Object {
 		style.load(hxd.Res.domkit.belt);
 
 		var cout = 1;
-		for (i in invGrid) {
+		for ( i in invGrid ) {
 			var beltCont = new BeltCont(Assets.fontPixel, cout, centerFlow);
 			beltSlots.push(beltCont);
 			style.addObject(beltCont);
@@ -45,8 +45,8 @@ class Belt extends Object {
 		deselectCells();
 	}
 
-	public function findAndReplaceItem(item : en.Item, ?to : en.Item = null) : en.Item {
-		for (j in invGrid) if ( j.item == item ) {
+	public function findAndReplaceItem( item : en.Item, ?to : en.Item = null ) : en.Item {
+		for ( j in invGrid ) if ( j.item == item ) {
 			j.item.remove();
 			j.item = to;
 			return j.item;
@@ -55,18 +55,28 @@ class Belt extends Object {
 	}
 
 	public function getFreeSlot() : InventoryCell {
-		for (i in invGrid) if ( i.item == null || i.item.isDisposed ) return i;
+		for ( i in invGrid ) if ( i.item == null || i.item.isDisposed ) return i;
 		return null;
 	}
 
-	public function selectCell(number : Int = 1) {
+	public function selectCell( number : Int = 1 ) {
 		deselectCells();
 		if ( player.holdItem == null || !player.holdItem.isInCursor() ) {
 			selectedCellNumber = number;
 			var cell = beltSlots[number - 1];
 
-			cell.backgroundColor = 0x6bace6;
-			cell.beltSlotNumber.color = Color.intToVector(0xbabac8);
+			cell.backgroundColor = Color.rgbaToInt({
+				r : 107,
+				g : 172,
+				b : 230,
+				a : 212
+			});
+			cell.beltSlotNumber.color = Color.intToVector(Color.rgbaToInt({
+				r : 66,
+				g : 66,
+				b : 66,
+				a : 255
+			}));
 			cell.paddingBottom = 10;
 
 			player.holdItem = player.invGrid.grid[player.invGrid.grid.length - 1][number - 1].item;
@@ -74,15 +84,20 @@ class Belt extends Object {
 	}
 
 	public function deselectCells() {
-		for (i in beltSlots) {
+		for ( i in beltSlots ) {
 			style.addObject(i);
 			i.paddingBottom = 0;
 			//   background: #494e55;
-			i.backgroundColor = 0x3a494e55;
+			i.backgroundColor = Color.rgbaToInt({
+				r : 73,
+				g : 78,
+				b : 85,
+				a : 200
+			});
 		}
 	}
 
-	override function sync(ctx : RenderContext) {
+	override function sync( ctx : RenderContext ) {
 		centerFlow.minWidth = Std.int(wScaled);
 		centerFlow.minHeight = Std.int(hScaled);
 		super.sync(ctx);
@@ -90,7 +105,7 @@ class Belt extends Object {
 
 	override function onRemove() {
 		super.onRemove();
-		for (i in beltSlots) {
+		for ( i in beltSlots ) {
 			i.remove();
 			style.removeObject(i);
 		}

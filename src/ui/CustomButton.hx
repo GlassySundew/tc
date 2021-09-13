@@ -1,6 +1,6 @@
 package ui;
 
-import ui.s2d.EventInteractive;
+import ch2.ui.EventInteractive;
 import h2d.Object;
 import h2d.col.Collider;
 /**
@@ -26,12 +26,12 @@ class CustomButton extends EventInteractive {
 	**/
 	public var simState(default, null) : ButtonState = 0xff;
 
-	public function new(width : Float, height : Float, ?parent : Object, ?shape : Collider, ?views : Array<IButtonStateView>) {
+	public function new( width : Float, height : Float, ?parent : Object, ?shape : Collider, ?views : Array<IButtonStateView> ) {
 		super(width, height, parent, shape);
 		flags = None;
 		state = Idle;
 		this.views = views != null ? views : [];
-		for (v in this.views) {
+		for ( v in this.views ) {
 			// if (Std.is(v, Object) && cast (v:Object) != this) {
 			//   addChild(cast v);
 			// }
@@ -43,7 +43,7 @@ class CustomButton extends EventInteractive {
 		onReleaseEvent.add(setStateUnpress);
 	}
 
-	override public function addChildAt(s : Object, pos : Int) {
+	override public function addChildAt( s : Object, pos : Int ) {
 		super.addChildAt(s, pos);
 		if ( Std.isOfType(s, IButtonStateView) ) {
 			var v : IButtonStateView = cast s;
@@ -51,33 +51,33 @@ class CustomButton extends EventInteractive {
 		}
 	}
 
-	function setStateOver(_) updateState(state == Hold ? Press : Hover);
+	function setStateOver( _ ) updateState(state == Hold ? Press : Hover);
 
-	function setStateOut(_) updateState(state == Press ? Hold : Idle);
+	function setStateOut( _ ) updateState(state == Press ? Hold : Idle);
 
-	function setStatePress(e : hxd.Event) {
+	function setStatePress( e : hxd.Event ) {
 		if ( e.button == 0 ) flags.set(LeftButtonPress); else
 			flags.set(RightButtonPress);
 		updateState(state == Hover ? Press : Hold);
 	}
 
-	function setStateUnpress(e : hxd.Event) {
+	function setStateUnpress( e : hxd.Event ) {
 		if ( e.button == 0 ) flags.reset(LeftButtonPress); else
 			flags.reset(RightButtonPress);
 		updateState(state == Press ? Hover : Idle);
 	}
 
-	inline function updateState(to : ButtonState) {
+	inline function updateState( to : ButtonState ) {
 		state = to;
 		if ( simState == 0xff ) invalidate();
 	}
 
-	public function setFlag(flag : ButtonFlags, value : Bool) {
+	public function setFlag( flag : ButtonFlags, value : Bool ) {
 		flags = (value ? flags.set(flag) : flags.reset(flag));
 		invalidate();
 	}
 
-	public inline function simulateState(state : ButtonState) {
+	public inline function simulateState( state : ButtonState ) {
 		simState = state;
 		invalidate();
 	}
@@ -89,7 +89,7 @@ class CustomButton extends EventInteractive {
 	/** Invalidates button and forces invalidate to be called. **/
 	public function invalidate() {
 		var s = simState == 0xff ? state : simState;
-		for (v in views) v.setState(s, flags);
+		for ( v in views ) v.setState(s, flags);
 	}
 }
 
@@ -99,60 +99,77 @@ class CustomButton extends EventInteractive {
 // }
 
 interface IButtonStateView {
-	function setState(state : ButtonState, flags : ButtonFlags) : Void;
+	function setState( state : ButtonState, flags : ButtonFlags ) : Void;
 }
 
 class CallbackButtonState implements IButtonStateView {
-	public function new(cb : (state : ButtonState, flags : ButtonFlags) -> Void) {
+	public function new( cb : ( state : ButtonState, flags : ButtonFlags ) -> Void ) {
 		this.onState = cb;
 	}
 
-	public var onState : (state : ButtonState, flags : ButtonFlags) -> Void;
+	public var onState : ( state : ButtonState, flags : ButtonFlags ) -> Void;
 
-	public function setState(state : ButtonState, flags : ButtonFlags) : Void {
+	public function setState( state : ButtonState, flags : ButtonFlags ) : Void {
 		onState(state, flags);
 	}
 }
 
-enum abstract ButtonFlags(Int) {
+enum abstract ButtonFlags( Int ) {
+
 	var None = 0;
+
 	var Toggled = 1;
+
 	var Disabled = 2;
+
 	var Focused = 4;
+
 	var Clicked = 8;
+
 	var Error = 16;
+
 	var Success = 32;
+
 	var LeftButtonPress = 64;
+
 	var RightButtonPress = 128;
+
 	var Custom1 = 256;
+
 	var Custom2 = 512;
+
 	var Custom3 = 1024;
+
 	var Custom4 = 2048;
 
-	public inline function has(flag : ButtonFlags) : Bool {
+	public inline function has( flag : ButtonFlags ) : Bool {
 		return (this & flag.toInt()) == flag.toInt();
 	}
 
-	public inline function set(flag : ButtonFlags) : ButtonFlags {
+	public inline function set( flag : ButtonFlags ) : ButtonFlags {
 		return asFlag(this | flag.toInt());
 	}
 
-	public inline function reset(flag : ButtonFlags) : ButtonFlags {
+	public inline function reset( flag : ButtonFlags ) : ButtonFlags {
 		return asFlag(this & ~flag.toInt());
 	}
 
-	public static inline function asFlag(i : Int) : ButtonFlags return cast(i);
+	public static inline function asFlag( i : Int ) : ButtonFlags return cast(i);
 
 	public inline function toInt() : Int return this;
 }
 
-enum abstract ButtonState(Int) to Int from Int {
+enum abstract ButtonState( Int ) to Int from Int {
+
 	// Unpressed
 	var Idle = 0;
+
 	// Mouse over
 	var Hover = 1;
+
 	// Pressed
 	var Press = 3;
+
 	// Pressed, not hovered
 	var Hold = 2;
 }

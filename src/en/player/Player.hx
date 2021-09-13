@@ -10,7 +10,7 @@ import hxbit.NetworkSerializable;
 import hxd.Key;
 import ui.InventoryGrid.CellGrid;
 import ui.PauseMenu;
-import ui.TextLabel;
+import ui.TextLabelComp;
 import ui.Window;
 import ui.player.Inventory;
 import ui.player.PlayerUI;
@@ -30,10 +30,10 @@ class Player extends Entity {
 
 	public var holdItem(default, set) : en.Item;
 
-	inline function set_holdItem(v : en.Item) {
+	inline function set_holdItem( v : en.Item ) {
 		if ( holdItem != null ) holdItem.onPlayerRemove.dispatch();
 		if ( v == null ) {
-			for (i in Inventory.ALL) i.invGrid.disableGrid();
+			for ( i in Inventory.ALL ) i.invGrid.disableGrid();
 		}
 		if ( v != null && !v.isInBelt() ) {
 			v.onPlayerHold.dispatch();
@@ -43,7 +43,7 @@ class Player extends Entity {
 		return holdItem = v;
 	}
 
-	public function new(x : Float, z : Float, ?tmxObj : TmxObject, ?uid : Int, ?nickname : String) {
+	public function new( x : Float, z : Float, ?tmxObj : TmxObject, ?uid : Int, ?nickname : String ) {
 		this.nickname = nickname;
 		this.uid = uid;
 		inst = this;
@@ -51,7 +51,7 @@ class Player extends Entity {
 		super(x, z, tmxObj);
 	}
 
-	override function init(?x : Float, ?z : Float, ?tmxObj : TmxObject) {
+	override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
 		spr = new HSprite(Assets.player, entParent);
 		#if !headless
 		ca = Main.inst.controller.createAccess("player");
@@ -59,25 +59,25 @@ class Player extends Entity {
 		#end
 
 		var direcs = [
-			{dir : "right", prio : 0},
-			{dir : "up_right", prio : 1},
-			{dir : "up", prio : 0},
-			{dir : "up_left", prio : 1},
-			{dir : "left", prio : 0},
-			{dir : "down_left", prio : 1},
-			{dir : "down", prio : 0},
-			{dir : "down_right", prio : 1}
+			{ dir : "right", prio : 0 },
+			{ dir : "up_right", prio : 1 },
+			{ dir : "up", prio : 0 },
+			{ dir : "up_left", prio : 1 },
+			{ dir : "left", prio : 0 },
+			{ dir : "down_left", prio : 1 },
+			{ dir : "down", prio : 0 },
+			{ dir : "down_right", prio : 1 }
 		];
-		for (i in 0...8) {
-			spr.anim.registerStateAnim("walk_" + direcs[i].dir, direcs[i].prio, (1 / 60 / 0.16), function() return isMoving() && dir == i);
-			spr.anim.registerStateAnim("idle_" + direcs[i].dir, direcs[i].prio, (1 / 60 / 0.16), function() return !isMoving() && dir == i);
+		for ( i in 0...8 ) {
+			spr.anim.registerStateAnim("walk_" + direcs[i].dir, direcs[i].prio, (1 / 60 / 0.16), function () return isMoving() && dir == i);
+			spr.anim.registerStateAnim("idle_" + direcs[i].dir, direcs[i].prio, (1 / 60 / 0.16), function () return !isMoving() && dir == i);
 		}
 		super.init(x, z, tmxObj);
 
 		#if !headless
 		// public var invGrid : InventoryGrid;
 
-		if ( inst == this ) ui = new PlayerUI(Main.inst.root);
+		if ( inst == this ) ui = new PlayerUI(Game.inst.root);
 
 		mesh.isLong = true;
 		mesh.isoWidth = mesh.isoHeight = 0.1;
@@ -99,28 +99,29 @@ class Player extends Entity {
 	/* записывает настройки  */
 	public function saveSettings() {
 		if ( inst == this ) {
-			Settings.params.inventoryCoordRatio.x = Player.inst.ui.inventory.win.x / Main.inst.w();
-			Settings.params.inventoryCoordRatio.y = Player.inst.ui.inventory.win.y / Main.inst.h();
-
+			if ( Player.inst.ui.inventory != null ) {
+				Settings.params.inventoryCoordRatio.x = Player.inst.ui.inventory.win.x / Main.inst.w();
+				Settings.params.inventoryCoordRatio.y = Player.inst.ui.inventory.win.y / Main.inst.h();
+			}
 			Settings.params.inventoryVisible = ui.inventory.win.visible;
 		}
 	}
 
-	override function set_netX(v : Float) : Float {
+	override function set_netX( v : Float ) : Float {
 		if ( inst != this ) {
 			footX = v;
 		}
 		return super.set_netX(v);
 	}
 
-	override function set_netY(v : Float) : Float {
+	override function set_netY( v : Float ) : Float {
 		if ( inst != this ) {
 			footY = v;
 		}
 		return super.set_netY(v);
 	}
 
-	override function customSerialize(ctx : Serializer) {
+	override function customSerialize( ctx : Serializer ) {
 		super.customSerialize(ctx);
 
 		// holditem
@@ -133,7 +134,7 @@ class Player extends Entity {
 		}
 	}
 
-	override function customUnserialize(ctx : Serializer) {
+	override function customUnserialize( ctx : Serializer ) {
 		if ( inst == null ) inst = this;
 
 		super.customUnserialize(ctx);
@@ -149,7 +150,7 @@ class Player extends Entity {
 		}
 	}
 
-	override public function networkAllow(op : hxbit.NetworkSerializable.Operation, propId : Int, clientSer : hxbit.NetworkSerializable) : Bool {
+	override public function networkAllow( op : hxbit.NetworkSerializable.Operation, propId : Int, clientSer : hxbit.NetworkSerializable ) : Bool {
 		// trace(clientSer == this && this == inst);
 		// var player = cast(clientSer, Player);
 		return clientSer == this;
@@ -168,7 +169,7 @@ class Player extends Entity {
 
 			GameClient.inst.player = this;
 			GameClient.inst.host.self.ownerObject = this;
-			sprFrame = {group : "null", frame : 0};
+			sprFrame = { group : "null", frame : 0 };
 		}
 		this.netX = netX;
 		this.netY = netY;
@@ -177,7 +178,7 @@ class Player extends Entity {
 	}
 
 	public function initNickname() {
-		var nicknameLabel = new TextLabel(nickname, Assets.fontPixel);
+		var nicknameLabel = new TextLabelComp(nickname, Assets.fontPixel);
 		var nicknameTex = new Texture(nicknameLabel.innerWidth, nicknameLabel.innerHeight + 10, [Target]);
 		nicknameLabel.drawTo(nicknameTex);
 		nicknameMesh = new TileSprite(Tile.fromTexture(nicknameTex), false, mesh);
@@ -220,7 +221,10 @@ class Player extends Entity {
 	function syncFrames() {
 		if ( sprFrame != null ) {
 			if ( spr.frame != sprFrame.frame || spr.groupName != sprFrame.group ) {
-				if ( this == inst ) sprFrame = {group : spr.groupName, frame : spr.frame}; else if ( sprFrame == null ) sprFrame = {group : "null", frame : 0}
+				if ( this == inst ) sprFrame = { group : spr.groupName, frame : spr.frame }; else if ( sprFrame == null ) sprFrame = {
+					group : "null",
+					frame : 0
+				}
 				else
 					spr.set(sprFrame.group, sprFrame.frame);
 			}
@@ -264,9 +268,7 @@ class Player extends Entity {
 		super.postUpdate();
 		#if !headless
 		if ( this == inst && !isLocked() && ui != null ) checkBeltInputs();
-		// if (Key.isPressed(Key.E)) {
-		// 	new FloatingItem(mesh.x, mesh.z, new GraviTool());
-		// }
+
 		if ( ca.isKeyboardPressed(Key.R) ) {
 			if ( holdItem != null && Std.isOfType(holdItem, Blueprint) && cast(holdItem, Blueprint).ghostStructure != null ) {
 				cast(holdItem, Blueprint).ghostStructure.flipX();
@@ -306,20 +308,9 @@ class Player extends Entity {
 		}
 
 		if ( ca.selectPressed() ) {
-			var hiddenTopWindow : Void -> Bool = () -> {
-				for (i in Window.ALL) {
-					if ( i.win.visible ) {
-						i.toggleVisible();
-						return true;
-					}
-				}
-				return false;
-			};
-			if ( !hiddenTopWindow() && !Game.inst.pauseCycle ) {
-				Game.inst.pause();
-				Game.inst.pauseCycle = true;
-				new PauseMenu();
-			}
+			Game.inst.pause();
+			Game.inst.pauseCycle = true;
+			new PauseMenu();
 		}
 
 		if ( ca.yPressed() ) {

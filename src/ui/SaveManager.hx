@@ -15,7 +15,7 @@ import h2d.col.Point;
 import hxd.Event;
 import hxd.File;
 import hxd.Key;
-import ui.s2d.EventInteractive;
+import ch2.ui.EventInteractive;
 
 enum Mode {
 	Save;
@@ -195,6 +195,7 @@ class SaveEntry extends Process {
 					if ( SaveManager.inst.onLoad != null ) SaveManager.inst.onLoad();
 					tools.Save.inst.loadGame(name);
 				case New(name):
+					SaveManager.inst.remove();
 					dialog = new NewSaveDialog(( e ) -> {}, mode, Main.inst.root);
 					syncDialog(dialog);
 			}
@@ -276,6 +277,7 @@ class SaveEntry extends Process {
 			interactive.height = horflow.innerHeight;
 		} catch( e:Dynamic ) {
 			destroy();
+
 			trace("some untrackable bug");
 		}
 	}
@@ -344,25 +346,26 @@ class NewSaveDialog extends Dialog {
 		for ( i in params.saveFiles ) {
 			if ( StringTools.startsWith(i, "new_save") ) newSaveCount++;
 		}
+		newSaveCount++;
 		textInput.text = "new_save" + newSaveCount;
 
 		this.activateEvent.add(( e ) -> {
 			mode = New(textInput.text);
 			try {
 				tools.Save.inst.makeFreshSave(textInput.text);
-				// tools.Save.inst.saveGame(textInput.text);
 			}
 			catch( e:Dynamic ) {
-				var errorText = new Text(Assets.fontPixel, generalFlow);
-				errorText.text = '$e'.split(":")[1];
+				trace(e);
 			}
 			refreshSaves();
 			if ( SaveManager.inst != null ) SaveManager.inst.refreshEntries();
 
 			remove();
-		});
+		}, 10);
 
 		var yesBut = new TextButton("ok", ( e ) -> {
+			SaveManager.inst.remove();
+			SaveManager.inst = null;
 			this.activateEvent.dispatch(e);
 		}, buttonsFlow);
 		var noBut = new TextButton("cancel", ( e ) -> {
@@ -420,7 +423,7 @@ class DeleteDialog extends Dialog {
 		dialogFlow.verticalAlign = Middle;
 		dialogFlow.horizontalSpacing = 6;
 
-		var deleteText = new TextLabel('Are you sure?', Assets.fontPixel, dialogFlow);
+		var deleteText = new TextLabelComp('Are you sure?', Assets.fontPixel, dialogFlow);
 
 		var yesBut = new TextButton("yes", ( e ) -> {
 			remove();

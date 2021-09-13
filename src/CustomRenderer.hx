@@ -4,9 +4,9 @@ import en.objs.IsoTileSpr;
 import h3d.pass.PassObject;
 import h3d.pass.PassList;
 
-typedef Point = {var x : Float; var y : Float; var z : Float;}
+typedef Point = { var x : Float; var y : Float; var z : Float; }
 
-typedef Line = {var pt1 : Point; var pt2 : Point;}
+typedef Line = { var pt1 : Point; var pt2 : Point; }
 
 class CustomRenderer extends h3d.scene.fwd.Renderer {
 	public var saoBlur : h3d.pass.Blur;
@@ -61,19 +61,19 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 		backToFront = depthSort.bind(false);
 	}
 
-	function set_depthColorMap(v : h3d.mat.Texture) {
+	function set_depthColorMap( v : h3d.mat.Texture ) {
 		var pixels = v.capturePixels();
 		depthColorMax = pixels.getPixel(pixels.width - 1, 0);
 		// all.clearColors[0] = depthColorMax;
 		return depthColorMap = v;
 	}
 
-	override function renderPass(p : h3d.pass.Base, passes, ?sort) {
+	override function renderPass( p : h3d.pass.Base, passes, ?sort ) {
 		return super.renderPass(p, passes, sort);
 	}
 
-	function sortIsoPoly(passes : PassList) {
-		passes.sort(function(o1, o2) {
+	function sortIsoPoly( passes : PassList ) {
+		passes.sort(function ( o1, o2 ) {
 			return -1;
 		});
 	}
@@ -146,14 +146,14 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 		post.apply(colorTex, ctx.time);
 	}
 
-	public function flash(color : Int, duration : Float) {
+	public function flash( color : Int, duration : Float ) {
 		post.flash(color, ctx.time, duration);
 	}
 
 	@:access(h3d.scene.Object)
-	public override function depthSort(frontToBack : Bool, passes : PassList) {
+	public override function depthSort( frontToBack : Bool, passes : PassList ) {
 		var cam = ctx.camera.m;
-		for (p in passes) {
+		for ( p in passes ) {
 			var z = p.obj.absPos._41 * cam._13 + p.obj.absPos._42 * cam._23 + p.obj.absPos._43 * cam._33 + cam._43;
 			var w = p.obj.absPos._41 * cam._14 + p.obj.absPos._42 * cam._24 + p.obj.absPos._43 * cam._34 + cam._44;
 			p.depth = z / w;
@@ -161,19 +161,20 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 
 		// if ( frontToBack ) passes.sort(function(p1, p2) return p1.index == p2.index ? (p1.depth > p2.depth ? 1 : -1) : p1.index
 		// 	- p2.index); else {
-		passes.sort(function(p1, p2) {
+		passes.sort(function ( p1, p2 ) {
 			// trace(p1.pass.layer, p2.pass.layer);
 			return try {
 				getFrontPassIso(p1, p2);
 			}
 			catch( e:Dynamic ) {
-				p1.pass.layer == p2.pass.layer ? (p1.depth > p2.depth ? -1 : 1) : p1.pass.layer - p2.pass.layer;
+				(p1.depth > p2.depth ? -1 : 1);
+				// p1.pass.layer == p2.pass.layer ? (p1.depth > p2.depth ? -1 : 1) : p1.pass.layer - p2.pass.layer;
 			};
 		});
 		// }
 	}
 
-	function getFrontPassIso(p1 : PassObject, p2 : PassObject) : Int {
+	function getFrontPassIso( p1 : PassObject, p2 : PassObject ) : Int {
 		var a = cast(p1.obj, IsoTileSpr).getIsoBounds();
 		var b = cast(p2.obj, IsoTileSpr).getIsoBounds();
 		return // Я еблан
@@ -182,14 +183,15 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 				p1.obj.z > p2.obj.z ? -1 : 1;
 				// - comparePointAndLine({x : p1.obj.x, y : 0, z : p1.obj.z}, {pt1 : {x : b.xMin, y : 0, z : b.zMin}, pt2 : {x : b.xMax, y : 0, z : b.zMax}});
 			} else if ( b.xMax - b.xMin == 0 || b.zMax - b.zMin == 0 ) { // also check if
-				- comparePointAndLine({x : p2.obj.x, y : 0, z : p2.obj.z}, {pt1 : {x : a.xMin, y : 0, z : a.zMin}, pt2 : {x : a.xMax, y : 0, z : a.zMax}});
+				- comparePointAndLine({ x : p2.obj.x, y : 0, z : p2.obj.z },
+					{ pt1 : { x : a.xMin, y : 0, z : a.zMin }, pt2 : { x : a.xMax, y : 0, z : a.zMax } });
 			} else {
-				-(compareLineAndLine({pt1 : {x : b.xMin, y : 0, z : b.zMin}, pt2 : {x : b.xMax, y : 0, z : b.zMax}},
-					{pt1 : {x : a.xMin, y : 0, z : a.zMin}, pt2 : {x : a.xMax, y : 0, z : a.zMax}}));
+				-(compareLineAndLine({ pt1 : { x : b.xMin, y : 0, z : b.zMin }, pt2 : { x : b.xMax, y : 0, z : b.zMax } },
+					{ pt1 : { x : a.xMin, y : 0, z : a.zMin }, pt2 : { x : a.xMax, y : 0, z : a.zMax } }));
 			}
 	}
 
-	function comparePointAndLine(pt : Point, line : Line) : Int {
+	function comparePointAndLine( pt : Point, line : Line ) : Int {
 		if ( pt.z > line.pt1.z && pt.z > line.pt2.z ) {
 			return -1;
 		} else if ( pt.z < line.pt1.z && pt.z < line.pt2.z ) {
@@ -201,7 +203,7 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 		}
 	}
 
-	function compareLineAndLine(line1 : Line, line2 : Line) {
+	function compareLineAndLine( line1 : Line, line2 : Line ) {
 		var comp1 = comparePointAndLine(line1.pt1, line2);
 		var comp2 = comparePointAndLine(line1.pt2, line2);
 		var oneVStwo = comp1 == comp2 ? comp1 : -2;
@@ -219,9 +221,9 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 			return compareLineCenters(line1, line2);
 	}
 
-	function compareLineCenters(line1 : Line, line2 : Line) {
+	function compareLineCenters( line1 : Line, line2 : Line ) {
 		return centerHeight(line1) > centerHeight(line2) ? -1 : 1;
 	}
 
-	function centerHeight(line : Line) return (line.pt1.z + line.pt2.z) / 2;
+	function centerHeight( line : Line ) return (line.pt1.z + line.pt2.z) / 2;
 }

@@ -27,7 +27,6 @@ enum TmxGeneratable {
 	TileGeneratable( tile : CoordinatedTile );
 	ObjectGeneratable( object : TmxObject );
 	Random( tmxGen : TmxGeneratable );
-	Not( tmxGen : TmxGeneratable );
 }
 /** 
 	небольшое расхождение с оригинальным алгоритмом tiled: если указано случайное распределение тайлов через 
@@ -162,7 +161,7 @@ class AutoMap {
 					layerByName = switch type {
 						case TileGeneratable(tile): newTileLayer();
 						case ObjectGeneratable(object): newObjectLayer();
-						case Random(tmxGen) | Not(tmxGen):
+						case Random(tmxGen):
 							switch tmxGen {
 								case TileGeneratable(tile): newTileLayer();
 								case ObjectGeneratable(object): newObjectLayer();
@@ -323,13 +322,6 @@ class AutoMap {
 										if ( StringTools.startsWith(inputLayerName, "%not%") ) {
 											isNot = true;
 											inputLayerName = StringTools.replace(inputLayerName, "%not%", "");
-											for ( tileFromI => tileFrom in inputTilesFrom ) {
-												switch tileFrom {
-													case Not(tmxGen):
-														inputTilesFrom[tileFromI] = tmxGen;
-													default:
-												}
-											}
 										}
 
 										var ruleMatches = ruleMatchesOnLayer(inputTilesFrom, extractedLayerTo, isNot, layerTile0x, layerTile0y);
@@ -529,8 +521,7 @@ class AutoMap {
 						for ( tile in layer ) {
 							if ( tile.x == regionTile.x && tile.y == regionTile.y ) {
 								isTileSet = true;
-								createRuleIfNotExistsAndAdd(randomMatched ? Random(TileGeneratable(tile)) : notIsMatched ? Not(TileGeneratable(tile)) : TileGeneratable(tile),
-									layerName, whereTo);
+								createRuleIfNotExistsAndAdd(randomMatched ? Random(TileGeneratable(tile)) : TileGeneratable(tile), layerName, whereTo);
 							}
 						}
 						if ( !isTileSet ) {
@@ -555,7 +546,7 @@ class AutoMap {
 							if ( tile != null && tile.tile.gid != 0 ) return false;
 						case ObjectGeneratable(object):
 							if ( object != null ) return false;
-						case Random(tmxGen) | Not(tmxGen):
+						case Random(tmxGen) :
 							switch tmxGen {
 								case TileGeneratable(tile):
 									if ( tile != null && tile.tile.gid != 0 ) return false;

@@ -233,7 +233,7 @@ import h3d.scene.Mesh;
 
 	public function unlock() cd.unset("lock");
 
-	public inline function dropItem( item : en.Item, ?angle : Float, ?power : Float ) : en.Item {
+	public function dropItem( item : en.Item, ?angle : Float, ?power : Float ) : en.Item {
 		angle = angle == null ? Math.random() * M.toRad(360) : angle;
 		power = power == null ? Math.random() * .04 * 48 + .01 : power;
 

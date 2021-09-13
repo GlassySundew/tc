@@ -1,3 +1,4 @@
+
 -debug
 -hl bin/game.hl
 hl.sdl.hxml
@@ -8,3 +9,4 @@ hl.sdl.hxml
 # -D colliders_debug
 # -D sqlite_debug_verbose
 # -D display_proto
+

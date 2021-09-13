@@ -1,0 +1,21 @@
+window {
+  width: 20;
+  height: 20;
+}
+
+.close_button {
+  align: top right;
+  position: absolute;
+  offset: 1 -1;
+}
+
+.dragable_comp {
+  height: 20;
+  position: absolute;
+}
+
+.windowLabel {
+  scale: 0.5;
+  align: top middle;
+  padding-top: 14;
+}

@@ -18,7 +18,7 @@ class PlayerUI extends Layers {
 
 	var leftTop : SideCont;
 
-	public function new(parent : Layers) {
+	public function new( parent : Layers ) {
 		super();
 
 		var gridConf = uiConf.get("inventory").getObjectByName("grid");
@@ -26,15 +26,8 @@ class PlayerUI extends Layers {
 		Player.inst.invGrid = new CellGrid(gridConf.properties.getInt("width"), gridConf.properties.getInt("height"), gridConf.properties.getInt("tileWidth"),
 			gridConf.properties.getInt("tileHeight"));
 
-		for (j in 0...Player.inst.invGrid.grid.length) {
-			for (i in 0...Player.inst.invGrid.grid[j].length) {
-				var tempInter = Player.inst.invGrid.grid[j][i];
-				tempInter.inter.x = gridConf.x + i * (gridConf.properties.getInt("tileWidth") + gridConf.properties.getInt("gapX"));
-				tempInter.inter.y = gridConf.y + j * (gridConf.properties.getInt("tileHeight") + gridConf.properties.getInt("gapY"));
-			}
-		}
-
 		parent.add(this, Const.DP_BG);
+
 		inventory = new Inventory(Player.inst.invGrid, this);
 		inventory.containmentEntity = Player.inst;
 
@@ -43,15 +36,11 @@ class PlayerUI extends Layers {
 		inventory.win.y = Settings.params.inventoryCoordRatio.toString() == new Vector(-1,
 			-1).toString() ? inventory.win.y : Settings.params.inventoryCoordRatio.y * Main.inst.h();
 
+		this.add(inventory.win, Const.DP_UI);
 		if ( Settings.params.inventoryVisible ) inventory.toggleVisible();
 
-		// Освобождаем последний ряд для Belt
-		for (i in inventory.invGrid.grid[inventory.invGrid.grid.length - 1]) i.remove();
-
-		this.add(inventory.win, Const.DP_UI);
-
 		belt = new Belt(Player.inst.invGrid.grid[Player.inst.invGrid.grid.length - 1], this);
-		this.add(belt, Const.DP_UI);
+		this.add(belt, Const.DP_UI_FRONT);
 
 		leftTop = new SideCont(Top, Left, this);
 		this.add(leftTop, Const.DP_UI);
@@ -61,12 +50,12 @@ class PlayerUI extends Layers {
 
 		// new StatView(Health, leftTop);
 
-		var style = new h2d.domkit.Style();
-		style.load(hxd.Res.domkit.side);
-		style.addObject(leftTop);
+		// var style = new h2d.domkit.Style();
+		// style.load(hxd.Res.domkit.side);
+		// style.addObject(leftTop);
 	}
 
-	override function sync(ctx : RenderContext) {
+	override function sync( ctx : RenderContext ) {
 		super.sync(ctx);
 	}
 

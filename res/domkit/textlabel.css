@@ -1,26 +1,7 @@
-.textLabel {
-  /* position: absolute; */
-
-  /* width: 300px;  Ширина слоя */
-  /* margin: 7px; /* Значение отступов */
-  /* padding: 10px; /* Поля вокруг текста */
-  /* border: 4px solid black; /* Параметры границы */
-  /* Цвет фона */
+.backgroundHolder {
+  position: absolute;
 }
-/* text { */
-/* } */
+
 .containerFlow {
-  /* margin-top: 15; */
-  /* width: 1; */
-
-  padding: 3;
-  padding-top: 0;
-  align: middle middle;
-  /* position: absolute; */
-  background: rgba(0, 0, 0, 0.319);
+  position: absolute;
 }
-
-
-/* .borderFlow {
-
-} */

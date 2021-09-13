@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.4" tiledversion="2020.11.25" name="ui" tilewidth="157" tileheight="157" tilecount="8" columns="0" objectalignment="bottom">
+<tileset version="1.5" tiledversion="1.7.2" name="ui" tilewidth="160" tileheight="160" tilecount="10" columns="0" objectalignment="bottom">
  <tileoffset x="1" y="1"/>
  <grid orientation="isometric" width="1" height="1"/>
  <tile id="0">
@@ -24,6 +24,12 @@
   <image width="12" height="12" source="separated/ui/close_button_inventory0.png"/>
  </tile>
  <tile id="9">
-  <image width="157" height="157" source="../separated/ui/navigation.png"/>
+  <image width="160" height="160" source="../separated/ui/navigation.png"/>
+ </tile>
+ <tile id="10">
+  <image width="26" height="30" source="../separated/ui/9slice_window.png"/>
+ </tile>
+ <tile id="11">
+  <image width="18" height="18" source="../separated/ui/inventory_cell.png"/>
  </tile>
 </tileset>

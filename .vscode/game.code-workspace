@@ -13,6 +13,11 @@
       "titleBar.inactiveBackground": "#134e41",
       "titleBar.activeBackground": "#1a6b59",
       "titleBar.activeForeground": "#ffffff"
-    }
+    },
+    "css.lint.emptyRules": "ignore",
+    "css.lint.unknownProperties": "ignore",
+    "editor.suggest.showReferences": false,
+    "latex-workshop.hover.ref.enabled": false,
+    "editor.codeLens": false
   }
 }

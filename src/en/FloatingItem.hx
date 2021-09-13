@@ -170,10 +170,9 @@ class FloatingItem extends Interactive {
 		if ( !isLocked() ) bumpAwayFrom(Player.inst, distPx(Player.inst) < 20 ? -.065 * tmod : 0);
 
 		if ( player != null && distPx(player) < 10 && !isLocked() ) {
-			player.ui.inventory.invGrid.giveItem(item, player) != null ? {
-				destroy();
-				if ( sqlId != null ) Save.inst.removeEntityById(sqlId);
-			} : {};
+			player.ui.inventory.invGrid.giveItem(item, player);
+			destroy();
+			if ( sqlId != null ) Save.inst.removeEntityById(sqlId);
 		}
 	}
 

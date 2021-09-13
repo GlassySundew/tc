@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.5" tiledversion="1.7.1" name="entities" tilewidth="114" tileheight="134" tilecount="15" columns="10" backgroundcolor="#171717">
+<tileset version="1.5" tiledversion="1.7.2" name="entities" tilewidth="114" tileheight="134" tilecount="15" columns="10" backgroundcolor="#171717">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="2">
   <image width="48" height="48" source="separated/player/player.png"/>
@@ -72,7 +72,7 @@
  <tile id="12">
   <image width="48" height="77" source="separated/structures/door.png"/>
   <objectgroup draworder="index" id="3">
-   <object id="3" x="2" y="65">
+   <object id="3" x="2" y="66">
     <polygon points="0,0 24,-12 30,-9 6,3"/>
    </object>
    <object id="5" name="center" x="19" y="62">
@@ -136,7 +136,7 @@
  <tile id="17">
   <image width="48" height="66" source="separated/structures/back_door.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="33" y="51" rotation="180">
+   <object id="1" x="33" y="52" rotation="180">
     <polygon points="0,-9 24,3 30,0 6,-12"/>
    </object>
    <object id="2" name="center" x="21" y="56">

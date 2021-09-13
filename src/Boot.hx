@@ -1,12 +1,10 @@
 import h3d.Engine;
 import hxd.Window;
 import h2d.Scene;
-import hxd.inspect.Inspector;
 
 class Boot extends hxd.App {
 	public static var inst : Boot;
 
-	public var inspector : Inspector;
 
 	public var renderer : CustomRenderer;
 
@@ -28,12 +26,9 @@ class Boot extends hxd.App {
 		// s2d.scaleMode = AutoZoom(640, 360, true);
 		// s2d.scaleMode = LetterBox(640, 360, true, Center, Center);
 
-		s3d.lightSystem.ambientLight.set(1, 1, 1);
+		// s3d.lightSystem.ambientLight.set(1, 1, 1);
 		onResize();
 		// Window.
-		#if( castle && hl && debug )
-		inspector = new hxd.inspect.Inspector(s3d);
-		#end
 	}
 
 	override function onResize() {

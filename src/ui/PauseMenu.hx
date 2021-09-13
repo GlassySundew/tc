@@ -1,5 +1,6 @@
 package ui;
 
+import tools.Save;
 import h2d.Tile;
 import MainMenu.OptionsMenu;
 import MainMenu.TextButton;
@@ -25,7 +26,7 @@ class PauseMenu extends Process {
 
 		pauseContainer = new Object();
 
-		Main.inst.root.add(pauseContainer, Const.DP_UI);
+		Game.inst.root.add(pauseContainer, Const.DP_UI);
 
 		backgroundGraphics = new Graphics(pauseContainer);
 
@@ -85,6 +86,8 @@ class PauseMenu extends Process {
 
 			new TextButton("exit to main menu", (e) -> {
 				Game.inst.destroy();
+				Save.inst.disconnect();
+				
 				new MainMenu(Boot.inst.s2d);
 				exit();
 			}, vertFlow);

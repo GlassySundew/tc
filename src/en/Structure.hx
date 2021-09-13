@@ -154,14 +154,6 @@ class Structure extends Interactive {
 	function initInv(gridConf : TmxObject) {
 		if ( invGrid == null ) invGrid = new CellGrid(gridConf.properties.getInt("width"), gridConf.properties.getInt("height"),
 			gridConf.properties.getInt("tileWidth"), gridConf.properties.getInt("tileHeight"));
-
-		for (j in 0...invGrid.grid.length) {
-			for (i in 0...invGrid.grid[j].length) {
-				var tempInter = invGrid.grid[j][i];
-				tempInter.inter.x = gridConf.x + i * (gridConf.properties.getInt("tileWidth") + gridConf.properties.getInt("gapX"));
-				tempInter.inter.y = gridConf.y + j * (gridConf.properties.getInt("tileHeight") + gridConf.properties.getInt("gapY"));
-			}
-		}
 	}
 
 	public static function fromCdbEntry(x : Int, y : Int, cdbEntry : StructuresKind, ?amount : Int = 1) : Structure {
