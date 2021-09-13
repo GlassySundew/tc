@@ -214,7 +214,7 @@ class Level extends dn.Process {
 			}
 		}
 
-		// Хуйня чтобы получать 3d координаты курсора
+		// чтобы получать 3d координаты курсора
 		{
 			var bounds = new Bounds();
 			bounds.addPoint(new Point(0, 0, 0));
@@ -371,7 +371,7 @@ private class InternalRender extends TileLayerRenderer {
 		// tiles that contain *	 at the end of their file name as a slots for
 		// structures; can be visible only when choosing place for structure to build
 
-		// Это говнище должно быть visible только тогда, когда у игрока в holdItem есть blueprint
+		// Это должно быть visible только тогда, когда у игрока в holdItem есть blueprint
 		#if !headless
 		if ( eregFileName.match(sourceTile.image.source)
 			&& StringTools.endsWith(eregFileName.matched(1),
