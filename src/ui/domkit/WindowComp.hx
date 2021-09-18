@@ -1,4 +1,4 @@
-package ui;
+package ui.domkit;
 
 import cherry.soup.EventSignal.EventSignal2;
 import cherry.soup.EventSignal.EventSignal0;
@@ -10,7 +10,7 @@ import h2d.ScaleGrid;
 import h2d.Flow;
 
 interface WindowCompI {
-	public var window :WindowComp;
+	public var window : WindowComp;
 }
 
 /**background nineslice**/
@@ -20,6 +20,8 @@ class WindowComp extends Flow implements h2d.domkit.Object implements WindowComp
 	public var style : Style;
 	public var bringOnTopOfALL : Void -> Void;
 	public var clampInScreen : Void -> Void;
+
+    /** dragable callbacks **/
 	public var onDrag : EventSignal2<Float, Float> = new EventSignal2();
 	public var onPush : Event -> Void;
 	public var toggleVisible : Void -> Void;
@@ -36,9 +38,23 @@ class WindowComp extends Flow implements h2d.domkit.Object implements WindowComp
 		
 		window = this;
 
-		background = new ScaleGrid(tile, bl, bt, br, bb);
-		window.addChildAt(background, -1);
-		window.getProperties(background).isAbsolute = true;		
+        needReflow = true;
+        
+        borderLeft = bl;
+        borderTop = bt;
+        borderRight = br;
+        borderBottom = bb;
+
+
+		// background = new ScaleGrid(tile, bl, bt, br, bb, window);
+        backgroundTile = tile;
+
+        needReflow = true;
+
+
+        
+        // window.addChildAt(background, 0);
+		// window.getProperties(window.background).isAbsolute = true;		
 
 		style = new h2d.domkit.Style();
 		style.load(hxd.Res.domkit.window, true);

@@ -16,7 +16,6 @@
 -lib random
 -lib haxe-concurrent
 
--D flow_border
 -D heaps_enable_hl_mp3
 -cp src.helper
 --macro Helper.init()

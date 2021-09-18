@@ -1,5 +1,6 @@
 package ui.player;
 
+import ui.domkit.ButtonIconComp;
 import dn.Process;
 import h2d.Tile;
 import h2d.Flow;
@@ -8,7 +9,7 @@ import h2d.Font;
 import h2d.domkit.Style;
 
 class ButtonIcon extends Object {
-	public var container:ButtonIconCont;
+	public var container:ButtonIconComp;
 	public var buttonSpr:HSprite;
 
 	public var centerFlow:Flow;
@@ -27,7 +28,7 @@ class ButtonIcon extends Object {
 		buttonSpr.anim.setSpeed(0.025 * Game.inst.tmod);
 
 		Game.inst.root.add(this, Const.DP_UI);
-		container = new ButtonIconCont(centerFlow);
+		container = new ButtonIconComp(centerFlow);
 		buttonSpr.visible = false;
 		buttonSpr.setCenterRatio();
 		style = new h2d.domkit.Style();

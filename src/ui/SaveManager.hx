@@ -1,5 +1,6 @@
 package ui;
 
+import ui.domkit.TextLabelComp;
 import cherry.soup.EventSignal.EventSignal1;
 import MainMenu.TextButton;
 import dn.Process;

@@ -1,6 +1,5 @@
 package en.structures;
 
-import ui.InventoryComp;
 import hxd.System;
 import en.player.Player;
 import format.tmx.Data.TmxObject;

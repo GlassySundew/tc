@@ -1,10 +1,21 @@
 .scrollable {
-
-  width: 130;
+  width: 140;
   height: 180;
-  padding-left: 7;
-  padding-right: 7;
-  padding-top: 3;
-  padding-bottom: 8;
+
+  align: top;
 }
 
+.scroll_bar {
+  fill-height: true;
+  align: top;
+  width: 6;
+  padding-left: 2;
+}
+
+.content_flow {
+  padding-left: 7;
+  padding-right: 8;
+  padding-top: 3;
+  padding-bottom: 8;
+  layout: horizontal;
+}

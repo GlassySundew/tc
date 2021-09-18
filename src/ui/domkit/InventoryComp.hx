@@ -1,9 +1,9 @@
-package ui;
+package ui.domkit;
 
+import ui.domkit.WindowComp.WindowCompI;
 import h2d.Bitmap;
 import ui.InventoryGrid.CellGrid;
-import ui.WindowComp.WindowCompI;
-import ui.TextLabelComp;
+import ui.domkit.TextLabelComp;
 import h2d.Flow;
 
 @:uiComp("inventoryComp")

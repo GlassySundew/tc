@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-up" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#afafaf" nextlayerid="68" nextobjectid="124">
  <properties>
-  <property name="DeleteTiles" type="bool" value="false"/>
+  <property name="DeleteTiles" type="bool" value="true"/>
   <property name="MatchOutsideMap" type="bool" value="false"/>
-  <property name="NoOverlappingRules" type="bool" value="false"/>
+  <property name="NoOverlappingRules" type="bool" value="true"/>
  </properties>
  <tileset firstgid="1" source="../alpha.tsx"/>
  <layer id="16" name="regions_input" width="100" height="100">
@@ -31,7 +31,7 @@
    eJzt2TEOgkAQhlHuBqV26nm4hJ5XWgvjBiP/OvteTfGFZLMzME0AAFmnxufuP63gk+39r+mGauZ0AC+WdABNzukAKOCRDgCGsM2662KHAAqxw/dvLnzvXNIBdMm3rGOZbfe5pQNgMGbWvrir21zTAXTNOfp/lXd14Dj+OcF39p4fOybAeMxcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA7z0Bty8M1Q==
   </data>
  </layer>
- <layer id="6" name="output_ground" width="100" height="100">
+ <layer id="6" name="output_ground" width="100" height="100" visible="0">
   <data encoding="base64" compression="zlib">
    eJzt1zEKgzAYgNGcT5di7+EZMlbt2ANrh0IQFBfzK31vSiCQjwyapMQ/mA6sGU6vYMv37MeT9/iklIsxXNreN6upVsHPezV/FeO2ZsjNPaIDACo58vZY/ue5Le6nAAAAxHlGB8AF9dEBcANddAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAFM1R8CYc=
   </data>

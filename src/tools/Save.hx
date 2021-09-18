@@ -25,7 +25,7 @@ typedef CachedEntity = {
 	public var blob : String;
 	public var level_id : Null<Int>;
 }
-
+/** for proper work .hdll libs of sqlite of the latest version need to be compiled(amalgamation) and also with URI enabled **/
 class Save {
 	public static var inst : Save;
 
@@ -203,7 +203,7 @@ class Save {
 	public function saveGame( fileName : String ) {
 		var targetFilePath = SAVEPATH + fileName + Const.SAVEFILE_EXT;
 		if ( isDbLocatedInMemory("maindb") ) {
-			// legacy thingy
+			// debug scenario when entry point was not in main menu
 			// backing target file
 			if ( File.exists(targetFilePath) ) {
 				bakSave(fileName);
@@ -214,6 +214,7 @@ class Save {
 			sqlite.request('vacuum maindb into ${sqlite.quote(targetFilePath)}');
 			startTransaction();
 		} else if ( currentFile != null && currentFile == fileName ) {
+			// saving in the same file as previous time
 			// целевой файл бекапится, а потом удаляется
 			bakSave(fileName);
 			File.delete(targetFilePath);
@@ -224,9 +225,7 @@ class Save {
 			reattachMainFrom(fileName);
 			startTransaction();
 		} else {
-			// сейв в тот же самый файл
-			// try sqlite.rollback() catch( e:Dynamic ) {}
-
+			// saving to new file
 			reattachMainFrom(fileName);
 			startTransaction();
 		}
@@ -244,6 +243,7 @@ class Save {
 			// single-player only, exclude with compiler flag in multiplayer
 			// sqlite.request("delete from maindb.entities where name like '%.Player'");
 
+			// dropping "entities" tmx layer in favor of previously saved layer
 			var entitiesTmxLayer = level.getLayerByName('entities');
 			if ( entitiesTmxLayer != null ) level.data.layers.remove(entitiesTmxLayer);
 
@@ -261,7 +261,7 @@ class Save {
 			)');
 			}
 
-			// requesting our newly updated/inserted room to assign sql id to current level
+			// requesting our newly updated/inserted room to assign sql id to it's instance
 			var cachedLevel : CachedLevel = sqlite.request('select id "sqlId", * from maindb.rooms where name = ${sqlite.quote(level.lvlName)}').next();
 
 			level.sqlId = cachedLevel.id;

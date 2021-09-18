@@ -1,5 +1,6 @@
 package en;
 
+import ui.domkit.TextLabelComp;
 import ch2.ui.EventInteractive;
 import hxd.Res;
 import en.structures.Chest;
@@ -11,7 +12,6 @@ import en.items.Blueprint;
 import h2d.Scene;
 import h2d.RenderContext;
 import en.player.Player;
-import ui.TextLabelComp;
 import h2d.Bitmap;
 import h2d.Object;
 import h2d.Interactive;
@@ -222,7 +222,7 @@ import h2d.Interactive;
 		}
 		isDisposed = false;
 	}
-
+    
 	override function onRemove() {
 		super.onRemove();
 		// isDisposed = true;

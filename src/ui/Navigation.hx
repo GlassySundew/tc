@@ -16,7 +16,7 @@ class Navigation extends Window {
 	public function new( ?parent : Object ) {
 		super(parent);
 
-		var textLabel = new ui.TextLabelComp("Navigation console", Assets.fontPixel, win);
+		var textLabel = new ui.domkit.TextLabelComp("Navigation console", Assets.fontPixel, win);
 		textLabel.scale(.5);
 		textLabel.x = win.getSize().width / 2;
 

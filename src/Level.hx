@@ -368,7 +368,7 @@ private class InternalRender extends TileLayerRenderer {
 			+ (tile.flippedDiagonally ? (tile.flippedVertically ? h2dTile.height : -h2dTile.width + h2dTile.height) : 0);
 
 		// Creating isometric(rombic) h3d.scene.Interactive on top of separated
-		// tiles that contain *	 at the end of their file name as a slots for
+		// tiles that contain * at the end of their file name as a slots for
 		// structures; can be visible only when choosing place for structure to build
 
 		// Это должно быть visible только тогда, когда у игрока в holdItem есть blueprint
@@ -443,7 +443,7 @@ class StructTile extends Object {
 			}
 		});
 
-		tile.onPushEvent.add(event -> {
+		tile.onClickEvent.add(event -> {
 			if ( Player.inst != null && Player.inst.holdItem != null && Std.isOfType(Player.inst.holdItem, Blueprint) ) {
 				cast(Player.inst.holdItem, Blueprint).onStructurePlace.dispatch(this);
 			}

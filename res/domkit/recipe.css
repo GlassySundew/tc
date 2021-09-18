@@ -1,4 +1,5 @@
-recipe-comp {
+recipe-comp window {
+  height: 20;
 }
 
 .windowLabel {

@@ -19,8 +19,8 @@ class FixedScrollArea extends ScrollArea {
 	override function sync( ctx : RenderContext ) {
 		super.sync(ctx);
 		try {
-			if ( fillHeight ) height = cast(parent, Flow).maxHeight;
-			if ( fillWidth ) width = cast(parent, Flow).maxWidth;
+			if ( fillHeight ) height = cast(parent, Flow).outerHeight;
+			if ( fillWidth ) width = cast(parent, Flow).outerWidth;
 		} catch( e ) {}
 	}
 

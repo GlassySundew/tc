@@ -1,0 +1,17 @@
+.ingreds_holder {
+  padding: 3;
+  padding-bottom: 8;
+  vspacing: 2;
+}
+
+.windowLabel {
+  padding-top: 13;
+  padding-bottom: 9;
+}
+
+ingreds-hint-comp window {
+  layout: vertical;
+}
+ingreds-hint-comp {
+  layout: vertical;
+}

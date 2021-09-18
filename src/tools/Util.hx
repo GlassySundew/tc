@@ -1,7 +1,7 @@
 package tools;
 
 import hxd.res.Resource;
-import ui.WindowComp.WindowCompI;
+import ui.domkit.WindowComp.WindowCompI;
 import cdb.Types.TilePos;
 import format.tmx.*;
 import format.tmx.Data;

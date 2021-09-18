@@ -171,9 +171,6 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 		} else
 			for ( e in level.entities ) searchAndSpawnEnt(e);
 
-		// if ( manual && Player.inst != null ) {
-		// 	trace("zhopa
-		// 	");
 
 		// 	var playerObj = level.entities.filter(e -> e.name == "player")[0];
 		// 	Player.inst.footX = playerObj.x;

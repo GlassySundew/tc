@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="1000" height="1000" tilewidth="1" tileheight="1" infinite="0" backgroundcolor="#333b3f" nextlayerid="12" nextobjectid="80">
+<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="1000" height="1000" tilewidth="1" tileheight="1" infinite="0" backgroundcolor="#333b3f" nextlayerid="13" nextobjectid="87">
  <tileset firstgid="1" source="ui.tsx"/>
- <tileset firstgid="13" source="entities.tsx"/>
+ <tileset firstgid="14" source="entities.tsx"/>
  <objectgroup draworder="index" id="5" name="hz che eto"/>
  <objectgroup draworder="index" id="2" name="inventory">
   <object id="21" name="window" gid="2" x="140" y="348" width="114" height="124"/>
@@ -26,7 +26,6 @@
   <object id="47" name="close" gid="7" x="169" y="275" width="12" height="12"/>
  </objectgroup>
  <objectgroup draworder="index" id="10" name="navigation">
-  <object id="66" name="window" gid="10" x="481" y="385" width="160" height="160"/>
   <object id="59" name="close" gid="7" x="554" y="236" width="12" height="12"/>
   <object id="61" name="navigation" x="411" y="244" width="140" height="131"/>
   <object id="65" name="dragable" x="402" y="226" width="148" height="14"/>
@@ -54,7 +53,6 @@
   <object id="56" name="close" gid="7" x="340" y="237" width="12" height="12"/>
  </objectgroup>
  <objectgroup draworder="index" id="4" name="craft">
-  <object id="6" name="window" gid="1" x="93" y="133" width="134" height="127"/>
   <object id="13" name="recipes" x="38" y="26" width="105" height="98"/>
   <object id="17" name="sign" x="94" y="18">
    <point/>
@@ -64,21 +62,19 @@
   <object id="49" name="close" gid="7" x="155" y="17" width="12" height="12"/>
   <object id="51" name="dragable" x="27" y="7" width="124" height="15"/>
  </objectgroup>
+ <objectgroup draworder="index" id="12" name="craft-caret">
+  <object id="84" name="window" gid="13" x="194" y="36" width="6" height="18"/>
+  <object id="86" name="9slice" x="193" y="24" width="4" height="8"/>
+ </objectgroup>
  <objectgroup draworder="index" id="6" name="craft_recipe">
   <object id="78" name="window" gid="4" x="234" y="72" width="32" height="20"/>
   <object id="79" name="9slice" x="240" y="55" width="7" height="16"/>
  </objectgroup>
  <objectgroup draworder="index" id="7" name="ingreds_hint">
-  <object id="44" name="window" gid="6" x="340" y="31" width="104" height="25"/>
-  <object id="41" name="sign" x="341" y="13">
-   <point/>
-  </object>
-  <object id="43" name="flow" x="291" y="20">
-   <point/>
-  </object>
+  <object id="83" name="window" gid="6" x="295" y="80" width="22" height="33"/>
+  <object id="81" name="9slice" x="289" y="68" width="14" height="7"/>
  </objectgroup>
  <objectgroup draworder="index" id="8" name="ingreds_comp">
-  <object id="37" name="window" gid="5" x="451" y="37" width="98" height="20"/>
   <object id="38" name="icon" x="405" y="20">
    <point/>
   </object>

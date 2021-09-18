@@ -47,14 +47,15 @@ class VerticalSlider extends EventInteractive {
 		super.draw(ctx);
 		if ( tile.height != Std.int(height) ) tile.setSize(Std.int(width), tile.height);
 		emitTile(ctx, tile);
-		var px = getDy();
-		cursorObj.y = px;
+        var px = getDy();
+        cursorObj.y = px;
+
 	}
 
 	var handleDX = 0.0;
 
 	inline function getDy() {
-		return Math.round((value - minValue) * (height - cursorObj.height) / (maxValue - minValue));
+		return Math.abs(Math.round((value - minValue) * (height - cursorObj.height) / (maxValue - minValue)));
 	}
 
 	inline function getValue( cursorX : Float ) : Float {
@@ -77,6 +78,7 @@ class VerticalSlider extends EventInteractive {
 				}
 
 				onChange();
+                
 				var scene = scene;
 				value = getValue(e.relY);
 				var capture = ( e : Event ) -> {
@@ -87,8 +89,12 @@ class VerticalSlider extends EventInteractive {
 					value = getValue(e.relY);
 					onChange();
 				}
+
+                
 				capture(e);
 				startCapture(capture);
+
+               
 			default:
 		}
 	}

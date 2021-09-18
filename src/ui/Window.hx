@@ -1,7 +1,7 @@
 package ui;
 
+import ui.domkit.WindowComp.WindowCompI;
 import h2d.Layers;
-import ui.WindowComp.WindowCompI;
 import h2d.ScaleGrid;
 import en.player.Player;
 import h2d.Flow;
@@ -25,7 +25,6 @@ class Window extends dn.Process {
 		ALL.push(this);
 		win = new h2d.Object(parent);
 
-		dn.Process.resizeAll();
 		Game.inst.delayer.addF(() -> {
 			updateBackgroundInteractive();
 		}, 1);
@@ -33,9 +32,9 @@ class Window extends dn.Process {
 
 	function updateBackgroundInteractive() {
 
-		if ( win != null && windowComp != null ) {
+		if ( win != null && windowComp != null && windowComp.window != null  ) {
 			if ( backgroundInter != null ) backgroundInter.remove();
-
+            
 			backgroundInter = new Interactive(windowComp.window.innerWidth, windowComp.window.innerHeight);
 			win.addChildAt(backgroundInter, 0);
 			backgroundInter.cursor = Default;

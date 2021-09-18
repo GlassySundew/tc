@@ -5,7 +5,7 @@ import h3d.Vector;
 class Camera extends dn.Process {
 	public var target(default, set) : Null<Entity>;
 
-	function set_target(v : Null<Entity>) {
+	function set_target( v : Null<Entity> ) {
 		if ( parallax != null && v != null ) {
 			parallax.x = v.footX;
 			parallax.z = v.footY;
@@ -31,7 +31,7 @@ class Camera extends dn.Process {
 	// public var wid(get, never):Int;
 	// public var hei(get, never):Int;
 
-	public function new(?parent : Process) {
+	public function new( ?parent : Process ) {
 		super(parent == null ? Game.inst : parent);
 		x = y = 0;
 		dx = dy = 0;
@@ -46,7 +46,7 @@ class Camera extends dn.Process {
 		onResize();
 	}
 
-	function updateCamera(?x = 0., ?y = 0.) {
+	function updateCamera( ?x = 0., ?y = 0. ) {
 		if ( parallax != null ) {
 			parallax.x = x;
 			parallax.z = y;
@@ -69,7 +69,7 @@ class Camera extends dn.Process {
 
 	var shakePower = 1.0;
 
-	public function shakeS(t : Float, ?pow = 1.0) {
+	public function shakeS( t : Float, ?pow = 1.0 ) {
 		cd.setS("shaking", t, false);
 		shakePower = pow;
 	}
@@ -124,6 +124,8 @@ class Camera extends dn.Process {
 
 	override function onResize() {
 		super.onResize();
-		if ( parallax != null ){ parallax.drawParallax();}
+		if ( parallax != null ) {
+			parallax.drawParallax();
+		}
 	}
 }

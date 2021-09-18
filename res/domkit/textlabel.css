@@ -1,7 +1,9 @@
 .backgroundHolder {
   position: absolute;
+  padding-bottom: 1;
 }
 
 .containerFlow {
   position: absolute;
 }
+

@@ -10,7 +10,7 @@ import hxbit.NetworkSerializable;
 import hxd.Key;
 import ui.InventoryGrid.CellGrid;
 import ui.PauseMenu;
-import ui.TextLabelComp;
+import ui.domkit.TextLabelComp;
 import ui.Window;
 import ui.player.Inventory;
 import ui.player.PlayerUI;

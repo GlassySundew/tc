@@ -1,0 +1,22 @@
+window {
+  width: 100;
+  height: 20;
+}
+
+.windowLabel {
+  align: left;
+  padding-left: 49;
+  padding-top: 13;
+}
+
+.icon {
+  position: absolute;
+  x: 2;
+  y: 2;
+}
+
+.amount-label {
+  position: absolute;
+  align: middle right;
+  padding-right: 7;
+}

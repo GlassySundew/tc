@@ -114,7 +114,8 @@ class CellGrid extends h2d.Object {
 	}
 
 	public function findSameItem( item : Item, ?ignoreFull : Bool = true ) : InventoryCell {
-		for ( i in grid ) for ( j in i ) if ( j.item.isSameTo(item)
+        
+		for ( i in grid ) for ( j in i ) if ( j.item != null && !j.item.isDisposed && j.item.isSameTo(item)
 			&& (j.item.amount < Data.items.get(item.cdbEntry).stack.int() || !ignoreFull) ) return j;
 		return null;
 	}
@@ -125,7 +126,7 @@ class CellGrid extends h2d.Object {
 
 		var splitAndFill : Void -> InventoryCell = () -> {
 			do {
-				if ( slot.item == null ) {
+				if ( slot.item == null || slot.item.isDisposed ) {
 					// Пустая ячейка
 					if ( item.amount > Data.items.get(item.cdbEntry).stack.int() ) {
 						item.amount -= Data.items.get(item.cdbEntry).stack.int();

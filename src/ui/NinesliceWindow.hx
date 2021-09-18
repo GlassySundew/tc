@@ -2,7 +2,7 @@ package ui;
 
 import en.player.Player;
 import haxe.CallStack;
-import ui.WindowComp.WindowCompI;
+import ui.domkit.WindowComp.WindowCompI;
 import h2d.Object;
 import h2d.Tile;
 import haxe.Constraints.Constructible;

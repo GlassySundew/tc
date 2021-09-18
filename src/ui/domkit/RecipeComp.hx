@@ -1,5 +1,6 @@
-package ui;
+package ui.domkit;
 
+import ui.domkit.WindowComp.WindowCompI;
 import hxd.res.Resource;
 import h2d.Tile;
 import hxd.Event;
@@ -7,21 +8,25 @@ import cherry.soup.EventSignal.EventSignal1;
 import hxd.Res;
 import h2d.Object;
 import h2d.Flow;
-import ui.WindowComp.WindowCompI;
+import ui.domkit.WindowComp.WindowCompI;
 
-@:uicomp("recipe-comp")
+@:uiCoomp("recipe-comp")
 class RecipeComp extends Flow implements h2d.domkit.Object implements WindowCompI {
     public var onWheel : EventSignal1<Event> = new EventSignal1();
-    
-    static var sheet: Resource;
-    var iconSpr:Tile;
+    public var onOver : EventSignal1<Event> = new EventSignal1();
+    public var onOut : EventSignal1<Event> = new EventSignal1();
+
+    public dynamic function craft() {} 
+
+    static var sheet : Resource;
+    var iconSpr : Tile;
 
     static var SRC = 
         <recipe-comp>
             <window(backgroundTile, bl, bt, br, bb) public id="window" layout="horizontal">
                 <bitmap src={iconSpr} class="icon" />
                 <flow class="craft_button" public id="craft_button" />
-                </window>
+            </window>
         </recipe-comp>
             ;   
 	public function new( recipe : Data.Recipes, backgroundTile : h2d.Tile, bl : Int, bt : Int, br : Int, bb : Int, ?parent : Null<Object> ) {
@@ -35,9 +40,10 @@ class RecipeComp extends Flow implements h2d.domkit.Object implements WindowComp
 		window.style.load(sheet);
 
         enableInteractive = true;
-        interactive.onWheel = (e) -> onWheel.dispatch(e);
 
-        interactive.onFocus Add
+        interactive.onWheel = (e) -> {onWheel.dispatch(e);}
+        interactive.onOver = (e) -> {onOver.dispatch(e);};
+        interactive.onOut = (e) -> {onOut.dispatch(e);};
 
         var craft_but0 = new HSprite(Assets.ui, "craft_but0");
 		var craft_but1 = new HSprite(Assets.ui, "craft_but1");
@@ -45,6 +51,7 @@ class RecipeComp extends Flow implements h2d.domkit.Object implements WindowComp
 
 		var craftButton = new ui.Button([craft_but0.tile, craft_but1.tile, craft_but2.tile], craft_button);
 
+        craftButton.onClickEvent.add((e) -> craft());
 
-	}
+	}   
 }

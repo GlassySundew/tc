@@ -1,7 +1,8 @@
 package ui.player;
 
+import ui.domkit.InventoryComp;
 import h2d.Flow;
-import ui.WindowComp;
+import ui.domkit.WindowComp;
 import en.player.Player;
 import h2d.Object;
 import ui.InventoryGrid.CellGrid;

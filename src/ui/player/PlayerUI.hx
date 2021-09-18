@@ -1,5 +1,6 @@
 package ui.player;
 
+import ui.domkit.SideComp;
 import en.player.Player;
 import h2d.Layers;
 import h2d.RenderContext;
@@ -16,7 +17,7 @@ class PlayerUI extends Layers {
 
 	public var craft : Crafting;
 
-	var leftTop : SideCont;
+	var leftTop : SideComp;
 
 	public function new( parent : Layers ) {
 		super();
@@ -42,7 +43,7 @@ class PlayerUI extends Layers {
 		belt = new Belt(Player.inst.invGrid.grid[Player.inst.invGrid.grid.length - 1], this);
 		this.add(belt, Const.DP_UI_FRONT);
 
-		leftTop = new SideCont(Top, Left, this);
+		leftTop = new SideComp(Top, Left, this);
 		this.add(leftTop, Const.DP_UI);
 
 		craft = new Crafting(this);

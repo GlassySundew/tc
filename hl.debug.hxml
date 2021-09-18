@@ -4,7 +4,6 @@
 hl.sdl.hxml
 
 -D linux
-
 # -D depth_debug
 # -D colliders_debug
 # -D sqlite_debug_verbose

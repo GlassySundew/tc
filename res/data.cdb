@@ -373,6 +373,10 @@
 						{
 							"item": "iron",
 							"amount": 1
+						},
+						{
+							"item": "seeds_seaweed",
+							"amount": 4
 						}
 					],
 					"result": [

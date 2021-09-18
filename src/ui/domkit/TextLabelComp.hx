@@ -1,4 +1,4 @@
-package ui;
+package ui.domkit;
 
 import h2d.filter.Outline;
 import h2d.col.Bounds;
@@ -12,10 +12,10 @@ import h2d.domkit.Style;
 class TextLabelComp extends h2d.Flow implements h2d.domkit.Object {
 	static var SRC =
 		<textLabel public id="textLabel">
-			<flow class="backgroundHolder" public id="backgroundHolder" position="absolute" />
-			<flow class="containerFlow" public id="containerFlow">
-					<text class="textLabel" public id="labelTxt" />
-			</flow>
+		    <flow class="backgroundHolder" public id="backgroundHolder" position="absolute" />
+		    <flow class="containerFlow" public id="containerFlow">
+		        <text class="textLabel" public id="labelTxt" />
+		    </flow>
 		</textLabel>;
 
 	public var label(get, set):String;

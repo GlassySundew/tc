@@ -102,7 +102,6 @@ class GameClient extends Process implements IGame {
 			}
 		});
 		// host.onMessage = function(c, msg:Message) {
-		// 	trace("zhopa");
 		// 	switch( msg.type ) {
 		// 		case mapLoad:
 		// 			var map = cast(msg, MapLoad);
