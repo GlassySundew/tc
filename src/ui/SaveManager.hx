@@ -1,5 +1,6 @@
 package ui;
 
+import haxe.CallStack;
 import ui.domkit.TextLabelComp;
 import cherry.soup.EventSignal.EventSignal1;
 import MainMenu.TextButton;
@@ -9,7 +10,6 @@ import h2d.Flow;
 import h2d.Object;
 import h2d.RenderContext;
 import h2d.ScaleGrid;
-import h2d.Text;
 import h2d.Tile;
 import h2d.col.Bounds;
 import h2d.col.Point;
@@ -59,7 +59,7 @@ class SaveManager extends SecondaryMenu {
 		generalFlow.layout = Vertical;
 		generalFlow.horizontalAlign = Middle;
 
-		var signText = new Text(Assets.fontPixel, generalFlow);
+		var signText = new ShadowedText(Assets.fontPixel, generalFlow);
 		signText.text = switch mode {
 			case Save: "Save file: ";
 			case Load: "Load file: ";
@@ -167,7 +167,7 @@ class SaveEntry extends Process {
 
 	function set_selected( v : Bool ) {
 		if ( v ) {
-			horflow.backgroundTile = Tile.fromColor(0x454545, 1, 1, .9);
+			horflow.backgroundTile = Tile.fromColor(0x222222, 1, 1, .9);
 			utilityFlow.visible = true;
 		} else {
 			horflow.backgroundTile = null;
@@ -196,7 +196,6 @@ class SaveEntry extends Process {
 					if ( SaveManager.inst.onLoad != null ) SaveManager.inst.onLoad();
 					tools.Save.inst.loadGame(name);
 				case New(name):
-					SaveManager.inst.remove();
 					dialog = new NewSaveDialog(( e ) -> {}, mode, Main.inst.root);
 					syncDialog(dialog);
 			}
@@ -223,7 +222,7 @@ class SaveEntry extends Process {
 			}
 		}
 
-		var text = new Text(Assets.fontPixel, horflow);
+		var text = new ShadowedText(Assets.fontPixel, horflow);
 		text.text = name;
 
 		utilityFlow = new Flow(thisObject);
@@ -258,12 +257,13 @@ class SaveEntry extends Process {
 
 		switch mode {
 			case Save | Load:
-				var edit = new Button([edit0.tile, edit1.tile, edit0.tile], utilityFlow);
-				edit.onClickEvent.add(( e ) -> {
-					dialog = new RenameDialog(name, activateEntry, mode, Main.inst.root);
-					syncDialog(dialog);
-				});
-
+				/*
+					var edit = new Button([edit0.tile, edit1.tile, edit0.tile], utilityFlow);
+					edit.onClickEvent.add(( e ) -> {
+						dialog = new RenameDialog(name, (e) -> {}, mode, Main.inst.root);
+						syncDialog(dialog);
+					});
+				 */
 				var delete = new Button([delete0.tile, delete1.tile, delete0.tile], utilityFlow);
 				delete.onClickEvent.add(( e ) -> {
 					dialog = new DeleteDialog(name, activateEntry, mode, Main.inst.root);
@@ -277,9 +277,7 @@ class SaveEntry extends Process {
 			interactive.width = horflow.innerWidth;
 			interactive.height = horflow.innerHeight;
 		} catch( e:Dynamic ) {
-			destroy();
-
-			trace("some untrackable bug");
+			trace("some untrackable bug: " + e);
 		}
 	}
 
@@ -302,8 +300,7 @@ class Dialog extends SecondaryMenu {
 			activateEvent(e);
 			refreshSaves();
 			if ( SaveManager.inst != null ) SaveManager.inst.refreshEntries();
-			remove();
-		});
+		}, -1);
 	}
 
 	override function sync( ctx : RenderContext ) {
@@ -328,7 +325,7 @@ class NewSaveDialog extends Dialog {
 		dialogFlow.verticalAlign = Middle;
 		dialogFlow.padding = 2;
 
-		var dialogText = new Text(Assets.fontPixel, dialogFlow);
+		var dialogText = new ShadowedText(Assets.fontPixel, dialogFlow);
 		dialogText.text = 'Enter new save name: ';
 
 		textInput = new TextInput(Assets.fontPixel, dialogFlow);
@@ -352,22 +349,21 @@ class NewSaveDialog extends Dialog {
 
 		this.activateEvent.add(( e ) -> {
 			mode = New(textInput.text);
-			try {
-				tools.Save.inst.makeFreshSave(textInput.text);
-			}
-			catch( e:Dynamic ) {
-				trace(e);
-			}
+			tools.Save.inst.makeFreshSave(textInput.text);
+
 			refreshSaves();
 			if ( SaveManager.inst != null ) SaveManager.inst.refreshEntries();
 
 			remove();
-		}, 10);
+		});
 
 		var yesBut = new TextButton("ok", ( e ) -> {
 			SaveManager.inst.remove();
 			SaveManager.inst = null;
 			this.activateEvent.dispatch(e);
+			Main.inst.delayer.addF(() -> {
+				tools.Save.inst.saveGame(textInput.text);
+			}, 1);
 		}, buttonsFlow);
 		var noBut = new TextButton("cancel", ( e ) -> {
 			remove();
@@ -379,6 +375,10 @@ class NewSaveDialog extends Dialog {
 
 	override function sync( ctx : RenderContext ) {
 		super.sync(ctx);
+	}
+
+	override function onRemove() {
+		super.onRemove();
 	}
 }
 
@@ -393,7 +393,7 @@ class RenameDialog extends Dialog {
 		dialogFlow.verticalAlign = Middle;
 		dialogFlow.padding = 2;
 
-		var dialogText = new Text(Assets.fontPixel, dialogFlow);
+		var dialogText = new ShadowedText(Assets.fontPixel, dialogFlow);
 		dialogText.text = 'Enter new save name: ';
 
 		var textInput = new TextInput(Assets.fontPixel, dialogFlow);

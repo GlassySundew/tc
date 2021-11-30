@@ -1,16 +1,10 @@
 package ui;
 
-import h2d.RenderContext;
-import h2d.Flow;
 import ch2.ui.EventInteractive;
-import cherry.soup.EventSignal.EventSignal0;
-import cherry.soup.EventSignal.EventSignal1;
-import ui.player.Inventory;
-import haxe.Constraints.Function;
-import h3d.scene.Object;
-import h2d.ScaleGrid;
-import hxd.Event;
 import en.player.Player;
+import h2d.Flow;
+import h2d.RenderContext;
+import hxd.Event;
 
 class InventoryCell extends h2d.Flow {
 	public var item(default, set) : en.Item;
@@ -27,7 +21,7 @@ class InventoryCell extends h2d.Flow {
 		return item = v;
 	}
 
-	public function new( ?width : Int = 0, ?height : Int = 0, ?parent : h2d.Object ) {
+	public function new( ?width : Int = 0, ?height : Int = 0, containmentEntity : Entity, ?parent : h2d.Object ) {
 		super(parent);
 		inter = new ch2.ui.EventInteractive(width, height, this);
 		// inter.visible = false;
@@ -35,16 +29,19 @@ class InventoryCell extends h2d.Flow {
 		inter.onPush = function ( e : Event ) {
 			if ( Player.inst.holdItem != null && !Player.inst.holdItem.isDisposed && Player.inst.holdItem.isInCursor() && (item == null || item.isDisposed) ) {
 				item = Game.inst.player.holdItem;
+				item.containerEntity = containmentEntity;
 				Game.inst.player.holdItem = null;
 				// Когда кладём предмет в слот, все курсоры сеток должны быть выключены
-				for ( i in Inventory.ALL ) i.invGrid.disableGrid();
+				for ( e in Entity.ALL ) if ( e.invGrid != null ) e.invGrid.disableGrid();
 			}
 		}
 		getProperties(inter).isAbsolute = true;
 	}
-	override function sync(ctx:RenderContext) {
+
+	override function sync( ctx : RenderContext ) {
 		super.sync(ctx);
 	}
+
 	public override function onRemove() {
 		super.onRemove();
 	}
@@ -55,9 +52,9 @@ class CellGrid extends h2d.Object {
 
 	inline function get_player() return Player.inst;
 
-	public var itemCout(get, never) : Int;
+	public var itemCount(get, never) : Int;
 
-	function get_itemCout() {
+	function get_itemCount() {
 		var cout = 0;
 		for ( i in grid ) for ( j in i ) if ( j.item != null ) cout++;
 		return cout;
@@ -70,8 +67,12 @@ class CellGrid extends h2d.Object {
 	public var cellWidth : Int;
 	public var cellHeight : Int;
 
-	public function new( width : Int, height : Int, ?cellWidth : Int = 0, ?cellHeight : Int = 0, ?parent : h2d.Object ) {
+	public var containmentEntity : Entity;
+
+	public function new( width : Int, height : Int, ?cellWidth : Int = 0, ?cellHeight : Int = 0, containmentEntity : Entity, ?parent : h2d.Object ) {
 		super(parent);
+
+		this.containmentEntity = containmentEntity;
 
 		this.width = width;
 		this.height = height;
@@ -80,7 +81,9 @@ class CellGrid extends h2d.Object {
 		this.cellHeight = cellHeight;
 
 		grid = [
-			for ( _ in 0...height ) [for ( _ in 0...width ) new InventoryCell(cellWidth, cellHeight, this)]
+			for ( _ in 0...height ) [
+				for ( _ in 0...width ) new InventoryCell(cellWidth, cellHeight, containmentEntity, this)
+			]
 		];
 	}
 
@@ -114,8 +117,10 @@ class CellGrid extends h2d.Object {
 	}
 
 	public function findSameItem( item : Item, ?ignoreFull : Bool = true ) : InventoryCell {
-        
-		for ( i in grid ) for ( j in i ) if ( j.item != null && !j.item.isDisposed && j.item.isSameTo(item)
+
+		for ( i in grid ) for ( j in i ) if ( j.item != null
+			&& !j.item.isDisposed
+			&& j.item.isSameTo(item)
 			&& (j.item.amount < Data.items.get(item.cdbEntry).stack.int() || !ignoreFull) ) return j;
 		return null;
 	}
@@ -123,7 +128,6 @@ class CellGrid extends h2d.Object {
 	public function giveItem( item : en.Item, containerEntity : Entity, ?ignoreFull : Bool = true, ?doStack : Bool = true ) : InventoryCell {
 		// Поиск Item в сетке, amount которого меньше или не равен stack из cdbEntry, и добавление к нему
 		var slot = findSameItem(item, ignoreFull);
-
 		var splitAndFill : Void -> InventoryCell = () -> {
 			do {
 				if ( slot.item == null || slot.item.isDisposed ) {

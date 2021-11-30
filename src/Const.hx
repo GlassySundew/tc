@@ -2,7 +2,6 @@ class Const {
 	public static var FPS = 60;
 	public static var AUTO_SCALE_TARGET_WID = -1; // -1 to disable auto-scaling on width
 	public static var AUTO_SCALE_TARGET_HEI = -1; // -1 to disable auto-scaling on height
-	public static var CAM_OFFSET = 240;
 	public static var SCALE = 2.0; // ignored if auto-scaling
 	public static var UI_SCALE = 2.0;
 	public static var GRID_WIDTH = 48;
@@ -33,4 +32,6 @@ class Const {
 	public static var LEVELS_PATH = "tiled/levels/";
 	public static var ATLAS_PATH = "tiled/atlas/";
 	public static var SAVEFILE_EXT = ".zhopa";
+
+	public static var jumpReach = 80;
 }

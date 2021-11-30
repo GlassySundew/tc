@@ -37,7 +37,7 @@ class FloatingItem extends Interactive {
 
 		super.init(x, z, tmxObj);
 
-		spr.setCenterRatio(0, 0);
+		setPivot(0, 0);
 		spr.tile.getTexture().filter = Nearest;
 
 		mesh.remove();
@@ -151,7 +151,7 @@ class FloatingItem extends Interactive {
 
 	override function postUpdate() {
 		super.postUpdate();
-		checkCollisions();
+		updateCollisions();
 		// polyMesh.material.texture.clear(0, 0);
 		// bmp.tile = spr.tile;
 		// bmp.drawTo(polyMesh.material.texture);
@@ -176,8 +176,8 @@ class FloatingItem extends Interactive {
 		}
 	}
 
-	override function checkCollisions() {
-		super.checkCollisions();
+	override function updateCollisions() {
+		super.updateCollisions();
 		checkCollsAgainstAll();
 	}
 

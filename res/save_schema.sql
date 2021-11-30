@@ -1,5 +1,5 @@
 --
--- Файл сгенерирован с помощью SQLiteStudio v3.3.2 в Mon Mar 22 21:03:57 2021
+-- Файл сгенерирован с помощью SQLiteStudio v3.3.3 в Mon Nov 15 22:45:58 2021
 --
 -- Использованная кодировка текста: UTF-8
 --
@@ -20,10 +20,16 @@ CREATE TABLE entities (
 );
 
 
+-- Таблица: game
+CREATE TABLE game (
+    blob BLOB
+);
+
+
 -- Таблица: rooms
 CREATE TABLE rooms (
     id   INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR,
+    name VARCHAR UNIQUE,
     tmx  TEXT
 );
 

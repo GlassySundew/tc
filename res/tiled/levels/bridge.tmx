@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-down" compressionlevel="0" width="50" height="50" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="55" nextobjectid="755">
+<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-down" compressionlevel="0" width="50" height="50" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#0f0f0f" nextlayerid="55" nextobjectid="768">
  <tileset firstgid="1" source="alpha.tsx"/>
  <tileset firstgid="151" source="entities.tsx"/>
  <layer id="33" name="ground" width="50" height="50" offsetx="0" offsety="4">
@@ -31,8 +31,8 @@
   <object id="697" x="432" y="480">
    <polygon points="0,0 0,48 -24,48 -24,0"/>
   </object>
-  <object id="698" x="408" y="504" width="168" height="24"/>
-  <object id="699" x="552" y="480" width="24" height="48"/>
+  <object id="698" x="432" y="504" width="120" height="24"/>
+  <object id="699" x="552" y="456" width="24" height="48"/>
   <object id="736" x="456" y="408">
    <polygon points="0,0 24.5,-36.5 10,-54 -19.5,-12.5"/>
   </object>
@@ -44,19 +44,16 @@
   </object>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="751" gid="165" x="529" y="409" width="60" height="50"/>
-  <object id="718" gid="166" x="489" y="399" width="104" height="44">
-   <properties>
-    <property name="interactable" type="bool" value="true"/>
-   </properties>
-  </object>
+  <object id="756" gid="164" x="582" y="490" width="114" height="134"/>
   <object id="733" gid="168" x="504" y="504" width="48" height="66">
    <properties>
     <property name="to" type="file" value="ship_pascal.tmx"/>
    </properties>
   </object>
-  <object id="735" gid="167" x="502.5" y="409.5" width="48" height="45"/>
-  <object id="752" gid="164" x="583" y="491" width="114" height="134"/>
   <object id="734" gid="153" x="503" y="457" width="48" height="48"/>
+  <object id="761" gid="165" x="528" y="408" width="48" height="48"/>
+  <object id="762" gid="166" x="504" y="408" width="144" height="60"/>
+  <object id="763" gid="167" x="504" y="408" width="48" height="48"/>
+  <object id="766" gid="170" x="456" y="504" width="48" height="48"/>
  </objectgroup>
 </map>

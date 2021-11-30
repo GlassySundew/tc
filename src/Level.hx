@@ -90,7 +90,7 @@ class Level extends dn.Process {
 						if ( ol.name == 'obstacles' ) {
 							switch( obj.objectType ) {
 								case OTPolygon(points):
-									var pts = checkPolyClockwise(points);
+									var pts = makePolyClockwise(points);
 									setWalkable(obj, pts);
 								case OTRectangle:
 									setWalkable(obj);
@@ -260,11 +260,11 @@ class Level extends dn.Process {
 		#end
 	}
 
-	public function setWalkable( poly : TmxObject, ?points : Array<Dynamic> ) { // setting obstacles as a differ polygon
+	public function setWalkable( poly : TmxObject, ?points : Array<TmxPoint> ) { // setting obstacles as a differ polygon
 		var vertices : Array<differ.math.Vector> = [];
 
 		if ( points != null ) {
-			checkPolyClockwise(points);
+			makePolyClockwise(points);
 			for ( i in points ) vertices.push(new differ.math.Vector(cartToIso(i.x, i.y).x, cartToIso(i.x, i.y).y));
 			walkable.push(new Polygon(cartToIsoLocal(poly.x, poly.y).x, cartToIsoLocal(poly.x, poly.y).y, vertices));
 		} else if ( poly.objectType == OTRectangle ) {

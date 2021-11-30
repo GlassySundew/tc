@@ -1,20 +1,15 @@
 package en;
 
-import ui.domkit.TextLabelComp;
 import ch2.ui.EventInteractive;
-import hxd.Res;
-import en.structures.Chest;
-import ui.InventoryGrid.InventoryCell;
-import hxd.Key;
-import ui.player.Inventory;
 import cherry.soup.EventSignal.EventSignal0;
-import en.items.Blueprint;
-import h2d.Scene;
-import h2d.RenderContext;
 import en.player.Player;
+import en.structures.Chest;
 import h2d.Bitmap;
 import h2d.Object;
-import h2d.Interactive;
+import h2d.RenderContext;
+import h2d.Scene;
+import hxd.Key;
+import ui.domkit.TextLabelComp;
 
 @:keep class Item extends Object {
 	public var ent : Entity;
@@ -80,13 +75,8 @@ import h2d.Interactive;
 		amountLabel.verticalAlign = Bottom;
 		amountLabel.scale(.5);
 
-		amountLabel.paddingLeft = 5;
-		amountLabel.paddingTop = 2;
-
-		// amountLabel.containerFlow.padding = 2;
-		amountLabel.containerFlow.paddingTop = -3;
-		// amountLabel.containerFlow.paddingBottom = 3;
-		// amountLabel.containerFlow.paddingLeft = 1;
+		amountLabel.containerFlow.paddingTop = -2;
+		amountLabel.containerFlow.paddingLeft = -1;
 
 		interactive = new EventInteractive(spr.tile.width, spr.tile.height, spr);
 		interactive.enableRightButton = true;
@@ -109,12 +99,12 @@ import h2d.Interactive;
 				var swapHold = () -> {
 					// swapping this item with the one player holds
 					Player.inst.ui.belt.deselectCells();
-					for ( i in Inventory.ALL ) i.invGrid.enableGrid();
+					for ( e in Entity.ALL ) if ( e.invGrid != null ) e.invGrid.enableGrid();
 
-					var swapItem = Game.inst.player.holdItem;
+					var swapItem = Player.inst.holdItem;
 					swapItem = (swapItem == this) ? null : swapItem;
 
-					for ( i in Inventory.ALL ) i.invGrid.findAndReplaceItem(this, swapItem);
+					for ( e in Entity.ALL ) if ( e.invGrid != null ) e.invGrid.findAndReplaceItem(this, swapItem);
 					Player.inst.holdItem = this;
 				}
 				// Быстрый перенос предмета через shift
@@ -142,23 +132,26 @@ import h2d.Interactive;
 								textLabel.dispose();
 								containerEntity = Player.inst;
 
-								for ( i in Inventory.ALL ) if ( i.invGrid != Player.inst.invGrid
-									&& i.invGrid.findAndReplaceItem(this) != null ) break;
+								for ( e in Entity.ALL ) if ( e.invGrid != null
+									&& e.invGrid != Player.inst.invGrid
+									&& e.invGrid.findAndReplaceItem(this) != null ) break;
 								Player.inst.invGrid.findAndReplaceItem(freeSlot.item, this);
 							}
 						} else if ( containerEntity.isOfType(Player) ) {
 							// Предмет был кликнут в инвентарной сетке игрока
 							var itemWasMoved = false;
 							var giveItemToFirstVisibleChest = () -> {
-								for ( i in Inventory.ALL ) {
-									if ( i.containmentEntity.isOfType(Chest) && i.win.visible && i.win.parent != null ) {
+								for ( e in Entity.ALL ) if ( e.invGrid != null ) {
+									if ( e.isOfType(Chest)
+										&& Std.downcast(e, Chest).inventory.win.visible
+										&& Std.downcast(e, Chest).inventory.win.parent != null ) {
 										// Перемещаем из игрока в тот сундук, с которым в прошлый раз взаимодействовали
-										var freeSlot = i.invGrid.getFreeSlot();
+										var freeSlot = e.invGrid.getFreeSlot();
 										if ( freeSlot != null ) {
-											containerEntity = i.containmentEntity;
+											containerEntity = e;
 											textLabel.dispose();
 											Player.inst.invGrid.findAndReplaceItem(this);
-											i.invGrid.findAndReplaceItem(freeSlot.item, this);
+											e.invGrid.findAndReplaceItem(freeSlot.item, this);
 											itemWasMoved = true;
 										}
 										return;
@@ -189,6 +182,7 @@ import h2d.Interactive;
 							cout++;
 						}
 					} else {
+						// item is clicked anywhere else but in belt
 						textLabel.dispose();
 						if ( Player.inst.holdItem != null && !Player.inst.holdItem.isDisposed && isSameTo(Player.inst.holdItem)
 							&& !Player.inst.holdItem.isInBelt() ) {
@@ -216,13 +210,14 @@ import h2d.Interactive;
 				if ( Player.inst.holdItem == null || (Player.inst.holdItem != null && Player.inst.holdItem.isInBelt()) ) {
 					Player.inst.ui.belt.deselectCells();
 					Player.inst.holdItem = Item.fromCdbEntry(cdbEntry, Math.ceil(amount - amount / 2));
+
 					amount = Std.int(amount / 2);
 				}
 			}
 		}
 		isDisposed = false;
 	}
-    
+
 	override function onRemove() {
 		super.onRemove();
 		// isDisposed = true;
@@ -239,15 +234,14 @@ import h2d.Interactive;
 		textLabel.remove();
 		amountLabel.remove();
 
-		for ( i in Inventory.ALL ) i.invGrid.findAndReplaceItem(this);
+		for ( e in Entity.ALL ) if ( e.invGrid != null ) e.invGrid.findAndReplaceItem(this);
 	}
 
 	override function sync( ctx : RenderContext ) {
 		if ( spr != null ) {
-			amountLabel.paddingLeft = 16 - amountLabel.innerWidth;
 			if ( textLabel != null ) {
-				textLabel.x = Boot.inst.s2d.mouseX + 20;
-				textLabel.y = Boot.inst.s2d.mouseY + 20;
+				textLabel.x = Boot.inst.s2d.mouseX + 30;
+				textLabel.y = Boot.inst.s2d.mouseY + 30;
 			}
 			interactive.width = spr.tile.width;
 			interactive.height = spr.tile.height;
@@ -255,12 +249,7 @@ import h2d.Interactive;
 			interactive.x = -spr.tile.width / 2;
 			interactive.y = -spr.tile.height / 2;
 
-			if ( isInCursor() ) {
-				visible = !Game.inst.isPaused();
-
-				x = Boot.inst.s2d.mouseX + 13 * scaleX;
-				y = Boot.inst.s2d.mouseY + 13 * scaleY;
-			}
+			amountLabel.x = 7 - amountLabel.containerFlow.innerWidth / 2;
 
 			if ( over ) {
 				if ( ca.yPressed() ) {

@@ -1,0 +1,3 @@
+# @install: lix --silent download "gh://github.com/snowkit/differ#a5f3bebaa3e4c2d492cb1529e88d612ab886d955" into differ/1.4.0/github/a5f3bebaa3e4c2d492cb1529e88d612ab886d955
+-cp ${HAXE_LIBCACHE}/differ/1.4.0/github/a5f3bebaa3e4c2d492cb1529e88d612ab886d955/
+-D differ=1.4.0

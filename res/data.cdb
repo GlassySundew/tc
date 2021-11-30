@@ -68,19 +68,11 @@
 				},
 				{
 					"id": "navigation_console",
-					"use_range": 100,
+					"use_range": 60,
 					"isoWidth": 0,
 					"isoHeight": 0,
 					"hp": -1,
 					"drop": []
-				},
-				{
-					"id": "bridge_wall",
-					"drop": [],
-					"hp": 0,
-					"isoWidth": 0,
-					"isoHeight": 0,
-					"use_range": 0
 				},
 				{
 					"id": "chest",
@@ -88,7 +80,7 @@
 					"hp": 0,
 					"isoWidth": 0.9,
 					"isoHeight": 0.6,
-					"use_range": 23
+					"use_range": 10
 				},
 				{
 					"id": "sleeping_pod",
@@ -104,7 +96,7 @@
 					"hp": 0,
 					"isoWidth": 0,
 					"isoHeight": 0,
-					"use_range": 20
+					"use_range": 7
 				},
 				{
 					"id": "emerald",
@@ -385,55 +377,6 @@
 							"amount": 3
 						}
 					]
-				},
-				{
-					"id": "",
-					"name": "",
-					"item_icon": "iron",
-					"ingreds": [],
-					"result": []
-				},
-				{
-					"id": "",
-					"name": "",
-					"item_icon": "iron",
-					"ingreds": [],
-					"result": []
-				},
-				{
-					"id": "",
-					"name": "",
-					"item_icon": "iron",
-					"ingreds": [],
-					"result": []
-				},
-				{
-					"id": "",
-					"name": "",
-					"item_icon": "iron",
-					"ingreds": [],
-					"result": []
-				},
-				{
-					"id": "",
-					"name": "",
-					"item_icon": "iron",
-					"ingreds": [],
-					"result": []
-				},
-				{
-					"id": "",
-					"name": "",
-					"item_icon": "iron",
-					"ingreds": [],
-					"result": []
-				},
-				{
-					"id": "",
-					"name": "",
-					"item_icon": "iron",
-					"ingreds": [],
-					"result": []
 				}
 			],
 			"separators": [],
@@ -449,46 +392,27 @@
 					"scope": null
 				},
 				{
-					"typeStr": "14",
-					"name": "img"
+					"typeStr": "1",
+					"name": "atlas_name",
+					"kind": null
 				}
 			],
 			"lines": [
 				{
 					"id": "asteroid0",
-					"img": {
-						"file": "tiled/atlas/ui.png",
-						"size": 32,
-						"x": 10,
-						"y": 0
-					}
+					"atlas_name": "asteroid0"
 				},
 				{
 					"id": "asteroid1",
-					"img": {
-						"file": "tiled/atlas/ui.png",
-						"size": 32,
-						"x": 5,
-						"y": 0
-					}
+					"atlas_name": "asteroid1"
 				},
 				{
 					"id": "asteroid2",
-					"img": {
-						"file": "tiled/atlas/ui.png",
-						"size": 32,
-						"x": 15,
-						"y": 0
-					}
+					"atlas_name": "asteroid2"
 				},
 				{
 					"id": "asteroid3",
-					"img": {
-						"file": "tiled/atlas/ui.png",
-						"size": 32,
-						"x": 20,
-						"y": 0
-					}
+					"atlas_name": "asteroid3"
 				}
 			],
 			"separators": [],

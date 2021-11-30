@@ -1,19 +1,19 @@
 -cp src
 -cp .
--cp vendor/differ/src
 -cp vendor/format-tiled/
 
+-lib differ
 -lib hide
 -lib domkit
 -lib heaps
 -lib Heeps
 -lib castle
 -lib hxbit
-# -lib msignal
 -lib deepnightLibs
 -lib compiletime
 -lib oauth
 -lib random
+-lib seedyrng
 -lib haxe-concurrent
 
 -D heaps_enable_hl_mp3

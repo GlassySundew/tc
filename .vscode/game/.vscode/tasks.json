@@ -83,16 +83,18 @@
       ]
     },
     {
-      "type": "hxml",
-      "file": "hl.debug copy.hxml",
-      "problemMatcher": [
-        "$haxe-absolute",
-        "$haxe",
-        "$haxe-error",
-        "$haxe-trace"
-      ],
-      "group": "build",
-      "label": "haxe: hl.debug copy.hxml"
+      "type": "shell",
+      "label": "run hl",
+      "command": "cd ../../ && hl bin/game.hl",
+      "dependsOn": "kill hl",
+      "runOptions": {
+        "instanceLimit": 2
+      }
+    },
+    {
+      "type": "shell",
+      "label": "kill hl",
+      "command": "killall -9 hl || :"
     }
   ]
 }

@@ -1,5 +1,6 @@
 package mapgen;
 
+import hxd.Res;
 import format.tmx.Data;
 import haxe.Serializer;
 import haxe.Unserializer;
@@ -40,13 +41,12 @@ class AutoMap {
 	var ruleMaps : Array<TmxMap>;
 	/** Generates autotile rules from rules.tmx **/
 	public function new( rulePath : String ) {
-		var ruleFiles : String = sys.io.File.getContent(rulePath);
-
+		var ruleFiles : String = Res.loader.load(rulePath).entry.getText();
 		ruleMaps = [];
 
 		for ( i in ruleFiles.split('\n') ) {
 			if ( i != "" && !StringTools.startsWith(i, "//") && !StringTools.startsWith(i, "#") ) {
-				ruleMaps.push(resolveMap(StringTools.replace(i, "./", "")));
+				ruleMaps.push(MapCache.inst.get(StringTools.replace(i, "./", "")));
 			}
 		}
 
@@ -138,8 +138,8 @@ class AutoMap {
 		var appliedTiles : Array<{x : Int, y : Int }> = [];
 
 		function applyRuleToLayer( rule : { regions_input : CoordinatedIsland, regions_output : CoordinatedIsland },
-				outputs : Map<String, Array<TmxGeneratable>>, layerTile0x : Int, layerTile0y : Int,
-				props : { deleteTiles : Bool, noOverlappingRules : Bool } ) {
+			outputs : Map<String, Array<TmxGeneratable>>, layerTile0x : Int, layerTile0y : Int,
+			props : { deleteTiles : Bool, noOverlappingRules : Bool } ) {
 
 			function createLayerIfNotExistsByName( name : String, type : TmxGeneratable ) {
 				var layerByName = map.getLayersByName(name)[0];
@@ -265,7 +265,7 @@ class AutoMap {
 		}
 
 		function isOverlapping( rule : { regions_input : CoordinatedIsland, regions_output : CoordinatedIsland },
-				outputs : Map<String, Array<TmxGeneratable>>, layerTile0x : Int, layerTile0y : Int ) : Bool {
+			outputs : Map<String, Array<TmxGeneratable>>, layerTile0x : Int, layerTile0y : Int ) : Bool {
 
 			for ( output in outputs ) {
 				if ( output.length > 0 ) {
@@ -286,8 +286,7 @@ class AutoMap {
 								var y = (tile.y - rule0y + layerTile0y + rule.regions_output[0].y - rule.regions_input[0].y);
 
 								if ( tile.tile.gid != 0 && Lambda.exists(appliedTiles, tile -> {
-									tile.x == x
-									&& tile.y == y;
+									return tile.x == x && tile.y == y;
 								}) ) return true;
 							default:
 						}
@@ -391,7 +390,7 @@ class AutoMap {
 	}
 	/** raw rule layers are put in here **/
 	function compileRules( regions_input : ExtractedLayer, regions_output : ExtractedLayer, inputs : Map<String, TmxExtracted>,
-			outputs : Map<String, TmxExtracted>, ruleMap : TmxMap ) {
+		outputs : Map<String, TmxExtracted>, ruleMap : TmxMap ) {
 		var passedTiles : Array<String> = [];
 		function checkTile( i : Int, j : Int, array : ExtractedLayer ) : CoordinatedTile {
 			return try {
@@ -485,7 +484,7 @@ class AutoMap {
 		}
 
 		function generateRules( regions_input : Array<CoordinatedIsland>, regions_output : Array<CoordinatedIsland>, inputs : Map<String, TmxCoordinated>,
-				outputs : Map<String, TmxCoordinated> ) {
+			outputs : Map<String, TmxCoordinated> ) {
 
 			var localRules : Rules = [];
 
@@ -503,10 +502,12 @@ class AutoMap {
 			function fillLayerWith( object : TmxCoordinated, regionTile : CoordinatedTile, whereTo : Map<String, Array<TmxGeneratable>>, layerName : String ) {
 				// random check
 				var randomMatched = false;
-				if ( eregAutoMapRandomLayer.match(layerName) ) {
+				/** regex to match automapping random rules **/
+				var eregRandom = ~/(?:output|input)([0-9]+)_([a-z]+)$/gi;
+				if ( eregRandom.match(layerName) ) {
 					randomMatched = true;
-					layerName = StringTools.replace(layerName, eregAutoMapRandomLayer.matched(1), "");
-					layerName += "%random%" + eregAutoMapRandomLayer.matched(1);
+					layerName = StringTools.replace(layerName, eregRandom.matched(1), "");
+					layerName += "%random%" + eregRandom.matched(1);
 				}
 
 				var notIsMatched = false;
@@ -546,7 +547,7 @@ class AutoMap {
 							if ( tile != null && tile.tile.gid != 0 ) return false;
 						case ObjectGeneratable(object):
 							if ( object != null ) return false;
-						case Random(tmxGen) :
+						case Random(tmxGen):
 							switch tmxGen {
 								case TileGeneratable(tile):
 									if ( tile != null && tile.tile.gid != 0 ) return false;

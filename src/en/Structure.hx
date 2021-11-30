@@ -1,25 +1,26 @@
 package en;
 
+import hxd.Key;
 import Level.StructTile;
-import hxbit.Serializer;
-import ui.InventoryGrid.CellGrid;
-import format.tmx.Data.TmxLayer;
 import format.tmx.Data.TmxObject;
 import h2d.Bitmap;
 import h3d.mat.Texture;
+import hxbit.Serializer;
 import hxd.Res;
-import format.tmx.*;
 
 class Structure extends Interactive {
-	@:s public var cdbEntry : StructuresKind = null;
+	@:s public var cdbEntry : StructuresKind;
 	public var toBeCollidedAgainst = true;
 
-	public function new(x : Float, y : Float, ?tmxObject : TmxObject, ?cdbEntry : StructuresKind) {
+	public function new( x : Float, y : Float, ?tmxObject : TmxObject, ?cdbEntry : StructuresKind ) {
 		this.cdbEntry = cdbEntry;
 		super(x, y, tmxObject);
 	}
+	/**
+		all serializable variables access in init(), unfortunately, have to be wrapped around a delayer because all serializble vars are synced later on 
+	**/
+	public override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
 
-	public override function init(?x : Float, ?z : Float, ?tmxObj : TmxObject) {
 		// CDB parsed entry corresponding to this structure instance class name
 		if ( cdbEntry == null ) try {
 			eregClass.match('$this'.toLowerCase());
@@ -27,10 +28,6 @@ class Structure extends Interactive {
 		}
 		catch( Dynamic ) {}
 
-		/**
-			Initializing spr and making it static sprite from structures atlas as a
-			class name if not initialized in custom structure class file
-		**/
 		if ( spr == null ) {
 			spr = new HSprite(Assets.structures, entParent);
 			eregClass.match('$this'.toLowerCase());
@@ -39,6 +36,9 @@ class Structure extends Interactive {
 			}
 			catch( e:Dynamic ) {}
 		}
+
+		// Initializing spr and making it static sprite from structures atlas as a
+		// class name if not initialized in custom structure class file
 
 		if ( cdbEntry == null ) try {
 			cdbEntry = Data.structures.resolve(spr.groupName).id;
@@ -52,8 +52,8 @@ class Structure extends Interactive {
 		interact.onPushEvent.add(event -> {
 			if ( Game.inst.player.holdItem != null ) applyItem(Game.inst.player.holdItem);
 		});
-		interact.onOverEvent.add((_) -> activateInteractive());
-		interact.onOutEvent.add((e : hxd.Event) -> {
+		interact.onOverEvent.add(( _ ) -> activateInteractive());
+		interact.onOutEvent.add(( e : hxd.Event ) -> {
 			turnOffHighlight();
 		});
 		#end
@@ -75,26 +75,23 @@ class Structure extends Interactive {
 			}
 			#end
 		}
+
+		interact.onTextInputEvent.add(( e ) -> {
+			
+			if ( Key.isPressed(Key.R) ) {
+				flipX();
+			}
+		});
 	}
 
 	public function offsetFootByTile() {
 		footY += (StructTile.polyPrim != null ? StructTile.polyPrim.getBounds().zSize / 2 - Level.inst.data.tileHeight : 0);
 	}
 
-	@:keep
-	override function customSerialize(ctx : Serializer) {
-		super.customSerialize(ctx);
-	}
-
-	@:keep
-	override function customUnserialize(ctx : Serializer) {
-		super.customUnserialize(ctx);
-	}
-
-	function dropAllItems(?angle : Float, ?power : Float) {
+	function dropAllItems( ?angle : Float, ?power : Float ) {
 		if ( invGrid != null ) {
-			for (i in invGrid.grid) {
-				for (j in i) {
+			for ( i in invGrid.grid ) {
+				for ( j in i ) {
 					if ( j.item != null ) {
 						j.item = dropItem(j.item, angle == null ? Math.random() * M.toRad(360) : angle,
 							power == null ? Math.random() * .03 * 48 + .01 : power);
@@ -104,25 +101,26 @@ class Structure extends Interactive {
 		}
 	}
 
-	public function applyItem(item : Item) {
-		emitDestroyItem(item);
-		if ( Data.items.get(item.cdbEntry).can_hit ) {
-			// Damaging the structure
-			if ( health > Data.items.get(item.cdbEntry).damage ) {
-				health -= Data.items.get(item.cdbEntry).damage;
-			} else {
-				if ( cdbEntry != null ) {
-					for (i in Data.structures.get(cdbEntry).drop) inline dropItem(Item.fromCdbEntry(i.item.id, i.amount));
-					dropAllItems();
-				}
-				dispose();
-			}
-		} else {
-			item.onStructureUse.dispatch();
-		}
+	public function applyItem( item : Item ) {
+		// this should not exist
+		// if ( Data.items.get(item.cdbEntry).can_hit ) {
+		// 	emitDestroyItem(item);
+		// 	// Damaging the structure
+		// 	if ( health > Data.items.get(item.cdbEntry).damage ) {
+		// 		health -= Data.items.get(item.cdbEntry).damage;
+		// 	} else {
+		// 		if ( cdbEntry != null ) {
+		// 			for ( i in Data.structures.get(cdbEntry).drop ) inline dropItem(Item.fromCdbEntry(i.item.id, i.amount));
+		// 			dropAllItems();
+		// 		}
+		// 		dispose();
+		// 	}
+		// } else {
+		// 	item.onStructureUse.dispatch();
+		// }
 	}
 
-	public function emitDestroyItem(item : Item) {
+	public function emitDestroyItem( item : Item ) {
 		var hitPart = Res.hit_ico.toGpuParticlesClamped(mesh);
 		hitPart.z = 15;
 
@@ -151,15 +149,10 @@ class Structure extends Interactive {
 		};
 	}
 
-	function initInv(gridConf : TmxObject) {
-		if ( invGrid == null ) invGrid = new CellGrid(gridConf.properties.getInt("width"), gridConf.properties.getInt("height"),
-			gridConf.properties.getInt("tileWidth"), gridConf.properties.getInt("tileHeight"));
-	}
-
-	public static function fromCdbEntry(x : Int, y : Int, cdbEntry : StructuresKind, ?amount : Int = 1) : Structure {
+	public static function fromCdbEntry( x : Int, y : Int, cdbEntry : StructuresKind, ?amount : Int = 1 ) : Structure {
 		var structure : Structure = null;
 		var entClasses = (CompileTime.getAllClasses(Structure));
-		for (e in entClasses) {
+		for ( e in entClasses ) {
 			if ( eregCompTimeClass.match('$e'.toLowerCase())
 				&& eregCompTimeClass.matched(1) == Data.structures.get(cdbEntry).id.toString() ) {
 				structure = Type.createInstance(e, [x, y, null, cdbEntry]);

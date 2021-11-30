@@ -1,8 +1,8 @@
 
 items.png
-size: 80, 32
+size: 80,32
 format: RGBA8888
-filter: Nearest, Nearest
+filter: Nearest,Nearest
 repeat: none
 door
   rotate: false

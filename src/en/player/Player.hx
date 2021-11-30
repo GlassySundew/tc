@@ -1,18 +1,20 @@
 package en.player;
 
-import hxbit.Serializer;
+import haxe.CallStack;
+import tools.Save;
+import seedyrng.Random;
+import ui.Navigation;
 import ch3.scene.TileSprite;
 import en.items.Blueprint;
 import format.tmx.Data.TmxObject;
 import h2d.Tile;
 import h3d.mat.Texture;
 import hxbit.NetworkSerializable;
+import hxbit.Serializer;
 import hxd.Key;
-import ui.InventoryGrid.CellGrid;
+import ui.Navigation.NavigationTarget;
 import ui.PauseMenu;
 import ui.domkit.TextLabelComp;
-import ui.Window;
-import ui.player.Inventory;
 import ui.player.PlayerUI;
 
 class Player extends Entity {
@@ -26,19 +28,36 @@ class Player extends Entity {
 	public var ui : PlayerUI;
 
 	public var ca : dn.heaps.Controller.ControllerAccess;
-	public var itemsManager : dn.heaps.Controller.ControllerAccess;
+	public var belt : dn.heaps.Controller.ControllerAccess;
 
 	public var holdItem(default, set) : en.Item;
+
+	// celestial
+	// generated name of the asteroid
+	@:s public var residesOnId(default, set) : String;
+	@:s public var travelling : Bool;
+
+	function set_residesOnId( v : String ) {
+		return residesOnId = v;
+	}
 
 	inline function set_holdItem( v : en.Item ) {
 		if ( holdItem != null ) holdItem.onPlayerRemove.dispatch();
 		if ( v == null ) {
-			for ( i in Inventory.ALL ) i.invGrid.disableGrid();
+			if ( holdItem != null ) {
+				Cursors.removeObjectFromCursor(holdItem);
+				holdItem.visible = true;
+			}
+			for ( e in Entity.ALL ) if ( e.invGrid != null ) e.invGrid.disableGrid();
 		}
 		if ( v != null && !v.isInBelt() ) {
+			v.x = 13;
+			v.y = 13;
+			Cursors.passObjectForCursor(v);
+			v.visible = false;
 			v.onPlayerHold.dispatch();
+			v.containerEntity = this;
 			Boot.inst.s2d.addChild(v);
-			v.scaleX = v.scaleY = 2;
 		}
 		return holdItem = v;
 	}
@@ -47,18 +66,26 @@ class Player extends Entity {
 		this.nickname = nickname;
 		this.uid = uid;
 		inst = this;
+		travelling = false;
 
 		super(x, z, tmxObj);
+
+		// new game here, thus setting player to a random asteroid in 0, 0 asteroid chunk, idk what to make it in multiplayer
+		if ( Navigation.inst.fields.length > 0 ) {
+			var r = new Random();
+			r.setStringSeed(Game.inst.seed);
+			residesOnId = r.choice(Navigation.inst.fields[0].targets).id;
+		}
 	}
 
 	override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
 		spr = new HSprite(Assets.player, entParent);
 		#if !headless
 		ca = Main.inst.controller.createAccess("player");
-		itemsManager = Main.inst.controller.createAccess("playerItemsManager");
+		belt = Main.inst.controller.createAccess("belt");
 		#end
 
-		var direcs = [
+		for ( i => dir in [
 			{ dir : "right", prio : 0 },
 			{ dir : "up_right", prio : 1 },
 			{ dir : "up", prio : 0 },
@@ -67,10 +94,9 @@ class Player extends Entity {
 			{ dir : "down_left", prio : 1 },
 			{ dir : "down", prio : 0 },
 			{ dir : "down_right", prio : 1 }
-		];
-		for ( i in 0...8 ) {
-			spr.anim.registerStateAnim("walk_" + direcs[i].dir, direcs[i].prio, (1 / 60 / 0.16), function () return isMoving() && dir == i);
-			spr.anim.registerStateAnim("idle_" + direcs[i].dir, direcs[i].prio, (1 / 60 / 0.16), function () return !isMoving() && dir == i);
+		] ) {
+			spr.anim.registerStateAnim("walk_" + dir.dir, dir.prio, (1 / 60 / 0.16), function () return isMoving() && this.dir == i);
+			spr.anim.registerStateAnim("idle_" + dir.dir, dir.prio, (1 / 60 / 0.16), function () return !isMoving() && this.dir == i);
 		}
 		super.init(x, z, tmxObj);
 
@@ -79,21 +105,42 @@ class Player extends Entity {
 
 		if ( inst == this ) ui = new PlayerUI(Game.inst.root);
 
-		mesh.isLong = true;
-		mesh.isoWidth = mesh.isoHeight = 0.1;
-
 		#if depth_debug
 		mesh.renewDebugPts();
 		#end
 		#end
 
-		// Костыльный фикс ебаного бага с бампом игрока при старте уровня
+		// Костыльный фикс бага с бампом игрока при старте уровня
 		lock(30);
-		// inventory.invGrid.giveItem();
 
 		#if headless
 		enableReplication = true;
 		#end
+
+		Game.inst.delayer.addF(() -> {
+			checkTeleport(false);
+		}, 4);
+	}
+	/** 
+		shows teleport button if the map is already generated or add callback to show butotn
+		@param acceptTmxPlayerCoord if true, then player's position will be set as the player objct in tmx entities layer, false is regular
+	**/
+	public function checkTeleport( acceptTmxPlayerCoord : Bool = false ) {
+
+		// search for a target to put a link to in a teleport button
+		var target = Navigation.inst.getTargetById(residesOnId);
+
+		if ( target != null &&
+			target.generator != null &&
+			target.generator.mapIsGenerating ) {
+			target.generator.onGeneration.add(() -> {
+				ui.prepareTeleportDown(target.bodyLevelName, acceptTmxPlayerCoord);
+			});
+		} else if ( target != null &&
+			target.generator != null ) {
+
+			ui.prepareTeleportDown(target.bodyLevelName, acceptTmxPlayerCoord);
+		}
 	}
 
 	/* записывает настройки  */
@@ -102,8 +149,14 @@ class Player extends Entity {
 			if ( Player.inst.ui.inventory != null ) {
 				Settings.params.inventoryCoordRatio.x = Player.inst.ui.inventory.win.x / Main.inst.w();
 				Settings.params.inventoryCoordRatio.y = Player.inst.ui.inventory.win.y / Main.inst.h();
+				Settings.params.inventoryVisible = ui.inventory.win.visible;
 			}
-			Settings.params.inventoryVisible = ui.inventory.win.visible;
+
+			if ( Player.inst.ui.craft != null ) {
+				Settings.params.playerCrafting.x = Player.inst.ui.craft.win.x / Main.inst.w();
+				Settings.params.playerCrafting.y = Player.inst.ui.craft.win.y / Main.inst.h();
+				Settings.params.playerCraftingVisible = ui.craft.win.visible;
+			}
 		}
 	}
 
@@ -176,7 +229,7 @@ class Player extends Entity {
 		initNickname();
 		syncFrames();
 	}
-
+	/**generate nickname text mesh**/
 	public function initNickname() {
 		var nicknameLabel = new TextLabelComp(nickname, Assets.fontPixel);
 		var nicknameTex = new Texture(nicknameLabel.innerWidth, nicknameLabel.innerHeight + 10, [Target]);
@@ -206,12 +259,16 @@ class Player extends Entity {
 			saveSettings();
 			inst = null;
 		}
-		ui.remove();
+		ui.destroy();
 		ui = null;
+
 		if ( nicknameMesh != null ) {
 			nicknameMesh.remove();
 			nicknameMesh = null;
 		}
+		ca.dispose();
+		belt.dispose();
+
 		holdItem.remove();
 		holdItem = null;
 		#end
@@ -277,10 +334,14 @@ class Player extends Entity {
 		#end
 	}
 
-	override function checkCollisions() {
-		super.checkCollisions();
+	override function updateCollisions() {
+		super.updateCollisions();
 		if ( !isLocked() ) checkCollsAgainstAll();
 	}
+
+	public function lockBelt() belt.lock();
+
+	public function unlockBelt() belt.unlock();
 
 	function checkBeltInputs() {
 		if ( ca.isPressed(LT) ) {
@@ -299,8 +360,8 @@ class Player extends Entity {
 
 		// Wheel scroll item selection
 		var cellToSelect = ui.belt.selectedCellNumber;
-		if ( ca.isKeyboardPressed(Key.MOUSE_WHEEL_DOWN) ) cellToSelect++;
-		if ( ca.isKeyboardPressed(Key.MOUSE_WHEEL_UP) ) cellToSelect--;
+		if ( belt.isKeyboardPressed(Key.MOUSE_WHEEL_DOWN) ) cellToSelect++;
+		if ( belt.isKeyboardPressed(Key.MOUSE_WHEEL_UP) ) cellToSelect--;
 		if ( cellToSelect != ui.belt.selectedCellNumber ) {
 			if ( cellToSelect < 1 ) cellToSelect = ui.belt.beltSlots.length;
 			if ( cellToSelect > ui.belt.beltSlots.length ) cellToSelect = 1;

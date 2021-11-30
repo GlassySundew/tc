@@ -17,6 +17,7 @@ using tools.Util.ReverseArrayKeyValueIterator;
 using tools.Util.SocketHostExtender;
 using tools.Util.TmxLayerExtender;
 using tools.Util.TmxMapExtender;
+using tools.Util.SeedyRandomExtender;
 
 #if !macro
 import Data;

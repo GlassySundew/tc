@@ -13,6 +13,7 @@ class GpuParticleClamped extends GpuParticle {
 				var clampedTime = clamp(totTime, 0, stopAt) % (props.life * loopCounter);
 				transformedPosition = relativePosition + (input.normal * (1 + speedIncr * clampedTime)) * clampedTime + offset;
 			}
+			
 			normT = t / props.life;
 			randProp = -props.time / props.life;
 			if ( clipBounds ) transformedPosition = (transformedPosition - volumeMin) % volumeSize + volumeMin;

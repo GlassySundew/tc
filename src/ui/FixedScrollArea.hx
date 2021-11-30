@@ -7,8 +7,8 @@ import h2d.col.Bounds;
 import ch2.ui.ScrollArea;
 
 class FixedScrollArea extends ScrollArea {
-	var fillWidth : Bool;
-	var fillHeight : Bool;
+	public var fillWidth : Bool;
+	public var fillHeight : Bool;
 
 	public function new( width : Int, height : Int, scrollStep : Int = 16, ?fillWidth = false, ?fillHeight = false, ?bounds : Bounds, ?parent : Object ) {
 		super(width, height, scrollStep, bounds, parent);
@@ -19,8 +19,8 @@ class FixedScrollArea extends ScrollArea {
 	override function sync( ctx : RenderContext ) {
 		super.sync(ctx);
 		try {
-			if ( fillHeight ) height = cast(parent, Flow).outerHeight;
-			if ( fillWidth ) width = cast(parent, Flow).outerWidth;
+			if ( fillHeight ) height = Std.int(cast(parent, Flow).innerHeight);
+			if ( fillWidth ) width = Std.int(cast(parent, Flow).innerWidth);
 		} catch( e ) {}
 	}
 

@@ -24,10 +24,10 @@
     {
       "text": "Run HL",
       "color": "orange",
-      "command": "cd ../../ && hl bin/game.hl",
+      "command": "workbench.action.tasks.runTask|run hl",
+      "commandType": "palette",
       "alignment": "right",
-      "skipErrorMessage": true,
-      "skipTerminateQuickPick": true,
+      "skipTerminateQuickPick": false,
       "priority": -11
     },
 

@@ -1,0 +1,3 @@
+# @install: lix --silent download "gh://github.com/chfoo/seedyrng#47357d37cc2db295ebd7d6e041b9cb326de9606d" into seedyrng/1.1.0/github/47357d37cc2db295ebd7d6e041b9cb326de9606d
+-cp ${HAXE_LIBCACHE}/seedyrng/1.1.0/github/47357d37cc2db295ebd7d6e041b9cb326de9606d/src/
+-D seedyrng=1.1.0

@@ -159,36 +159,29 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 			p.depth = z / w;
 		}
 
-		// if ( frontToBack ) passes.sort(function(p1, p2) return p1.index == p2.index ? (p1.depth > p2.depth ? 1 : -1) : p1.index
-		// 	- p2.index); else {
 		passes.sort(function ( p1, p2 ) {
-			// trace(p1.pass.layer, p2.pass.layer);
 			return try {
 				getFrontPassIso(p1, p2);
 			}
 			catch( e:Dynamic ) {
 				(p1.depth > p2.depth ? -1 : 1);
-				// p1.pass.layer == p2.pass.layer ? (p1.depth > p2.depth ? -1 : 1) : p1.pass.layer - p2.pass.layer;
 			};
 		});
-		// }
 	}
 
 	function getFrontPassIso( p1 : PassObject, p2 : PassObject ) : Int {
 		var a = cast(p1.obj, IsoTileSpr).getIsoBounds();
 		var b = cast(p2.obj, IsoTileSpr).getIsoBounds();
-		return // Я еблан
-			if ( b.zMax - b.zMin == 0 && a.zMax - a.zMin == 0 ) // check if player
-			{
-				p1.obj.z > p2.obj.z ? -1 : 1;
-				// - comparePointAndLine({x : p1.obj.x, y : 0, z : p1.obj.z}, {pt1 : {x : b.xMin, y : 0, z : b.zMin}, pt2 : {x : b.xMax, y : 0, z : b.zMax}});
-			} else if ( b.xMax - b.xMin == 0 || b.zMax - b.zMin == 0 ) { // also check if
-				- comparePointAndLine({ x : p2.obj.x, y : 0, z : p2.obj.z },
-					{ pt1 : { x : a.xMin, y : 0, z : a.zMin }, pt2 : { x : a.xMax, y : 0, z : a.zMax } });
-			} else {
-				-(compareLineAndLine({ pt1 : { x : b.xMin, y : 0, z : b.zMin }, pt2 : { x : b.xMax, y : 0, z : b.zMax } },
-					{ pt1 : { x : a.xMin, y : 0, z : a.zMin }, pt2 : { x : a.xMax, y : 0, z : a.zMax } }));
-			}
+		return if ( b.zMax - b.zMin == 0 && a.zMax - a.zMin == 0 ) // point to point
+		{
+			p1.obj.z > p2.obj.z ? -1 : 1;
+			// - comparePointAndLine({x : p1.obj.x, y : 0, z : p1.obj.z}, {pt1 : {x : b.xMin, y : 0, z : b.zMin}, pt2 : {x : b.xMax, y : 0, z : b.zMax}});
+		} else if ( b.xMax - b.xMin == 0 || b.zMax - b.zMin == 0 ) { // point to long iso obj
+			- comparePointAndLine({ x : p2.obj.x, y : 0, z : p2.obj.z }, { pt1 : { x : a.xMin, y : 0, z : a.zMin }, pt2 : { x : a.xMax, y : 0, z : a.zMax } });
+		} else {
+			-(compareLineAndLine({ pt1 : { x : b.xMin, y : 0, z : b.zMin }, pt2 : { x : b.xMax, y : 0, z : b.zMax } },
+				{ pt1 : { x : a.xMin, y : 0, z : a.zMin }, pt2 : { x : a.xMax, y : 0, z : a.zMax } }));
+		}
 	}
 
 	function comparePointAndLine( pt : Point, line : Line ) : Int {

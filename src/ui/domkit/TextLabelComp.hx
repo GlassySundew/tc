@@ -1,5 +1,7 @@
 package ui.domkit;
 
+import hxd.Res;
+import h2d.filter.Shader;
 import h2d.filter.Outline;
 import h2d.col.Bounds;
 import h2d.Tile;
@@ -55,8 +57,11 @@ class TextLabelComp extends h2d.Flow implements h2d.domkit.Object {
 		this.font = font;
 		label = text;
 		
+		ShadowedText.addTextOutlineTo(labelTxt);
+
 		var style = new h2d.domkit.Style();
 		style.load(hxd.Res.domkit.textlabel);
+
 		style.addObject(textLabel);
 		
 		outline = new Outline(1);
@@ -66,8 +71,8 @@ class TextLabelComp extends h2d.Flow implements h2d.domkit.Object {
 	}
 	
 override function sync(ctx:RenderContext) {
-	backgroundHolder.minWidth = containerFlow.innerWidth;
-	backgroundHolder.minHeight = containerFlow.innerHeight;
+	backgroundHolder.minWidth = containerFlow.outerWidth;
+	backgroundHolder.minHeight = containerFlow.outerHeight;
 
 	backgroundHolder.x = containerFlow.x;
 	backgroundHolder.y = containerFlow.y;

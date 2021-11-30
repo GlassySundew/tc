@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.5" tiledversion="1.7.2" name="ui" tilewidth="114" tileheight="124" tilecount="8" columns="0" objectalignment="bottom">
+<tileset version="1.5" tiledversion="1.7.2" name="ui" tilewidth="32" tileheight="33" tilecount="8" columns="0" objectalignment="bottom">
  <tileoffset x="1" y="1"/>
  <grid orientation="isometric" width="1" height="1"/>
- <tile id="1">
-  <image width="114" height="124" source="separated/ui/inventory.png"/>
- </tile>
  <tile id="2">
   <image width="4" height="10" source="separated/ui/caret0.png"/>
  </tile>
@@ -25,5 +22,8 @@
  </tile>
  <tile id="12">
   <image width="6" height="18" source="../separated/ui/scrollbar_background_9slice.png"/>
+ </tile>
+ <tile id="13">
+  <image width="12" height="12" source="../separated/ui/navigation_win.png"/>
  </tile>
 </tileset>

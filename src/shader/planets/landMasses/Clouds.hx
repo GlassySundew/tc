@@ -14,7 +14,7 @@ class Clouds extends Shader {
 			position : Vec4,
 			color : Vec4,
 		};
-
+        
 		@global var time : Float;
 
 		@param var pixels : Float;

@@ -61,12 +61,12 @@ class GameServer extends Process implements IGame {
 		// startLevel(lvlName);
 	}
 
-	public function startLevel(name : String) {
+	public function startLevel( name : String ) {
 		engine.clear(0, 1);
 		execAfterLvlLoad = new EventSignal0();
 		if ( level != null ) {
 			level.destroy();
-			for (e in Entity.ALL) e.destroy();
+			for ( e in Entity.ALL ) e.destroy();
 			gc();
 		}
 		tmxMap = resolveMap(name);
@@ -80,7 +80,7 @@ class GameServer extends Process implements IGame {
 		var entClasses = (CompileTime.getAllClasses(Entity));
 
 		// Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity and puts name into spr group if not found
-		function searchAndSpawnEnt(e : TmxObject) {
+		function searchAndSpawnEnt( e : TmxObject ) {
 			var isoX = 0., isoY = 0.;
 			if ( tmxMap.orientation == Isometric ) {
 				// все объекты в распаршенных слоях уже с конвертированными координатами
@@ -90,7 +90,7 @@ class GameServer extends Process implements IGame {
 			}
 
 			// Парсим все классы - наследники en.Entity и спавним их
-			for (eClass in entClasses) {
+			for ( eClass in entClasses ) {
 				eregCompTimeClass.match('$eClass'.toLowerCase());
 				if ( e.name == "player" ) {
 					tmxMap.properties.setFloat("playerX", isoX);
@@ -111,35 +111,35 @@ class GameServer extends Process implements IGame {
 				default:
 			}
 		}
-		for (e in level.entities) searchAndSpawnEnt(e);
+		for ( e in level.entities ) searchAndSpawnEnt(e);
 
 		applyTmxObjOnEnt();
 
 		// player = Player.inst;
 
 		// rect-obj position fix
-		for (en in Entity.ALL) if ( en.tmxObj != null ) en.footY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
+		for ( en in Entity.ALL ) if ( en.tmxObj != null ) en.footY -= en.tmxObj.objectType == OTRectangle ? Const.GRID_HEIGHT : 0;
 
 		// new AxesHelper(Boot.inst.s3d);
 		// new GridHelper(Boot.inst.s3d, 10, 10);
 	}
 
-	public function applyTmxObjOnEnt(?ent : Null<Entity>) {
+	public function applyTmxObjOnEnt( ?ent : Null<Entity> ) {
 		// если ent не определён, то на все Entity из массива ALL будут добавлены TmxObject из тайлсета с названием colls
 		// parsing collision objects from 'colls' tileset
-		for (tileset in tmxMap.tilesets) {
+		for ( tileset in tmxMap.tilesets ) {
 			var ereg = ~/(^[^.]*)+/; // regexp to take tileset name
-			if ( ereg.match(tileset.source) && ereg.matched(1) == 'colls' ) for (tile in tileset.tiles) {
+			if ( ereg.match(tileset.source) && ereg.matched(1) == 'colls' ) for ( tile in tileset.tiles ) {
 				if ( eregFileName.match(tile.image.source) ) {
 					var ents = ent != null ? [ent] : Entity.ALL;
-					for (ent in ents) {
+					for ( ent in ents ) {
 						if ( (tile.objectGroup != null && eregClass.match('$ent'.toLowerCase()))
 							&& ((eregClass.matched(1) == eregFileName.matched(1)
 								&& tile.objectGroup.objects.length > 0
 								|| (Std.isOfType(ent, SpriteEntity)
 									&& eregFileName.matched(1) == ent.spr.groupName))) /*&& ent.collisions.length == 0*/ ) {
 							var centerSet = false;
-							for (obj in tile.objectGroup.objects) { // Засовываем объекты для детекта коллизий по Entity
+							for ( obj in tile.objectGroup.objects ) { // Засовываем объекты для детекта коллизий по Entity
 								var params = {
 									x : M.round(obj.x) + ent.footX,
 									y : M.round(obj.y) + ent.footY,
@@ -158,7 +158,7 @@ class GameServer extends Process implements IGame {
 									var pivotY = ((obj.y + yCent)) / ent.spr.tile.height;
 									pivotX = (ent.tmxObj != null && ent.tmxObj.flippedVertically) ? 1 - pivotX : pivotX;
 
-									ent.spr.setCenterRatio(pivotX, pivotY);
+									ent.setPivot(pivotX, pivotY);
 									ent.footX += M.round((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width);
 									ent.footY -= (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height;
 								}
@@ -169,22 +169,22 @@ class GameServer extends Process implements IGame {
 										xCent = M.round(obj.width / 2);
 										yCent = M.round(obj.height / 2);
 										ent.collisions.set(shape,
-											{cent : new h3d.Vector(xCent, yCent), offset : new h3d.Vector(obj.x + xCent, -obj.y - yCent)});
+											{ cent : new h3d.Vector(xCent, yCent), offset : new h3d.Vector(obj.x + xCent, -obj.y - yCent) });
 									case OTRectangle:
 										// Точка парсится как OTRectangle, точка с названием center будет обозначать центр
 
 										ent.collisions.set(Polygon.rectangle(params.x, params.y, params.width, params.height),
-											{cent : new h3d.Vector(), offset : new h3d.Vector()});
+											{ cent : new h3d.Vector(), offset : new h3d.Vector() });
 									case OTPolygon(points):
-										var pts = checkPolyClockwise(points);
+										var pts = makePolyClockwise(points);
 										var verts : Array<Vector> = [];
-										for (i in pts) {
+										for ( i in pts ) {
 											verts.push(new Vector((i.x), (-i.y)));
 										}
 										var yArr = verts.copy();
-										yArr.sort(function(a, b) return (a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0));
+										yArr.sort(function ( a, b ) return (a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0));
 										var xArr = verts.copy();
-										xArr.sort(function(a, b) return (a.x < b.x) ? -1 : ((a.x > b.x) ? 1 : 0));
+										xArr.sort(function ( a, b ) return (a.x < b.x) ? -1 : ((a.x > b.x) ? 1 : 0));
 
 										// xCent и yCent - половины ширины и высоты неповёрнутого полигона соответственно
 										xCent = M.round((xArr[xArr.length - 1].x + xArr[0].x) * .5);
@@ -206,7 +206,7 @@ class GameServer extends Process implements IGame {
 										if ( ent.tmxObj != null && ent.tmxObj.flippedVertically ) poly.scaleX = -1;
 										var xOffset = poly.scaleX < 0 ? ent.spr.tile.width - obj.x : obj.x;
 										var yOffset = -obj.y;
-										ent.collisions.set(poly, {cent : new h3d.Vector(xCent, -yCent), offset : new h3d.Vector(xOffset, yOffset)});
+										ent.collisions.set(poly, { cent : new h3d.Vector(xCent, -yCent), offset : new h3d.Vector(xOffset, yOffset) });
 									case OTPoint:
 										if ( obj.name == "center" ) {
 											if ( centerSet ) unsetCenter();
@@ -242,14 +242,14 @@ class GameServer extends Process implements IGame {
 	function gc() {
 		if ( Entity.GC == null || Entity.GC.length == 0 ) return;
 
-		for (e in Entity.GC) e.dispose();
+		for ( e in Entity.GC ) e.dispose();
 		Entity.GC = [];
 	}
 
 	override function onDispose() {
 		super.onDispose();
 
-		for (e in Entity.ALL) e.destroy();
+		for ( e in Entity.ALL ) e.destroy();
 		gc();
 	}
 
@@ -257,10 +257,10 @@ class GameServer extends Process implements IGame {
 		super.update();
 
 		// Updates
-		for (e in Entity.ALL) if ( !e.destroyed ) e.preUpdate();
-		for (e in Entity.ALL) if ( !e.destroyed ) e.update();
-		for (e in Entity.ALL) if ( !e.destroyed ) e.postUpdate();
-		for (e in Entity.ALL) if ( !e.destroyed ) e.frameEnd();
+		for ( e in Entity.ALL ) if ( !e.destroyed ) e.preUpdate();
+		for ( e in Entity.ALL ) if ( !e.destroyed ) e.update();
+		for ( e in Entity.ALL ) if ( !e.destroyed ) e.postUpdate();
+		for ( e in Entity.ALL ) if ( !e.destroyed ) e.frameEnd();
 		gc();
 	}
 }

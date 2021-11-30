@@ -13,7 +13,7 @@ class ScrollbarComp extends Flow implements h2d.domkit.Object implements WindowC
             </window>
         </scrollbar>;
     
-    public function new( backgroundTile : h2d.Tile, bl : Int, bt : Int, br : Int, bb : Int, ?parent : Null<h2d.Object>) {
+    public function new( backgroundTile : h2d.Tile, bl : Int, bt : Int, br : Int, bb : Int, ?parent : Null<h2d.Object>, rest : haxe.Rest<Dynamic>) {
         super(parent);
 		initComponent();
         

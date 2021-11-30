@@ -1,5 +1,8 @@
 package tools;
 
+import ui.NinesliceWindow.NinesliceConf;
+import haxe.Serializer;
+import seedyrng.Random;
 import hxd.res.Resource;
 import ui.domkit.WindowComp.WindowCompI;
 import cdb.Types.TilePos;
@@ -25,6 +28,7 @@ class Util {
 
 	/** regex to match automapping random rules **/
 	static var eregAutoMapRandomLayer = ~/(?:output|input)([0-9]+)_([a-z]+)$/gi;
+
 	/** regex to match automapping inputnot rules **/
 	static var eregAutoMapInputNotLayer = ~/(?:input)not_([a-z]+)$/gi;
 	/** Regex to get '$this' class name i.e. en.Entity -> Entity **/
@@ -37,12 +41,12 @@ class Util {
 		return Res.loader.loadParentalFix(cdbTile.file).toTile().sub(cdbTile.x * cdbTile.size, cdbTile.y * cdbTile.size, cdbTile.size, cdbTile.size);
 	}
 
-	inline static function checkPolyClockwise( points : Array<Dynamic> ) {
+	inline static function makePolyClockwise( points : Array<TmxPoint> ) {
 		var pts = points.copy();
 		var sum = .0;
-		for ( i in 0...pts.length ) {
-			var actualItpp = (i >= pts.length - 1) ? 0 : i + 1;
-			sum += (pts[actualItpp].x - pts[i].x) * (pts[actualItpp].y + pts[i].y);
+		for ( i => pt in pts ) {
+			var nextIdx = (i == pts.length - 1) ? 0 : i + 1;
+			sum += (pts[nextIdx].x - pt.x) * (pts[nextIdx].y + pt.y);
 		}
 		sum < 0 ? pts.reverse() : {};
 		return pts;
@@ -64,11 +68,11 @@ class Util {
 
 	public static var wScaled(get, never) : Int;
 
-	inline static function get_wScaled() return Std.int(Boot.inst.s2d.width / Const.SCALE);
+	inline static function get_wScaled() return Std.int(Boot.inst.s2d.width / Const.UI_SCALE);
 
 	public static var hScaled(get, never) : Int;
 
-	inline static function get_hScaled() return Std.int(Boot.inst.s2d.height / Const.SCALE);
+	inline static function get_hScaled() return Std.int(Boot.inst.s2d.height / Const.UI_SCALE);
 
 	inline static function getTileFromSeparatedTsx( tile : TmxTilesetTile ) : Tile {
 		// #if pak
@@ -106,10 +110,20 @@ class Util {
 
 	inline static function emptyTiles( map : TmxMap ) return [for ( i in 0...(map.height * map.width) ) new TmxTile(0)];
 
-	inline static function getProjectedDifferPolygonRect( ?obj : TmxObject, points : Array<TmxPoint> ) : Vector {
-		var pts = checkPolyClockwise(points);
+	static inline function rotatePoly( obj : TmxObject, points : Array<TmxPoint> ) {
+		for ( pt in points ) {
+			var old = new Vector(pt.x, pt.y);
+			var angle = M.toRad(obj.rotation);
+
+			pt.x = (old.x) * Math.cos(angle) - (old.y) * Math.sin(angle);
+			pt.y = (old.x) * Math.sin(angle) + (old.y) * Math.cos(angle);
+		}
+	}
+
+	static function getProjectedDifferPolygonRect( ?obj : TmxObject, points : Array<TmxPoint> ) : differ.math.Vector {
+		var pts = makePolyClockwise(points);
 		var verts : Array<Vector> = [];
-		for ( i in pts ) verts.push(new Vector((i.x), (-i.y)));
+		for ( i in pts ) verts.push(new Vector((i.x), (i.y)));
 
 		var yArr = verts.copy();
 		yArr.sort(function ( a, b ) return (a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0));
@@ -117,20 +131,10 @@ class Util {
 		xArr.sort(function ( a, b ) return (a.x < b.x) ? -1 : ((a.x > b.x) ? 1 : 0));
 
 		// xCent и yCent - половины ширины и высоты неповёрнутого полигона соответственно
-		var xCent : Float = M.round((xArr[xArr.length - 1].x + xArr[0].x) * .5);
-		var yCent : Float = -M.round((yArr[yArr.length - 1].y + yArr[0].y) * .5);
+		var xCent : Float = Std.int((xArr[xArr.length - 1].x + xArr[0].x) * .5);
+		var yCent : Float = Std.int((yArr[yArr.length - 1].y + yArr[0].y) * .5);
 
-		// c - радиус от начальной точки поли до центра поли
-		var c = Math.sqrt(M.pow(xCent, 2) + M.pow(yCent, 2));
-		// alpha - угол между начальной точкой неповёрнутого полигона и центром полигона
-		var alpha = Math.atan(yCent / xCent);
-
-		// xCent и yCent в данный момент - проекции отрезка, соединяющего начальную точку полигона и центр полигона на оси x и y соответственно
-		if ( obj != null ) {
-			yCent = -c * (Math.sin(M.toRad(-obj.rotation) - alpha));
-			xCent = c * (Math.cos(M.toRad(-obj.rotation) - alpha));
-		}
-		return new Vector(xCent, yCent);
+		return new differ.math.Vector(xCent, yCent);
 	}
 
 	static var entParent : Scene;
@@ -139,6 +143,28 @@ class Util {
 	public static var uiConf : Map<String, TmxLayer>;
 
 	public static var inventoryCoordRatio : Vector = new Vector(-1, -1);
+
+	public static function nineSliceFromConf( ?conf : String = "window" ) : NinesliceConf {
+		var backgroundConf = uiConf.get(conf).getObjectByName("window");
+		var nineSlice = uiConf.get(conf).getObjectByName("9slice");
+
+		switch backgroundConf.objectType {
+			case OTTile(gid):
+				var picName = Tools.getTileByGid(uiMap, gid).image.source;
+				if ( eregFileName.match(picName) ) {
+					return {
+						atlasName : eregFileName.matched(1),
+						bl : Std.int(nineSlice.x),
+						bt : Std.int(nineSlice.y),
+						br : Std.int(nineSlice.width),
+						bb : Std.int(nineSlice.height)
+					};
+				} else
+					throw "bad logic";
+			default:
+				throw "bad logic";
+		}
+	}
 }
 
 class ReverseIterator {
@@ -172,6 +198,18 @@ class ReverseArrayKeyValueIterator<T> {
 
 	public static inline function reversedKeyValues<T>( arr : Array<T> ) {
 		return new ReverseArrayKeyValueIterator(arr);
+	}
+}
+
+
+
+class SeedyRandomExtender {
+	public static function seededString( r : Random, length : Int, ?charactersToUse = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" ) {
+		var str = "";
+		for ( i in 0...length ) {
+			str += charactersToUse.charAt(r.randomInt(0, charactersToUse.length - 1));
+		}
+		return str;
 	}
 }
 

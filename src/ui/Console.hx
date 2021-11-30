@@ -60,7 +60,10 @@ class Console extends h2d.Console {
 		], function ( ?k : Data.ItemsKind, ?amount : Int = 1 ) {
 			if ( Data.items.get(k) != null ) {
 				var newItem = Item.fromCdbEntry(k, amount);
-				Game.inst.player.ui.inventory.invGrid.giveItem(newItem, Game.inst.player, false);
+				
+				trace(Player.inst.ui.inventory.invGrid);
+
+				Player.inst.ui.inventory.invGrid.giveItem(newItem, Player.inst, false);
 			}
 		});
 
@@ -69,7 +72,7 @@ class Console extends h2d.Console {
 		});
 
 		this.addCommand("hud", [], function ( ?k : String ) {
-			Player.inst.ui.visible = !Player.inst.ui.visible;
+			Player.inst.ui.root.visible = !Player.inst.ui.root.visible;
 		});
 
 		this.addAlias("+", "set");
@@ -80,7 +83,7 @@ class Console extends h2d.Console {
 			Level.inst.cursorInteract.visible = false;
 		});
 		this.addCommand("loadlvl", [{name : "k", t : AString}], function ( name : String, ?manual : Bool = true ) {
-			Game.inst.startLevel(name + ".tmx", manual);
+			Game.inst.startLevel(name + ".tmx", true);
 		});
 		var pp : Bool = true;
 		this.addCommand("pp", [], function ( ?k : String ) {

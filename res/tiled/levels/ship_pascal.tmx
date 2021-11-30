@@ -1,171 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-down" compressionlevel="0" width="23" height="24" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="807" nextobjectid="14529">
+<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-down" compressionlevel="0" width="11" height="15" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#0f0f0f" nextlayerid="807" nextobjectid="14894">
  <tileset firstgid="1" source="alpha.tsx"/>
  <tileset firstgid="151" source="entities.tsx"/>
- <layer id="54" name="proto" width="23" height="24" opacity="0.58">
+ <layer id="54" name="proto" width="11" height="15" opacity="0.58">
   <data encoding="base64" compression="zlib">
-   eAErYGBgKBjFo2EwgtNAMNDv2DA18gU2c0Fig8VsmPvQ3QMTR6fR1eHjw/Siq4GJo9Po6vDxYXrxqSFXjpZmk+umUX3UyTOj4Ti0whEAcJXtMw==
+   eAErYGBgKBjFWMMgGBgu6BhXWKGrA/FH1ULCD1c44BIHANxbQ6k=
   </data>
  </layer>
- <layer id="42" name="walls" width="23" height="24">
+ <layer id="42" name="walls" width="11" height="15">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwGgLhwCBAxxlUCJYIKpiBzQigWxuwiZMjBvI3sl+pZTbM79Q2G5f7QOLp5AQAkh5cZiMpIZtJDfeRbfmoxtEQGIIhAACVPgqi
+   eAFjYBgF+EIgHCiJjDNwKI7AIY4uDDSrAV0MF3+4q03H4XEAov4IZQ==
   </data>
  </layer>
- <layer id="804" name="ground_bot" width="23" height="24">
+ <layer id="804" name="ground_bot" width="11" height="15">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwGgL0DoEwGlo42Mwm1j3EqkMOOmx6QoEK0HEIsiYi2djMJlIrXmUgt5HjHryGjkqOhsAwDAEAtU0FAQ==
+   eAFjYBgFtAqBMBIMHqlqQ4FhhIxDgHwAvdMEAw==
   </data>
  </layer>
- <layer id="33" name="ground" width="23" height="24">
+ <layer id="33" name="ground" width="11" height="15">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwskMgD+j9YCyYGqGCzVyQGDUANcyG+R3dPdQwG2YGMWYHoSsiwMdlNgFtREmDzCbVPUQZPKpoNARGQ4CkEAAA3P4Mhw==
+   eAFjYBgFuEIgDygRjIZxqUVXB+LjAiNJbRCuQMAjDgAB/Q0T
   </data>
  </layer>
- <layer id="36" name="wallsAgri" width="23" height="24" offsetx="-10" offsety="-1">
+ <layer id="36" name="wallsAgri" width="11" height="15">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwGgKjITAaAqMhMBoCoyEwuEIAAAigAAE=
+   eAFjYBgFoyEwuEIAAAKUAAE=
   </data>
  </layer>
- <layer id="190" name="shadows" width="23" height="24" visible="0">
+ <layer id="190" name="shadows" width="11" height="15" visible="0">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwskMgBuj9aAaGBmQcD+RTI1SAZmIAoNgBDEEyBKhhNsjv2PxKDbNBZmDzK9A+kLgDMga6wwEoTDTAZTbRBuBRCHIfqe7BY9yo1GgIjIYAmSEAACC2EZM=
+   eAFjYBgFuEIgBigRzcDQAMPxQDYutUA1KADIP4AigMQZzmqBYQQKMwcYBoahA5LXiWICADO/D10=
   </data>
  </layer>
- <layer id="805" name="light" width="23" height="24">
+ <layer id="805" name="light" width="11" height="15">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFIyEEsoGezEHDuVTwONDcBioYg9UIoHupYjbI7+h+pYbZML/Twmxc7gPaRXGY4DIbaySQKEgN95FoJVx5Ppw1OBmD3X2DM9RGXTWSQwAABPEM+A==
+   eAFjYBhcIBvonBwknIvDeUB1DTikMISB5o2qBYYKMCyJDgeMQKSyQD4e8wB4hwns
   </data>
  </layer>
  <objectgroup id="47" name="image"/>
  <objectgroup id="34" name="obstacles">
-  <object id="14122" x="336" y="312" width="24" height="24"/>
-  <object id="14123" x="360" y="288" width="24" height="24"/>
-  <object id="14124" x="219" y="195">
+  <object id="14859" x="216" y="336" width="24" height="24"/>
+  <object id="14860" x="240" y="312" width="24" height="24"/>
+  <object id="14861" x="123" y="147">
    <polygon points="-3,-3 -3,5 5,-3"/>
   </object>
-  <object id="14125" x="360" y="192" width="24" height="24"/>
-  <object id="14126" x="360" y="216" width="24" height="24"/>
-  <object id="14127" x="360" y="240" width="24" height="24"/>
-  <object id="14128" x="360" y="264" width="24" height="24"/>
-  <object id="14129" x="354" y="312">
+  <object id="14862" x="240" y="144" width="24" height="24"/>
+  <object id="14863" x="240" y="168" width="24" height="24"/>
+  <object id="14864" x="240" y="192" width="24" height="24"/>
+  <object id="14865" x="240" y="216" width="24" height="24"/>
+  <object id="14866" x="240" y="240" width="24" height="24"/>
+  <object id="14867" x="240" y="264" width="24" height="24"/>
+  <object id="14868" x="240" y="288" width="24" height="24"/>
+  <object id="14869" x="234" y="336">
    <polygon points="0,0 6,0 6,-6"/>
   </object>
-  <object id="14130" x="216" y="312" width="24" height="24"/>
-  <object id="14131" x="240" y="312" width="24" height="24"/>
-  <object id="14132" x="264" y="312" width="24" height="24"/>
-  <object id="14133" x="288" y="312" width="24" height="24"/>
-  <object id="14134" x="312" y="312" width="24" height="24"/>
-  <object id="14135" x="240" y="168" width="24" height="24"/>
-  <object id="14136" x="264" y="168" width="24" height="24"/>
-  <object id="14137" x="288" y="168" width="24" height="24"/>
-  <object id="14138" x="312" y="168" width="24" height="24"/>
-  <object id="14139" x="336" y="168" width="24" height="24"/>
-  <object id="14140" x="192" y="216" width="24" height="24"/>
-  <object id="14141" x="192" y="240" width="24" height="24"/>
-  <object id="14142" x="192" y="264" width="24" height="24"/>
-  <object id="14143" x="192" y="288" width="24" height="24"/>
-  <object id="14144" x="192" y="192" width="24" height="24"/>
-  <object id="14145" x="216" y="168" width="24" height="24"/>
-  <object id="14379" x="336" y="312" width="24" height="24"/>
-  <object id="14380" x="360" y="288" width="24" height="24"/>
-  <object id="14381" x="96" y="360" width="24" height="24"/>
-  <object id="14382" x="120" y="336" width="24" height="24"/>
-  <object id="14383" x="219" y="195">
-   <polygon points="-3,-3 -3,5 5,-3"/>
-  </object>
-  <object id="14384" x="75" y="267">
-   <polygon points="-3,-3 -3,5 5,-3"/>
-  </object>
-  <object id="14385" x="360" y="192" width="24" height="24"/>
-  <object id="14386" x="360" y="216" width="24" height="24"/>
-  <object id="14387" x="360" y="240" width="24" height="24"/>
-  <object id="14388" x="360" y="264" width="24" height="24"/>
-  <object id="14389" x="120" y="288" width="24" height="24"/>
-  <object id="14390" x="120" y="312" width="24" height="24"/>
-  <object id="14391" x="354" y="312">
-   <polygon points="0,0 6,0 6,-6"/>
-  </object>
-  <object id="14392" x="114" y="360">
-   <polygon points="0,0 6,0 6,-6"/>
-  </object>
-  <object id="14393" x="216" y="312" width="24" height="24"/>
-  <object id="14394" x="240" y="312" width="24" height="24"/>
-  <object id="14395" x="264" y="312" width="24" height="24"/>
-  <object id="14396" x="288" y="312" width="24" height="24"/>
-  <object id="14397" x="312" y="312" width="24" height="24"/>
-  <object id="14398" x="72" y="360" width="24" height="24"/>
-  <object id="14399" x="240" y="168" width="24" height="24"/>
-  <object id="14400" x="264" y="168" width="24" height="24"/>
-  <object id="14401" x="288" y="168" width="24" height="24"/>
-  <object id="14402" x="312" y="168" width="24" height="24"/>
-  <object id="14403" x="336" y="168" width="24" height="24"/>
-  <object id="14404" x="192" y="216" width="24" height="24"/>
-  <object id="14405" x="192" y="240" width="24" height="24"/>
-  <object id="14406" x="192" y="264" width="24" height="24"/>
-  <object id="14407" x="48" y="288" width="24" height="24"/>
-  <object id="14408" x="192" y="288" width="24" height="24"/>
-  <object id="14409" x="48" y="312" width="24" height="24"/>
-  <object id="14410" x="48" y="336" width="24" height="24"/>
-  <object id="14411" x="192" y="192" width="24" height="24"/>
-  <object id="14412" x="216" y="168" width="24" height="24"/>
-  <object id="14413" x="48" y="264" width="24" height="24"/>
-  <object id="14414" x="72" y="240" width="24" height="24"/>
-  <object id="14415" x="336" y="312" width="24" height="24"/>
-  <object id="14416" x="360" y="288" width="24" height="24"/>
-  <object id="14417" x="96" y="360" width="24" height="24"/>
-  <object id="14418" x="120" y="336" width="24" height="24"/>
-  <object id="14419" x="219" y="195">
-   <polygon points="-3,-3 -3,5 5,-3"/>
-  </object>
-  <object id="14420" x="75" y="267">
-   <polygon points="-3,-3 -3,5 5,-3"/>
-  </object>
-  <object id="14421" x="360" y="192" width="24" height="24"/>
-  <object id="14422" x="360" y="216" width="24" height="24"/>
-  <object id="14423" x="360" y="240" width="24" height="24"/>
-  <object id="14424" x="120" y="264" width="24" height="24"/>
-  <object id="14425" x="360" y="264" width="24" height="24"/>
-  <object id="14426" x="120" y="288" width="24" height="24"/>
-  <object id="14427" x="120" y="312" width="24" height="24"/>
-  <object id="14428" x="354" y="312">
-   <polygon points="0,0 6,0 6,-6"/>
-  </object>
-  <object id="14429" x="114" y="360">
-   <polygon points="0,0 6,0 6,-6"/>
-  </object>
-  <object id="14430" x="216" y="312" width="24" height="24"/>
-  <object id="14431" x="240" y="312" width="24" height="24"/>
-  <object id="14432" x="264" y="312" width="24" height="24"/>
-  <object id="14433" x="288" y="312" width="24" height="24"/>
-  <object id="14434" x="312" y="312" width="24" height="24"/>
-  <object id="14435" x="72" y="360" width="24" height="24"/>
-  <object id="14436" x="240" y="168" width="24" height="24"/>
-  <object id="14437" x="264" y="168" width="24" height="24"/>
-  <object id="14438" x="288" y="168" width="24" height="24"/>
-  <object id="14439" x="312" y="168" width="24" height="24"/>
-  <object id="14440" x="336" y="168" width="24" height="24"/>
-  <object id="14441" x="96" y="240" width="24" height="24"/>
-  <object id="14442" x="192" y="216" width="24" height="24"/>
-  <object id="14443" x="192" y="240" width="24" height="24"/>
-  <object id="14444" x="192" y="264" width="24" height="24"/>
-  <object id="14445" x="48" y="288" width="24" height="24"/>
-  <object id="14446" x="192" y="288" width="24" height="24"/>
-  <object id="14447" x="48" y="312" width="24" height="24"/>
-  <object id="14448" x="48" y="336" width="24" height="24"/>
-  <object id="14449" x="192" y="192" width="24" height="24"/>
-  <object id="14450" x="216" y="168" width="24" height="24"/>
-  <object id="14451" x="48" y="264" width="24" height="24"/>
-  <object id="14452" x="72" y="240" width="24" height="24"/>
+  <object id="14870" x="120" y="336" width="24" height="24"/>
+  <object id="14871" x="144" y="336" width="24" height="24"/>
+  <object id="14872" x="168" y="336" width="24" height="24"/>
+  <object id="14873" x="192" y="336" width="24" height="24"/>
+  <object id="14874" x="144" y="120" width="24" height="24"/>
+  <object id="14875" x="168" y="120" width="24" height="24"/>
+  <object id="14876" x="192" y="120" width="24" height="24"/>
+  <object id="14877" x="216" y="120" width="24" height="24"/>
+  <object id="14878" x="96" y="168" width="24" height="24"/>
+  <object id="14879" x="96" y="192" width="24" height="24"/>
+  <object id="14880" x="96" y="216" width="24" height="24"/>
+  <object id="14881" x="96" y="240" width="24" height="24"/>
+  <object id="14882" x="96" y="264" width="24" height="24"/>
+  <object id="14883" x="96" y="288" width="24" height="24"/>
+  <object id="14884" x="96" y="312" width="24" height="24"/>
+  <object id="14885" x="96" y="144" width="24" height="24"/>
+  <object id="14886" x="120" y="120" width="24" height="24"/>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="8692" gid="2147483811" x="288" y="216" width="48" height="77">
+  <object id="8850" gid="153" x="216" y="192" width="48" height="48"/>
+  <object id="14891" gid="163" x="193" y="169" width="48" height="77">
    <properties>
     <property name="to" type="file" value="bridge.tmx"/>
    </properties>
   </object>
-  <object id="8850" gid="153" x="288" y="216" width="48" height="48"/>
-  <object id="10906" gid="161" x="264" y="312" width="96" height="72"/>
-  <object id="14250" gid="170" x="336" y="216" width="48" height="36"/>
+  <object id="14892" gid="2147483811" x="144" y="168" width="48" height="77"/>
+  <object id="14893" gid="170" x="240" y="192" width="48" height="48">
+   <properties>
+    <property name="item:iron" type="int" value="3"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

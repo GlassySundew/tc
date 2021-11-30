@@ -1,3 +1,6 @@
+import hx.concurrent.Future.FutureResult;
+import mapgen.MapGen;
+import hx.concurrent.executor.Executor;
 import Level.StructTile;
 import cherry.soup.EventSignal.EventSignal0;
 import differ.math.Vector;
@@ -13,9 +16,8 @@ import hxbit.Serializer;
 import tools.Save;
 import tools.Settings;
 import ui.Hud;
+import ui.Navigation;
 import ui.PauseMenu;
-
-// import tools.Save;
 
 class Game extends Process implements IGame implements hxbit.Serializable {
 	public static var inst : Game;
@@ -45,10 +47,57 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 	public var suspended : Bool = false;
 	public var pauseCycle : Bool = false;
 
-	public function new() {
+	@:s public var seed : Null<String>;
+	public var navFieldsGenerated : Null<Int>;
+
+	// celestial stuff
+	// var fields : Array<NavigationField> = [];
+
+	public function new( ?seed : String ) {
 		super(Main.inst);
 
+		if ( seed == null ) seed = Random.string(10);
+		this.seed = seed;
+
+		initLoad(false);
+
+		new Navigation(
+			Const.jumpReach,
+			'${Game.inst.seed}'
+		);
+
+		// generating initial asteroids to have where to put player on
+		// we do not yet have need to save stuff about asteroids, temporal clause
+		@:privateAccess
+		Navigation.inst.fields.push(new NavigationField(
+			seed,
+			0,
+			0 // ,
+			// Navigation.inst.bodiesContainer
+		));
+
+		// for( i in Navigation.inst.fields) {
+		// 	for( target in i.targets) {
+		// 		target.createGenerator();
+
+		// 	}
+		// }
+	}
+	/**
+		added in favor of unserializing
+
+		@param mockConstructor if true, then we will execute dn.Process constructor clause
+	**/
+	public function initLoad( ?mockConstructor = true ) {
+		if ( mockConstructor ) {
+			init();
+
+			if ( parent == null ) Process.ROOTS.push(this); else
+				parent.addChild(this);
+		}
+
 		inst = this;
+
 		ca = Main.inst.controller.createAccess("game");
 		ca.setLeftDeadZone(0.2);
 		ca.setRightDeadZone(0.2);
@@ -60,54 +109,61 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 
 	public function onCdbReload() {}
 
-	public function nextLevel() {
-		/*
-			if (level.data.getStr("nextLevel") != "")
-					startLevel(level.data.getStr("nextLevel"));
-				else {
-					var ogmoProj = new ogmo.Project(hxd.Res.map.ld45, false);
-				if (ogmoProj.getLevelByName("level" + (level.lid + 1)) == null)
-				startLevel("level" + level.lid);
-			else
-				startLevel("level" + (level.lid + 1));
-		}*/
+	@:keep
+	public function customSerialize( ctx : hxbit.Serializer ) {
+		// navigation
+		var s = new hxbit.Serializer();
+		ctx.addBytes(s.serialize(Navigation.inst));
+	}
+	/** при десеаризации создается пустой инстанс Game, отсюда в Game.inst будет выгружены все параметры **/
+	@:keep
+	public function customUnserialize( ctx : hxbit.Serializer ) {
+		initLoad();
+
+		// navigation
+		var s = new Serializer();
+		s.unserialize(ctx.getBytes(), Navigation);
+
+		Game.inst.delayer.addF(() -> {
+			for ( field in Navigation.inst.fields ) {
+				@:privateAccess Navigation.inst.bodiesContainer.addChild(field.object);
+				// for ( target in field.targets ) {
+				// 	field.addChild(target);
+				// }
+			}
+		}, 1);
 	}
 
 	public function restartLevel() {
 		// startLevel(lvlName);
 	}
-
-	// по сути workaround, т.к. надо, чтобы тайлы сохранялись отдельно, вместо .tmx файла целиком
-	// public function loadLevel(resolvedMap:) {
-	// 	engine.clear(0, 1);
-	// }
-
-	public function startLevel( name : String, ?manual : Bool = false ) {
-
-		// tmxMap = resolveMap(name);
-		// startLevelFromParsedTmx(tmxMap, name);
+	/**
+		@param manual debug parameter, if true, player won't be moved on level change
+	**/
+	public function startLevel( name : String, ?manual : Bool = false, ?acceptTmxPlayerCoord : Bool = false ) {
+		var levelFromCache : Level;
 
 		if ( level != null ) {
-			var cachedLevel = Save.inst.saveLevel(level);
+			Save.inst.saveLevel(level);
 		}
 
-		var levelFromCache = Save.inst.loadLevelByName(name.split(".")[0]);
-		if ( levelFromCache == null ) {
-			tmxMap = resolveMap(name);
-			startLevelFromParsedTmx(tmxMap, name, manual);
+		// in fact its not only from cache, it will pull level that was already pushed to db
+		levelFromCache = Save.inst.loadLevelByName(name.split(".")[0], acceptTmxPlayerCoord);
 
-			var cachedPlayer = Save.inst.playerSavedOn(level);
-			if ( cachedPlayer != null ) {
-				Save.inst.loadEntity(cachedPlayer);
-				player = Player.inst;
-				targetCameraOnPlayer();
-			}
-		} else {
-			level = levelFromCache;
+		if ( levelFromCache == null ) {
+			tmxMap = MapCache.inst.get(name);
+			startLevelFromParsedTmx(tmxMap, name, manual, acceptTmxPlayerCoord);
+
+			// var cachedPlayer = Save.inst.playerSavedOn(level);
+			// if ( !manual && cachedPlayer != null ) {
+			// 	Save.inst.loadEntity(cachedPlayer);
+			// 	player = Player.inst;
+			// 	targetCameraOnPlayer();
+			// }
 		}
 	}
 
-	public function startLevelFromParsedTmx( tmxMap : TmxMap, name : String, ?manual : Bool = false ) {
+	public function startLevelFromParsedTmx( tmxMap : TmxMap, name : String, ?manual : Bool = false, ?acceptTmxPlayerCoord : Bool = false ) {
 		this.tmxMap = tmxMap;
 		engine.clear(0, 1);
 		execAfterLvlLoad = new EventSignal0();
@@ -119,16 +175,15 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 			}
 			gc();
 		}
-
 		level = new Level(tmxMap);
 		level.lvlName = lvlName = name.split('.')[0];
 
 		// получаем sql id для уровня
-		Save.inst.bringPlayerToLevel(Save.inst.saveLevel(level));
+		var loadedLevel = Save.inst.saveLevel(level);
 
 		// Entity spawning
 		CompileTime.importPackage("en");
-		var entClasses = (CompileTime.getAllClasses(Entity));
+		var entClasses = CompileTime.getAllClasses(Entity);
 
 		// Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity and puts name into spr group if not found
 		function searchAndSpawnEnt( e : TmxObject ) {
@@ -162,29 +217,34 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 				default:
 			}
 		}
+
+		var playerEnt : TmxObject = null;
+		if ( acceptTmxPlayerCoord ) for ( ent in level.entities ) if ( ent.name == "player" ) playerEnt = ent;
+
 		// Загрузка игрока при переходе в другую локацию
+		Save.inst.bringPlayerToLevel(loadedLevel);
 		var cachedPlayer = Save.inst.playerSavedOn(level);
 
 		if ( cachedPlayer != null ) {
 			for ( e in level.entities ) if ( manual || e.name != "player" ) searchAndSpawnEnt(e);
-			// Save.inst.loadEntity(cachedPlayer);
-		} else
-			for ( e in level.entities ) searchAndSpawnEnt(e);
-
-
-		// 	var playerObj = level.entities.filter(e -> e.name == "player")[0];
-		// 	Player.inst.footX = playerObj.x;
-		// 	Player.inst.footY = playerObj.y;
-		// }
-		applyTmxObjOnEnt();
+			Save.inst.loadEntity(cachedPlayer);
+		} else {
+			// a crutchy fix for isometric sorting glitches - player for somewhat reason must be in the bottom of entities list
+			for ( e in level.entities ) if ( e.name != "player" ) searchAndSpawnEnt(e);
+			for ( e in level.entities ) if ( e.name == "player" ) searchAndSpawnEnt(e);
+		}
 
 		player = Player.inst;
-		targetCameraOnPlayer();
+		if ( playerEnt != null ) player.setFeetPos(playerEnt.x, playerEnt.y);
 
 		delayer.addF(() -> {
 			hideStrTiles();
-		}, 2);
+			Process.resizeAll();
+		}, 3);
 
+		applyTmxObjOnEnt();
+
+		targetCameraOnPlayer();
 		return level;
 	}
 
@@ -195,117 +255,109 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 
 	public function applyTmxObjOnEnt( ?ent : Null<Entity> ) {
 		// если ent не определён, то на все Entity из массива ALL будут добавлены TmxObject из тайлсета с названием colls
+
 		// parsing collision objects from 'colls' tileset
+		var entitiesTs : TmxTileset = null;
+
 		for ( tileset in tmxMap.tilesets ) {
-			if ( StringTools.contains(tileset.source, "entities") ) for ( tile in tileset.tiles ) {
-				if ( eregFileName.match(tile.image.source) ) {
-					var ents = ent != null ? [ent] : Entity.ALL;
-					for ( ent in ents ) {
-						if ( (tile.objectGroup != null && eregClass.match('$ent'.toLowerCase()))
-							&& (((eregClass.matched(1) == eregFileName.matched(1) || ent.spr.groupName == eregFileName.matched(1))
-								&& tile.objectGroup.objects.length > 0
-								|| (Std.isOfType(ent, SpriteEntity)
-									&& eregFileName.matched(1) == ent.spr.groupName))) /*&& ent.collisions.length == 0*/ ) {
-							var centerSet = false;
+			if ( StringTools.contains(tileset.source, "entities") ) {
+				entitiesTs = tileset;
+			}
+		}
 
-							for ( obj in tile.objectGroup.objects ) { // Засовываем объекты для детекта коллизий по Entity
-								var params = {
-									x : M.round(obj.x) + ent.footX,
-									y : M.round(obj.y) + ent.footY,
-									width : M.round(obj.width),
-									height : M.round(obj.height)
-								};
-								var xCent = 0.;
-								var yCent = 0.;
-								function unsetCenter() {
-									ent.footX -= ((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width);
-									ent.footY += (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height;
-								}
-								function getCenterPivot() : h3d.Vector {
-									var pivotX = ((obj.x + xCent)) / ent.spr.tile.width;
-									var pivotY = ((obj.y + yCent)) / ent.spr.tile.height;
-									// pivotX = (ent.tmxObj != null && ent.tmxObj.flippedHorizontally) ? 1 - pivotX : pivotX;
-									pivotY = (ent.tmxObj != null && ent.tmxObj.flippedVertically) ? 1 - pivotY : pivotY;
-									return new h3d.Vector(pivotX, pivotY);
-								}
-								function setCenter() {
-									var center = getCenterPivot();
+		var ents = ent != null ? [ent] : Entity.ALL;
 
-									if ( obj.name == "center" ) {
-										ent.mesh.xOff = -(center.x - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
-										ent.mesh.yOff = (center.y - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
-										#if depth_debug
-										ent.mesh.renewDebugPts();
-										#end
+		for ( tile in entitiesTs.tiles ) {
+			if ( eregFileName.match(tile.image.source) ) {
+				var picName = eregFileName.matched(1);
+
+				for ( ent in ents ) {
+					eregClass.match('$ent'.toLowerCase());
+					var entityName = eregClass.matched(1);
+
+					if ( entityName == picName
+						|| ent.spr.groupName == picName ) {
+
+						// соотношение, которое в конце будет применено к entity
+						var center = new Vector();
+
+						for ( obj in tile.objectGroup.objects ) {
+							switch obj.objectType {
+								case OTRectangle:
+								case OTEllipse:
+									var shape = new differ.shapes.Circle(0, 0, obj.width / 2);
+									var cent = new Vector(
+										obj.width / 2,
+										obj.height / 2
+									);
+
+									ent.collisions.set(shape,
+										{
+											cent : new h3d.Vector(cent.x, cent.y),
+											offset : new h3d.Vector(obj.x + cent.x, obj.y + cent.y)
+										});
+
+									if ( center.x == 0 && center.y == 0 ) {
+										center.x = cent.x + obj.x;
+										center.y = cent.y + obj.y;
 									}
+								case OTPoint:
+									switch obj.name {
+										case "center":
+											center.x = obj.x;
+											center.y = obj.y;
+									}
+								case OTPolygon(points):
+									var pts = makePolyClockwise(points);
+									rotatePoly(obj, pts);
 
-									ent.spr.setCenterRatio(center.x, center.y);
-								}
+									var cent = getProjectedDifferPolygonRect(obj, points);
 
-								switch( obj.objectType ) {
-									case OTEllipse:
-										var shape = new differ.shapes.Circle(0, 0, params.width / 2);
-										shape.scaleY = params.height / params.width;
-										xCent = M.round(obj.width / 2);
-										yCent = M.round(obj.height / 2);
-										ent.collisions.set(shape,
-											{ cent : new h3d.Vector(xCent, yCent), offset : new h3d.Vector(obj.x + xCent, -obj.y - yCent) });
-									case OTRectangle:
-										// Точка парсится как OTRectangle, точка с названием center будет обозначать центр
+									var verts : Array<Vector> = [];
+									for ( i in pts ) verts.push(new Vector(i.x, i.y));
 
-										ent.collisions.set(Polygon.rectangle(params.x, params.y, params.width, params.height),
-											{ cent : new h3d.Vector(), offset : new h3d.Vector() });
-									case OTPolygon(points):
-										var cents = getProjectedDifferPolygonRect(obj, points);
-										xCent = cents.x;
-										yCent = cents.y;
+									var poly = new Polygon(0, 0, verts);
 
-										var pts = checkPolyClockwise(points);
-										var verts : Array<Vector> = [];
-										for ( i in pts ) verts.push(new Vector((i.x), (-i.y)));
-
-										var poly = new Polygon(0, 0, verts);
-										poly.rotation = -obj.rotation;
-
-										// vertical flipping
-										// if ( ent.tmxObj != null && ent.tmxObj.flippedHorizontally ) poly.scaleX = -1;
-										if ( ent.tmxObj != null && ent.tmxObj.flippedVertically ) poly.scaleY = -1;
-
-										var xOffset = /*poly.scaleX < 0 ? ent.spr.tile.width - obj.x :*/ obj.x;
-										var yOffset = -obj.y;
-										ent.collisions.set(poly, { cent : new h3d.Vector(xCent, -yCent), offset : new h3d.Vector(xOffset, yOffset) });
-									case OTPoint:
-										if ( obj.name == "center" ) {
-											if ( centerSet ) unsetCenter();
-											setCenter();
-											ent.offsetFootByCenter();
-											centerSet = true;
+									poly.scaleY = -1;
+									ent.collisions.set(
+										poly,
+										{
+											cent : new h3d.Vector(cent.x, cent.y),
+											offset : new h3d.Vector(obj.x, obj.y)
 										}
-									default:
-								}
+									);
 
-								if ( !centerSet ) {
-									setCenter();
-									ent.offsetFootByCenter();
-
-									centerSet = true;
-								} else {
-									var center = getCenterPivot();
-									if ( obj.name != "center" ) {
-										ent.mesh.xOff = (center.x - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
-										ent.mesh.yOff = -(center.y - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
+									if ( center.x == 0 && center.y == 0 ) {
+										center.x = cent.x + obj.x;
+										center.y = cent.y + obj.y;
 									}
-								}
+								default:
 							}
-							try {
-								cast(ent, Interactive).rebuildInteract();
-							}
-							catch( e:Dynamic ) {}
-							// if ( ent.tmxObj != null && ent.tmxObj.flippedHorizontally && ent.mesh.isLong ) ent.mesh.flipX();
+						}
 
-							if ( Std.isOfType(ent, SpriteEntity) && tile.properties.exists("interactable") ) {
-								cast(ent, SpriteEntity).interactable = tile.properties.getBool("interactable");
-							}
+						// ending serving this particular entity 'ent' here
+						var pivotX = (center.x) / ent.spr.tile.width;
+						var pivotY = (center.y) / ent.spr.tile.height;
+
+						ent.setPivot(pivotX, pivotY);
+
+						var actualX = ent.spr.tile.width / 2;
+						var actualY = ent.spr.tile.height;
+
+						ent.footX -= actualX - ent.spr.pivot.centerFactorX * ent.spr.tile.width;
+						ent.footY += actualY - ent.spr.pivot.centerFactorY * ent.spr.tile.height;
+
+						#if depth_debug
+						ent.mesh.renewDebugPts();
+						#end
+
+						try {
+							cast(ent, Interactive).rebuildInteract();
+						}
+						catch( e:Dynamic ) {}
+
+						if ( Std.isOfType(ent, SpriteEntity) && tile.properties.exists("interactable") ) {
+							cast(ent, SpriteEntity).interactable = tile.properties.getBool("interactable");
 						}
 					}
 				}
@@ -364,6 +416,16 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 		for ( i in structTiles ) i.visible = false;
 	}
 
+	override function pause() {
+		super.pause();
+		if ( Player.inst != null && Player.inst.holdItem != null ) Player.inst.holdItem.visible = false;
+	}
+
+	override function resume() {
+		super.resume();
+		if ( Player.inst != null && Player.inst.holdItem != null ) Player.inst.holdItem.visible = true;
+	}
+
 	public function suspendGame() {
 		if ( suspended ) return;
 
@@ -399,6 +461,7 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 	}
 }
 
+// debug stuff
 class AxesHelper extends h3d.scene.Graphics {
 	public function new( ?parent : h3d.scene.Object, size = 2.0, colorX = 0xEB304D, colorY = 0x7FC309, colorZ = 0x288DF9, lineWidth = 2.0 ) {
 		super(parent);

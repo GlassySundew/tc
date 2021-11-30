@@ -1,41 +1,55 @@
 package ui;
 
-import ui.domkit.WindowComp.WindowCompI;
-import h2d.Layers;
-import h2d.ScaleGrid;
-import en.player.Player;
+import hxbit.Serializable;
+import ch2.ui.EventInteractive;
 import h2d.Flow;
-import h2d.Interactive;
+import h2d.Layers;
 import h2d.Object;
-import ui.Dragable;
+import ui.domkit.WindowComp.WindowCompI;
 
-class Window extends dn.Process {
+class Window extends dn.Process implements Serializable {
 	public static var ALL : Array<Window> = [];
 
 	var windowComp : WindowCompI;
 
 	public var win : Object;
 	/**backdround sprite**/
-	var backgroundInter : Interactive;
+	var backgroundInter : EventInteractive;
 	/**
 		@param parent is usually supposed to be Player.inst.ui
 	**/
-	public function new( ?parent : h2d.Object ) {
+	public function new( ?parent : Object ) {
 		super(Game.inst);
+
+		beforeInitLoad(parent);
+		initLoad(parent);
+	}
+
+	public function beforeInitLoad( ?parent : Object ) {
 		ALL.push(this);
 		win = new h2d.Object(parent);
 
-		Game.inst.delayer.addF(() -> {
-			updateBackgroundInteractive();
-		}, 1);
+		Game.inst.delayer.addF(updateBackgroundInteractive, 1);
 	}
 
-	function updateBackgroundInteractive() {
+	public function initLoad( ?parent : Object ) {}
 
-		if ( win != null && windowComp != null && windowComp.window != null  ) {
+	@:keep
+	public function customSerialize( ctx : hxbit.Serializer ) {}
+
+	@:keep
+	public function customUnserialize( ctx : hxbit.Serializer ) {
+		Game.inst.delayer.addF(() -> {
+			beforeInitLoad();
+			initLoad();
+		}, 0);
+	}
+
+	public function updateBackgroundInteractive() {
+		if ( win != null && windowComp != null && windowComp.window != null && win.parent != null ) {
 			if ( backgroundInter != null ) backgroundInter.remove();
-            
-			backgroundInter = new Interactive(windowComp.window.innerWidth, windowComp.window.innerHeight);
+
+			backgroundInter = new EventInteractive(windowComp.window.getSize().width, windowComp.window.getSize().height);
 			win.addChildAt(backgroundInter, 0);
 			backgroundInter.cursor = Default;
 			backgroundInter.onPush = function ( e ) {
@@ -54,13 +68,13 @@ class Window extends dn.Process {
 
 	function clampInScreen() {
 		if ( win != null && windowComp != null ) {
-			win.x = hxd.Math.clamp(win.x, 0, Game.inst.w() / Const.SCALE - windowComp.window.innerWidth);
-			win.y = hxd.Math.clamp(win.y, 0, Game.inst.h() / Const.SCALE - windowComp.window.innerHeight);
+			win.x = hxd.Math.clamp(win.x, 0, wScaled - windowComp.window.innerWidth);
+			win.y = hxd.Math.clamp(win.y, 0, hScaled - windowComp.window.innerHeight);
 		}
 	}
 
 	public function bringOnTopOfALL() {
-		try {
+		if ( win.parent != null ) try {
 			Std.downcast(win.parent, Layers).add(win, Const.DP_UI);
 		} catch( e ) {
 			win.parent.addChild(win);

@@ -1,12 +1,9 @@
-import h2d.filter.Bloom;
-import h3d.Matrix;
-import h2d.filter.ColorMatrix;
+import ui.ShadowedText;
 import dn.Process;
 import h2d.Bitmap;
 import h2d.Flow;
 import h2d.Object;
 import h2d.RenderContext;
-import h2d.Text;
 import h2d.Tile;
 import h3d.Vector;
 import h3d.mat.Texture;
@@ -45,47 +42,49 @@ class MainMenu extends Process {
 		parentFlow.getProperties(socialFlow).isAbsolute = true;
 		parentFlow.getProperties(planetFlow).isAbsolute = true;
 
-		var riversBmp = new Bitmap(Tile.fromTexture(new Texture(100, 100)).center(), planetFlow);
+		/*
+			var riversBmp = new Bitmap(Tile.fromTexture(new Texture(100, 100)).center(), planetFlow);
 
-		var riversShader = new shader.planets.rivers.Rivers();
-		riversShader.pixels = 100;
-		riversShader.river_cutoff = 0.368;
-		riversShader.col1 = new Vector(0.388235, 0.670588, 0.247059, 1);
-		riversShader.col2 = new Vector(0.231373, 0.490196, 0.309804, 1);
-		riversShader.col3 = new Vector(0.184314, 0.341176, 0.32549, 1);
-		riversShader.col4 = new Vector(0.156863, 0.207843, 0.25098, 1);
-		riversShader.river_col = new Vector(0.309804, 0.643137, 0.721569, 1);
-		riversShader.river_col_dark = new Vector(0.25098, 0.286275, 0.45098, 1);
-		riversShader.dither_size = 2;
-		riversShader.seed = Random.float(1, 10);
-		riversShader.size = 3;
-		riversShader.OCTAVES = 5;
+			var riversShader = new shader.planets.rivers.Rivers();
+			riversShader.pixels = 100;
+			riversShader.river_cutoff = 0.368;
+			riversShader.col1 = new Vector(0.388235, 0.670588, 0.247059, 1);
+			riversShader.col2 = new Vector(0.231373, 0.490196, 0.309804, 1);
+			riversShader.col3 = new Vector(0.184314, 0.341176, 0.32549, 1);
+			riversShader.col4 = new Vector(0.156863, 0.207843, 0.25098, 1);
+			riversShader.river_col = new Vector(0.309804, 0.643137, 0.721569, 1);
+			riversShader.river_col_dark = new Vector(0.25098, 0.286275, 0.45098, 1);
+			riversShader.dither_size = 2;
+			riversShader.seed = Random.float(1, 10);
+			riversShader.size = 3;
+			riversShader.OCTAVES = 5;
 
-		riversBmp.addShader(riversShader);
+			riversBmp.addShader(riversShader);
 
-		var cloudsBmp = new Bitmap(Tile.fromTexture(new Texture(102, 102)).center(), planetFlow);
+			var cloudsBmp = new Bitmap(Tile.fromTexture(new Texture(102, 102)).center(), planetFlow);
 
-		var cloudsShader = new shader.planets.landMasses.Clouds();
-		cloudsShader.pixels = 102;
-		cloudsShader.cloud_cover = 0.47;
-		cloudsShader.stretch = 2;
-		cloudsShader.cloud_curve = 1.3;
-		cloudsShader.light_border_1 = 0.52;
-		cloudsShader.light_border_2 = 0.62;
-		cloudsShader.base_color = new Vector(0.960784, 1, 0.909804, 1);
-		cloudsShader.outline_color = new Vector(0.87451, 0.878431, 0.909804, 1);
-		cloudsShader.shadow_base_color = new Vector(0.407843, 0.435294, 0.6, 1);
-		cloudsShader.shadow_outline_color = new Vector(0.25098, 0.286275, 0.45098, 1);
-		cloudsShader.size = 7.315;
-		cloudsShader.OCTAVES = 2;
-		cloudsShader.seed = Random.float(1, 10);
+			var cloudsShader = new shader.planets.landMasses.Clouds();
+			cloudsShader.pixels = 102;
+			cloudsShader.cloud_cover = 0.47;
+			cloudsShader.stretch = 2;
+			cloudsShader.cloud_curve = 1.3;
+			cloudsShader.light_border_1 = 0.52;
+			cloudsShader.light_border_2 = 0.62;
+			cloudsShader.base_color = new Vector(0.960784, 1, 0.909804, 1);
+			cloudsShader.outline_color = new Vector(0.87451, 0.878431, 0.909804, 1);
+			cloudsShader.shadow_base_color = new Vector(0.407843, 0.435294, 0.6, 1);
+			cloudsShader.shadow_outline_color = new Vector(0.25098, 0.286275, 0.45098, 1);
+			cloudsShader.size = 7.315;
+			cloudsShader.OCTAVES = 2;
+			cloudsShader.seed = Random.float(1, 10);
 
-		cloudsBmp.addShader(cloudsShader);
+			cloudsBmp.addShader(cloudsShader);
 
-		planetFlow.scale(1.9);
+			planetFlow.scale(1.9);
 
-		cloudsShader.time_speed = 0.05;
-		riversShader.time_speed = 0.03;
+			cloudsShader.time_speed = 0.05;
+			riversShader.time_speed = 0.03;
+		 */
 
 		socialFlow.verticalAlign = Bottom;
 		socialFlow.horizontalAlign = Right;
@@ -130,45 +129,37 @@ class MainMenu extends Process {
 		vertFlow.layout = Vertical;
 		vertFlow.verticalSpacing = 1;
 
-		var mm = new Text(Assets.fontPixel, vertFlow);
-		mm.smooth = true;
+		var mm = new ShadowedText(Assets.fontPixel, vertFlow);
 		mm.scale(1.5);
 		mm.text = "Total condemn";
 
 		vertFlow.addSpacing(10);
 
-		new TextButton("login", ( _ ) -> {
-			destroy();
-			Main.inst.startGameClient();
-		}, vertFlow);
+		// new TextButton("login", ( _ ) -> {
+		// 	destroy();
+		// 	Main.inst.startGameClient();
+		// }, vertFlow);
 
 		var newGame : TextButton = null;
 		newGame = new TextButton("new game", ( _ ) -> {
 			var dialog : NewSaveDialog = null;
 			dialog = new NewSaveDialog(( e ) -> {
-				Main.inst.startGame();
+				Main.inst.startGame("1000000");
 				Game.inst.startLevel("ship_pascal.tmx");
-				Main.inst.delayer.addF(() -> {
-					tools.Save.inst.saveGame(dialog.textInput.text);
-				}, 1);
 				destroy();
 			}, Save, Main.inst.root);
 			Main.inst.root.add(dialog, Const.DP_UI + 2);
 			dialog.x = parentFlow.x;
 			dialog.y = newGame.y;
-
-			// destroy();
-			// Main.inst.startGame();
-			// Game.inst.startLevel("ship_pascal");
 		}, vertFlow);
 
 		if ( params.saveFiles.length > 0 ) {
-			var loadGame : Object = null;
-			loadGame = new TextButton("load game", ( _ ) -> {
+			var loadObj : Object = null;
+			loadObj = new TextButton("load game", ( _ ) -> {
 				var loadMan = new SaveManager(Load, () -> {
 					destroy();
 				}, parentFlow);
-				loadMan.x = loadGame.x + loadGame.getSize().xMax + 20;
+				loadMan.x = loadObj.x + loadObj.getSize().xMax + 20;
 				parentFlow.getProperties(loadMan).isAbsolute = true;
 			}, vertFlow);
 		}
@@ -193,6 +184,8 @@ class MainMenu extends Process {
 
 		Boot.inst.engine.backgroundColor = 0x0c0c0c;
 		onResize();
+
+		if ( tools.Save.inst != null ) tools.Save.inst.currentFile = null;
 	}
 
 	override function onResize() {
@@ -214,8 +207,8 @@ class MainMenu extends Process {
 }
 
 class TextButton extends ui.Button {
-	public function new( string : String, ?action : Event -> Void, ?colorDef : Int = 0xffffff, ?colorPressed : Int = 0x45798d, ?parent ) {
-		var text = new Text(Assets.fontPixel);
+	public function new( string : String, ?action : Event -> Void, ?colorDef : Int = 0xffffff, ?colorPressed : Int = 0x676767, ?parent ) {
+		var text = new ShadowedText(Assets.fontPixel);
 		text.color = Color.intToVector(colorDef);
 		text.smooth = true;
 		text.text = "  " + string;
@@ -250,7 +243,7 @@ class OptionsMenu extends SecondaryMenu {
 		vertFlow.layout = Vertical;
 		vertFlow.verticalSpacing = 10;
 
-		var mm = new Text(Assets.fontPixel, vertFlow);
+		var mm = new ShadowedText(Assets.fontPixel, vertFlow);
 		mm.smooth = true;
 		mm.scale(1.5);
 		mm.text = "Options";
@@ -259,7 +252,7 @@ class OptionsMenu extends SecondaryMenu {
 		horFlow.layout = Horizontal;
 		horFlow.verticalAlign = Top;
 
-		var nickname = new Text(Assets.fontPixel, horFlow);
+		var nickname = new ShadowedText(Assets.fontPixel, horFlow);
 		nickname.text = "username: ";
 
 		nicknameInput = new ui.TextInput(Assets.fontPixel, horFlow);

@@ -23,6 +23,8 @@ class Settings {
 		inventoryCoordRatio : new Vector(-1, -1),
 		inventoryVisible : false,
 		chestCoordRatio : new Vector(-1, -1),
+        playerCrafting : new Vector(-1, -1),
+        playerCraftingVisible : false,
 		saveFiles : [],
 	};
 
@@ -53,7 +55,7 @@ class Settings {
 			fileList = File.listDirectory(SAVEPATH);
 		} catch( e:SysError ) {}
 		
-		for (i in params.saveFiles) if ( !fileList.contains(i + Const.SAVEFILE_EXT) ) params.saveFiles.remove(i);
+		for (i in params.saveFiles.copy()) if ( !fileList.contains(i + Const.SAVEFILE_EXT) ) params.saveFiles.remove(i);
 
 		for (i in fileList) {
 			var saveFile = i.split(".")[0];

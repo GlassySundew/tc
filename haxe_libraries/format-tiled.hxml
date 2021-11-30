@@ -1,0 +1,3 @@
+# @install: lix --silent download "gh://github.com/Yanrishatum/haxe-format-tiled#f8447f055fd98c3c0b6233c026117d09656baa94" into format-tiled/2.3.0/github/f8447f055fd98c3c0b6233c026117d09656baa94
+-cp ${HAXE_LIBCACHE}/format-tiled/2.3.0/github/f8447f055fd98c3c0b6233c026117d09656baa94/
+-D format-tiled=2.3.0

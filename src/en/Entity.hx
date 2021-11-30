@@ -1,39 +1,35 @@
 package en;
 
-import ui.InventoryGrid.CellGrid;
+import h3d.scene.Object;
+import h3d.scene.Sphere;
+import h3d.scene.Mesh;
+import hxd.IndexBuffer;
+import differ.shapes.Circle;
+import differ.shapes.Polygon;
+import h3d.col.Bounds;
+import hxGeomAlgo.PoleOfInaccessibility;
+import hxGeomAlgo.HxPoint;
+import h2d.col.Point;
+import hxbit.Serializable;
+import differ.Collision;
+import differ.shapes.Shape;
+import dn.heaps.slib.HSprite;
+import en.objs.IsoTileSpr;
+import en.player.Player;
+import format.tmx.Data.TmxObject;
+import format.tmx.Data.TmxTilesetTile;
+import format.tmx.Tools;
+import h2d.Tile;
+import h3d.Vector;
+import h3d.mat.Texture;
+import haxe.Serializer;
 import haxe.Unserializer;
 import haxe.crypto.Base64;
 import haxe.io.Bytes;
-import haxe.Serializer;
-import hxd.System;
 import hxbit.NetworkSerializable;
-import hxbit.Serializable;
-import h2d.Scene;
-import differ.shapes.Circle;
-import differ.Collision;
-import ch3.scene.TileSprite;
-import en.objs.IsoTileSpr;
-import h3d.Matrix;
-import hxd.Key;
-import format.tmx.Data.TmxTilesetTile;
-import format.tmx.Tools;
-import format.tmx.Data.TmxTile;
-import h2d.Tile;
-import h2d.Bitmap;
-import format.tmx.Data.TmxObject;
-import h3d.prim.Sphere;
-import differ.shapes.Shape;
-import en.player.Player;
-import h3d.prim.Cylinder;
-import tools.CPoint;
-import dn.heaps.slib.HSprite;
-import h3d.mat.Texture;
-import h3d.prim.Cube;
-import h3d.Vector;
-import h3d.scene.Mesh;
+import ui.InventoryGrid.CellGrid;
 
-@:keep class Entity implements NetworkSerializable {
-	// private var anim:String;
+class Entity implements NetworkSerializable {
 	public static var ALL : Array<Entity> = [];
 	public static var GC : Array<Entity> = [];
 	/**
@@ -79,8 +75,10 @@ import h3d.scene.Mesh;
 
 	public var dir(default, set) = 6;
 
-	inline function get_tmod() return #if headless GameServer.inst.tmod #else if ( Game.inst != null ) Game.inst.tmod else
-		GameClient.inst.tmod #end;
+	inline function get_tmod() {
+		return #if headless GameServer.inst.tmod #else if ( Game.inst != null ) Game.inst.tmod else
+			GameClient.inst.tmod #end;
+	}
 
 	public var player(get, never) : en.player.Player;
 
@@ -139,19 +137,21 @@ import h3d.scene.Mesh;
 
 	private var rotAngle : Float = -0.01;
 	private var tex : Texture;
+	private var texTile : Tile;
 
 	public var cd : dn.Cooldown;
 	public var tw : Tweenie;
-	public var flippedX = false;
+	@:s public var flippedX : Bool;
+	public var pivotChanged = true;
 
 	public static var isoCoefficient = 1.2;
 
 	public var invGrid : CellGrid;
 
-	var debugLabel : Null<h2d.Text>;
-
 	public function new( ?x : Float = 0, ?z : Float = 0, ?tmxObj : Null<TmxObject> ) {
 		init(x, z, tmxObj);
+
+		flippedX = false;
 	}
 
 	public function init( ?x : Float, ?z : Float, ?tmxObj : Null<TmxObject> ) {
@@ -162,7 +162,7 @@ import h3d.scene.Mesh;
 		tw = new Tweenie(Const.FPS);
 
 		if ( spr == null ) throw "spr hasnt been initialised in " + this;
-		if ( spr != null && spr.groupName == null && sprFrame != null ) {
+		if ( spr.groupName == null && sprFrame != null ) {
 			spr.set(sprFrame.group, sprFrame.frame);
 		}
 		if ( this.tmxObj == null && tmxObj != null ) this.tmxObj = tmxObj;
@@ -174,7 +174,11 @@ import h3d.scene.Mesh;
 		spr.blendMode = Alpha;
 		spr.drawTo(tex);
 
-		mesh = new IsoTileSpr(spr.tile, false, Boot.inst.s3d);
+		texTile = Tile.fromTexture(tex);
+		texTile.getTexture().filter = Nearest;
+
+		mesh = new IsoTileSpr(texTile, false, Boot.inst.s3d);
+
 		mesh.material.mainPass.setBlendMode(AlphaAdd);
 
 		mesh.rotate(tmxObj != null ? M.toRad(tmxObj.rotation) : 0, -rotAngle, M.toRad(90));
@@ -194,16 +198,99 @@ import h3d.scene.Mesh;
 
 		if ( tmxObj != null && tmxObj.flippedVertically ) spr.scaleY = -1;
 		if ( tmxObj != null && tmxObj.flippedHorizontally ) {
-			// spr.scaleX = -1;
-			// flippedX = true;
-			Main.inst.delayer.addF(() -> {
+			Game.inst.delayer.addF(() -> {
 				flipX();
 			}, 0);
 		}
-
 		level = Level.inst;
+
+		#if debug
+		updateDebugDisplay();
+		#end
 	}
 
+	var debugObjs : Array<Object> = [];
+	/** update debug centers and colliders poly**/
+	public function updateDebugDisplay() {
+
+		for ( i in debugObjs ) if ( i != null ) i.remove();
+		debugObjs = [];
+
+		#if entity_centers
+		var sphere = new Sphere(0x361bcc, 1, false, mesh);
+		sphere.material.mainPass.wireframe = true;
+		sphere.material.shadows = false;
+		sphere.material.mainPass.depth(true, Less);
+		sphere.x = 0.25;
+		debugObjs.push(sphere);
+		#end
+
+		#if colliders_debug
+		Game.inst.delayer.addF(() -> {
+			for ( shape => values in collisions ) {
+				switch true {
+					case Std.isOfType(shape, Polygon) => a if ( a ):
+						var pts : Array<h3d.col.Point> = [];
+
+						var poly = cast(shape, Polygon);
+
+						for ( pt in poly.vertices ) {
+							pts.push(new h3d.col.Point(pt.x, 0, pt.y));
+						}
+						var idx = new IndexBuffer();
+						for ( i in 1...pts.length - 1 ) {
+							idx.push(0);
+							idx.push(i);
+							idx.push(i + 1);
+						}
+
+						var polyPrim = new h3d.prim.Polygon(pts, idx);
+						polyPrim.addUVs();
+						polyPrim.addNormals();
+
+						var isoDebugMesh = new Mesh(polyPrim, mesh);
+						// isoDebugMesh.rotate(0, M.toRad(180), M.toRad(90));
+						isoDebugMesh.material.color.setColor(0x361bcc);
+						isoDebugMesh.material.shadows = false;
+						isoDebugMesh.material.mainPass.wireframe = true;
+						isoDebugMesh.material.mainPass.depth(true, Less);
+
+						isoDebugMesh.x = 0.5;
+						isoDebugMesh.y = (spr.pivot.centerFactorX * spr.tile.width)
+							- values.offset.x;
+						isoDebugMesh.z = (spr.pivot.centerFactorY * spr.tile.height)
+							- values.offset.y;
+
+						isoDebugMesh.rotate(M.toRad(poly.rotation), 0, -M.toRad(90));
+						isoDebugMesh.scaleX = poly.scaleX;
+						isoDebugMesh.scaleZ = poly.scaleY;
+
+						debugObjs.push(isoDebugMesh);
+
+					// isoDebugMesh.z = shape.y;
+					case Std.isOfType(shape, Circle) => a if ( a ):
+						var circle = cast(shape, Circle);
+
+						var sphere = new Sphere(0x361bcc, circle.radius, false, mesh);
+						sphere.material.mainPass.wireframe = true;
+						sphere.material.shadows = false;
+						sphere.material.mainPass.depth(true, Less);
+						sphere.scaleZ = circle.scaleY;
+
+						sphere.x = .25;
+						sphere.y = (spr.pivot.centerFactorX * spr.tile.width)
+							- values.offset.x;
+						sphere.z = (spr.pivot.centerFactorY * spr.tile.height)
+							- values.offset.y;
+
+						debugObjs.push(sphere);
+				}
+			}
+		}, 3);
+		#end
+	}
+
+	// network oveeridable
 	public function alive() {}
 
 	public function isOfType<T : Entity>( c : Class<T> ) return Std.isOfType(this, c);
@@ -227,11 +314,16 @@ import h3d.scene.Mesh;
 		return !destroyed; // && life > 0;
 	}
 
-	public function isLocked() return cd.has("lock");
+	public function isLocked() return cd == null ? true : cd.has("lock");
 
 	public function lock( ?ms : Float ) cd.setMs("lock", ms != null ? ms : 1 / 0);
 
-	public function unlock() cd.unset("lock");
+	public function unlock() if ( cd != null ) cd.unset("lock");
+
+	public function setPivot( x : Float, y : Float ) {
+		pivotChanged = true;
+		spr.pivot.setCenterRatio(x, y);
+	}
 
 	public function dropItem( item : en.Item, ?angle : Float, ?power : Float ) : en.Item {
 		angle = angle == null ? Math.random() * M.toRad(360) : angle;
@@ -258,36 +350,31 @@ import h3d.scene.Mesh;
 	/**Flips spr.scaleX, all of collision objects, and sorting rectangle**/
 	public function flipX() {
 		flippedX = !flippedX;
-		checkCollisions();
-		if ( collisions != null ) {
-			for ( collObj in collisions.keys() ) {
-				collObj.x = 0;
-				collObj.y = 0;
-			}
-		}
-
-		footX -= M.round((spr.pivot.centerFactorX - .5) * spr.tile.width);
-
-		for ( i in collisions.keys() ) {
-			i.scaleX *= -1;
-			// collisions.get(i).offset.x = i.scaleX < 0 ? spr.tile.width - i.x : i.x;
-			collisions.get(i).offset.x *= -1;
-			collisions.get(i).offset.x += spr.tile.width;
-		}
 
 		spr.scaleX *= -1;
 		spr.pivot.centerFactorX = 1 - spr.pivot.centerFactorX;
+		pivotChanged = true;
 
-		footX += M.round((spr.pivot.centerFactorX - .5) * spr.tile.width);
-		mesh.xOff *= -1;
+		footX -= (((1 - spr.pivot.centerFactorX * 2) * spr.tile.width));
+
+		updateCollisions();
+
+		for ( shape => value in collisions ) {
+			shape.x = shape.y = 0;
+
+			shape.scaleX *= -1;
+			value.offset.x *= -1;
+			value.offset.x += spr.tile.width;
+		}
+
 		if ( mesh.isLong ) mesh.flipX();
-		// footX += (spr.scaleX < 0 ? ((1 + spr.pivot.centerFactorX) * -spr.tile.width * .5) : ((spr.pivot.centerFactorX - .5) * spr.tile.width));
+		mesh.renewDebugPts();
 
 		try {
-			// cast(this, Interactive).interact.scaleX *= -1;
 			cast(this, Interactive).rebuildInteract();
 		}
 		catch( e:Dynamic ) {}
+		updateDebugDisplay();
 	}
 
 	public inline function bumpAwayFrom( e : Entity, spd : Float, ?spdZ = 0., ?ignoreReduction = false ) {
@@ -310,6 +397,23 @@ import h3d.scene.Mesh;
 	public inline function distPx( e : Entity ) {
 		return M.dist(footX, footY, e.footX, e.footY);
 	}
+	/**
+		подразумевается, что у этой сущности есть длинный изометрический меш
+	**/
+	public function distPolyToPt( e : Entity ) {
+		if ( mesh == null || !mesh.isLong ) return distPx(e); else {
+
+			var verts = mesh.getIsoVerts();
+
+			var pt1 = new HxPoint(footX + mesh.xOff + verts.up.x, footY + mesh.yOff + verts.up.y);
+			var pt2 = new HxPoint(footX + mesh.xOff + verts.right.x, footY + mesh.yOff + verts.right.y);
+			var pt3 = new HxPoint(footX + mesh.xOff + verts.down.x, footY + mesh.yOff + verts.down.y);
+			var pt4 = new HxPoint(footX + mesh.xOff + verts.left.x, footY + mesh.yOff + verts.left.y);
+
+			var dist = PoleOfInaccessibility.pointToPolygonDist(e.footX, e.footY, [[pt1, pt2, pt3, pt4]]);
+			return -dist;
+		}
+	}
 
 	public inline function distPxFree( x : Float, y : Float ) {
 		return M.dist(footX, footY, x, y);
@@ -329,12 +433,14 @@ import h3d.scene.Mesh;
 
 		ctx.addString(spr.groupName);
 		ctx.addInt(spr.frame);
-		ctx.addBool(flippedX);
 
 		// items inventory
 		if ( invGrid != null ) {
 			ctx.addInt(invGrid.grid.length);
 			ctx.addInt(invGrid.grid[0].length);
+
+			ctx.addInt(invGrid.cellWidth);
+			ctx.addInt(invGrid.cellHeight);
 			for ( i in invGrid.grid ) for ( j in i ) {
 				if ( j.item != null ) {
 					ctx.addString(Std.string(j.item.cdbEntry));
@@ -360,23 +466,36 @@ import h3d.scene.Mesh;
 			group : ctx.getString(),
 			frame : ctx.getInt()
 		};
-		init();
 
-		level.game.applyTmxObjOnEnt(this);
-		if ( ctx.getBool() ) {
-			flipX();
-		}
-		offsetFootByCenterReversed();
+		Game.inst.delayer.addF(() -> {
+			init();
+
+			level.game.applyTmxObjOnEnt(this);
+			if ( flippedX ) {
+				Game.inst.delayer.addF(() -> {
+					flipX();
+					flippedX = true;
+
+					footX += (((1 - spr.pivot.centerFactorX * 2) * spr.tile.width));
+				}, 2);
+			}
+			offsetFootByCenterReversed();
+		}, 1);
 
 		// items inventory
 		var invHeight = ctx.getInt();
 		var invWidth = ctx.getInt();
-		if ( invGrid == null && invHeight > 0 && invWidth > 0 ) invGrid = new CellGrid(invWidth, invHeight);
 
+		if ( invGrid == null && invHeight > 0 && invWidth > 0 ) {
+			var cellWidth = ctx.getInt();
+			var cellHeight = ctx.getInt();
+			invGrid = new CellGrid(invWidth, invHeight, cellWidth, cellHeight, this);
+		}
 		for ( i in 0...invHeight ) for ( j in 0...invWidth ) {
 			var itemString = ctx.getString();
 			var itemAmount = ctx.getInt();
-			if ( itemString != "null" ) {
+			if ( itemString != "null" && itemString != "null" && itemString != null ) {
+
 				var item = Item.fromCdbEntry(Data.items.resolve(itemString).id, itemAmount);
 				item.containerEntity = this;
 
@@ -395,10 +514,6 @@ import h3d.scene.Mesh;
 		ALL.remove(this);
 		spr.remove();
 
-		if ( debugLabel != null ) {
-			debugLabel.remove();
-			debugLabel = null;
-		}
 		if ( mesh != null ) {
 			mesh.tile.dispose();
 			mesh.primitive.dispose();
@@ -411,7 +526,7 @@ import h3d.scene.Mesh;
 		#end
 		tw.destroy();
 		cd = null;
-		for ( i in collisions.keys() ) i.destroy();
+		if ( collisions != null ) for ( i in collisions.keys() ) if ( i != null ) i.destroy();
 		collisions = null;
 		spr = null;
 		mesh = null;
@@ -434,7 +549,7 @@ import h3d.scene.Mesh;
 	}
 
 	// used by save manager, when saved objects are already offset by center
-	public function offsetFootByCenterYReversed() {
+	public function offsetFootByCenterXReversed() {
 		footX += ((spr.pivot.centerFactorX - .5) * spr.tile.width);
 		footY += (spr.pivot.centerFactorY) * spr.tile.height - spr.tile.height;
 	}
@@ -443,16 +558,17 @@ import h3d.scene.Mesh;
 		destroy();
 	}
 
-	public function checkCollisions() {
+	public function updateCollisions() {
 		#if !headless
 		if ( collisions != null ) {
-			for ( collObj in collisions.keys() ) {
+			for ( collObj => values in collisions ) {
 				collObj.x = footX
-					- collisions.get(collObj).cent.x
-					- (spr.pivot.centerFactorX * spr.tile.width - collisions.get(collObj).offset.x - collisions.get(collObj).cent.x);
+					- spr.pivot.centerFactorX * spr.tile.width
+					+ values.offset.x;
+
 				collObj.y = footY
-					- collisions.get(collObj).cent.y
-					+ (spr.pivot.centerFactorY * spr.tile.height + collisions.get(collObj).offset.y + collisions.get(collObj).cent.y);
+					+ spr.pivot.centerFactorY * spr.tile.height
+					- values.offset.y;
 			}
 		}
 		#end
@@ -465,6 +581,7 @@ import h3d.scene.Mesh;
 			if ( !(ent.isOfType(FloatingItem) || isOfType(FloatingItem))
 				&& !(Std.isOfType(ent, Structure) && !(cast(ent, Structure).toBeCollidedAgainst))
 				&& ent != this ) {
+
 				for ( collObj in collisions.keys() ) {
 					for ( entCollObj in ent.collisions.keys() ) {
 						var collideInfo = Collision.shapeWithShape(collObj, entCollObj);
@@ -483,6 +600,7 @@ import h3d.scene.Mesh;
 				}
 			}
 		}
+
 		for ( poly in Level.inst.walkable ) {
 			for ( collObj in collisions.keys() ) {
 				var collideInfo = Collision.shapeWithShape(collObj, poly);
@@ -509,8 +627,6 @@ import h3d.scene.Mesh;
 	}
 
 	public function preUpdate() {
-		// this.footX = footX;
-		// this.footY = footY;
 		spr.anim.update(tmod);
 		cd.update(tmod);
 		tw.update(tmod);
@@ -577,7 +693,7 @@ import h3d.scene.Mesh;
 	public function postUpdate() {
 		#if !headless
 		if ( mesh != null ) {
-			checkCollisions();
+			updateCollisions();
 			// spr.scaleX = dir * sprScaleX;
 			// spr.scaleY = sprScaleY;
 
@@ -604,21 +720,38 @@ import h3d.scene.Mesh;
 	public function frameEnd() {
 		#if !headless
 		if ( mesh != null ) {
-			tex.clear(0, 0);
-			spr.x = spr.scaleX > 0 ? -spr.tile.dx : spr.tile.dx + spr.tile.width;
-			spr.y = spr.scaleY > 0 ? -spr.tile.dy : spr.tile.dy + spr.tile.height;
+			@:privateAccess
+			var bounds = mesh.plane.getBounds();
 
-			// if ( tmxObj.flippedVertically ) mesh.rotate(0, 0.1, 0);
+			bounds.xMax = spr.tile.width + footX;
+			bounds.xMin = footX;
 
-			spr.drawTo(tex);
-			var tile = Tile.fromTexture(tex);
-			tile.getTexture().filter = Nearest;
-			tile.setCenterRatio(spr.pivot.centerFactorX, spr.pivot.centerFactorY);
-			mesh.tile = tile;
+			var needForDraw = Game.inst.camera.s3dCam.frustum.hasBounds(bounds);
 
-			mesh.x = footX;
-			mesh.z = footY;
-		}
+			if ( !needForDraw ) {
+				mesh.visible = false;
+				spr.visible = false;
+			}
+
+			if ( needForDraw ) {
+				mesh.visible = true;
+				spr.visible = true;
+
+				tex.clear(0, 0);
+				spr.x = spr.scaleX > 0 ? -spr.tile.dx : spr.tile.dx + spr.tile.width;
+				spr.y = spr.scaleY > 0 ? -spr.tile.dy : spr.tile.dy + spr.tile.height;
+
+				spr.drawTo(tex);
+				if ( pivotChanged ) {
+					texTile.setCenterRatio(spr.pivot.centerFactorX, spr.pivot.centerFactorY);
+					mesh.tile = texTile;
+					pivotChanged = false;
+				}
+
+				mesh.x = footX;
+				mesh.z = footY;
+			}
 		#end
+		}
 	}
 }

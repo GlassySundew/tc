@@ -15,15 +15,14 @@ class IngredsHintComp extends Flow implements Object implements WindowCompI {
                </window>
         </ingreds-hint-comp>;
 
-    static var sheet : Resource;
 
-    public function new( backgroundTile : h2d.Tile, bl : Int, bt : Int, br : Int, bb : Int, ?parent : Null<h2d.Object> ) {
+    public function new( backgroundTile : h2d.Tile, bl : Int, bt : Int, br : Int, bb : Int, ?parent : Null<h2d.Object>, rest : haxe.Rest<Dynamic> ) {
         super(parent);  
-        if ( sheet == null ) sheet = Res.domkit.ingreds_hint;
         initComponent();
      
         window.windowLabel.label = "Ingredients";
 
-        window.style.load(sheet);
+		window.style.load(Res.domkit.ingreds_hint);
+        
     }
 }

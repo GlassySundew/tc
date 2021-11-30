@@ -1,5 +1,8 @@
 package en.structures;
 
+import h3d.scene.Mesh;
+import h2d.Tile;
+import h3d.col.Point;
 import hxd.System;
 import en.player.Player;
 import format.tmx.Data.TmxObject;
@@ -17,11 +20,16 @@ class Chest extends Structure {
 
 	public function new( ?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : StructuresKind ) {
 		super(x, z, tmxObj, cdbEntry);
+
+		invGrid = new CellGrid(5, 5, 25, 25, this);
+
 		// adding items from props only when first loaded (with no serialization)
-		for ( i in tmxObj.properties.keys() ) {
-			var split = i.split(":");
-			if ( split.length > 1 && split[0] == "items" ) {
-				invGrid.giveItem(Item.fromCdbEntry(Data.items.resolve(split[1]).id), this);
+		for ( prop in tmxObj.properties.keys() ) {
+			var split = prop.split(":");
+			if ( split.length > 1 && split[0] == "item" ) {
+				var item = Item.fromCdbEntry(Data.items.resolve(split[1]).id);
+				item.amount = tmxObj.properties.getInt(prop);
+				invGrid.giveItem(item, this);
 			}
 		}
 	}
@@ -30,16 +38,17 @@ class Chest extends Structure {
 		super.init(x, z, tmxObj);
 		ca = Main.inst.controller.createAccess("chest");
 
-		initInv(uiConf.get("chest").getObjectByName("grid"));
-
 		#if !headless
-		inventory = new ChestWin(invGrid, Player.inst.ui);
-		inventory.containmentEntity = this;
+		Game.inst.delayer.addF(() -> {
+			inventory = new ChestWin(invGrid,
+				Player.inst.ui.root);
+			inventory.containmentEntity = this;
+		}, 2);
 		#end
 
 		interact.onTextInputEvent.add(( e : Event ) -> {
 			if ( ca.aPressed() ) {
-				Player.inst.ui.inventory.win.visible = true;
+				if ( !Player.inst.ui.inventory.win.visible ) Player.inst.ui.inventory.toggleVisible();
 				inventory.toggleVisible();
 				// Window.centrizeTwoWins(Player.inst.ui.inventory, inventory);
 			}
@@ -50,14 +59,17 @@ class Chest extends Structure {
 		super.postUpdate();
 
 		if ( Player.inst != null
-			&& distPx(Player.inst) > Data.structures.get(cdbEntry).use_range
+			&& Player.inst.isMoving()
+			&& !isInPlayerRange()
 			&& inventory != null
-			&& inventory.win.visible == true ) inventory.win.visible = false;
+			&& inventory.win.visible == true ) {
+			inventory.toggleVisible();
+		}
 	}
 
 	override function dispose() {
 		super.dispose();
-		inventory.destroy();
+		if ( inventory != null ) inventory.destroy();
 	}
 }
 
@@ -69,8 +81,12 @@ class ChestWin extends Inventory {
 			Settings.params.chestCoordRatio.x = win.x / Main.inst.w();
 			Settings.params.chestCoordRatio.y = win.y / Main.inst.h();
 		});
-		
+
 		windowComp.window.windowLabel.labelTxt.text = "Chest";
+	}
+
+	override function initLoad( ?parent : Object ) {
+		super.initLoad(parent);
 	}
 
 	override function toggleVisible() {

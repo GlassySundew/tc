@@ -18,6 +18,8 @@
     "css.lint.unknownProperties": "ignore",
     "editor.suggest.showReferences": false,
     "latex-workshop.hover.ref.enabled": false,
-    "editor.codeLens": false
+    "editor.codeLens": false,
+    "editor.renderWhitespace": "all",
+    "editor.tabSize": 3
   }
 }

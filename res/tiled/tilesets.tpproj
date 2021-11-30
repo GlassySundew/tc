@@ -1,42 +1,3 @@
-name=player
-filename=player.atlas
-output=atlas
-
-alias=true
-alphaThreshold=0
-debug=false
-duplicatePadding=false
-edgePadding=false
-fast=false
-filterMag=Nearest
-filterMin=Nearest
-ignoreBlankImages=true
-maxHeight=2048
-maxWidth=2048
-minHeight=16
-minWidth=16
-paddingX=2
-paddingY=2
-pot=false
-mof=false
-rotation=false
-stripWhitespaceX=false
-stripWhitespaceY=false
-wrapX=ClampToEdge
-wrapY=ClampToEdge
-premultiplyAlpha=false
-grid=false
-square=false
-bleed=false
-limitMemory=false
-useIndexes=false
-
-scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:separated/player/idle_down_0.png,type:Input,regionName:null},{path:separated/player/idle_down_left_0.png,type:Input,regionName:null},{path:separated/player/idle_down_right_0.png,type:Input,regionName:null},{path:separated/player/idle_left_0.png,type:Input,regionName:null},{path:separated/player/idle_right_0.png,type:Input,regionName:null},{path:separated/player/idle_Slice 1_0.png,type:Input,regionName:null},{path:separated/player/idle_up_0.png,type:Input,regionName:null},{path:separated/player/idle_up_left_0.png,type:Input,regionName:null},{path:separated/player/idle_up_right_0.png,type:Input,regionName:null},{path:separated/player/player.png,type:Input,regionName:null},{path:separated/player/pre_down_0.png,type:Input,regionName:null},{path:separated/player/pre_down_left_0.png,type:Input,regionName:null},{path:separated/player/pre_down_right_0.png,type:Input,regionName:null},{path:separated/player/pre_left_0.png,type:Input,regionName:null},{path:separated/player/pre_right_0.png,type:Input,regionName:null},{path:separated/player/pre_Slice 1_0.png,type:Input,regionName:null},{path:separated/player/pre_up_0.png,type:Input,regionName:null},{path:separated/player/pre_up_left_0.png,type:Input,regionName:null},{path:separated/player/pre_up_right_0.png,type:Input,regionName:null},{path:separated/player/walk_down_0.png,type:Input,regionName:null},{path:separated/player/walk_down_1.png,type:Input,regionName:null},{path:separated/player/walk_down_2.png,type:Input,regionName:null},{path:separated/player/walk_down_3.png,type:Input,regionName:null},{path:separated/player/walk_down_left_0.png,type:Input,regionName:null},{path:separated/player/walk_down_left_1.png,type:Input,regionName:null},{path:separated/player/walk_down_left_2.png,type:Input,regionName:null},{path:separated/player/walk_down_left_3.png,type:Input,regionName:null},{path:separated/player/walk_down_right_0.png,type:Input,regionName:null},{path:separated/player/walk_down_right_1.png,type:Input,regionName:null},{path:separated/player/walk_down_right_2.png,type:Input,regionName:null},{path:separated/player/walk_down_right_3.png,type:Input,regionName:null},{path:separated/player/walk_left_0.png,type:Input,regionName:null},{path:separated/player/walk_left_1.png,type:Input,regionName:null},{path:separated/player/walk_left_2.png,type:Input,regionName:null},{path:separated/player/walk_left_3.png,type:Input,regionName:null},{path:separated/player/walk_right_0.png,type:Input,regionName:null},{path:separated/player/walk_right_1.png,type:Input,regionName:null},{path:separated/player/walk_right_2.png,type:Input,regionName:null},{path:separated/player/walk_right_3.png,type:Input,regionName:null},{path:separated/player/walk_Slice 1_0.png,type:Input,regionName:null},{path:separated/player/walk_Slice 1_1.png,type:Input,regionName:null},{path:separated/player/walk_Slice 1_2.png,type:Input,regionName:null},{path:separated/player/walk_Slice 1_3.png,type:Input,regionName:null},{path:separated/player/walk_up_0.png,type:Input,regionName:null},{path:separated/player/walk_up_1.png,type:Input,regionName:null},{path:separated/player/walk_up_2.png,type:Input,regionName:null},{path:separated/player/walk_up_3.png,type:Input,regionName:null},{path:separated/player/walk_up_left_0.png,type:Input,regionName:null},{path:separated/player/walk_up_left_1.png,type:Input,regionName:null},{path:separated/player/walk_up_left_2.png,type:Input,regionName:null},{path:separated/player/walk_up_left_3.png,type:Input,regionName:null},{path:separated/player/walk_up_right_0.png,type:Input,regionName:null},{path:separated/player/walk_up_right_1.png,type:Input,regionName:null},{path:separated/player/walk_up_right_2.png,type:Input,regionName:null},{path:separated/player/walk_up_right_3.png,type:Input,regionName:null}]
-
-
----
-
 name=items
 filename=
 output=atlas
@@ -72,6 +33,45 @@ useIndexes=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
 inputFiles=[{path:separated/items/door.png,type:Input,regionName:null},{path:separated/items/emerald.png,type:Input,regionName:null},{path:separated/items/fireaxe.png,type:Input,regionName:null},{path:separated/items/hydroponics.png,type:Input,regionName:null},{path:separated/items/item_gravity_manipulator.png,type:Input,regionName:null},{path:separated/items/item_iron_ore.png,type:Input,regionName:null},{path:separated/items/seaweed.png,type:Input,regionName:null},{path:separated/items/seeds_seaweed.png,type:Input,regionName:null},{path:separated/items/shadow.png,type:Input,regionName:null}]
+
+
+---
+
+name=player
+filename=player.atlas
+output=atlas
+
+alias=true
+alphaThreshold=0
+debug=false
+duplicatePadding=false
+edgePadding=false
+fast=false
+filterMag=Nearest
+filterMin=Nearest
+ignoreBlankImages=true
+maxHeight=2048
+maxWidth=2048
+minHeight=16
+minWidth=16
+paddingX=2
+paddingY=2
+pot=false
+mof=false
+rotation=false
+stripWhitespaceX=false
+stripWhitespaceY=false
+wrapX=ClampToEdge
+wrapY=ClampToEdge
+premultiplyAlpha=false
+grid=false
+square=false
+bleed=false
+limitMemory=false
+useIndexes=false
+
+scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
+inputFiles=[{path:separated/player/idle_down_0.png,type:Input,regionName:null},{path:separated/player/idle_down_left_0.png,type:Input,regionName:null},{path:separated/player/idle_down_right_0.png,type:Input,regionName:null},{path:separated/player/idle_left_0.png,type:Input,regionName:null},{path:separated/player/idle_right_0.png,type:Input,regionName:null},{path:separated/player/idle_Slice 1_0.png,type:Input,regionName:null},{path:separated/player/idle_up_0.png,type:Input,regionName:null},{path:separated/player/idle_up_left_0.png,type:Input,regionName:null},{path:separated/player/idle_up_right_0.png,type:Input,regionName:null},{path:separated/player/player.png,type:Input,regionName:null},{path:separated/player/pre_down_0.png,type:Input,regionName:null},{path:separated/player/pre_down_left_0.png,type:Input,regionName:null},{path:separated/player/pre_down_right_0.png,type:Input,regionName:null},{path:separated/player/pre_left_0.png,type:Input,regionName:null},{path:separated/player/pre_right_0.png,type:Input,regionName:null},{path:separated/player/pre_Slice 1_0.png,type:Input,regionName:null},{path:separated/player/pre_up_0.png,type:Input,regionName:null},{path:separated/player/pre_up_left_0.png,type:Input,regionName:null},{path:separated/player/pre_up_right_0.png,type:Input,regionName:null},{path:separated/player/walk_down_0.png,type:Input,regionName:null},{path:separated/player/walk_down_1.png,type:Input,regionName:null},{path:separated/player/walk_down_2.png,type:Input,regionName:null},{path:separated/player/walk_down_3.png,type:Input,regionName:null},{path:separated/player/walk_down_left_0.png,type:Input,regionName:null},{path:separated/player/walk_down_left_1.png,type:Input,regionName:null},{path:separated/player/walk_down_left_2.png,type:Input,regionName:null},{path:separated/player/walk_down_left_3.png,type:Input,regionName:null},{path:separated/player/walk_down_right_0.png,type:Input,regionName:null},{path:separated/player/walk_down_right_1.png,type:Input,regionName:null},{path:separated/player/walk_down_right_2.png,type:Input,regionName:null},{path:separated/player/walk_down_right_3.png,type:Input,regionName:null},{path:separated/player/walk_left_0.png,type:Input,regionName:null},{path:separated/player/walk_left_1.png,type:Input,regionName:null},{path:separated/player/walk_left_2.png,type:Input,regionName:null},{path:separated/player/walk_left_3.png,type:Input,regionName:null},{path:separated/player/walk_right_0.png,type:Input,regionName:null},{path:separated/player/walk_right_1.png,type:Input,regionName:null},{path:separated/player/walk_right_2.png,type:Input,regionName:null},{path:separated/player/walk_right_3.png,type:Input,regionName:null},{path:separated/player/walk_Slice 1_0.png,type:Input,regionName:null},{path:separated/player/walk_Slice 1_1.png,type:Input,regionName:null},{path:separated/player/walk_Slice 1_2.png,type:Input,regionName:null},{path:separated/player/walk_Slice 1_3.png,type:Input,regionName:null},{path:separated/player/walk_up_0.png,type:Input,regionName:null},{path:separated/player/walk_up_1.png,type:Input,regionName:null},{path:separated/player/walk_up_2.png,type:Input,regionName:null},{path:separated/player/walk_up_3.png,type:Input,regionName:null},{path:separated/player/walk_up_left_0.png,type:Input,regionName:null},{path:separated/player/walk_up_left_1.png,type:Input,regionName:null},{path:separated/player/walk_up_left_2.png,type:Input,regionName:null},{path:separated/player/walk_up_left_3.png,type:Input,regionName:null},{path:separated/player/walk_up_right_0.png,type:Input,regionName:null},{path:separated/player/walk_up_right_1.png,type:Input,regionName:null},{path:separated/player/walk_up_right_2.png,type:Input,regionName:null},{path:separated/player/walk_up_right_3.png,type:Input,regionName:null}]
 
 
 ---
@@ -158,7 +158,7 @@ name=ui
 filename=
 output=atlas
 
-alias=true
+alias=false
 alphaThreshold=0
 debug=false
 duplicatePadding=false
@@ -174,26 +174,26 @@ minWidth=16
 paddingX=0
 paddingY=0
 pot=false
-mof=true
+mof=false
 rotation=false
 stripWhitespaceX=false
 stripWhitespaceY=false
 wrapX=ClampToEdge
 wrapY=ClampToEdge
 premultiplyAlpha=false
-grid=true
-square=true
+grid=false
+square=false
 bleed=false
 limitMemory=false
 useIndexes=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:separated/ui/9slice_window.png,type:Input,regionName:null},{path:separated/ui/asteroid0.png,type:Input,regionName:null},{path:separated/ui/asteroid1.png,type:Input,regionName:null},{path:separated/ui/asteroid2.png,type:Input,regionName:null},{path:separated/ui/asteroid3.png,type:Input,regionName:null},{path:separated/ui/body_selected.png,type:Input,regionName:null},{path:separated/ui/caret0.png,type:Input,regionName:null},{path:separated/ui/caret1.png,type:Input,regionName:null},{path:separated/ui/close_button_inventory0.png,type:Input,regionName:null},{path:separated/ui/close_button_inventory1.png,type:Input,regionName:null},{path:separated/ui/close_button_inventory2.png,type:Input,regionName:null},{path:separated/ui/craft_but0.png,type:Input,regionName:null},{path:separated/ui/craft_but1.png,type:Input,regionName:null},{path:separated/ui/craft_but2.png,type:Input,regionName:null},{path:separated/ui/crafting.png,type:Input,regionName:null},{path:separated/ui/cursor0.png,type:Input,regionName:null},{path:separated/ui/cursor1.png,type:Input,regionName:null},{path:separated/ui/cursor2.png,type:Input,regionName:null},{path:separated/ui/discord0.png,type:Input,regionName:null},{path:separated/ui/discord1.png,type:Input,regionName:null},{path:separated/ui/discord2.png,type:Input,regionName:null},{path:separated/ui/edit0.png,type:Input,regionName:null},{path:separated/ui/edit1.png,type:Input,regionName:null},{path:separated/ui/health_caret.png,type:Input,regionName:null},{path:separated/ui/health_line.png,type:Input,regionName:null},{path:separated/ui/health_sign.png,type:Input,regionName:null},{path:separated/ui/inventory.png,type:Input,regionName:null},{path:separated/ui/inventory_cell.png,type:Input,regionName:null},{path:separated/ui/keyboard_icon0.png,type:Input,regionName:null},{path:separated/ui/keyboard_icon1.png,type:Input,regionName:null},{path:separated/ui/navigation.png,type:Input,regionName:null},{path:separated/ui/new0.png,type:Input,regionName:null},{path:separated/ui/new1.png,type:Input,regionName:null},{path:separated/ui/new2.png,type:Input,regionName:null},{path:separated/ui/oxygen_scale.png,type:Input,regionName:null},{path:separated/ui/oxygen_sign.png,type:Input,regionName:null},{path:separated/ui/recipe.png,type:Input,regionName:null},{path:separated/ui/recipe_comp.png,type:Input,regionName:null},{path:separated/ui/recipe_hint.png,type:Input,regionName:null},{path:separated/ui/save0.png,type:Input,regionName:null},{path:separated/ui/save1.png,type:Input,regionName:null},{path:separated/ui/save2.png,type:Input,regionName:null},{path:separated/ui/scrollbar_background_9slice.png,type:Input,regionName:null},{path:separated/ui/Slice 1.png,type:Input,regionName:null},{path:separated/ui/start0.png,type:Input,regionName:null},{path:separated/ui/start1.png,type:Input,regionName:null},{path:separated/ui/start2.png,type:Input,regionName:null},{path:separated/ui/trash0.png,type:Input,regionName:null},{path:separated/ui/trash1.png,type:Input,regionName:null},{path:separated/ui/travel_but0.png,type:Input,regionName:null},{path:separated/ui/travel_but1.png,type:Input,regionName:null},{path:separated/ui/twitter0.png,type:Input,regionName:null},{path:separated/ui/twitter1.png,type:Input,regionName:null},{path:separated/ui/twitter2.png,type:Input,regionName:null},{path:separated/ui/vk0.png,type:Input,regionName:null},{path:separated/ui/vk1.png,type:Input,regionName:null},{path:separated/ui/vk2.png,type:Input,regionName:null}]
+inputFiles=[{path:separated/ui/cursor2.png,type:Input,regionName:null},{path:separated/ui/9slice_window.png,type:Input,regionName:null},{path:separated/ui/asteroid0.png,type:Input,regionName:""},{path:separated/ui/asteroid1.png,type:Input,regionName:null},{path:separated/ui/asteroid2.png,type:Input,regionName:null},{path:separated/ui/asteroid3.png,type:Input,regionName:null},{path:separated/ui/body_selected.png,type:Input,regionName:null},{path:separated/ui/caret0.png,type:Input,regionName:null},{path:separated/ui/caret1.png,type:Input,regionName:null},{path:separated/ui/close_button_inventory0.png,type:Input,regionName:null},{path:separated/ui/close_button_inventory1.png,type:Input,regionName:null},{path:separated/ui/close_button_inventory2.png,type:Input,regionName:null},{path:separated/ui/craft_but0.png,type:Input,regionName:null},{path:separated/ui/craft_but1.png,type:Input,regionName:null},{path:separated/ui/craft_but2.png,type:Input,regionName:null},{path:separated/ui/cursor0.png,type:Input,regionName:null},{path:separated/ui/cursor1.png,type:Input,regionName:null},{path:separated/ui/discord0.png,type:Input,regionName:null},{path:separated/ui/discord1.png,type:Input,regionName:null},{path:separated/ui/discord2.png,type:Input,regionName:null},{path:separated/ui/edit0.png,type:Input,regionName:null},{path:separated/ui/edit1.png,type:Input,regionName:null},{path:separated/ui/health_caret.png,type:Input,regionName:null},{path:separated/ui/health_line.png,type:Input,regionName:null},{path:separated/ui/health_sign.png,type:Input,regionName:null},{path:separated/ui/inventory_cell.png,type:Input,regionName:null},{path:separated/ui/keyboard_icon0.png,type:Input,regionName:null},{path:separated/ui/keyboard_icon1.png,type:Input,regionName:null},{path:separated/ui/navigation_win.png,type:Input,regionName:null},{path:separated/ui/new0.png,type:Input,regionName:null},{path:separated/ui/new1.png,type:Input,regionName:null},{path:separated/ui/new2.png,type:Input,regionName:null},{path:separated/ui/oxygen_scale.png,type:Input,regionName:null},{path:separated/ui/oxygen_sign.png,type:Input,regionName:null},{path:separated/ui/player_head.png,type:Input,regionName:null},{path:separated/ui/recipe.png,type:Input,regionName:null},{path:separated/ui/recipe_comp.png,type:Input,regionName:null},{path:separated/ui/recipe_hint.png,type:Input,regionName:null},{path:separated/ui/save0.png,type:Input,regionName:null},{path:separated/ui/save1.png,type:Input,regionName:null},{path:separated/ui/save2.png,type:Input,regionName:null},{path:separated/ui/scrollbar_background_9slice.png,type:Input,regionName:null},{path:separated/ui/start0.png,type:Input,regionName:null},{path:separated/ui/start1.png,type:Input,regionName:null},{path:separated/ui/start2.png,type:Input,regionName:null},{path:separated/ui/tp0.png,type:Input,regionName:null},{path:separated/ui/tp1.png,type:Input,regionName:null},{path:separated/ui/trash0.png,type:Input,regionName:null},{path:separated/ui/trash1.png,type:Input,regionName:null},{path:separated/ui/travel_but0.png,type:Input,regionName:null},{path:separated/ui/travel_but1.png,type:Input,regionName:null},{path:separated/ui/travel_but2.png,type:Input,regionName:null},{path:separated/ui/twitter0.png,type:Input,regionName:null},{path:separated/ui/twitter1.png,type:Input,regionName:null},{path:separated/ui/twitter2.png,type:Input,regionName:null},{path:separated/ui/vk0.png,type:Input,regionName:null},{path:separated/ui/vk1.png,type:Input,regionName:null},{path:separated/ui/vk2.png,type:Input,regionName:null}]
 
 
 -PROJ-
 
-version=4.10.0
+version=4.9.0
 fileTypeType=png
 fileTypeData={encoding:RGBA8888}
 previewBackgroundColor=ffffffff

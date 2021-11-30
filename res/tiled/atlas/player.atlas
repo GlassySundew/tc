@@ -1,8 +1,8 @@
 
 player.png
-size: 198, 536
+size: 198,536
 format: RGBA8888
-filter: Nearest, Nearest
+filter: Nearest,Nearest
 repeat: none
 idle_Slice 1_0
   rotate: false

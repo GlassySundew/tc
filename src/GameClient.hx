@@ -1,3 +1,4 @@
+import ui.ShadowedText;
 import ui.PauseMenu;
 import MainMenu.TextButton;
 import h2d.Text;
@@ -64,7 +65,7 @@ class GameClient extends Process implements IGame {
 			if ( !b ) {
 				var infoFlow = new Flow(Boot.inst.s2d);
 				infoFlow.verticalAlign = Middle;
-				var textInfo = new Text(Assets.fontPixel, infoFlow);
+				var textInfo = new ShadowedText(Assets.fontPixel, infoFlow);
 				textInfo.text = "Server is down, stay tuned... ";
 				var mainMenuBut : TextButton = null;
 				mainMenuBut = new TextButton("return back to menu", ( e ) -> {
@@ -212,7 +213,7 @@ class GameClient extends Process implements IGame {
 										#end
 									}
 
-									ent.spr.setCenterRatio(pivotX, pivotY);
+									ent.setPivot(pivotX, pivotY);
 									ent.footX += M.round((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width);
 									ent.footY -= (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height;
 								}
@@ -223,13 +224,13 @@ class GameClient extends Process implements IGame {
 										xCent = M.round(obj.width / 2);
 										yCent = M.round(obj.height / 2);
 										ent.collisions.set(shape,
-											{cent : new h3d.Vector(xCent, yCent), offset : new h3d.Vector(obj.x + xCent, -obj.y - yCent)});
+											{ cent : new h3d.Vector(xCent, yCent), offset : new h3d.Vector(obj.x + xCent, -obj.y - yCent) });
 									case OTRectangle:
 										// Точка парсится как OTRectangle, точка с названием center будет обозначать центр
 										ent.collisions.set(Polygon.rectangle(params.x, params.y, params.width, params.height),
-											{cent : new h3d.Vector(), offset : new h3d.Vector()});
+											{ cent : new h3d.Vector(), offset : new h3d.Vector() });
 									case OTPolygon(points):
-										var pts = checkPolyClockwise(points);
+										var pts = makePolyClockwise(points);
 										var verts : Array<Vector> = [];
 										for ( i in pts ) {
 											verts.push(new Vector((i.x), (-i.y)));
@@ -259,7 +260,7 @@ class GameClient extends Process implements IGame {
 										if ( ent.tmxObj != null && ent.tmxObj.flippedVertically ) poly.scaleX = -1;
 										var xOffset = poly.scaleX < 0 ? ent.spr.tile.width - obj.x : obj.x;
 										var yOffset = -obj.y;
-										ent.collisions.set(poly, {cent : new h3d.Vector(xCent, -yCent), offset : new h3d.Vector(xOffset, yOffset)});
+										ent.collisions.set(poly, { cent : new h3d.Vector(xCent, -yCent), offset : new h3d.Vector(xOffset, yOffset) });
 									case OTPoint:
 										if ( obj.name == "center" ) {
 											if ( centerSet ) unsetCenter();

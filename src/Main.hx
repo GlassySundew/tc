@@ -23,6 +23,7 @@ class Main extends Process {
 		super();
 		inst = this;
 		createRoot(s);
+		
 		// root.filter = new h2d.filter.ColorMatrix();
 
 		#if( hl && pak )
@@ -51,8 +52,8 @@ class Main extends Process {
 		Assets.init();
 		Cursors.init();
 		Lang.init("en");
-
-		uiMap = resolveMap("ui.tmx");
+		 
+		uiMap = MapCache.inst.get("ui.tmx");
 		uiConf = uiMap.mapLayersByName();
 		for ( i in uiConf ) {
 			var window = i.getObjectByName("window");
@@ -107,15 +108,13 @@ class Main extends Process {
 		#if debug
 		new MainMenu(Boot.inst.s2d);
 
-		// var autoMapper = new mapgen.AutoMap("res/tiled/levels/rules.txt");
-
+		// var autoMapper = new mapgen.AutoMap("tiled/levels/rules.txt");
 		// var mapGen = new MapGen(resolveMap('procgen/asteroids.tmx'), autoMapper);
-		// mapGen.generate(50, 50, 100, 5, 15)
-		// var applicableMap = autoMapper.applyRulesToMap(resolveMap('test.tmx'));
+		// var applicableMap = autoMapper.applyRulesToMap(mapGen.generate(50, 50, 100, 5, 15));
 
 		// startGame();
 
-		// Game.inst.startLevel("bridge.tmx");
+		// // Game.inst.startLevel("bridge.tmx");
 		// Game.inst.startLevelFromParsedTmx(applicableMap, "test.tmx");
 		#else
 		new MainMenu(Boot.inst.s2d);
@@ -129,23 +128,21 @@ class Main extends Process {
 		Settings.params.fullscreen = s.displayMode == Fullscreen;
 		#end
 	}
-
-	public function startGame() {
+	/** single-player **/
+	public function startGame( ?seed : String ) {
 		if ( Game.inst != null ) {
 			Game.inst.destroy();
-			delayer.addF(function () {
-				new Game();
-			}, 2);
+			@:privateAccess Process._garbageCollector(Process.ROOTS);
+			new Game(seed);
 		} else
-			new Game();
+			new Game(seed);
 	}
 
 	public function startGameClient() {
 		if ( GameClient.inst != null ) {
 			GameClient.inst.destroy();
-			delayer.addF(function () {
-				new GameClient();
-			}, 2);
+			@:privateAccess Process._garbageCollector(Process.ROOTS);
+			new GameClient();
 		} else
 			new GameClient();
 	}
@@ -153,11 +150,9 @@ class Main extends Process {
 	override function onResize() {
 		super.onResize();
 
-		if ( Const.AUTO_SCALE_TARGET_WID > 0 ) Const.SCALE = M.ceil(h() / Const.AUTO_SCALE_TARGET_WID); else if ( Const.AUTO_SCALE_TARGET_HEI > 0 )
-			Const.SCALE = M.floor(h() / Const.AUTO_SCALE_TARGET_HEI);
-		root.setScale(Const.SCALE);
-
-		// Boot.inst.s2d.scaleMode = Zoom(Const.SCALE);
+		if ( Const.AUTO_SCALE_TARGET_WID > 0 ) Const.UI_SCALE = M.ceil(h() / Const.AUTO_SCALE_TARGET_WID); else if ( Const.AUTO_SCALE_TARGET_HEI > 0 )
+			Const.UI_SCALE = M.floor(h() / Const.AUTO_SCALE_TARGET_HEI);
+		root.setScale(Const.UI_SCALE);
 	}
 
 	override function update() {

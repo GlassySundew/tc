@@ -1,28 +1,30 @@
 package ui.player;
 
-import ui.domkit.ScrollbarComp;
 import ch2.ui.EventInteractive;
 import ch2.ui.ScrollArea;
 import en.player.Player;
 import h2d.Flow;
 import h2d.Object;
 import h2d.ScaleGrid;
+import h2d.Tile;
 import h2d.col.Bounds;
 import h2d.col.Point;
+import h3d.Vector;
+import haxe.Constraints.Constructible;
 import hxd.Event;
 import ui.InventoryGrid.InventoryCell;
 import ui.domkit.CraftingComp;
 import ui.domkit.IngredComp;
 import ui.domkit.IngredsHintComp;
 import ui.domkit.RecipeComp;
+import ui.domkit.ScrollbarComp;
+import ui.domkit.WindowComp.WindowCompI;
 
 class Crafting extends NinesliceWindow {
 	var scrollable : ScrollArea;
 
 	public function new( ?parent : Object ) {
-		super(( tile, bl, bt, br, bb, parent ) -> {
-			new CraftingComp(tile, bl, bt, br, bb, parent);
-		}, parent);
+		super(CraftingComp, parent);
 
 		windowComp.window.windowLabel.labelTxt.text = "Crafting";
 		var craftingComp = cast(windowComp, CraftingComp);
@@ -51,8 +53,8 @@ class Crafting extends NinesliceWindow {
 
 		var scroll = ( e : Event ) -> {
 			if ( e.kind == EWheel ) {
-				scrollable.scrollBy(0, e.wheelDelta);
-				slider.value = scrollable.scrollY;
+				slider.value = scrollable.scrollY + e.wheelDelta * scrollable.scrollStep;
+				Game.inst.tw.createMs(scrollable.scrollY, slider.value, TLinear, 60);
 			}
 		};
 
@@ -60,6 +62,7 @@ class Crafting extends NinesliceWindow {
 
 		scrollable = new FixedScrollArea(0, 0, true, true, Std.downcast(windowComp, CraftingComp).scrollable);
 		@:privateAccess scrollable.sync(Boot.inst.s2d.ctx);
+		scrollable.scrollStep = 30;
 
 		var recipeEntriesFlow = new Flow();
 		recipeEntriesFlow.layout = Vertical;
@@ -76,6 +79,8 @@ class Crafting extends NinesliceWindow {
 		var backgroundScroll = new EventInteractive(0, 0);
 		scrollable.addChildAt(backgroundScroll, 0);
 		backgroundScroll.onWheelEvent.add(scroll);
+		backgroundScroll.onOverEvent.add(( e ) -> if ( Player.inst != null ) Player.inst.lockBelt());
+		backgroundScroll.onOutEvent.add(( e ) -> if ( Player.inst != null ) Player.inst.unlockBelt());
 		backgroundScroll.width = recipeEntriesFlow.innerWidth;
 		backgroundScroll.height = recipeEntriesFlow.innerHeight;
 		backgroundScroll.cursor = Default;
@@ -90,9 +95,13 @@ class Crafting extends NinesliceWindow {
 
 		slider.maxValue = recipeEntriesFlow.innerHeight > scrollable.height ? recipeEntriesFlow.innerHeight - scrollable.height : 0.1;
 
+		slider.onOverEvent.add(( e ) -> if ( Player.inst != null ) Player.inst.lockBelt());
+		slider.onOutEvent.add(( e ) -> if ( Player.inst != null ) Player.inst.unlockBelt());
+
 		slider.onPushEvent.add(( _ ) -> {
 			slider.cursorObj.tile = caretDown;
 		});
+
 		slider.onReleaseEvent.add(( _ ) -> {
 			slider.cursorObj.tile = caretUp;
 		});
@@ -101,7 +110,24 @@ class Crafting extends NinesliceWindow {
 			scrollable.scrollTo(0, slider.value);
 		};
 
+		windowComp.window.onDrag.add(( x, y ) -> {
+			Settings.params.playerCrafting.x = win.x / Main.inst.w();
+			Settings.params.playerCrafting.y = win.y / Main.inst.h();
+		});
+
 		toggleVisible();
+	}
+
+	override function toggleVisible() {
+		super.toggleVisible();
+
+		win.x = Settings.params.playerCrafting.toString() == new Vector(-1, -1).toString() ? win.x : Settings.params.playerCrafting.x * Main.inst.w();
+		win.y = Settings.params.playerCrafting.toString() == new Vector(-1, -1).toString() ? win.y : Settings.params.playerCrafting.y * Main.inst.h();
+	}
+
+	override function onDispose() {
+		super.onDispose();
+		if ( Player.inst != null ) Player.inst.unlockBelt();
 	}
 }
 
@@ -111,18 +137,19 @@ class Recipe extends NinesliceWindow {
 	var hint : IngredsHint;
 
 	public function new( recipe : Data.Recipes, ?parent : Object ) {
-		super("craft_recipe", ( tile, bl, bt, br, bb, parent ) -> {
-			new RecipeComp(recipe, tile, bl, bt, br, bb, parent);
-		}, parent);
+		super("craft_recipe", RecipeComp, parent, recipe);
 
+		// cast(windowComp, Recip)
 		windowComp.window.windowLabel.labelTxt.text = recipe.name + (recipe.result.length > 0 ? (" x " + recipe.result[0].amount) : "");
 
 		var recipeComp = Std.downcast(windowComp, RecipeComp);
 		recipeComp.onOver.add(( e ) -> {
 			hint = new IngredsHint(recipe, Game.inst.root);
+			if ( Player.inst != null ) Player.inst.lockBelt();
 		});
 		recipeComp.onOut.add(( e ) -> {
 			if ( hint != null ) hint.destroy();
+			if ( Player.inst != null ) Player.inst.unlockBelt();
 		});
 		recipeComp.craft = () -> craft(recipe);
 	}
@@ -177,43 +204,31 @@ class Recipe extends NinesliceWindow {
 /** Показывает ингредиенты **/
 class IngredsHint extends NinesliceWindow {
 	public function new( recipe : Data.Recipes, ?parent : Object ) {
-		super("ingreds_hint", ( tile, bl, bt, br, bb, parent ) -> {
-			new IngredsHintComp(tile, bl, bt, br, bb, parent);
-		}, parent);
+		super("ingreds_hint", IngredsHintComp, parent, recipe);
 
 		var hintComp = Std.downcast(windowComp, IngredsHintComp);
 
 		for ( i in recipe.ingreds ) {
 			new Ingred(i, hintComp.ingreds_holder);
 		}
+		bringOnTopOfALL();
 	}
 
 	override function update() {
 		super.update();
 
 		{
-			win.x = (Boot.inst.s2d.mouseX + 20) / Const.SCALE;
-			win.y = (Boot.inst.s2d.mouseY + 20) / Const.SCALE;
+			win.x = (Boot.inst.s2d.mouseX + 20) / Const.UI_SCALE;
+			win.y = (Boot.inst.s2d.mouseY + 20) / Const.UI_SCALE;
 		}
 	}
 }
 
 class Ingred extends NinesliceWindow {
 	public function new( ingred : Data.Recipes_ingreds, ?parent : Object ) {
-		super("craft_recipe", ( tile, bl, bt, br, bb, parent ) -> {
-			new IngredComp(tile, bl, bt, br, bb, ingred, parent);
-		}, parent);
+		super("craft_recipe", IngredComp, parent, ingred);
 
 		var ingredComp = Std.downcast(windowComp, IngredComp);
 		ingredComp.window.windowLabel.label = ingred.item != null ? ingred.item.display_name : "zhopa";
-		// var baseSpr = new HSprite(Assets.ui, "recipe_comp", this);
-		// var iconSpr = new HSprite(Assets.items, ingred.item.atlas_name, this);
-
-		// var nameLabel = new TextLabelComp(ingred.item.display_name, Assets.fontPixel, this);
-		// nameLabel.scale(.5);
-
-		// var amountLabel = new TextLabelComp('${ingred.amount}', Assets.fontPixel, this);
-		// amountLabel.scale(.5);
-		// amountLabel.center();
 	}
 }

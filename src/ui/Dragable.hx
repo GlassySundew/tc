@@ -1,5 +1,6 @@
 package ui;
 
+import h2d.col.Point;
 import h2d.Flow;
 import h2d.RenderContext;
 import cherry.soup.EventSignal.EventSignal2;
@@ -19,19 +20,16 @@ class Dragable extends EventInteractive {
 	public var onDrag : EventSignal2<Float, Float> = new EventSignal2();
 
 	public function new( width, height, ?onDrag : Float -> Float -> Void, ?onPush : Event -> Void, ?parent, ?shape, ?fillWidth : Bool = false,
-			?fillHeight : Bool = false ) {
+		?fillHeight : Bool = false ) {
 		super(width, height, parent, shape);
 		this.fillWidth = fillWidth;
 		this.fillHeight = fillHeight;
 		if ( onPush != null ) this.onPush = onPush;
-
 		if ( onDrag != null ) this.onDrag.add(onDrag);
-		visible = true;
 	}
 
 	override function sync( ctx : RenderContext ) {
 		super.sync(ctx);
-
 		try {
 			if ( fillHeight ) height = cast(parent, Flow).innerHeight;
 			if ( fillWidth ) width = cast(parent, Flow).innerWidth;
@@ -42,9 +40,7 @@ class Dragable extends EventInteractive {
 		if ( e.cancel ) return;
 		switch( e.kind ) {
 			case EPush:
-
-				handleDX = e.relX;
-				handleDY = e.relY;
+				var mouseHandle = new Point(Boot.inst.s2d.mouseX, Boot.inst.s2d.mouseY);
 
 				var scene = scene;
 				startCapture(function ( e ) {
@@ -52,9 +48,12 @@ class Dragable extends EventInteractive {
 						scene.stopCapture();
 						return;
 					}
-					var deltaX = (e.relX - handleDX) / 8;
-					var deltaY = (e.relY - handleDY) / 8;
-					if ( onDrag != null ) onDrag.dispatch(deltaX - deltaX % 0.5, deltaY - deltaY % 0.5);
+
+					var deltaX = (Boot.inst.s2d.mouseX - mouseHandle.x) / Const.UI_SCALE;
+					var deltaY = (Boot.inst.s2d.mouseY - mouseHandle.y) / Const.UI_SCALE;
+					mouseHandle = new Point(Boot.inst.s2d.mouseX, Boot.inst.s2d.mouseY);
+
+					if ( onDrag != null ) onDrag.dispatch(deltaX - deltaX % (1 / Const.UI_SCALE), deltaY - deltaY % (1 / Const.UI_SCALE));
 				});
 
 			default:

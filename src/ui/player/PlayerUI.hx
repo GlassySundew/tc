@@ -1,35 +1,38 @@
 package ui.player;
 
-import ui.domkit.SideComp;
+import dn.Process;
 import en.player.Player;
+import format.tmx.Data.TmxMap;
+import h2d.Flow;
 import h2d.Layers;
-import h2d.RenderContext;
-import h2d.domkit.Style;
 import h3d.Vector;
-import hxd.System;
-import tools.Settings.*;
 import tools.Settings;
 import ui.InventoryGrid.CellGrid;
+import ui.domkit.SideComp;
 
-class PlayerUI extends Layers {
+class PlayerUI extends Process {
 	public var inventory : Inventory;
 	public var belt : Belt;
 
 	public var craft : Crafting;
 
-	var leftTop : SideComp;
+	var flow : Flow;
+	var topLeft : SideComp;
+
+	var topRight : SideComp;
+
+	var teleport : Button;
 
 	public function new( parent : Layers ) {
-		super();
+		super(Game.inst);
 
-		var gridConf = uiConf.get("inventory").getObjectByName("grid");
+		createRootInLayers(Game.inst.root, Const.DP_UI);
 
-		Player.inst.invGrid = new CellGrid(gridConf.properties.getInt("width"), gridConf.properties.getInt("height"), gridConf.properties.getInt("tileWidth"),
-			gridConf.properties.getInt("tileHeight"));
+		flow = new Flow(root);
 
-		parent.add(this, Const.DP_BG);
+		if ( Player.inst.invGrid == null ) Player.inst.invGrid = new CellGrid(5, 6, 18, 18, Player.inst);
 
-		inventory = new Inventory(Player.inst.invGrid, this);
+		inventory = new Inventory(Player.inst.invGrid, root);
 		inventory.containmentEntity = Player.inst;
 
 		inventory.win.x = Settings.params.inventoryCoordRatio.toString() == new Vector(-1,
@@ -37,30 +40,62 @@ class PlayerUI extends Layers {
 		inventory.win.y = Settings.params.inventoryCoordRatio.toString() == new Vector(-1,
 			-1).toString() ? inventory.win.y : Settings.params.inventoryCoordRatio.y * Main.inst.h();
 
-		this.add(inventory.win, Const.DP_UI);
+		root.add(inventory.win, Const.DP_UI);
 		if ( Settings.params.inventoryVisible ) inventory.toggleVisible();
 
-		belt = new Belt(Player.inst.invGrid.grid[Player.inst.invGrid.grid.length - 1], this);
-		this.add(belt, Const.DP_UI_FRONT);
+		belt = new Belt(Player.inst.invGrid.grid[Player.inst.invGrid.grid.length - 1], root);
+		root.add(belt, Const.DP_UI_FRONT);
 
-		leftTop = new SideComp(Top, Left, this);
-		this.add(leftTop, Const.DP_UI);
+		topLeft = new SideComp(Top, Left, root);
+		root.add(topLeft, Const.DP_UI);
 
-		craft = new Crafting(this);
-		this.add(craft.win, Const.DP_UI);
+		topRight = new SideComp(Top, Right, flow);
+		topRight.paddingTop = topRight.paddingRight = 2;
 
-		// new StatView(Health, leftTop);
+		root.add(topLeft, Const.DP_UI);
+
+		craft = new Crafting(root);
+		root.add(craft.win, Const.DP_UI);
+
+		teleport = new Button(
+			[
+				new HSprite(Assets.ui, "tp0").tile,
+				new HSprite(Assets.ui, "tp1").tile
+			],
+			topRight);
+		teleport.visible = false;
+
+		onResize();
+
+		// new StatView(Health, topLeft);
 
 		// var style = new h2d.domkit.Style();
 		// style.load(hxd.Res.domkit.side);
-		// style.addObject(leftTop);
+		// style.addObject(topLeft);
 	}
 
-	override function sync( ctx : RenderContext ) {
-		super.sync(ctx);
+	public function prepareTeleportDown( name : String ,acceptTmxPlayerCoord:Bool = false) {
+		teleport.scaleY = 1;
+		prepareTeleport(name, acceptTmxPlayerCoord);
 	}
 
-	override function onRemove() {
-		super.onRemove();
+	public function prepareTeleportUp( name : String,acceptTmxPlayerCoord:Bool ) {
+		teleport.scaleY = -1;
+		prepareTeleport(name, acceptTmxPlayerCoord);
+	}
+
+	public inline function prepareTeleport( name : String, acceptTmxPlayerCoord:Bool ) {
+		teleport.visible = true;
+		teleport.onClickEvent.add(( _ ) -> Game.inst.startLevel(name, false, acceptTmxPlayerCoord));
+	}
+
+	public function unprepareTeleport() {
+		teleport.visible = false;
+		teleport.onClickEvent.removeAll();
+	}
+
+	override function onResize() {
+		super.onResize();
+		topRight.minWidth = wScaled;
 	}
 }

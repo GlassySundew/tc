@@ -5,13 +5,8 @@ import h2d.Object;
 
 class Scrollbar extends NinesliceWindow {
 	public function new( ?parent : Null<Object> ) {
-		super("craft-caret", ( tile, bl, bt, br, bb, parent ) -> {
-			new ScrollbarComp(tile, bl, bt, br, bb, parent);
-		}, parent);
+		super("craft-caret", ScrollbarComp, parent);
 
-        windowComp.window.windowLabel.remove();
-        
-
-
+		windowComp.window.windowLabel.remove();
 	}
 }

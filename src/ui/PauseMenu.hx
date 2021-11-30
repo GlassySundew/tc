@@ -1,7 +1,5 @@
 package ui;
 
-import tools.Save;
-import h2d.Tile;
 import MainMenu.OptionsMenu;
 import MainMenu.TextButton;
 import dn.Process;
@@ -9,12 +7,12 @@ import en.player.Player;
 import h2d.Flow;
 import h2d.Graphics;
 import h2d.Object;
-import h2d.Text;
-import h2d.filter.ColorMatrix;
-import h3d.Matrix;
+import h2d.Tile;
+import tools.Save;
 
 class PauseMenu extends Process {
 	public static var inst : PauseMenu;
+
 	var pauseContainer : Object;
 	var backgroundGraphics : Graphics;
 	var vertFlow : Flow;
@@ -26,7 +24,12 @@ class PauseMenu extends Process {
 
 		pauseContainer = new Object();
 
-		Game.inst.root.add(pauseContainer, Const.DP_UI);
+		Game.inst.root.add(pauseContainer, Const.DP_UI_FRONT);
+
+		var backgroundFlowForInteractive = new Flow(pauseContainer);
+		backgroundFlowForInteractive.fillHeight = true;
+		backgroundFlowForInteractive.fillWidth = true;
+		backgroundFlowForInteractive.enableInteractive = true;
 
 		backgroundGraphics = new Graphics(pauseContainer);
 
@@ -50,44 +53,44 @@ class PauseMenu extends Process {
 
 			vertFlow.backgroundTile = Tile.fromColor(0x000000, 1, 1, 0.5);
 
-			var mm = new Text(Assets.fontPixel, vertFlow);
+			var mm = new ShadowedText(Assets.fontPixel, vertFlow);
 			mm.smooth = true;
 			mm.scale(1.5);
 			mm.text = "Menu";
 
 			vertFlow.addSpacing(20);
 
-			new TextButton("continue", (e) -> {
+			new TextButton("continue", ( e ) -> {
 				exit();
 			}, vertFlow);
 
 			var saveGame : Object = null;
-			saveGame = new TextButton("save game", (e) -> {
+			saveGame = new TextButton("save game", ( e ) -> {
 				// Main.inst.save.saveGame();
 				var saveMan = new SaveManager(Save, pauseContainer);
 				saveMan.x = saveGame.x + saveGame.getSize().xMax + 20;
 				// saveMan.y = saveGame.y;
 			}, vertFlow);
 
-			var loadGame : Object = null;
-			loadGame = new TextButton("load game", (e) -> {
+			var loadObj : Object = null;
+			loadObj = new TextButton("load game", ( e ) -> {
 				// exit();
 				// Main.inst.save.loadGame();
 				var loadMan = new SaveManager(Load, pauseContainer);
-				loadMan.x = loadGame.x + loadGame.getSize().xMax + 20;
+				loadMan.x = loadObj.x + loadObj.getSize().xMax + 20;
 				// loadMan.y = loadGame.y;
 
 				// "save/" + (Settings.saveFiles[0] == null ? "autosave" : Settings.saveFiles[0])
 			}, vertFlow);
 
-			new TextButton("options", (e) -> {
+			new TextButton("options", ( e ) -> {
 				var opts = new OptionsMenu(pauseContainer);
 			}, vertFlow);
 
-			new TextButton("exit to main menu", (e) -> {
+			new TextButton("exit to main menu", ( e ) -> {
 				Game.inst.destroy();
 				Save.inst.disconnect();
-				
+
 				new MainMenu(Boot.inst.s2d);
 				exit();
 			}, vertFlow);
@@ -117,7 +120,6 @@ class PauseMenu extends Process {
 			Game.inst.pauseCycle = true;
 			Game.inst.resume();
 		}
-			
 	}
 
 	override function onResize() {

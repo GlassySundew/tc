@@ -33,7 +33,8 @@ class MapGen {
 	var autoMapper : AutoMap;
 	var groundTiles : Array<Int> = [];
 	var voidTiles : Array<Int> = [];
-
+	
+	/** already placed rooms **/
 	var roomList : Array<{x : Int, y : Int, sample : Null<GenSample> }> = [];
 
 	var samples : Array<GenSample> = [];
@@ -152,7 +153,7 @@ class MapGen {
 			localPath : ""
 		};
 
-		var map = resolveMap('test.tmx');
+		// var map = resolveMap('test.tmx');
 
 		map.tilesets = sampleMap.tilesets;
 
@@ -161,7 +162,8 @@ class MapGen {
 		var randomX = Random.int(0, Std.int(mapWidth - startingRoomSize.x));
 		var randomY = Random.int(0, Std.int(mapHeight - startingRoomSize.y));
 
-		applySample(startingRoom, startingRoomSize, randomX, randomY, map);
+		if ( applySample(startingRoom, startingRoomSize, randomX, randomY, map) == false )
+			throw "was not able to place starting room. Perhaps, map size is too low, map is crowded, or the sample is corrupted";
 
 		#if exits_mapgen_debug
 		// var startingExits = findPossibleExits(startingRoom, map);
@@ -179,7 +181,9 @@ class MapGen {
 		while( failed < fail ) {
 
 			var chooseRoom = Random.fromArray(roomList);
-			var chooseRoomPossibeExits = chooseRoom.sample.exits;
+			var chooseRoomPossibeExits = null;
+			chooseRoomPossibeExits = chooseRoom.sample.exits;
+
 			var chooseExit = Random.fromArray(chooseRoomPossibeExits);
 			var chooseExitDirection = Random.fromArray(chooseExit.towards);
 
@@ -281,7 +285,7 @@ class MapGen {
 	}
 
 	function findGroundAroundVoid( id : Int, tiles : Array<TmxTile>, result : Array<{x : Int, y : Int, ?towards : Array<Towards> }>,
-			map : TmxMap ) : Array<Null<Int>> {
+		map : TmxMap ) : Array<Null<Int>> {
 		var x = id % map.width;
 		var y = M.floor(id / map.width);
 		var grounds : Array<Null<Int>> = [];
