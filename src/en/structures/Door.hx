@@ -8,13 +8,12 @@ import hxd.Key;
 class Door extends Structure {
 	@:s public var leadsTo : String;
 
-	public function new( ?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : StructuresKind ) {
-		super(x, z, tmxObj, cdbEntry);
-	}
-
 	public override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
 		super.init(x, z, tmxObj);
-		if ( tmxObj != null && tmxObj.properties.exists("to") ) leadsTo = tmxObj.properties.getString("to");
+		if ( tmxObj != null && tmxObj.properties.exists("to") )
+			leadsTo = tmxObj.properties.getString("to");
+		interactable = true;
+
 
 		interact.onTextInputEvent.add(( e : Event ) -> {
 			if ( Key.isPressed(Key.E) ) {
@@ -24,12 +23,13 @@ class Door extends Structure {
 					var castedG = cast(Level.inst.game, Game);
 					var curLvl = castedG.lvlName;
 
-					castedG.startLevel(leadsTo);
+					castedG.startLevel(leadsTo, {});
 					Game.inst.delayer.addF(() -> {
 						var door = findDoor(curLvl);
 						if ( door != null ) {
+							interactable = true;
 							player.setFeetPos(door.footX, door.footY);
-							castedG.camera.recenter();
+							Game.inst.targetCameraOnPlayer();
 						}
 					}, 1);
 				}
@@ -55,13 +55,12 @@ class Door extends Structure {
 			}
 		}
 		#if debug
-		throw "wrong door markup";
+		// throw "wrong door markup";
 		#end
 		return null;
 	}
 
 	override function postUpdate() {
 		super.postUpdate();
-		// mesh.z += 1 / Camera.ppu;
 	}
 }

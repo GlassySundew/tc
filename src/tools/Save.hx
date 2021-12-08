@@ -207,7 +207,7 @@ class Save {
 		var targetFilePath = SAVEPATH + fileName + Const.SAVEFILE_EXT;
 
 		if ( isDbLocatedInMemory("maindb") ) {
-			// debug scenario when entry point was not in main menu(i. e. scripted level start)
+			// debug scenario when entry point was not in main menu(i.e. scripted to load level)
 			if ( File.exists(targetFilePath) ) {
 				bakSave(fileName);
 				File.delete(targetFilePath);
@@ -218,14 +218,11 @@ class Save {
 			startTransaction();
 		} else if ( currentFile != null && currentFile != fileName ) {
 			// saving into other file
-
-			// rollbackChanges();
 			// целевой файл бекапится, а потом удаляется
 			if ( File.exists(targetFilePath) ) {
 				bakSave(fileName);
 				File.delete(targetFilePath);
 			}
-
 			// нам нужно, чтобы в текущем файле не сохранились изменения, поэтому мы сохраняем его копию (.swap),
 			// чтобы сохранить изменения и поменять сохранённый файл на тот, в который мы хотим сохраниться, затем первый файл вернуть в прежнее состояние
 			sys.io.File.copy(currentFilePath, currentFilePath + ".swap");
@@ -234,15 +231,9 @@ class Save {
 			commitChanges();
 
 			sys.io.File.copy(currentFilePath, targetFilePath);
-
 			File.delete(currentFilePath);
-
 			FileSystem.rename(currentFilePath + ".swap", currentFilePath);
 
-			reattachMainFrom(fileName);
-			startTransaction();
-		} else {
-			// saving to the same file
 			reattachMainFrom(fileName);
 			startTransaction();
 		}
@@ -270,7 +261,13 @@ class Save {
 			// dropping "entities" tmx layer in favor of previously saved layer
 			var tmxMap : format.tmx.Data.TmxMap = Unserializer.run(haxe.Serializer.run(level.data));
 			var entitiesTmxLayer = tmxMap.getLayersByName('entities');
-			if ( entitiesTmxLayer != null ) tmxMap.layers.remove(entitiesTmxLayer[0]);
+			if ( entitiesTmxLayer != null )
+				for ( i in entitiesTmxLayer )
+					switch i {
+						case LObjectGroup(group):
+							for ( obj in group.objects.copy() ) if ( obj.name != "player" ) group.objects.remove(obj);
+						default:
+					}
 
 			var cachedLevel = upsertLevelMap(level.lvlName, tmxMap);
 
@@ -290,34 +287,50 @@ class Save {
 
 	public function upsertLevelMap( name : String, tmxMap : format.tmx.Data.TmxMap ) : CachedLevel {
 		var levelBlob = sqlite.quote(Base64.encode(Bytes.ofString(haxe.Serializer.run(tmxMap))));
+
 		var query = sqlite.request('
-		insert into maindb.rooms (name, tmx) values(
-			${sqlite.quote(name)},
-			${levelBlob}
-		) 
-		on conflict(name) do update set 
-			name = ${sqlite.quote(name)}, 
-			tmx = ${levelBlob} 
-			where 
-				name = ${sqlite.quote(name)}
-		 returning *
+			insert into maindb.rooms (name, tmx) values(
+				${sqlite.quote(name)},
+				${levelBlob}
+			) 
+			on conflict(name) do update set 
+				name = ${sqlite.quote(name)}, 
+				tmx = ${levelBlob} 
+				where 
+					name = ${sqlite.quote(name)}
+			returning *
 		').next();
 
 		return query;
 	}
 
+	function upsertPlayerFeet( player : Player ) {}
+
 	public function saveEntity( entity : Entity ) {
 		var s = new hxbit.Serializer();
 		var bytes = s.serialize(entity);
 
-		if ( Std.isOfType(entity, Player) && isPlayerSaved() ) {
-			sqlite.request('update maindb.entities set
-				name = ${sqlite.quote(Std.string(entity))},
-				blob = ${sqlite.quote(Base64.encode(bytes))},
-				level_id = ${entity.level.sqlId}
-				where name = "en.player.Player" and id = ${entity.sqlId}
-			');
-		} else if ( entity.sqlId != null ) {
+		// we remain a shallow copy of the player saying only their feet if we want to know them when we will be bringing this player back again on this level
+		if ( Std.isOfType(entity, Player) ) {
+			if ( sqlite.request('select * from maindb.entities where name = "player_shallow_feet" and level_id = ${entity.level.sqlId}').hasNext() )
+				sqlite.request('
+						update maindb.entities set 
+							blob = "${entity.footX}_${entity.footY}"
+						where 
+							name = "player_shallow_feet"
+							and level_id = ${entity.level.sqlId}
+				')
+			else
+				sqlite.request('
+						insert into maindb.entities (name, blob, level_id) values(
+							"player_shallow_feet",
+							"${entity.footX}_${entity.footY}",
+							${entity.level.sqlId}
+						)
+				');
+		}
+
+		if ( entity.sqlId != null ) {
 			// this entity has been previously saved and is bling updated to db
 			sqlite.request('update maindb.entities set
 					name = ${sqlite.quote(Std.string(entity))},
@@ -326,12 +339,13 @@ class Save {
 					where id = ${entity.sqlId}
 				');
 		} else {
-			// this entity is freshly created, can be a player if it is fresh
+			// this entity is freshly created, or a player if it is also fresh
 			sqlite.request('insert into maindb.entities (name, blob, level_id) values(
 					${sqlite.quote(Std.string(entity))},
 					${sqlite.quote(Base64.encode(bytes))},
 					${entity.level.sqlId}
 				)');
+
 			entity.sqlId = sqlite.request('select max(id) id from maindb.entities').next().id;
 		}
 	}
@@ -361,32 +375,37 @@ class Save {
 		rollbackChanges();
 		startTransaction();
 
-		loadLevelWithPlayerSingle();
+		Game.inst.startLevel(loadLevelWithPlayerSingle().name, {});
+
 		currentFile = fileName;
 	}
 
 	// Search for a room where player is saved in and loads it
-	public function loadLevelWithPlayerSingle() {
+	public function loadLevelWithPlayerSingle() : CachedLevel {
 		var playerEntry = sqlite.request('select * from maindb.entities where name = "en.player.Player"');
-		if ( playerEntry.length > 1 ) throw "save system malfunction, more than one player entries in single player mode";
-		var temp = sqlite.request('select * from maindb.rooms where id = ${playerEntry.next().level_id}').next();
-		loadLevel(temp);
+		if ( playerEntry.length > 1 ) trace("loading singleplayer but more than 1 player found...");
+
+		var cachedLevel = sqlite.request('select * from maindb.rooms where id = ${playerEntry.next().level_id}').next();
+		return cachedLevel;
 	}
 
-	public function loadLevel( level : CachedLevel, ?acceptTmxPlayerCoord : Bool = false ) : Level {
-		// bringPlayerToLevel(level);
+	public function loadSavedEntities( level : CachedLevel ) {
+		var entities = sqlite.request('
+			select * from maindb.entities 
+				where level_id = ${level.id} 
+					and not name = ${sqlite.quote("en.player.Player")}
+					and not name like "player_shallow%"
+		');
 
-		var loadedLevel = Game.inst.startLevelFromParsedTmx(Unserializer.run(Base64.decode(level.tmx).toString()), level.name, acceptTmxPlayerCoord);
-		loadedLevel.sqlId = Std.int(level.id);
-
-		var entities = sqlite.request('select * from maindb.entities where level_id = ${level.id} and not name = ${sqlite.quote("en.player.Player")}');
 		if ( entities.hasNext() ) for ( i in entities ) loadEntity(i);
+	}
 
-		// var entities = sqlite.request('select * from maindb.entities where level_id = ${level.id} and name = ${sqlite.quote("en.player.Player")}');
-		// if ( entities.hasNext() ) for ( i in entities ) loadEntity(i);
+	public function getSavedLevel( level : CachedLevel ) : format.tmx.Data.TmxMap {
 
-		Game.inst.player = Player.inst;
-		Game.inst.targetCameraOnPlayer();
+		var loadedLevel = Unserializer.run(Base64.decode(level.tmx).toString());
+		// loadedLevel.sqlId = Std.int(level.id);
+
+		loadSavedEntities(level);
 
 		return loadedLevel;
 	}
@@ -396,12 +415,11 @@ class Save {
 		return query.hasNext() ? query.next() : null;
 	}
 
-	public function loadLevelByName( name : String, ?acceptTmxPlayerCoord : Bool = false ) : Level {
+	public function getSavedLevelByName( name : String ) : format.tmx.Data.TmxMap {
 		try {
 			var levelToBeLoaded = getLevelByName(name);
 			if ( levelToBeLoaded != null ) {
-				// переносим игрока в новую локацию
-				var loadedLevel = loadLevel(levelToBeLoaded, acceptTmxPlayerCoord);
+				var loadedLevel = getSavedLevel(levelToBeLoaded);
 				return loadedLevel;
 			} else {
 				return null;
@@ -424,6 +442,10 @@ class Save {
 
 	public function playerSavedOn( level : Level ) : CachedEntity {
 		return sqlite.request('select * from maindb.entities where name = "en.player.Player" and level_id = ${level.sqlId}').next();
+	}
+
+	public function getPlayerShallowFeet( player : Player ) {
+		return sqlite.request('select * from maindb.entities where name = "player_shallow_feet" and level_id = ${player.level.sqlId}').next();
 	}
 	/**basically a fix for entity duplicates when disposing**/
 	public function removeEntityById( id : Int ) {

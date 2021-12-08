@@ -3,7 +3,7 @@ package en.structures;
 import format.tmx.Data.TmxObject;
 
 class Sleeping_Pod extends Structure {
-	public function new(?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : StructuresKind) {
+	public function new( ?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : Data.StructuresKind ) {
 		if ( spr == null ) {
 			spr = new HSprite(Assets.structures, entParent);
 			spr.set("sleeping_pod");

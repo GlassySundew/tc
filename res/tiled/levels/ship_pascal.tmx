@@ -1,88 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-down" compressionlevel="0" width="11" height="15" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#0f0f0f" nextlayerid="807" nextobjectid="14894">
+<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-down" compressionlevel="0" width="14" height="29" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#0f0f0f" nextlayerid="807" nextobjectid="15071">
  <tileset firstgid="1" source="alpha.tsx"/>
  <tileset firstgid="151" source="entities.tsx"/>
- <layer id="54" name="proto" width="11" height="15" opacity="0.58">
+ <layer id="54" name="proto" width="14" height="29" opacity="0.58">
   <data encoding="base64" compression="zlib">
-   eAErYGBgKBjFWMMgGBgu6BhXWKGrA/FH1ULCD1c44BIHANxbQ6k=
+   eAErYGBgKBjFo2EATAPBaJjYdDHc9REbDqPqRsuS0TQASQMAQNSvXQ==
   </data>
  </layer>
- <layer id="42" name="walls" width="11" height="15">
+ <layer id="42" name="walls" width="14" height="29">
   <data encoding="base64" compression="zlib">
-   eAFjYBgF+EIgHCiJjDNwKI7AIY4uDDSrAV0MF3+4q03H4XEAov4IZQ==
+   eAFjYBgFoyGACIFwIBOGMxDCeFkReGWxSwLtaMAug190IPSl43fSqOxoCIyGAFoIAACuVAWJ
   </data>
  </layer>
- <layer id="804" name="ground_bot" width="11" height="15">
+ <layer id="804" name="ground_bot" width="14" height="29">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFtAqBMBIMHqlqQ4FhhIxDgHwAvdMEAw==
+   eAFjYBgFoyFA3RAII9O4wawvFOgnGA4h03+j2kZDYKSEAAAsAwKs
   </data>
  </layer>
- <layer id="33" name="ground" width="11" height="15">
+ <layer id="33" name="ground" width="14" height="29">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFuEIgDygRjIZxqUVXB+LjAiNJbRCuQMAjDgAB/Q0T
+   eAFjYBgFoyEACYE8IBWMhIkNF2Q9IDaxYCD1BRHryFF1oyEwGgIkhwAAWBsGlw==
   </data>
  </layer>
- <layer id="36" name="wallsAgri" width="11" height="15">
+ <layer id="36" name="wallsAgri" width="14" height="29">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwuEIAAAKUAAE=
+   eAFjYBgFoyEwGgKjITAaAqMhQL0QAAAGWAAB
   </data>
  </layer>
- <layer id="190" name="shadows" width="11" height="15" visible="0">
+ <layer id="190" name="shadows" width="14" height="29" visible="0">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFuEIgBigRzcDQAMPxQDYutUA1KADIP4AigMQZzmqBYQQKMwcYBoahA5LXiWICADO/D10=
+   eAFjYBgFoyEACYEYIBXNwNAAwvFATGy4ANXDAZB9AM4hwKC3PqCfQP5zAGGgXx0IOG9UejQERkOAzBAAAL1MCYU=
   </data>
  </layer>
- <layer id="805" name="light" width="11" height="15">
+ <layer id="805" name="light" width="14" height="29">
   <data encoding="base64" compression="zlib">
-   eAFjYBhcIBvonBwknIvDeUB1DTikMISB5o2qBYYKMCyJDgeMQKSyQD4e8wB4hwns
+   eAFjYBgFtAqBbKDBOVCcS6QlQD0NRCpFUQa0Z0joA4YDWe5E8SwdOfl0tGvUqtEQGC4hAADJpwa8
   </data>
  </layer>
  <objectgroup id="47" name="image"/>
  <objectgroup id="34" name="obstacles">
-  <object id="14859" x="216" y="336" width="24" height="24"/>
-  <object id="14860" x="240" y="312" width="24" height="24"/>
-  <object id="14861" x="123" y="147">
+  <object id="15013" x="192" y="336" width="24" height="24"/>
+  <object id="15014" x="216" y="312" width="24" height="24"/>
+  <object id="15015" x="123" y="219">
    <polygon points="-3,-3 -3,5 5,-3"/>
   </object>
-  <object id="14862" x="240" y="144" width="24" height="24"/>
-  <object id="14863" x="240" y="168" width="24" height="24"/>
-  <object id="14864" x="240" y="192" width="24" height="24"/>
-  <object id="14865" x="240" y="216" width="24" height="24"/>
-  <object id="14866" x="240" y="240" width="24" height="24"/>
-  <object id="14867" x="240" y="264" width="24" height="24"/>
-  <object id="14868" x="240" y="288" width="24" height="24"/>
-  <object id="14869" x="234" y="336">
+  <object id="15016" x="216" y="216" width="24" height="24"/>
+  <object id="15017" x="216" y="240" width="24" height="24"/>
+  <object id="15018" x="216" y="264" width="24" height="24"/>
+  <object id="15019" x="216" y="288" width="24" height="24"/>
+  <object id="15020" x="210" y="336">
    <polygon points="0,0 6,0 6,-6"/>
   </object>
-  <object id="14870" x="120" y="336" width="24" height="24"/>
-  <object id="14871" x="144" y="336" width="24" height="24"/>
-  <object id="14872" x="168" y="336" width="24" height="24"/>
-  <object id="14873" x="192" y="336" width="24" height="24"/>
-  <object id="14874" x="144" y="120" width="24" height="24"/>
-  <object id="14875" x="168" y="120" width="24" height="24"/>
-  <object id="14876" x="192" y="120" width="24" height="24"/>
-  <object id="14877" x="216" y="120" width="24" height="24"/>
-  <object id="14878" x="96" y="168" width="24" height="24"/>
-  <object id="14879" x="96" y="192" width="24" height="24"/>
-  <object id="14880" x="96" y="216" width="24" height="24"/>
-  <object id="14881" x="96" y="240" width="24" height="24"/>
-  <object id="14882" x="96" y="264" width="24" height="24"/>
-  <object id="14883" x="96" y="288" width="24" height="24"/>
-  <object id="14884" x="96" y="312" width="24" height="24"/>
-  <object id="14885" x="96" y="144" width="24" height="24"/>
-  <object id="14886" x="120" y="120" width="24" height="24"/>
+  <object id="15021" x="120" y="336" width="24" height="24"/>
+  <object id="15022" x="144" y="336" width="24" height="24"/>
+  <object id="15023" x="168" y="336" width="24" height="24"/>
+  <object id="15024" x="144" y="192" width="24" height="24"/>
+  <object id="15025" x="168" y="192" width="24" height="24"/>
+  <object id="15026" x="192" y="192" width="24" height="24"/>
+  <object id="15027" x="96" y="240" width="24" height="24"/>
+  <object id="15028" x="96" y="264" width="24" height="24"/>
+  <object id="15029" x="96" y="288" width="24" height="24"/>
+  <object id="15030" x="96" y="312" width="24" height="24"/>
+  <object id="15031" x="96" y="216" width="24" height="24"/>
+  <object id="15032" x="120" y="192" width="24" height="24"/>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="8850" gid="153" x="216" y="192" width="48" height="48"/>
-  <object id="14891" gid="163" x="193" y="169" width="48" height="77">
+  <object id="8850" gid="153" x="192" y="264" width="48" height="48"/>
+  <object id="14894" gid="170" x="168" y="288" width="48" height="48">
    <properties>
-    <property name="to" type="file" value="bridge.tmx"/>
+    <property name="item:iron" type="int" value="5"/>
    </properties>
   </object>
-  <object id="14892" gid="2147483811" x="144" y="168" width="48" height="77"/>
-  <object id="14893" gid="170" x="240" y="192" width="48" height="48">
+  <object id="15070" gid="2147483811" x="168" y="240" width="48" height="72">
    <properties>
-    <property name="item:iron" type="int" value="3"/>
+    <property name="to" type="file" value="bridge.tmx"/>
    </properties>
   </object>
  </objectgroup>

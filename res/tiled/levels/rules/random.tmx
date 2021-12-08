@@ -4,42 +4,42 @@
   <property name="DeleteTiles" type="bool" value="false"/>
  </properties>
  <tileset firstgid="1" source="../alpha.tsx"/>
- <layer id="2" name="regions_input" width="5" height="5">
+ <layer id="2" name="regions_input" width="5" height="5" visible="0">
   <data encoding="base64" compression="zlib">
    eJxjYGBgcGJABU5YxCgBAEFcAMc=
   </data>
  </layer>
- <layer id="3" name="regions_output" width="5" height="5">
+ <layer id="3" name="regions_output" width="5" height="5" visible="0">
   <data encoding="base64" compression="zlib">
    eJxjYMAOnHCIkwMAE/wAQw==
   </data>
  </layer>
  <layer id="4" name="input_proto" width="5" height="5" opacity="0.75">
   <data encoding="base64" compression="zlib">
-   eJxjYMAO3HCIkwMAFSwARw==
+   eJxjYMAOpuMQJwcAAC04AJg=
   </data>
  </layer>
- <layer id="11" name="inputnot_proto" width="5" height="5" opacity="0.8">
+ <layer id="11" name="inputnot_proto" width="5" height="5" visible="0" opacity="0.8">
   <data encoding="base64" compression="zlib">
    eJxjYGBgKGBABeh8SgEATWQA4Q==
   </data>
  </layer>
- <layer id="5" name="output1_ground" width="5" height="5">
+ <layer id="5" name="output1_ground" width="5" height="5" visible="0">
   <data encoding="base64" compression="zlib">
    eJxjYMAO3HCIkwMAFSwARw==
   </data>
  </layer>
- <layer id="6" name="output2_ground" width="5" height="5">
+ <layer id="6" name="output2_ground" width="5" height="5" visible="0">
   <data encoding="base64" compression="zlib">
    eJxjYMAO3HGIkwMAFXgASA==
   </data>
  </layer>
- <layer id="7" name="output3_ground" width="5" height="5">
+ <layer id="7" name="output3_ground" width="5" height="5" visible="0">
   <data encoding="base64" compression="zlib">
    eJxjYMAOPHCIkwMAFcQASQ==
   </data>
  </layer>
- <layer id="8" name="output4_ground" width="5" height="5">
+ <layer id="8" name="output4_ground" width="5" height="5" visible="0">
   <data encoding="base64" compression="zlib">
    eJxjYMAOPHGIkwMAFhAASg==
   </data>

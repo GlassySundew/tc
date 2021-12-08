@@ -1,9 +1,5 @@
 package en.player;
 
-import haxe.CallStack;
-import tools.Save;
-import seedyrng.Random;
-import ui.Navigation;
 import ch3.scene.TileSprite;
 import en.items.Blueprint;
 import format.tmx.Data.TmxObject;
@@ -12,7 +8,8 @@ import h3d.mat.Texture;
 import hxbit.NetworkSerializable;
 import hxbit.Serializer;
 import hxd.Key;
-import ui.Navigation.NavigationTarget;
+import seedyrng.Random;
+import ui.Navigation;
 import ui.PauseMenu;
 import ui.domkit.TextLabelComp;
 import ui.player.PlayerUI;
@@ -33,32 +30,45 @@ class Player extends Entity {
 	public var holdItem(default, set) : en.Item;
 
 	// celestial
-	// generated name of the asteroid
+	/** generated name of the asteroid **/
 	@:s public var residesOnId(default, set) : String;
 	@:s public var travelling : Bool;
+	@:s public var onBoard : Bool;
 
 	function set_residesOnId( v : String ) {
 		return residesOnId = v;
 	}
 
+	public function putItemInCursor( v : Item ) {
+		for ( e in Entity.ALL ) if ( e.cellGrid != null ) e.cellGrid.grid.enableGrid();
+		v.x = 13;
+		v.y = 13;
+		Cursors.passObjectForCursor(v);
+		v.visible = false;
+		v.onPlayerHold.dispatch();
+		v.containerEntity = this;
+		Boot.inst.s2d.addChild(v);
+	}
+
 	inline function set_holdItem( v : en.Item ) {
+		Cursors.removeObjectFromCursor(holdItem);
+
 		if ( holdItem != null ) holdItem.onPlayerRemove.dispatch();
 		if ( v == null ) {
 			if ( holdItem != null ) {
-				Cursors.removeObjectFromCursor(holdItem);
 				holdItem.visible = true;
 			}
-			for ( e in Entity.ALL ) if ( e.invGrid != null ) e.invGrid.disableGrid();
+			for ( e in Entity.ALL ) if ( e.cellGrid != null ) e.cellGrid.grid.disableGrid();
 		}
+
+		if ( holdItem != null && !holdItem.isDisposed )
+			holdItem.visible = true;
+
 		if ( v != null && !v.isInBelt() ) {
-			v.x = 13;
-			v.y = 13;
-			Cursors.passObjectForCursor(v);
-			v.visible = false;
-			v.onPlayerHold.dispatch();
-			v.containerEntity = this;
-			Boot.inst.s2d.addChild(v);
+			putItemInCursor(v);
+			Player.inst.ui.belt.deselectCells();
 		}
+
 		return holdItem = v;
 	}
 
@@ -67,6 +77,7 @@ class Player extends Entity {
 		this.uid = uid;
 		inst = this;
 		travelling = false;
+		onBoard = true;
 
 		super(x, z, tmxObj);
 
@@ -101,7 +112,7 @@ class Player extends Entity {
 		super.init(x, z, tmxObj);
 
 		#if !headless
-		// public var invGrid : InventoryGrid;
+		// public var cellGrid : InventoryGrid;
 
 		if ( inst == this ) ui = new PlayerUI(Game.inst.root);
 
@@ -118,28 +129,34 @@ class Player extends Entity {
 		#end
 
 		Game.inst.delayer.addF(() -> {
-			checkTeleport(false);
-		}, 4);
+			checkTeleport();
+		}, 1);
 	}
+
+	public static var onGenerationCallback : Void -> Void;
 	/** 
 		shows teleport button if the map is already generated or add callback to show butotn
 		@param acceptTmxPlayerCoord if true, then player's position will be set as the player objct in tmx entities layer, false is regular
 	**/
-	public function checkTeleport( acceptTmxPlayerCoord : Bool = false ) {
+	public function checkTeleport() {
 
 		// search for a target to put a link to in a teleport button
 		var target = Navigation.inst.getTargetById(residesOnId);
 
-		if ( target != null &&
+		onGenerationCallback = () -> {
+			if ( onBoard )
+				ui.prepareTeleportDown(target.bodyLevelName, true);
+			else
+				ui.prepareTeleportUp("ship_pascal", false);
+		}
+
+		if ( ui != null ) if ( target != null &&
 			target.generator != null &&
 			target.generator.mapIsGenerating ) {
-			target.generator.onGeneration.add(() -> {
-				ui.prepareTeleportDown(target.bodyLevelName, acceptTmxPlayerCoord);
-			});
+			target.generator.onGeneration.add(onGenerationCallback);
 		} else if ( target != null &&
 			target.generator != null ) {
-
-			ui.prepareTeleportDown(target.bodyLevelName, acceptTmxPlayerCoord);
+			onGenerationCallback();
 		}
 	}
 
@@ -178,7 +195,7 @@ class Player extends Entity {
 		super.customSerialize(ctx);
 
 		// holditem
-		if ( holdItem != null ) {
+		if ( holdItem != null && holdItem.isInCursor()) {
 			ctx.addString(Std.string(holdItem.cdbEntry));
 			ctx.addInt(holdItem.amount);
 		} else {
@@ -245,11 +262,11 @@ class Player extends Entity {
 	}
 
 	public function disableGrids() {
-		ui.inventory.invGrid.disableGrid();
+		ui.inventory.cellGrid.grid.disableGrid();
 	}
 
 	public function enableGrids() {
-		ui.inventory.invGrid.enableGrid();
+		ui.inventory.cellGrid.grid.enableGrid();
 	}
 
 	override function dispose() {
@@ -259,8 +276,11 @@ class Player extends Entity {
 			saveSettings();
 			inst = null;
 		}
-		ui.destroy();
-		ui = null;
+
+		if ( ui != null ) {
+			ui.destroy();
+			ui = null;
+		}
 
 		if ( nicknameMesh != null ) {
 			nicknameMesh.remove();
@@ -298,7 +318,7 @@ class Player extends Entity {
 			var leftAng = Math.atan2(ca.lyValue(), ca.lxValue());
 			if ( !isLocked() ) {
 				if ( leftPushed ) {
-					var s = 0.325 * leftDist * tmod;
+					var s = 0.325 * leftDist;
 					dx += Math.cos(leftAng) * s;
 					dy += Math.sin(leftAng) * s;
 
@@ -308,7 +328,7 @@ class Player extends Entity {
 
 					if ( ca.lxValue() > 0.3 && ca.lyValue() > 0.3 ) dir = 1; else if ( ca.lxValue() < -0.3 && ca.lyValue() > 0.3 ) dir = 3; else
 						if ( ca.lxValue() < -0.3
-						&& ca.lyValue() < -0.3 ) dir = 5; else if ( ca.lxValue() > 0.3 && ca.lyValue() < -0.3 ) dir = 7;
+							&& ca.lyValue() < -0.3 ) dir = 5; else if ( ca.lxValue() > 0.3 && ca.lyValue() < -0.3 ) dir = 7;
 				} else {
 					dx *= Math.pow(0.6, tmod);
 					dy *= Math.pow(0.6, tmod);
@@ -375,8 +395,10 @@ class Player extends Entity {
 		}
 
 		if ( ca.yPressed() ) {
+			// Q
 			if ( holdItem != null && !holdItem.isDisposed ) {
 				if ( Key.isDown(Key.CTRL) ) {
+
 					// dropping whole stack
 					dropItem(Item.fromCdbEntry(holdItem.cdbEntry, holdItem.amount), angToPxFree(Level.inst.cursX, Level.inst.cursY), 2.3);
 					holdItem.amount = 0;
@@ -386,7 +408,13 @@ class Player extends Entity {
 					dropItem(Item.fromCdbEntry(holdItem.cdbEntry, 1), angToPxFree(Level.inst.cursX, Level.inst.cursY), 2.3);
 					holdItem.amount--;
 				}
+				if ( holdItem == null || holdItem.isDisposed )
+					Player.inst.ui.belt.deselectCells();
 			}
+
+			if ( holdItem != null
+				&& holdItem.isInCursor() )
+				holdItem = holdItem;
 		}
 	}
 }

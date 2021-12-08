@@ -20,6 +20,6 @@ using tools.Util.TmxMapExtender;
 using tools.Util.SeedyRandomExtender;
 
 #if !macro
-import Data;
+// import Data;
 #end
 

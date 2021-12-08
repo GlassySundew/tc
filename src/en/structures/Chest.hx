@@ -18,18 +18,19 @@ class Chest extends Structure {
 
 	var ca : dn.heaps.Controller.ControllerAccess;
 
-	public function new( ?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : StructuresKind ) {
+	public function new( ?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : Data.StructuresKind ) {
 		super(x, z, tmxObj, cdbEntry);
+		interactable = true;
 
-		invGrid = new CellGrid(5, 5, 25, 25, this);
+		cellGrid = new CellGrid(5, 5, 25, 25, this);
 
-		// adding items from props only when first loaded (with no serialization)
+		// addingData.Items from props only when first loaded (with no serialization)
 		for ( prop in tmxObj.properties.keys() ) {
 			var split = prop.split(":");
 			if ( split.length > 1 && split[0] == "item" ) {
 				var item = Item.fromCdbEntry(Data.items.resolve(split[1]).id);
 				item.amount = tmxObj.properties.getInt(prop);
-				invGrid.giveItem(item, this);
+				cellGrid.giveItem(item);
 			}
 		}
 	}
@@ -40,9 +41,11 @@ class Chest extends Structure {
 
 		#if !headless
 		Game.inst.delayer.addF(() -> {
-			inventory = new ChestWin(invGrid,
-				Player.inst.ui.root);
-			inventory.containmentEntity = this;
+			if ( Player.inst != null && Player.inst.ui != null ) {
+				inventory = new ChestWin(cellGrid,
+					Player.inst.ui.root);
+				inventory.containmentEntity = this;
+			}
 		}, 2);
 		#end
 
@@ -58,11 +61,13 @@ class Chest extends Structure {
 	override function postUpdate() {
 		super.postUpdate();
 
-		if ( Player.inst != null
+		if (
+			Player.inst != null
 			&& Player.inst.isMoving()
 			&& !isInPlayerRange()
 			&& inventory != null
-			&& inventory.win.visible == true ) {
+			&& inventory.win.visible == true
+		) {
 			inventory.toggleVisible();
 		}
 	}
@@ -74,13 +79,8 @@ class Chest extends Structure {
 }
 
 class ChestWin extends Inventory {
-	public function new( ?invGrid : CellGrid, ?parent : Object ) {
-		super(false, invGrid, parent);
-
-		windowComp.window.onDrag.add(( x, y ) -> {
-			Settings.params.chestCoordRatio.x = win.x / Main.inst.w();
-			Settings.params.chestCoordRatio.y = win.y / Main.inst.h();
-		});
+	public function new( ?cellGrid : CellGrid, ?parent : Object ) {
+		super(false, cellGrid, parent);
 
 		windowComp.window.windowLabel.labelTxt.text = "Chest";
 	}
@@ -90,9 +90,10 @@ class ChestWin extends Inventory {
 	}
 
 	override function toggleVisible() {
-		win.x = Settings.params.chestCoordRatio.toString() == new Vector(-1, -1).toString() ? win.x : Settings.params.chestCoordRatio.x * Main.inst.w();
-		win.y = Settings.params.chestCoordRatio.toString() == new Vector(-1, -1).toString() ? win.y : Settings.params.chestCoordRatio.y * Main.inst.h();
-
+		if ( !win.visible ) {
+			win.x = Player.inst.ui.inventory.windowComp.window.getSize().width + Player.inst.ui.inventory.win.x + 4;
+			win.y = Player.inst.ui.inventory.win.y + (Player.inst.ui.inventory.windowComp.window.getSize().height - windowComp.window.getSize().height) / 2;
+		}
 		super.toggleVisible();
 	}
 }

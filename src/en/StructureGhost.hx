@@ -4,10 +4,12 @@ package en;
 class StructureGhost extends Structure {
 	public var canBePlaced : Bool = false;
 
-	public function new(cdbEntry : StructuresKind) {
+	public function new( cdbEntry : Data.StructuresKind ) {
 		spr = new HSprite(Assets.structures, entParent);
 		spr.set('${Data.structures.get(cdbEntry).id}');
+
 		super(0, 0, cdbEntry);
+		
 		toBeCollidedAgainst = false;
 
 		interact.onPushEvent.removeAll();
@@ -40,9 +42,9 @@ class StructureGhost extends Structure {
 		colorAdd.setColor(0xbe3434);
 	}
 
-	override function applyItem(item : Item) {}
+	override function applyItem( item : Item ) {}
 
-	override function emitDestroyItem(item : Item) {}
+	override function emitDestroyItem( item : Item ) {}
 
 	override function updateInteract() {}
 

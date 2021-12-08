@@ -1,5 +1,7 @@
 package en;
 
+import tools.Save;
+import shader.FlipX;
 import h3d.scene.Object;
 import h3d.scene.Sphere;
 import h3d.scene.Mesh;
@@ -127,6 +129,7 @@ class Entity implements NetworkSerializable {
 	public var colorAdd : h3d.Vector;
 	public var spr : HSprite;
 	public var mesh : IsoTileSpr;
+	public var meshDefaultRotation : Vector;
 	public var tmpDt : Float;
 	public var tmpCur : Float;
 	public var lastFootX : Float;
@@ -143,10 +146,17 @@ class Entity implements NetworkSerializable {
 	public var tw : Tweenie;
 	@:s public var flippedX : Bool;
 	public var pivotChanged = true;
+	public var flipXShader : FlipX;
 
 	public static var isoCoefficient = 1.2;
 
-	public var invGrid : CellGrid;
+	public var cellGrid : CellGrid;
+	/** из-за того, что метод отрисовки, который я добавил в том виде, какой он есть 
+		сейчас(тайл с spr просто передаётся в mesh ), всякие эффекты и шейдеры не будут 
+		работать, значит, надо добавить сценарий, где спрайт будет рисоваться через h2d.Object.drawTo()
+	**/
+	public var forceDrawTo : Bool = false;
+	public var refreshTile : Bool = false;
 
 	public function new( ?x : Float = 0, ?z : Float = 0, ?tmxObj : Null<TmxObject> ) {
 		init(x, z, tmxObj);
@@ -179,9 +189,10 @@ class Entity implements NetworkSerializable {
 
 		mesh = new IsoTileSpr(texTile, false, Boot.inst.s3d);
 
-		mesh.material.mainPass.setBlendMode(AlphaAdd);
+		mesh.material.mainPass.setBlendMode(Alpha);
 
-		mesh.rotate(tmxObj != null ? M.toRad(tmxObj.rotation) : 0, -rotAngle, M.toRad(90));
+		meshDefaultRotation = new Vector(tmxObj != null ? M.toRad(tmxObj.rotation) : 0, -rotAngle, M.toRad(90));
+		mesh.rotate(meshDefaultRotation.x, meshDefaultRotation.y, meshDefaultRotation.z);
 		var s = mesh.material.mainPass.addShader(new h3d.shader.ColorAdd());
 		s.color = colorAdd;
 		mesh.material.mainPass.enableLights = false;
@@ -335,8 +346,6 @@ class Entity implements NetworkSerializable {
 		item.remove();
 		item = null;
 
-		Player.inst.ui.belt.deselectCells();
-
 		return item;
 	}
 
@@ -349,9 +358,13 @@ class Entity implements NetworkSerializable {
 	}
 	/**Flips spr.scaleX, all of collision objects, and sorting rectangle**/
 	public function flipX() {
+		refreshTile = true;
 		flippedX = !flippedX;
 
 		spr.scaleX *= -1;
+
+		@:privateAccess mesh.plane.invalidate();
+
 		spr.pivot.centerFactorX = 1 - spr.pivot.centerFactorX;
 		pivotChanged = true;
 
@@ -374,6 +387,7 @@ class Entity implements NetworkSerializable {
 			cast(this, Interactive).rebuildInteract();
 		}
 		catch( e:Dynamic ) {}
+
 		updateDebugDisplay();
 	}
 
@@ -434,14 +448,14 @@ class Entity implements NetworkSerializable {
 		ctx.addString(spr.groupName);
 		ctx.addInt(spr.frame);
 
-		// items inventory
-		if ( invGrid != null ) {
-			ctx.addInt(invGrid.grid.length);
-			ctx.addInt(invGrid.grid[0].length);
+		// Data.Items inventory
+		if ( cellGrid != null ) {
+			ctx.addInt(cellGrid.grid.length);
+			ctx.addInt(cellGrid.grid[0].length);
 
-			ctx.addInt(invGrid.cellWidth);
-			ctx.addInt(invGrid.cellHeight);
-			for ( i in invGrid.grid ) for ( j in i ) {
+			ctx.addInt(cellGrid.cellWidth);
+			ctx.addInt(cellGrid.cellHeight);
+			for ( i in cellGrid.grid ) for ( j in i ) {
 				if ( j.item != null ) {
 					ctx.addString(Std.string(j.item.cdbEntry));
 					ctx.addInt(j.item.amount);
@@ -473,33 +487,35 @@ class Entity implements NetworkSerializable {
 			level.game.applyTmxObjOnEnt(this);
 			if ( flippedX ) {
 				Game.inst.delayer.addF(() -> {
+					flippedX = false;
 					flipX();
-					flippedX = true;
-
 					footX += (((1 - spr.pivot.centerFactorX * 2) * spr.tile.width));
-				}, 2);
+				}, 1);
 			}
 			offsetFootByCenterReversed();
 		}, 1);
 
-		// items inventory
+		// Data.Items inventory
 		var invHeight = ctx.getInt();
 		var invWidth = ctx.getInt();
 
-		if ( invGrid == null && invHeight > 0 && invWidth > 0 ) {
+		if ( cellGrid == null && invHeight > 0 && invWidth > 0 ) {
 			var cellWidth = ctx.getInt();
 			var cellHeight = ctx.getInt();
-			invGrid = new CellGrid(invWidth, invHeight, cellWidth, cellHeight, this);
+			cellGrid = new CellGrid(invWidth, invHeight, cellWidth, cellHeight, this);
 		}
 		for ( i in 0...invHeight ) for ( j in 0...invWidth ) {
 			var itemString = ctx.getString();
 			var itemAmount = ctx.getInt();
 			if ( itemString != "null" && itemString != "null" && itemString != null ) {
 
-				var item = Item.fromCdbEntry(Data.items.resolve(itemString).id, itemAmount);
-				item.containerEntity = this;
+				Game.inst.delayer.addF(() -> {
 
-				invGrid.grid[i][j].item = item;
+					var item = Item.fromCdbEntry(Data.items.resolve(itemString).id, itemAmount);
+					item.containerEntity = this;
+
+					cellGrid.grid[i][j].item = item;
+				}, 1);
 			}
 		}
 	}
@@ -555,6 +571,7 @@ class Entity implements NetworkSerializable {
 	}
 
 	public function kill( by : Null<Entity> ) {
+		Save.inst.removeEntityById(sqlId);
 		destroy();
 	}
 
@@ -729,23 +746,48 @@ class Entity implements NetworkSerializable {
 			var needForDraw = Game.inst.camera.s3dCam.frustum.hasBounds(bounds);
 
 			if ( !needForDraw ) {
+				mesh.culled = true;
 				mesh.visible = false;
 				spr.visible = false;
 			}
 
 			if ( needForDraw ) {
+				mesh.culled = false;
 				mesh.visible = true;
 				spr.visible = true;
 
-				tex.clear(0, 0);
-				spr.x = spr.scaleX > 0 ? -spr.tile.dx : spr.tile.dx + spr.tile.width;
-				spr.y = spr.scaleY > 0 ? -spr.tile.dy : spr.tile.dy + spr.tile.height;
-
-				spr.drawTo(tex);
 				if ( pivotChanged ) {
+					spr.x = spr.scaleX > 0 ? -spr.tile.dx : spr.tile.dx + spr.tile.width;
+					spr.y = spr.scaleY > 0 ? -spr.tile.dy : spr.tile.dy + spr.tile.height;
+					pivotChanged = false;
+					refreshTile = true;
+				}
+
+				if ( forceDrawTo ) {
+					tex.clear(0, 0);
+					spr.drawTo(tex);
 					texTile.setCenterRatio(spr.pivot.centerFactorX, spr.pivot.centerFactorY);
 					mesh.tile = texTile;
-					pivotChanged = false;
+				}
+				else
+					@:privateAccess {
+					if ( refreshTile
+						|| (spr.tile.u != mesh.plane.u0 && spr.tile.u != mesh.plane.u1)
+						|| (spr.tile.u2 != mesh.plane.u1 && spr.tile.u2 != mesh.plane.u0)
+						|| spr.tile.v != mesh.plane.v0
+						|| spr.tile.v2 != mesh.plane.v1 ) {
+
+						mesh.tile = spr.tile;
+						if ( flippedX ) {
+
+							var tmp = mesh.plane.u1;
+							mesh.plane.u1 = mesh.plane.u0;
+							mesh.plane.u0 = tmp;
+							mesh.plane.invalidate();
+						}
+
+						refreshTile = false;
+					}
 				}
 
 				mesh.x = footX;

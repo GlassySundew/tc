@@ -43,6 +43,7 @@ class Interactive extends Entity {
 	var polygonized : Array<Tri>;
 	var points : Array<HxPoint>;
 	var iconParent : Object;
+	var doHighlight : Bool = true;
 
 	function new( ?x : Float = 0, ?z : Float = 0, ?tmxObj : TmxObject ) {
 		super(x, z, tmxObj);
@@ -80,7 +81,8 @@ class Interactive extends Entity {
 
 	function activateInteractive() {
 		if ( interactable && isInPlayerRange() ) {
-			turnOnHighlight();
+			if ( doHighlight )
+				turnOnHighlight();
 			return true;
 		} else
 			return false;
@@ -99,6 +101,7 @@ class Interactive extends Entity {
 	public function turnOnHighlight() {
 		if ( cd != null ) {
 			spr.filter = filter;
+			forceDrawTo = true;
 			filter.enable = true;
 			cd.setS("keyboardIconInit", .4);
 			cd.setS("interacted", Const.INFINITE);
@@ -108,6 +111,7 @@ class Interactive extends Entity {
 	public function turnOffHighlight() {
 		if ( cd != null ) {
 			cd.unset("interacted");
+			forceDrawTo = false;
 			spr.filter = null;
 			filter.enable = false;
 			if ( buttonIcon != null ) buttonIcon.dispose();
@@ -125,9 +129,12 @@ class Interactive extends Entity {
 	function updateInteract() {
 		#if !headless
 		if ( interactable ) updateKeyIcon();
-		if ( interact != null && player.isMoving()) interact.visible = player != null
-			&& !player.destroyed
-			&& /*!player.ui.inventory.sprInv.visible &&*/ isInPlayerRange();
+		if ( interact != null && player != null && player.isMoving() )
+			interact.visible =
+				interactable
+				&& player != null
+				&& !player.destroyed
+				&& isInPlayerRange();
 		#end
 	}
 

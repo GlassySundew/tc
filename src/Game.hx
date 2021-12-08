@@ -1,3 +1,5 @@
+import h2d.Text;
+import haxe.Unserializer;
 import hx.concurrent.Future.FutureResult;
 import mapgen.MapGen;
 import hx.concurrent.executor.Executor;
@@ -18,6 +20,23 @@ import tools.Settings;
 import ui.Hud;
 import ui.Navigation;
 import ui.PauseMenu;
+/** 
+	@param manual debug parameter, if true, player will not be kept and will be load clear from tmx entity named 'player'
+	@param acceptTmxPlayerCoord same as manual, but the existing player instance wont be thrown off and only coords from tmx object 'player' will be applied to loaded player instance
+	@param acceptSqlPlayerCoord we are keeping player sql entry on previously visited locations to only apply their coords to our existing Player instance if visiting them once again
+**/
+@:structInit
+class LevelLoadPlayerConfig {
+	public var manual : Bool;
+	public var acceptTmxPlayerCoord : Bool;
+	public var acceptSqlPlayerCoord : Bool;
+
+	public function new( ?manual = false, ?acceptTmxPlayerCoord = false, ?acceptSqlPlayerCoord = false ) {
+		this.manual = manual;
+		this.acceptTmxPlayerCoord = acceptTmxPlayerCoord;
+		this.acceptSqlPlayerCoord = acceptSqlPlayerCoord;
+	}
+}
 
 class Game extends Process implements IGame implements hxbit.Serializable {
 	public static var inst : Game;
@@ -50,8 +69,9 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 	@:s public var seed : Null<String>;
 	public var navFieldsGenerated : Null<Int>;
 
-	// celestial stuff
-	// var fields : Array<NavigationField> = [];
+	#if game_tmod
+	var stats : h2d.Text;
+	#end
 
 	public function new( ?seed : String ) {
 		super(Main.inst);
@@ -82,6 +102,9 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 
 		// 	}
 		// }
+
+		new AxesHelper(Boot.inst.s3d);
+		new GridHelper(Boot.inst.s3d);
 	}
 	/**
 		added in favor of unserializing
@@ -89,6 +112,10 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 		@param mockConstructor if true, then we will execute dn.Process constructor clause
 	**/
 	public function initLoad( ?mockConstructor = true ) {
+		#if game_tmod
+		stats = new Text(Assets.fontPixel, Boot.inst.s2d);
+		#end
+
 		if ( mockConstructor ) {
 			init();
 
@@ -140,30 +167,83 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 	/**
 		@param manual debug parameter, if true, player won't be moved on level change
 	**/
-	public function startLevel( name : String, ?manual : Bool = false, ?acceptTmxPlayerCoord : Bool = false ) {
-		var levelFromCache : Level;
-
-		if ( level != null ) {
+	public function startLevel( name : String, playerLoadConf : LevelLoadPlayerConfig ) {
+		if ( level != null )
 			Save.inst.saveLevel(level);
-		}
 
 		// in fact its not only from cache, it will pull level that was already pushed to db
-		levelFromCache = Save.inst.loadLevelByName(name.split(".")[0], acceptTmxPlayerCoord);
+		var levelFromCache = Save.inst.getLevelByName(name.split(".")[0]);
 
-		if ( levelFromCache == null ) {
+		if ( levelFromCache != null ) {
+			startLevelFromParsedTmx(
+				Unserializer.run(haxe.crypto.Base64.decode(levelFromCache.tmx).toString()),
+				levelFromCache.name,
+				playerLoadConf
+			);
+			level.sqlId = Std.int(levelFromCache.id);
+			Save.inst.loadSavedEntities(levelFromCache);
+		} else {
 			tmxMap = MapCache.inst.get(name);
-			startLevelFromParsedTmx(tmxMap, name, manual, acceptTmxPlayerCoord);
-
-			// var cachedPlayer = Save.inst.playerSavedOn(level);
-			// if ( !manual && cachedPlayer != null ) {
-			// 	Save.inst.loadEntity(cachedPlayer);
-			// 	player = Player.inst;
-			// 	targetCameraOnPlayer();
-			// }
+			startLevelFromParsedTmx(tmxMap, name, playerLoadConf);
 		}
 	}
 
-	public function startLevelFromParsedTmx( tmxMap : TmxMap, name : String, ?manual : Bool = false, ?acceptTmxPlayerCoord : Bool = false ) {
+	// Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity and puts name into spr group if not found
+	function searchAndSpawnEnt( e : TmxObject, entClasses : List<Class<Entity>> ) {
+		var isoX = 0., isoY = 0.;
+		if ( tmxMap.orientation == Isometric ) {
+			// все объекты в распаршенных слоях уже с конвертированными координатами
+			// entities export lies ahead
+			isoX = Level.inst.cartToIsoLocal(e.x, e.y).x;
+			isoY = Level.inst.cartToIsoLocal(e.x, e.y).y;
+		}
+
+		var source = "";
+		// var tilesetTile : TmxTilesetTile = null;
+
+		switch e.objectType {
+			case OTTile(gid):
+				source = Tools.getTileByGid(tmxMap, gid).image.source;
+			default:
+				"";
+		}
+
+		// Парсим все классы - наследники en.Entity и спавним их
+		for ( eClass in entClasses ) {
+			if ( eregCompTimeClass.match('$eClass'.toLowerCase()) ) {
+
+				// смотрим во всех наследников Entity и спавним, если совпадает
+				if ( eregCompTimeClass.matched(1) == e.name ) {
+					Type.createInstance(eClass, [isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, e]);
+					return;
+				} else {
+					// значит что сейчас мы смотрим настройку className тайла из тайлсета, который мы пытаемся заспавнить
+					switch e.objectType {
+						case OTTile(gid):
+							for ( tile in Tools.getTilesetByGid(tmxMap, gid).tiles ) {
+								if (
+									tile.image.source == source
+									&& tile.properties.existsType("className", PTString)
+									&& tile.properties.getString("className") == '$eClass'
+								) {
+									Type.createInstance(eClass, [isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, e]);
+									return;
+								}
+							}
+						default:
+					}
+				}
+			}
+		}
+
+		// если не найдено подходящего класса, то спавним spriteEntity, который является просто спрайтом
+		if ( eregFileName.match(source) ) {
+			new SpriteEntity(isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, eregFileName.matched(1), e);
+			return;
+		}
+	}
+
+	public function startLevelFromParsedTmx( tmxMap : TmxMap, name : String, playerLoadConf : LevelLoadPlayerConfig ) {
 		this.tmxMap = tmxMap;
 		engine.clear(0, 1);
 		execAfterLvlLoad = new EventSignal0();
@@ -185,57 +265,56 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 		CompileTime.importPackage("en");
 		var entClasses = CompileTime.getAllClasses(Entity);
 
-		// Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity and puts name into spr group if not found
-		function searchAndSpawnEnt( e : TmxObject ) {
-			var isoX = 0., isoY = 0.;
-			if ( tmxMap.orientation == Isometric ) {
-				// все объекты в распаршенных слоях уже с конвертированными координатами
-				// entities export lies ahead
-				isoX = Level.inst.cartToIsoLocal(e.x, e.y).x;
-				isoY = Level.inst.cartToIsoLocal(e.x, e.y).y;
-			}
-
-			// Парсим все классы - наследники en.Entity и спавним их
-			for ( eClass in entClasses ) {
-				eregCompTimeClass.match('$eClass'.toLowerCase());
-				if ( eregCompTimeClass.match('$eClass'.toLowerCase()) && eregCompTimeClass.matched(1) == e.name ) {
-					Type.createInstance(eClass, [isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, e]);
-					return;
-				}
-			}
-			// если не найдено подходящего класса, то спавним spriteEntity, который является просто спрайтом
-			switch( e.objectType ) {
-				case OTTile(gid):
-					var objGid = Tools.getTileByGid(tmxMap, gid);
-					if ( objGid != null ) {
-						var source = objGid.image.source;
-						if ( eregFileName.match(source) ) {
-							new SpriteEntity(isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, eregFileName.matched(1), e);
-							return;
-						}
-					}
-				default:
-			}
-		}
-
-		var playerEnt : TmxObject = null;
-		if ( acceptTmxPlayerCoord ) for ( ent in level.entities ) if ( ent.name == "player" ) playerEnt = ent;
-
 		// Загрузка игрока при переходе в другую локацию
 		Save.inst.bringPlayerToLevel(loadedLevel);
 		var cachedPlayer = Save.inst.playerSavedOn(level);
 
 		if ( cachedPlayer != null ) {
-			for ( e in level.entities ) if ( manual || e.name != "player" ) searchAndSpawnEnt(e);
+			// это значит, что инстанс игрока был ранее создан и делать нового не надо
+			for ( e in level.entities ) if ( playerLoadConf.manual
+				|| (
+					!e.properties.existsType("className", PTString)
+					|| e.properties.getString("className") != "en.player.$Player"
+				) ) {
+					searchAndSpawnEnt(e, entClasses);
+			}
 			Save.inst.loadEntity(cachedPlayer);
 		} else {
-			// a crutchy fix for isometric sorting glitches - player for somewhat reason must be in the bottom of entities list
-			for ( e in level.entities ) if ( e.name != "player" ) searchAndSpawnEnt(e);
-			for ( e in level.entities ) if ( e.name == "player" ) searchAndSpawnEnt(e);
+			for ( e in level.entities )
+				searchAndSpawnEnt(e, entClasses);
 		}
 
 		player = Player.inst;
-		if ( playerEnt != null ) player.setFeetPos(playerEnt.x, playerEnt.y);
+
+		if ( playerLoadConf.acceptTmxPlayerCoord ) {
+			delayer.addF(() -> {
+				var playerEnt : TmxObject = null;
+				for ( e in level.entities )
+					if (
+						!e.properties.existsType("className", PTString)
+						|| e.properties.getString("className") == "en.player.$Player"
+					)
+						playerEnt = e;
+				if ( playerEnt != null )
+					player.setFeetPos(
+						level.cartToIsoLocal(playerEnt.x, playerEnt.y).x,
+						level.cartToIsoLocal(playerEnt.x, playerEnt.y).y
+					);
+
+				targetCameraOnPlayer();
+			}, 1);
+		}
+
+		if ( playerLoadConf.acceptSqlPlayerCoord ) {
+			delayer.addF(() -> {
+				var playerEnt = Save.inst.getPlayerShallowFeet(player);
+				if ( playerEnt != null ) {
+					var blob = '${playerEnt.blob}'.split("_");
+					player.setFeetPos(Std.parseInt(blob[0]), Std.parseInt(blob[1]));
+				}
+				targetCameraOnPlayer();
+			}, 1);
+		}
 
 		delayer.addF(() -> {
 			hideStrTiles();
@@ -269,7 +348,14 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 
 		for ( tile in entitiesTs.tiles ) {
 			if ( eregFileName.match(tile.image.source) ) {
-				var picName = eregFileName.matched(1);
+				var picName = {
+					if ( tile.properties.existsType("className", PTString) ) {
+						var className = tile.properties.getString("className");
+						eregCompTimeClass.match(className);
+						eregCompTimeClass.matched(1).toLowerCase();
+					} else
+						eregFileName.matched(1);
+				}
 
 				for ( ent in ents ) {
 					eregClass.match('$ent'.toLowerCase());
@@ -384,6 +470,10 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 
 		inst = null;
 
+		#if game_tmod
+		if ( stats != null ) stats.remove();
+		#end
+
 		if ( camera != null ) camera.destroy();
 		for ( e in Entity.ALL ) e.destroy();
 		gc();
@@ -397,6 +487,10 @@ class Game extends Process implements IGame implements hxbit.Serializable {
 
 	override function update() {
 		super.update();
+
+		#if game_tmod
+		stats.text = "tmod: " + tmod;
+		#end
 
 		pauseCycle = false;
 

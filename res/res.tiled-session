@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "tiled/levels/test.tmx",
+    "activeFile": "tiled/levels/entities.tsx",
     "automapping.whileDrawing": false,
     "expandedProjectPaths": [
         ".",
@@ -541,19 +541,19 @@
             }
         },
         "tiled/levels/asteroid.tmx": {
-            "scale": 1,
-            "selectedLayer": 0,
+            "scale": 0.5,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 2400,
-                "y": 1184.5
+                "x": 2134,
+                "y": 1203
             }
         },
         "tiled/levels/bridge.tmx": {
-            "scale": 11,
+            "scale": 3,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 1200,
-                "y": 584.5
+                "x": 956,
+                "y": 511.5
             }
         },
         "tiled/levels/colls.tsx": {
@@ -563,7 +563,7 @@
         },
         "tiled/levels/entities.tsx": {
             "dynamicWrapping": true,
-            "scaleInDock": 0.5,
+            "scaleInDock": 0.33,
             "scaleInEditor": 0.75
         },
         "tiled/levels/env.tsx": {
@@ -585,11 +585,11 @@
             }
         },
         "tiled/levels/procgen/asteroids.tmx": {
-            "scale": 3,
-            "selectedLayer": 2,
+            "scale": 1,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 2400,
-                "y": 1088.6666666666665
+                "x": 2621,
+                "y": 384.5
             }
         },
         "tiled/levels/rules.tmx": {
@@ -605,19 +605,19 @@
             "scaleInDock": 1
         },
         "tiled/levels/rules/random.tmx": {
-            "scale": 1,
-            "selectedLayer": 7,
+            "scale": 8,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 219,
-                "y": -50.5
+                "x": 120.75,
+                "y": 52.8125
             }
         },
         "tiled/levels/rules/rules.tmx": {
-            "scale": 0.5,
-            "selectedLayer": 1,
+            "scale": 1.5,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 2400,
-                "y": 1089
+                "x": 3149.333333333333,
+                "y": 629.6666666666666
             }
         },
         "tiled/levels/rules/rules1.tmx": {
@@ -741,11 +741,11 @@
             }
         },
         "tiled/levels/ship_pascal.tmx": {
-            "scale": 3,
+            "scale": 5.5,
             "selectedLayer": 9,
             "viewCenter": {
-                "x": 411,
-                "y": 44.83333333333333
+                "x": 628.3636363636364,
+                "y": 214.63636363636363
             }
         },
         "tiled/levels/test.tmx": {
@@ -761,16 +761,16 @@
             "selectedLayer": 4,
             "viewCenter": {
                 "x": 124.9090909090909,
-                "y": 50.090909090909086
+                "y": 50.18181818181817
             }
         },
         "tiled/levels/ui.tsx": {
             "dynamicWrapping": true,
             "scaleInDock": 0.5,
-            "scaleInEditor": 0.75
+            "scaleInEditor": 0.33
         }
     },
-    "last.imagePath": "/home/glassysundew/Projects/tc/res/tiled/separated/ui",
+    "last.imagePath": "/home/glassysundew/Projects/tc/res/tiled/separated/env",
     "last.worldFilePath": "/home/glassysundew/Projects/tc/res/tiled/levels",
     "loadedWorlds": [
         "/home/glassysundew/Projects/tc/res/tiled/levels/world.world"
@@ -794,23 +794,22 @@
         "tiled/levels/rules/rules.tmx",
         "tiled/levels/rules/random.tmx",
         "tiled/levels/asteroid.tmx",
-        "tiled/levels/procgen/asteroids.tmx",
-        "tiled/levels/test.tmx"
+        "tiled/levels/procgen/asteroids.tmx"
     ],
     "project": "res.tiled-project",
-    "property.type": "int",
+    "property.type": "file",
     "recentFiles": [
-        "tiled/levels/test.tmx",
-        "tiled/levels/alpha.tsx",
         "tiled/levels/procgen/asteroids.tmx",
         "tiled/levels/ship_pascal.tmx",
         "tiled/levels/bridge.tmx",
+        "tiled/levels/alpha.tsx",
         "tiled/levels/ui.tmx",
         "tiled/levels/ui.tsx",
-        "tiled/levels/entities.tsx",
-        "tiled/levels/rules/rules.tmx",
-        "tiled/levels/rules/random.tmx",
         "tiled/levels/asteroid.tmx",
+        "tiled/levels/rules/random.tmx",
+        "tiled/levels/rules/rules.tmx",
+        "tiled/levels/entities.tsx",
+        "tiled/levels/test.tmx",
         "/mnt/part2/pixelart/1bitpack_kenney/Tilemap/sample_fantasy.tmx"
     ],
     "resizeMap.removeObjects": true,

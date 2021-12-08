@@ -1,5 +1,6 @@
 package mapgen;
 
+import seedyrng.Random;
 import haxe.Serializer;
 import haxe.Unserializer;
 import h3d.Vector;
@@ -33,9 +34,10 @@ class MapGen {
 	var autoMapper : AutoMap;
 	var groundTiles : Array<Int> = [];
 	var voidTiles : Array<Int> = [];
-	
 	/** already placed rooms **/
 	var roomList : Array<{x : Int, y : Int, sample : Null<GenSample> }> = [];
+
+	var random : Random;
 
 	var samples : Array<GenSample> = [];
 	/**
@@ -43,9 +45,12 @@ class MapGen {
 		@param map config for map generating behaviour
 		@param autoTiler for autotiling generated result
 	**/
-	public function new( sampleMap : TmxMap, autoMapper : AutoMap ) {
+	public function new( sampleMap : TmxMap, seed : String, autoMapper : AutoMap ) {
 		this.sampleMap = sampleMap;
 		this.autoMapper = autoMapper;
+
+		random = new Random();
+		random.setStringSeed(seed);
 
 		// looking up for void and ground tiles
 		for ( tileset in sampleMap.tilesets ) {
@@ -62,12 +67,11 @@ class MapGen {
 		for ( i in sampleMap.layers ) {
 			switch i {
 				case LGroup(group):
-					if ( group.name == "empty" ) continue;
 					var sampleType : SampleType = switch group.name {
 						case StringTools.contains(_, 'start') => true: Start;
 						case StringTools.contains(_, 'midst') => true: Midst;
 						case StringTools.contains(_, 'end') => true: End;
-						default: throw("pattern type not supported " + group.name);
+						default: continue;
 					}
 
 					// extracting non-zero samples from groups and grounding them down to zero coords
@@ -78,8 +82,11 @@ class MapGen {
 						switch i {
 							case LTileLayer(layer):
 								for ( tilei => tile in layer.data.tiles ) {
-									if ( (tile.gid != 0
-										&& (tilei % sampleMap.width) < lowestTile.x && M.floor(tilei / sampleMap.width) < lowestTile.y) ) {
+									if (
+										tile.gid != 0
+										&& tilei % sampleMap.width < lowestTile.x
+										&& M.floor(tilei / sampleMap.width) < lowestTile.y
+									) {
 										// pushing this very tile to storage
 										lowestTile.x = tilei % sampleMap.width;
 										lowestTile.y = M.floor(tilei / sampleMap.width);
@@ -95,7 +102,6 @@ class MapGen {
 							case LTileLayer(layer):
 								for ( tilei => tile in layer.data.tiles ) {
 									if ( tile.gid != 0 ) {
-
 										var tileID = Std.int(tilei % sampleMap.width
 											- lowestTile.x
 											+ (M.floor(tilei / sampleMap.width) - lowestTile.y) * sampleMap.width);
@@ -132,7 +138,15 @@ class MapGen {
 			}
 		}
 	}
-
+	/**
+		* Generate random layout of rooms, corridors and other features.
+		* @param   mapWidth    Width of the map area.
+		* @param   mapHeight   Height of the map area.
+		* @param	fail        A value from 1 upwards. The higer the value of fail, the greater the chance of larger dungeons being created. 
+		A low value (>10) tends to produce only a few rooms, a high value (<50) raises the chance that the whole map area will be used to create rooms (up to the value of mrooms).
+		* @param	b1          corridor bias. This is a value from 0 to 100 and represents the %chance a feature will be a corridor instead of a room. A value of 0 will produce rooms only, a value of 100 will produce corridors only.
+		* @param	mrooms	    Maximum number of rooms to create. This, combined with fail, can be used to create a specific number of rooms.
+	 */
 	public function generate( mapWidth : Int = 80, mapHeight : Int = 80, fail : Int = 100, b1 : Int = 5, mrooms : Int = 60 ) : TmxMap {
 		var map : TmxMap = {
 			version : sampleMap.version,
@@ -157,10 +171,10 @@ class MapGen {
 
 		map.tilesets = sampleMap.tilesets;
 
-		var startingRoom = Random.fromArray(samples.filter(sample -> sample.type == Start));
+		var startingRoom = random.choice(samples.filter(sample -> sample.type == Start));
 		var startingRoomSize = getSampleSize(startingRoom);
-		var randomX = Random.int(0, Std.int(mapWidth - startingRoomSize.x));
-		var randomY = Random.int(0, Std.int(mapHeight - startingRoomSize.y));
+		var randomX = random.randomInt(0, Std.int(mapWidth - startingRoomSize.x));
+		var randomY = random.randomInt(0, Std.int(mapHeight - startingRoomSize.y));
 
 		if ( applySample(startingRoom, startingRoomSize, randomX, randomY, map) == false )
 			throw "was not able to place starting room. Perhaps, map size is too low, map is crowded, or the sample is corrupted";
@@ -180,14 +194,14 @@ class MapGen {
 		var failed : Int = 0;
 		while( failed < fail ) {
 
-			var chooseRoom = Random.fromArray(roomList);
+			var chooseRoom = random.choice(roomList);
 			var chooseRoomPossibeExits = null;
 			chooseRoomPossibeExits = chooseRoom.sample.exits;
 
-			var chooseExit = Random.fromArray(chooseRoomPossibeExits);
-			var chooseExitDirection = Random.fromArray(chooseExit.towards);
+			var chooseExit = random.choice(chooseRoomPossibeExits);
+			var chooseExitDirection = random.choice(chooseExit.towards);
 
-			var newMidstSample = Random.fromArray(samples.filter(sample -> sample.type == Midst));
+			var newMidstSample = random.choice(samples.filter(sample -> sample.type == Midst));
 			var newMidstSampleSize = getSampleSize(newMidstSample);
 			var newMidstExits = newMidstSample.exits.filter(exit -> switch chooseExitDirection {
 				case North: if ( exit.towards.contains(South) ) true else false;
@@ -197,7 +211,7 @@ class MapGen {
 				default: false;
 			});
 
-			var newMidstExit = Random.fromArray(newMidstExits);
+			var newMidstExit = random.choice(newMidstExits);
 			var placingX = chooseExit.x + chooseRoom.x;
 			var placingY = chooseExit.y + chooseRoom.y;
 
@@ -418,7 +432,7 @@ class MapGen {
 		var toLayersByName = to.mapLayersByName();
 
 		function canBePlaced() : Bool {
-			if ( x < 0 || y < 0 || x + sampleSize.x > to.width || y + sampleSize.y > to.height ) return false;
+			if ( x < 0 || y < 0 || x + sampleSize.x + 5 > to.width || y + sampleSize.y + 5 > to.height ) return false;
 			for ( sampleLayer in sample.source.layers ) {
 				switch sampleLayer {
 					case LTileLayer(layerFrom):

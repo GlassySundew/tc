@@ -1,5 +1,6 @@
 package en;
 
+import en.player.Player;
 import hxd.Key;
 import Level.StructTile;
 import format.tmx.Data.TmxObject;
@@ -9,10 +10,10 @@ import hxbit.Serializer;
 import hxd.Res;
 
 class Structure extends Interactive {
-	@:s public var cdbEntry : StructuresKind;
+	@:s public var cdbEntry : Data.StructuresKind;
 	public var toBeCollidedAgainst = true;
 
-	public function new( x : Float, y : Float, ?tmxObject : TmxObject, ?cdbEntry : StructuresKind ) {
+	public function new( x : Float, y : Float, ?tmxObject : TmxObject, ?cdbEntry : Data.StructuresKind ) {
 		this.cdbEntry = cdbEntry;
 		super(x, y, tmxObject);
 	}
@@ -26,7 +27,9 @@ class Structure extends Interactive {
 			eregClass.match('$this'.toLowerCase());
 			cdbEntry = Data.structures.resolve(eregClass.matched(1)).id;
 		}
-		catch( Dynamic ) {}
+		catch( e:Dynamic ) {
+			// trace(e);
+		}
 
 		if ( spr == null ) {
 			spr = new HSprite(Assets.structures, entParent);
@@ -34,7 +37,9 @@ class Structure extends Interactive {
 			try {
 				spr.set(eregClass.matched(1));
 			}
-			catch( e:Dynamic ) {}
+			catch( e:Dynamic ) {
+				trace(e);
+			}
 		}
 
 		// Initializing spr and making it static sprite from structures atlas as a
@@ -61,8 +66,13 @@ class Structure extends Interactive {
 		// Setting parameters from cdb entry
 		if ( cdbEntry != null ) {
 			useRange = Data.structures.get(cdbEntry).use_range;
-			if ( useRange > 0 ) interactable = true;
 			health = Data.structures.get(cdbEntry).hp;
+
+			if ( health > 0 && !Data.structures.get(cdbEntry).interactable ) {
+				doHighlight = false;
+				interactable = true;
+			}
+
 			#if !headless
 			if ( Data.structures.get(cdbEntry).isoHeight != 0 && Data.structures.get(cdbEntry).isoWidth != 0 ) {
 				mesh.isLong = true;
@@ -75,13 +85,6 @@ class Structure extends Interactive {
 			}
 			#end
 		}
-
-		interact.onTextInputEvent.add(( e ) -> {
-			
-			if ( Key.isPressed(Key.R) ) {
-				flipX();
-			}
-		});
 	}
 
 	public function offsetFootByTile() {
@@ -89,8 +92,8 @@ class Structure extends Interactive {
 	}
 
 	function dropAllItems( ?angle : Float, ?power : Float ) {
-		if ( invGrid != null ) {
-			for ( i in invGrid.grid ) {
+		if ( cellGrid != null ) {
+			for ( i in cellGrid.grid ) {
 				for ( j in i ) {
 					if ( j.item != null ) {
 						j.item = dropItem(j.item, angle == null ? Math.random() * M.toRad(360) : angle,
@@ -103,26 +106,26 @@ class Structure extends Interactive {
 
 	public function applyItem( item : Item ) {
 		// this should not exist
-		// if ( Data.items.get(item.cdbEntry).can_hit ) {
-		// 	emitDestroyItem(item);
-		// 	// Damaging the structure
-		// 	if ( health > Data.items.get(item.cdbEntry).damage ) {
-		// 		health -= Data.items.get(item.cdbEntry).damage;
-		// 	} else {
-		// 		if ( cdbEntry != null ) {
-		// 			for ( i in Data.structures.get(cdbEntry).drop ) inline dropItem(Item.fromCdbEntry(i.item.id, i.amount));
-		// 			dropAllItems();
-		// 		}
-		// 		dispose();
-		// 	}
-		// } else {
-		// 	item.onStructureUse.dispatch();
-		// }
+		if ( health != -1 && Data.items.get(item.cdbEntry).can_hit ) {
+			emitDestroyItem(item);
+			// Damaging the structure
+			if ( health > Data.items.get(item.cdbEntry).damage ) {
+				health -= Data.items.get(item.cdbEntry).damage;
+			} else {
+				if ( cdbEntry != null ) {
+					for ( i in Data.structures.get(cdbEntry).drop ) inline dropItem(Item.fromCdbEntry(i.item.id, i.amount));
+					dropAllItems();
+				}
+				kill(Player.inst);
+			}
+		} else {
+			item.onStructureUse.dispatch();
+		}
 	}
 
 	public function emitDestroyItem( item : Item ) {
-		var hitPart = Res.hit_ico.toGpuParticlesClamped(mesh);
-		hitPart.z = 15;
+		// var hitPart = Res.hit_ico.toGpuParticlesClamped(mesh);
+		// hitPart.z = 15;
 
 		var texture = new Texture(Std.int(item.spr.tile.width), Std.int(item.spr.tile.height), [Target]);
 
@@ -131,25 +134,25 @@ class Structure extends Interactive {
 		bmp.y = item.spr.tile.height / 2;
 		bmp.drawTo(texture);
 
-		@:privateAccess
-		{
-			hitPart.getGroup("main").texture = texture;
-			hitPart.materials[0].mainPass.depth(false, Less);
-			hitPart.getGroup("main").pshader.stopAt = 0.2;
-			hitPart.getGroup("main").emitMode = FlatInversedDisc;
-		}
-		hitPart.scale(hitPart.getGroup("main").size);
-		hitPart.getGroup("main").texture.filter = Nearest;
+		// @:privateAccess
+		// {
+		// 	hitPart.getGroup("main").texture = texture;
+		// 	hitPart.materials[0].mainPass.depth(false, Less);
+		// 	hitPart.getGroup("main").pshader.stopAt = 0.2;
+		// 	hitPart.getGroup("main").emitMode = FlatInversedDisc;
+		// }
+		// hitPart.scale(hitPart.getGroup("main").size);
+		// hitPart.getGroup("main").texture.filter = Nearest;
 
-		hitPart.rotate(M.toRad(M.randRange(-13, 13)), 0, 0);
+		// hitPart.rotate(M.toRad(M.randRange(-13, 13)), 0, 0);
 
-		hitPart.onEnd = () -> {
-			hitPart.remove();
-			hitPart = null;
-		};
+		// hitPart.onEnd = () -> {
+		// 	hitPart.remove();
+		// 	hitPart = null;
+		// };
 	}
 
-	public static function fromCdbEntry( x : Int, y : Int, cdbEntry : StructuresKind, ?amount : Int = 1 ) : Structure {
+	public static function fromCdbEntry( x : Int, y : Int, cdbEntry : Data.StructuresKind, ?amount : Int = 1 ) : Structure {
 		var structure : Structure = null;
 		var entClasses = (CompileTime.getAllClasses(Structure));
 		for ( e in entClasses ) {

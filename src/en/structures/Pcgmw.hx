@@ -4,7 +4,7 @@ import en.objs.IsoTileSpr;
 import format.tmx.Data.TmxObject;
 
 class Pcgmw extends Structure {
-	public function new(?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : StructuresKind) {
+	public function new( ?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : Data.StructuresKind ) {
 		if ( spr == null ) {
 			spr = new HSprite(Assets.structures, entParent);
 			spr.set("pcgmw");

@@ -16,10 +16,10 @@ class InventoryComp extends Flow implements h2d.domkit.Object implements WindowC
 			<window(backgroundTile, bl, bt, br, bb) class="window" public id="window" layout="vertical">
 					<flow class="slots_holder" layout="vertical" >
 						${ 
-							if ( invGrid != null ) {
-								for ( y in 0...(removeLastRow ? invGrid.height - 1 : invGrid.height) ) {
+							if ( cellGrid != null ) {
+								for ( y in 0...(removeLastRow ? cellGrid.height - 1 : cellGrid.height) ) {
 									<flow class="hor_holder">
-									for ( x in 0...invGrid.width ) {
+									for ( x in 0...cellGrid.width ) {
 										<bitmap src={cellTile} class="inv_cell" public id="inv_cells[]">
 											<flow public id="item_holder[]" class="item_holder" position="absolute" />
 										</bitmap>
@@ -32,18 +32,18 @@ class InventoryComp extends Flow implements h2d.domkit.Object implements WindowC
 			</window>
 		</inventoryComp>;
 
-	public var invGrid:CellGrid;
+	public var cellGrid:CellGrid;
 	public var removeLastRow:Bool = false;
 	
 		// ?removeLastRow:Bool = false,
-		// ?invGrid : CellGrid, 
+		// ?cellGrid : CellGrid, 
 		/**
-			@param rest invGrid : CellGrid, removeLastRow : Bool
+			@param rest cellGrid : CellGrid, removeLastRow : Bool
 		**/
 	public function new( backgroundTile : h2d.Tile, bl : Int, bt : Int, br : Int, bb : Int, ?parent : h2d.Object, ...rest : Dynamic ) {
 		super(parent);
 		
-		invGrid = rest[0];
+		cellGrid = rest[0];
 		removeLastRow = rest[1];
 
 		cellTile = new HSprite(Assets.ui, "inventory_cell").tile;
@@ -58,17 +58,17 @@ class InventoryComp extends Flow implements h2d.domkit.Object implements WindowC
 
 	override function reflow() {
 
-		if(invGrid != null)
-			for ( yI => y in invGrid.grid) {
+		if(cellGrid != null)
+			for ( yI => y in cellGrid.grid) {
 				for ( xI => x in y ) {
 					try {
 						x.inter.onPushEvent.add((e) -> {
 							window.bringOnTopOfALL();
 						});
 						
-						item_holder[yI * invGrid.width + xI].addChild(x);
-						item_holder[yI * invGrid.width + xI].x = -Std.int((x.inter.width - inv_cells[yI * invGrid.width + xI].tile.width ) / 2);
-						item_holder[yI * invGrid.width + xI].y = -Std.int((x.inter.height - inv_cells[yI * invGrid.height + xI].tile.height ) / 2);
+						item_holder[yI * cellGrid.width + xI].addChild(x);
+						item_holder[yI * cellGrid.width + xI].x = -Std.int((x.inter.width - inv_cells[yI * cellGrid.width + xI].tile.width ) / 2);
+						item_holder[yI * cellGrid.width + xI].y = -Std.int((x.inter.height - inv_cells[yI * cellGrid.height + xI].tile.height ) / 2);
 					} catch ( e : Dynamic ) {}
 				}
 			}

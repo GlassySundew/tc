@@ -54,7 +54,6 @@ class PauseMenu extends Process {
 			vertFlow.backgroundTile = Tile.fromColor(0x000000, 1, 1, 0.5);
 
 			var mm = new ShadowedText(Assets.fontPixel, vertFlow);
-			mm.smooth = true;
 			mm.scale(1.5);
 			mm.text = "Menu";
 

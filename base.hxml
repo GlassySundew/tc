@@ -17,7 +17,8 @@
 -lib haxe-concurrent
 
 -D heaps_enable_hl_mp3
--cp src.helper
+
+-cp src/helper
 --macro Helper.init()
 
 -dce full

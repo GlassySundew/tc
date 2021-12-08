@@ -36,15 +36,15 @@ class Console extends h2d.Console {
 		h2d.Console.HIDE_LOG_TIMEOUT = 30;
 		#end
 		// Lib.redirectTracesToH2dConsole(this);
-		
+
 		// Debug flags
 		#if debug
 		flags = new Map();
-		this.addCommand("set", [{name : "k", t : AString}], function ( k : String ) {
+		this.addCommand("set", [{ name : "k", t : AString }], function ( k : String ) {
 			setFlag(k, true);
 			log("+ " + k, 0x80FF00);
 		});
-		this.addCommand("unset", [{name : "k", t : AString, opt : true}], function ( ?k : String ) {
+		this.addCommand("unset", [{ name : "k", t : AString, opt : true }], function ( ?k : String ) {
 			if ( k == null ) {
 				log("Reset all.", 0xFF0000);
 				flags = new Map();
@@ -55,15 +55,12 @@ class Console extends h2d.Console {
 		});
 
 		this.addCommand("giveItem", [
-			{name : "item", t : AString, opt : false},
-			{name : "amount", t : AInt, opt : true}
+			{ name : "item", t : AString, opt : false },
+			{ name : "amount", t : AInt, opt : true }
 		], function ( ?k : Data.ItemsKind, ?amount : Int = 1 ) {
 			if ( Data.items.get(k) != null ) {
 				var newItem = Item.fromCdbEntry(k, amount);
-				
-				trace(Player.inst.ui.inventory.invGrid);
-
-				Player.inst.ui.inventory.invGrid.giveItem(newItem, Player.inst, false);
+				Player.inst.ui.inventory.cellGrid.giveItem(newItem, false);
 			}
 		});
 
@@ -82,8 +79,8 @@ class Console extends h2d.Console {
 			new h3d.scene.CameraController(Boot.inst.s3d).loadFromCamera();
 			Level.inst.cursorInteract.visible = false;
 		});
-		this.addCommand("loadlvl", [{name : "k", t : AString}], function ( name : String, ?manual : Bool = true ) {
-			Game.inst.startLevel(name + ".tmx", true);
+		this.addCommand("loadlvl", [{ name : "k", t : AString }], function ( name : String, ?manual : Bool = true ) {
+			Game.inst.startLevel(name + ".tmx", { manual : true });
 		});
 		var pp : Bool = true;
 		this.addCommand("pp", [], function ( ?k : String ) {
@@ -115,7 +112,7 @@ class Console extends h2d.Console {
 	}
 
 	override function addCommand( name : String, ?help : String, args : Array<ConsoleArgDesc>, callb : Dynamic ) {
-		commands.set("/" + name, {help : help == null ? "" : help, args : args, callb : callb});
+		commands.set("/" + name, { help : help == null ? "" : help, args : args, callb : callb });
 	}
 
 	// override function runCommand(commandLine:String) {
@@ -257,7 +254,7 @@ class Console extends h2d.Console {
 	override function showHelp( ?command : String ) {
 		var all;
 		if ( command == null ) {
-			all = Lambda.array({iterator : function () return commands.keys()});
+			all = Lambda.array({ iterator : function () return commands.keys() });
 			all.sort(Reflect.compare);
 			all.remove("/help");
 			all.push("/help");

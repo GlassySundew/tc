@@ -40,11 +40,14 @@ class Level extends dn.Process {
 
 	public var wid(get, never) : Int;
 
-	inline function get_wid() return M.ceil(data.width * data.tileWidth);
-
+	// inline function get_wid() return M.ceil(data.width * data.tileWidth);
 	public var hei(get, never) : Int;
 
-	inline function get_hei() return M.ceil(data.height * data.tileHeight);
+	// inline function get_hei() return M.ceil(data.height * data.tileHeight);
+
+	inline function get_wid() return Std.int((Math.min(data.height, data.width) + Math.abs(-data.width + data.height) / 2) * data.tileWidth);
+
+	inline function get_hei() return Std.int((Math.min(data.height, data.width) + Math.abs(-data.width + data.height) / 2) * data.tileHeight);
 
 	//	public var lid(get, never):Int;
 	var invalidated = true;
@@ -108,7 +111,14 @@ class Level extends dn.Process {
 									default:
 								}
 							}
-							if ( ol.name == 'entities' ) entities.push(obj);
+							if ( ol.name == 'entities' ) {
+								switch obj.objectType {
+									case OTTile(gid):
+										Tools.propagateTilePropertiesToObject(obj, data, gid);
+									default:
+								}
+								entities.push(obj);
+							}
 						}
 					}
 				case LTileLayer(tl):
@@ -163,14 +173,14 @@ class Level extends dn.Process {
 
 		invalidated = false;
 
-		ground = new h3d.mat.Texture(data.width * data.tileWidth, data.height * data.tileHeight, [Target]);
+		ground = new h3d.mat.Texture(wid, hei, [Target]);
 		ground.filter = Nearest;
 
 		obj = new IsoTileSpr(Tile.fromTexture(ground), false, Boot.inst.s3d);
 		obj.alwaysSync = false;
 		obj.rotate(0, 0, M.toRad(90));
 
-		@:privateAccess obj.z += ground.height;
+		@:privateAccess obj.z += hei;
 		obj.material.shadows = false;
 		obj.material.mainPass.enableLights = false;
 		obj.material.mainPass.depth(false, LessEqual);
@@ -180,7 +190,7 @@ class Level extends dn.Process {
 			switch( e ) {
 				case LTileLayer(layer):
 					if ( layer.visible #if !display_proto && layer.name != "proto" #end ) {
-						layerRenderer = new LayerRender(data, layer);
+						layerRenderer = new LayerRender(data, wid, hei, layer);
 						layerRenderer.render.g.drawTo(ground);
 					}
 				default:
@@ -218,10 +228,11 @@ class Level extends dn.Process {
 		{
 			var bounds = new Bounds();
 			bounds.addPoint(new Point(0, 0, 0));
-			bounds.addPoint(new Point(ground.width, 0, ground.height));
+			bounds.addPoint(new Point(wid, 0, hei));
 
 			cursorInteract = new h3d.scene.Interactive(bounds, Boot.inst.s3d);
 			cursorInteract.priority = -10;
+			cursorInteract.propagateEvents = true;
 			cursorInteract.cursor = Default;
 			cursorInteract.onMove = function ( e : hxd.Event ) {
 				cursX = e.relX;
@@ -288,18 +299,23 @@ class Level extends dn.Process {
 		#end
 	}
 
-	public inline function cartToIsoLocal( x : Float, y : Float ) : Vector return new Vector(wid * .5 + cartToIso(x, y).x, hei - cartToIso(x, y).y);
+	public inline function cartToIsoLocal( x : Float, y : Float ) : Vector {
+		return new Vector(
+			-(data.width - data.height) / 2 * data.tileHeight + wid * .5 + cartToIso(x, y).x,
+			hei - cartToIso(x, y).y
+		);
+	}
 }
 
 class LayerRender extends h2d.Object {
 	public var render : InternalRender;
 
-	public function new( map : TmxMap, layer : TmxTileLayer ) {
+	public function new( map : TmxMap, wid : Int, hei : Int, layer : TmxTileLayer ) {
 		super();
 		render = new InternalRender(map, layer);
 		render.g = new h2d.Graphics();
 		render.g.blendMode = Alpha;
-		render.tex = new Texture(map.tileWidth * map.width, map.tileHeight * map.height, [Target]);
+		render.tex = new Texture(wid, hei, [Target]);
 
 		render.render();
 	}
@@ -315,6 +331,8 @@ private class InternalRender extends TileLayerRenderer {
 	override function renderOrthoTile( x : Float, y : Float, tile : TmxTile, tileset : TmxTileset ) : Void {
 		if ( tileset == null ) return;
 
+		x -= (Std.int(((map.width - map.height) / 2) * map.tileWidth));
+
 		if ( tileset.image == null ) {
 			renderOrthoTileFromImageColl(x, y, tile, tileset);
 			return;
@@ -324,6 +342,7 @@ private class InternalRender extends TileLayerRenderer {
 			x += tileset.tileOffset.x;
 			y += tileset.tileOffset.y;
 		}
+
 		var scaleX = tile.flippedHorizontally ? -1 : 1;
 		var scaleY = tile.flippedVertically ? -1 : 1;
 		Tools.getTileUVByLidUnsafe(tileset, tile.gid - tileset.firstGID, uv);
@@ -373,10 +392,12 @@ private class InternalRender extends TileLayerRenderer {
 
 		// Это должно быть visible только тогда, когда у игрока в holdItem есть blueprint
 		#if !headless
-		if ( eregFileName.match(sourceTile.image.source)
-			&& StringTools.endsWith(eregFileName.matched(1),
-				"floor") ) Level.inst.game.structTiles.push(new StructTile(bmp.x + Level.inst.data.tileWidth / 2,
-				Level.inst.ground.height - bmp.y - Level.inst.data.tileHeight / 2, Boot.inst.s3d));
+		if (
+			eregFileName.match(sourceTile.image.source)
+			&& StringTools.endsWith(eregFileName.matched(1), "floor") )
+			Level.inst.game.structTiles.push(new StructTile(bmp.x + Level.inst.data.tileWidth / 2,
+				Level.inst.hei - bmp.y - Level.inst.data.tileHeight / 2 + 2, Boot.inst.s3d));
+
 		bmp.drawTo(tex);
 		bmp.tile.dispose();
 		bmp.remove();
@@ -399,7 +420,7 @@ private class InternalRender extends TileLayerRenderer {
 
 		while( i < tiles.length ) {
 			tile = tiles[i];
-			renderIsoTile(x + ((ix - iy) * hw) + map.tileWidth * map.width / 2 - hw, y + (ix + iy) * hh, tile, Tools.getTilesetByGid(map, tile.gid));
+			renderIsoTile(x + ((ix - iy) * hw) + Std.int(map.tileWidth * map.width / 2 - hw), y + (ix + iy) * hh, tile, Tools.getTilesetByGid(map, tile.gid));
 			i++;
 			if ( ++ix == width ) {
 				ix = 0;
@@ -432,7 +453,7 @@ class StructTile extends Object {
 		tile = new EventInteractive(polyPrim.getCollider(), this);
 		tile.rotate(-0.01, 0, hxd.Math.degToRad(180));
 
-		tile.priority = -2;
+		tile.propagateEvents = true;
 		this.x = x;
 		this.z = y;
 		this.y = 0;
@@ -467,6 +488,7 @@ class StructTile extends Object {
 		// obj2.scale(10);
 		// // set the second cube color
 		// obj2.material.color.setColor(0xFFB280);
+		// obj2.material.shadows = false;
 		#end
 	}
 

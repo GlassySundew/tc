@@ -365,7 +365,12 @@ class AutoMap {
 				return ObjectLayer(group.objects);
 			case LTileLayer(layer):
 				return TileLayer(extractTiles(layer.data.tiles, ruleMap, layer.width));
+			case LGroup(group):
+				trace(group.name);
+				throw "wrong autotile markup";
+
 			default:
+				trace(layer);
 				throw "wrong autotile markup";
 		}
 	}

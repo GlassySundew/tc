@@ -1,71 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-up" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="66" nextobjectid="166">
+<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-up" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="69" nextobjectid="185">
  <tileset firstgid="1" source="../alpha.tsx"/>
- <tileset firstgid="151" source="../entities.tsx"/>
+ <tileset firstgid="152" source="../entities.tsx"/>
  <group id="2" name="start0">
   <layer id="3" name="proto" width="100" height="100">
    <data encoding="base64" compression="zlib">
-   eJzt1rEJACAMRUGncx73r8QiIGKfX9xBFsgrkjFIsz5Dn7P/eY0mvd4e1YQeemTRI4seWep+65HDzwsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQLINtkgQhQ==
+   eJzt1rEJACAMRUFHdhvXFYuAiH1+cQdZIK9IxiDN/Ax9zv7XNZr0entUE3rokUWPLHpkqfutRw4/LwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAyTZFhRd7
   </data>
   </layer>
   <objectgroup id="4" name="entities">
-   <object id="103" gid="153" x="96" y="120" width="48" height="48"/>
+   <object id="103" gid="154" x="96" y="120" width="48" height="48"/>
   </objectgroup>
  </group>
  <group id="5" name="start1">
   <layer id="6" name="proto" width="100" height="100">
    <data encoding="base64" compression="zlib">
-   eJzt1cEJACEMAEGrs57r/yU+hEOCT6M4A2kgS0gp3OoLhjx9//U3euSKeriVPHOPqA37jJ2vmrBX9NP1OIcfAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA72lzDBG5
+   eJzt1cEJACEMAEFLtptrV3wIhwSfRnEG0kCWkFK4VQ2GPH3/32/0yBX1cCt55h5RG/YZO181Ya/op+txDj8EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADe0wDxJRgN
   </data>
   </layer>
   <objectgroup id="7" name="entities">
-   <object id="104" gid="153" x="336" y="96" width="48" height="48"/>
+   <object id="104" gid="154" x="336" y="96" width="48" height="48"/>
   </objectgroup>
  </group>
  <group id="8" name="start2">
   <layer id="9" name="proto" width="100" height="100">
    <data encoding="base64" compression="zlib">
-   eJzt1bEJACAMAEGncx73r8TCRtROI3gHWSBPSEr8omyG+9re82Q0ibHq0ZtwV78DPd4x9vBDYvnlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ1XFVA+z
+   eJzt1bEJACAMAEFHdhvXFQsbUTuN4B1kgTwhKfGLvBnua3svk9EkxqpHb8Jd/Q70eMfYww+J5ZcDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACcVQGuYhW2
   </data>
   </layer>
   <objectgroup id="10" name="entities">
-   <object id="11" gid="171" x="648" y="72" width="48" height="36"/>
-   <object id="106" gid="153" x="672" y="96" width="48" height="48"/>
+   <object id="11" gid="172" x="648" y="72" width="48" height="36"/>
+   <object id="106" gid="154" x="672" y="96" width="48" height="48"/>
   </objectgroup>
  </group>
  <group id="57" name="midst0">
   <layer id="60" name="proto" width="100" height="100">
    <data encoding="base64" compression="zlib">
-   eJzt1rEJACAMAEGncx73r8QiEMQ+oneQBXxIbA0AAAAAgF+Mw1BnvX9Po0mtvUc0oYYed4n9pMc9cg/3o57/FQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALxnAui5DgE=
+   eJzt1tEJACAIQMFGbpvWjT4Eif6NugMX6IHWGgAAAAAAv+iHoc56/5FGk1p7j2hCDT3uEvtJj3vkHu5HPf8rAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAeM8E3AgTEQ==
   </data>
   </layer>
   <objectgroup id="59" name="entities">
-   <object id="150" gid="156" x="384" y="384" width="48" height="36"/>
-   <object id="151" gid="156" x="360" y="432" width="48" height="36"/>
-   <object id="153" gid="155" x="384" y="456" width="48" height="36"/>
-   <object id="155" gid="155" x="408" y="408" width="48" height="36"/>
-   <object id="157" gid="155" x="384" y="432" width="48" height="36"/>
-   <object id="159" gid="156" x="360" y="408" width="48" height="36"/>
-   <object id="160" gid="156" x="384" y="408" width="48" height="36"/>
-   <object id="161" gid="155" x="408" y="432" width="48" height="36"/>
-   <object id="165" gid="155" x="408" y="456" width="48" height="36"/>
+   <object id="153" gid="156" x="384" y="456" width="48" height="36"/>
+   <object id="157" gid="156" x="384" y="432" width="48" height="36"/>
+   <object id="165" gid="156" x="408" y="456" width="48" height="36"/>
+   <object id="170" gid="159" x="360" y="408" width="48" height="36"/>
+   <object id="171" gid="159" x="384" y="384" width="48" height="36"/>
   </objectgroup>
  </group>
  <group id="61" name="midst1">
   <layer id="63" name="proto" width="100" height="100">
    <data encoding="base64" compression="zlib">
-   eJzt16ERACEMRUGqox76V6cwDJxMvtidSQN5JhkDAAAAAPKtx1Bv734eo0mPWwtN+vz12E2oo0cWPbLokeV1X+nRx82bx08IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAtQ9iPBwB
+   eJzt17ERACEIRUFLthvbvcjE8QzhB7szNMBLYAwAAAAAKs3HUG/vfh2jSY9bC036vHrsJtTRI4seWfTI8ndf6dHHzZvHTwgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD5Ps5fK6E=
   </data>
   </layer>
   <objectgroup id="62" name="entities">
-   <object id="142" gid="156" x="120" y="360" width="48" height="36"/>
-   <object id="143" gid="156" x="120" y="384" width="48" height="36"/>
-   <object id="144" gid="156" x="144" y="384" width="48" height="36"/>
-   <object id="145" gid="155" x="96" y="336" width="48" height="36"/>
-   <object id="146" gid="155" x="120" y="336" width="48" height="36"/>
-   <object id="147" gid="155" x="168" y="336" width="48" height="36"/>
-   <object id="148" gid="155" x="144" y="336" width="48" height="36"/>
-   <object id="149" gid="155" x="168" y="360" width="48" height="36"/>
+   <object id="149" gid="156" x="720" y="384" width="48" height="36"/>
+   <object id="172" gid="159" x="672" y="384" width="48" height="36"/>
+   <object id="173" gid="159" x="672" y="408" width="48" height="36"/>
+   <object id="174" gid="159" x="696" y="408" width="48" height="36"/>
+  </objectgroup>
+ </group>
+ <group id="66" name="midst2">
+  <layer id="67" name="proto" width="100" height="100">
+   <data encoding="base64" compression="zlib">
+   eJzt1rsNACAIQEFGdhvXNRY2JsbGD8VdwgK8AiIAAAAAAIATymZ4q++8LkaP9/TIZe5RQo+fxp3QIwc9cln18F/94d/NRQ8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALirAanRI8U=
+  </data>
+  </layer>
+  <objectgroup id="68" name="entities">
+   <object id="180" gid="155" x="111" y="437" width="48" height="48"/>
+   <object id="181" gid="156" x="159" y="413" width="48" height="36"/>
+   <object id="182" gid="156" x="111" y="413" width="48" height="36"/>
+   <object id="183" gid="156" x="87" y="437" width="48" height="36"/>
+   <object id="184" gid="159" x="111" y="461" width="48" height="36"/>
   </objectgroup>
  </group>
 </map>

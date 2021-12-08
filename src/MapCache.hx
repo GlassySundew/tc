@@ -15,10 +15,9 @@ class MapCache extends StringMap<TmxMap> {
 	public var locked : Bool = false;
 
 	static function get_inst() : MapCache {
-if ( _inst == null ) new MapCache();
+		if ( _inst == null ) new MapCache();
 		return _inst;
 	}
-
 	/** multithreading modification of get method **/
 	public function getLocked( key : String ) {
 		if ( locked ) lock.wait();
@@ -33,7 +32,6 @@ if ( _inst == null ) new MapCache();
 			lock.release();
 			return map;
 		} else {
-
 			locked = false;
 			lock.release();
 			return mapFound;

@@ -24,7 +24,7 @@ using Util.LoaderExtender;
 @:expose
 class Util {
 	/**Regex to get class name provided by CompileTime libs, i.e. en.$Entity -> Entity **/
-	static var eregCompTimeClass = ~/\$([a-z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
+	static var eregCompTimeClass = ~/\$([a-zA-Z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
 
 	/** regex to match automapping random rules **/
 	static var eregAutoMapRandomLayer = ~/(?:output|input)([0-9]+)_([a-z]+)$/gi;

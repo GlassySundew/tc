@@ -151,13 +151,16 @@ class Navigation extends NinesliceWindow {
 
 		if ( win.parent != null ) refreshLinks(Const.jumpReach);
 
-		// focus on player's cluster
-		for ( field in fields ) {
-			if ( Lambda.exists(field.targets, ( target ) -> target.id == Player.inst.residesOnId) ) {
-				scrollToField(field);
-				return;
+		if ( Player.inst != null )
+			// focus on player's cluster
+			for ( field in fields ) {
+				if ( Lambda.exists(
+					field.targets,
+					( target ) -> target.id == Player.inst.residesOnId) ) {
+					scrollToField(field);
+					return;
+				}
 			}
-		}
 	}
 
 	public function refreshLinks( jumpReach : Float ) {
@@ -318,7 +321,12 @@ class NavigationField implements Serializable {
 		for ( i => pt in points ) {
 			var target : NavigationTarget = null;
 			target = new NavigationTarget(
-				random.choice([asteroid0, asteroid1, asteroid2, asteroid3]),
+				random.choice([
+					Data.Navigation_targetsKind.asteroid0,
+					Data.Navigation_targetsKind.asteroid1,
+					Data.Navigation_targetsKind.asteroid2,
+					Data.Navigation_targetsKind.asteroid3
+				]),
 				seed,
 				Std.int(pt.x),
 				Std.int(pt.y),
@@ -348,7 +356,7 @@ class NavigationField implements Serializable {
 class NavigationTarget implements Serializable {
 	var celestialObject : Button;
 
-	@:s public var cdbEntry : Navigation_targetsKind;
+	@:s public var cdbEntry : Data.Navigation_targetsKind;
 
 	@:s public var id : String;
 	/** string, под которым лежит карта в базе данных **/
@@ -374,7 +382,7 @@ class NavigationTarget implements Serializable {
 		@param x needed for generating id
 		@param y needed for generating id
 	**/
-	public function new( cdbEntry : Navigation_targetsKind, seed : String, x : Int, y : Int, ?parent : Object ) {
+	public function new( cdbEntry : Data.Navigation_targetsKind, seed : String, x : Int, y : Int, ?parent : Object ) {
 		this.cdbEntry = cdbEntry;
 		this.seed = seed;
 
@@ -450,7 +458,6 @@ class NavigationTarget implements Serializable {
 		var wherePlayerIs = Navigation.playersHeads[player].parent;
 		var time = M.dist(wherePlayerIs.x, wherePlayerIs.y, to.x, to.y) * 50;
 
-
 		Navigation.headsTweeners[player] = {
 			xTw : Game.inst.tw.createMs(
 				Navigation.playersHeads[player].x,
@@ -465,7 +472,7 @@ class NavigationTarget implements Serializable {
 		Game.inst.delayer.addMs(() -> {
 			stopHeadTweeners(player);
 			Player.inst.residesOnId = id;
-			Player.inst.checkTeleport(true);
+			Player.inst.checkTeleport();
 			Navigation.inst.refreshLinks(Const.jumpReach);
 			Navigation.inst.locked = false;
 		}, time);
@@ -528,7 +535,7 @@ class AsteroidGenerator {
 		this.name = name;
 		this.onGeneration = new EventSignal0();
 		if ( onGeneration != null ) this.onGeneration.add(onGeneration);
-		if ( executor == null ) executor = Executor.create(3);
+		if ( executor == null ) executor = Executor.create(1);
 
 		var lvl = tools.Save.inst.getLevelByName(name);
 		if ( lvl != null ) {
@@ -542,8 +549,8 @@ class AsteroidGenerator {
 		var future : TaskFuture<TmxMap> = null;
 		future = executor.submit(() -> {
 			var autoMapper = new mapgen.AutoMap("tiled/levels/rules.txt");
-			var mapGen = new MapGen(Unserializer.run(haxe.Serializer.run(MapCache.inst.get('procgen/asteroids.tmx'))), autoMapper);
-			return autoMapper.applyRulesToMap(mapGen.generate(50, 50, 100, 5, 15));
+			var mapGen = new MapGen(Unserializer.run(haxe.Serializer.run(MapCache.inst.get('procgen/asteroids.tmx'))), name, autoMapper);
+			return autoMapper.applyRulesToMap(mapGen.generate(80, 80, 60, 5, 15));
 		});
 
 		future.onResult = ( result : FutureResult<TmxMap> ) -> {

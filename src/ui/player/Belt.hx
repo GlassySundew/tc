@@ -1,5 +1,6 @@
 package ui.player;
 
+import ui.domkit.InventoryComp;
 import en.player.Player;
 import h2d.Flow;
 import h2d.Object;
@@ -19,18 +20,18 @@ class Belt extends Object {
 
 	public var selectedCell : BeltCont;
 	public var selectedCellNumber : Int = 0;
-	public var invGrid : Array<InventoryCell>;
+	public var grid : InventoryGrid;
 
-	public function new( invGrid : Array<InventoryCell>, ?parent : h2d.Object ) {
+	public function new( cellGrid : Array<InventoryCell>, ?parent : h2d.Object ) {
 		super(parent);
-		this.invGrid = invGrid;
+		grid = new InventoryGrid([cellGrid]);
 		centerFlow = new h2d.Flow(this);
 
 		style = new h2d.domkit.Style();
 		style.load(hxd.Res.domkit.belt);
 
 		var cout = 1;
-		for ( i in invGrid ) {
+		for ( i in cellGrid ) {
 			var beltCont = new BeltCont(Assets.fontPixel, cout, centerFlow);
 			beltSlots.push(beltCont);
 			style.addObject(beltCont);
@@ -41,22 +42,8 @@ class Belt extends Object {
 		}
 
 		// var iten = new en.items.GraviTool();
-		// invGrid.interGrid[2][0].item = iten;
+		// cellGrid.interGrid[2][0].item = iten;
 		deselectCells();
-	}
-
-	public function findAndReplaceItem( item : en.Item, ?to : en.Item = null ) : en.Item {
-		for ( j in invGrid ) if ( j.item == item ) {
-			j.item.remove();
-			j.item = to;
-			return j.item;
-		}
-		return null;
-	}
-
-	public function getFreeSlot() : InventoryCell {
-		for ( i in invGrid ) if ( i.item == null || i.item.isDisposed ) return i;
-		return null;
 	}
 
 	public function selectCell( number : Int = 1 ) {
@@ -77,9 +64,9 @@ class Belt extends Object {
 				b : 66,
 				a : 255
 			}));
-			cell.paddingBottom = 10;
+			cell.paddingBottom = 5;
 
-			player.holdItem = player.invGrid.grid[player.invGrid.grid.length - 1][number - 1].item;
+			player.holdItem = player.cellGrid.grid[player.cellGrid.grid.length - 1][number - 1].item;
 		}
 	}
 

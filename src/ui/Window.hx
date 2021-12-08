@@ -58,7 +58,7 @@ class Window extends dn.Process implements Serializable {
 		}
 	}
 
-	function recenter() {
+	public function recenter() {
 		if ( win != null ) {
 			var size = win.getSize();
 			win.x = Std.int((wScaled - size.width) / 2);

@@ -2,7 +2,10 @@
 <tileset version="1.5" tiledversion="1.7.2" name="entities" tilewidth="144" tileheight="134" tilecount="15" columns="10" backgroundcolor="#171717">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="2">
-  <image width="48" height="48" source="separated/player/player.png"/>
+  <properties>
+   <property name="className" value="en.player.$Player"/>
+  </properties>
+  <image width="48" height="48" source="separated/player/idle_down_0.png"/>
   <objectgroup draworder="index" id="2">
    <object id="11" x="22" y="39">
     <polygon points="0,0 3,0 6,-1 7,-3 6,-5 3,-6 0,-6 -3,-5 -4,-3 -3,-1"/>
@@ -13,9 +16,9 @@
   <properties>
    <property name="highlight" type="color" value="#ffffffff"/>
   </properties>
-  <image width="48" height="48" source="separated/structures/pcgmw.png"/>
+  <image width="48" height="48" source="separated/structures/workbench.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="114" x="24" y="43">
+   <object id="1" x="24" y="43">
     <polygon points="0,0 -14,-7 0,-14 14,-7"/>
    </object>
   </objectgroup>
@@ -48,7 +51,10 @@
   </objectgroup>
  </tile>
  <tile id="9">
-  <image width="95" height="48" source="separated/structures/hydroponics.png"/>
+  <properties>
+   <property name="className" value="en.structures.hydroponics.$Hydroponics"/>
+  </properties>
+  <image width="96" height="48" source="separated/structures/hydroponics0.png"/>
   <objectgroup draworder="index" id="2">
    <object id="1" x="-1" y="50">
     <polygon points="32,-14 73,-34 90,-26 49,-6"/>
@@ -64,12 +70,15 @@
   </objectgroup>
  </tile>
  <tile id="12">
-  <image width="48" height="77" source="separated/structures/door.png"/>
+  <properties>
+   <property name="className" value="en.structures.$Door"/>
+  </properties>
+  <image width="48" height="72" source="separated/structures/door0.png"/>
   <objectgroup draworder="index" id="3">
-   <object id="5" name="center" x="18" y="61">
+   <object id="5" name="center" x="20" y="58">
     <point/>
    </object>
-   <object id="6" x="10" y="68">
+   <object id="6" x="10" y="63">
     <polygon points="0,0 -8,-4 14,-15 22,-11"/>
    </object>
   </objectgroup>
@@ -101,9 +110,10 @@
  </tile>
  <tile id="15">
   <properties>
+   <property name="className" value="en.structures.$NavigationConsole"/>
    <property name="interactable" type="bool" value="true"/>
   </properties>
-  <image width="144" height="60" source="separated/structures/navigation_console.png"/>
+  <image width="144" height="60" source="separated/structures/navigationconsole.png"/>
   <objectgroup draworder="index" id="2">
    <object id="6" name="center" x="71" y="32">
     <point/>
@@ -128,17 +138,23 @@
   </objectgroup>
  </tile>
  <tile id="17">
-  <image width="48" height="66" source="separated/structures/back_door.png"/>
+  <properties>
+   <property name="className" value="en.structures.$BackDoor"/>
+  </properties>
+  <image width="48" height="60" source="separated/structures/backdoor0.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="4" x="25" y="63">
+   <object id="4" x="25" y="58">
     <polygon points="0,0 -22,-11 -14,-15 8,-4"/>
    </object>
-   <object id="5" name="center" x="21" y="53">
+   <object id="5" name="center" x="21" y="49">
     <point/>
    </object>
   </objectgroup>
  </tile>
  <tile id="19">
+  <properties>
+   <property name="interactable" type="bool" value="false"/>
+  </properties>
   <image width="48" height="48" source="separated/structures/chest.png"/>
   <objectgroup draworder="index" id="3">
    <object id="4" x="22" y="44">

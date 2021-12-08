@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.5" tiledversion="1.7.2" name="alpha" tilewidth="246" tileheight="133" tilecount="66" columns="0" backgroundcolor="#171717">
+<tileset version="1.5" tiledversion="1.7.2" name="alpha" tilewidth="246" tileheight="133" tilecount="67" columns="0" backgroundcolor="#171717">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="63">
   <image width="68" height="106" source="../separated/env/agro_wall.png"/>
@@ -17,9 +17,6 @@
   <image width="48" height="96" source="../separated/env/asteroid_bot1.png"/>
  </tile>
  <tile id="69">
-  <properties>
-   <property name="type" value="ground"/>
-  </properties>
   <image width="48" height="24" source="../separated/env/asteroid_cen0.png"/>
  </tile>
  <tile id="70">
@@ -234,5 +231,11 @@
  </tile>
  <tile id="149">
   <image width="49" height="96" source="../separated/env/asteroid_mid_edge0.png"/>
+ </tile>
+ <tile id="150">
+  <properties>
+   <property name="type" value="ground"/>
+  </properties>
+  <image width="48" height="24" source="../separated/env/ground.png"/>
  </tile>
 </tileset>

@@ -123,6 +123,7 @@ class MainMenu extends Process {
 		vk.onClickEvent.add(( _ ) -> {
 			System.openURL("https://vk.com/totalcondemn");
 		});
+		socialFlow.getProperties(vk).offsetY = -1;
 
 		vertFlow.paddingLeft = 10;
 		vertFlow.verticalAlign = Middle;
@@ -145,7 +146,7 @@ class MainMenu extends Process {
 			var dialog : NewSaveDialog = null;
 			dialog = new NewSaveDialog(( e ) -> {
 				Main.inst.startGame("1000000");
-				Game.inst.startLevel("ship_pascal.tmx");
+				Game.inst.startLevel("ship_pascal.tmx", {});
 				destroy();
 			}, Save, Main.inst.root);
 			Main.inst.root.add(dialog, Const.DP_UI + 2);

@@ -23,7 +23,7 @@ class Main extends Process {
 		super();
 		inst = this;
 		createRoot(s);
-		
+
 		// root.filter = new h2d.filter.ColorMatrix();
 
 		#if( hl && pak )
@@ -52,7 +52,7 @@ class Main extends Process {
 		Assets.init();
 		Cursors.init();
 		Lang.init("en");
-		 
+
 		uiMap = MapCache.inst.get("ui.tmx");
 		uiConf = uiMap.mapLayersByName();
 		for ( i in uiConf ) {
@@ -110,12 +110,12 @@ class Main extends Process {
 
 		// var autoMapper = new mapgen.AutoMap("tiled/levels/rules.txt");
 		// var mapGen = new MapGen(resolveMap('procgen/asteroids.tmx'), autoMapper);
-		// var applicableMap = autoMapper.applyRulesToMap(mapGen.generate(50, 50, 100, 5, 15));
+		// var applicableMap = autoMapper.applyRulesToMap(resolveMap('asteroid.tmx'));
 
 		// startGame();
 
-		// // Game.inst.startLevel("bridge.tmx");
-		// Game.inst.startLevelFromParsedTmx(applicableMap, "test.tmx");
+		// Game.inst.startLevel("bridge.tmx");
+		// Game.inst.startLevelFromParsedTmx(applicableMap, "test.tmx", {});
 		#else
 		new MainMenu(Boot.inst.s2d);
 		#end

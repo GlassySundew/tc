@@ -59,7 +59,6 @@ class Clouds extends Shader {
 			return mix(a, b, cubic.x) + (c - a) * cubic.y * (1.0 - cubic.x) + (d - b) * cubic.x * cubic.y;
 		}
 
-
 		function fbm(coord : Vec2) : Float {
 			var value : Float = 0.0;
 			var scale : Float = 0.5;
@@ -111,7 +110,6 @@ class Clouds extends Shader {
             
             return fbm;//step(a_cutoff, fbm);
         }
-
 
         function fragment() {
             // pixelize uv

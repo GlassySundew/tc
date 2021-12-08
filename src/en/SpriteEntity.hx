@@ -4,7 +4,7 @@ import en.player.Player;
 import format.tmx.Data.TmxObject;
 
 class SpriteEntity extends Structure {
-	public function new( ?x : Float = 0, ?z : Float = 0, sprite : String, ?tmxObj : TmxObject, ?cdbEntry : StructuresKind ) {
+	public function new( ?x : Float = 0, ?z : Float = 0, sprite : String, ?tmxObj : TmxObject, ?cdbEntry : Data.StructuresKind ) {
 		if ( sprFrame == null ) sprFrame = {
 			group : "",
 			frame : 0

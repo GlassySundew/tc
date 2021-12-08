@@ -16,14 +16,14 @@ class Inventory extends NinesliceWindow {
 
 	var ca : dn.heaps.Controller.ControllerAccess;
 
-	public var invGrid : CellGrid;
+	public var cellGrid : CellGrid;
 	public var containmentEntity : Entity;
 
-	public function new( ?removeLastRow : Bool = true, invGrid : CellGrid, ?parent : Null<Object> ) {
-		super("window", InventoryComp, parent, invGrid, removeLastRow);
+	public function new( ?removeLastRow : Bool = true, cellGrid : CellGrid, ?parent : Null<Object> ) {
+		super("window", InventoryComp, parent, cellGrid, removeLastRow);
 
-		this.invGrid = invGrid;
-		
+		this.cellGrid = cellGrid;
+
 		windowComp.window.windowLabel.labelTxt.text = "Inventory";
 
 		ca = Main.inst.controller.createAccess("inventory");

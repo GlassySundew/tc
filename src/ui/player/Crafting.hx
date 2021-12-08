@@ -6,11 +6,9 @@ import en.player.Player;
 import h2d.Flow;
 import h2d.Object;
 import h2d.ScaleGrid;
-import h2d.Tile;
 import h2d.col.Bounds;
 import h2d.col.Point;
 import h3d.Vector;
-import haxe.Constraints.Constructible;
 import hxd.Event;
 import ui.InventoryGrid.InventoryCell;
 import ui.domkit.CraftingComp;
@@ -18,12 +16,11 @@ import ui.domkit.IngredComp;
 import ui.domkit.IngredsHintComp;
 import ui.domkit.RecipeComp;
 import ui.domkit.ScrollbarComp;
-import ui.domkit.WindowComp.WindowCompI;
 
 class Crafting extends NinesliceWindow {
 	var scrollable : ScrollArea;
 
-	public function new( ?parent : Object ) {
+	public function new( source : Data.Recipes_recipe_source, ?parent : Object ) {
 		super(CraftingComp, parent);
 
 		windowComp.window.windowLabel.labelTxt.text = "Crafting";
@@ -71,9 +68,11 @@ class Crafting extends NinesliceWindow {
 		scrollable.addChild(recipeEntriesFlow);
 
 		for ( recipe in Data.recipes.all ) {
-			var rec = new Recipe(recipe, recipeEntriesFlow);
-			rec.windowComp.window.minWidth = scrollable.width;
-			cast(rec.windowComp, RecipeComp).onWheel.add(scroll);
+			if ( recipe.recipe_source.has(source) ) {
+				var rec = new Recipe(recipe, recipeEntriesFlow);
+				rec.windowComp.window.minWidth = scrollable.width;
+				cast(rec.windowComp, RecipeComp).onWheel.add(scroll);
+			}
 		}
 
 		var backgroundScroll = new EventInteractive(0, 0);
@@ -110,19 +109,7 @@ class Crafting extends NinesliceWindow {
 			scrollable.scrollTo(0, slider.value);
 		};
 
-		windowComp.window.onDrag.add(( x, y ) -> {
-			Settings.params.playerCrafting.x = win.x / Main.inst.w();
-			Settings.params.playerCrafting.y = win.y / Main.inst.h();
-		});
-
 		toggleVisible();
-	}
-
-	override function toggleVisible() {
-		super.toggleVisible();
-
-		win.x = Settings.params.playerCrafting.toString() == new Vector(-1, -1).toString() ? win.x : Settings.params.playerCrafting.x * Main.inst.w();
-		win.y = Settings.params.playerCrafting.toString() == new Vector(-1, -1).toString() ? win.y : Settings.params.playerCrafting.y * Main.inst.h();
 	}
 
 	override function onDispose() {
@@ -155,13 +142,13 @@ class Recipe extends NinesliceWindow {
 	}
 
 	public function craft( recipe : Data.Recipes ) {
-		// checking if player has required items
+		// checking if player has requiredData.Items
 		for ( i in recipe.ingreds ) {
 			var checkedCells : Array<InventoryCell> = [];
 
 			var amountPitch = i.amount;
 			while( amountPitch > 0 ) {
-				var targetItemSlot = Player.inst.ui.inventory.invGrid.findItemKind(i.item, 1, checkedCells);
+				var targetItemSlot = Player.inst.ui.inventory.cellGrid.grid.findItemKind(i.item, 1, checkedCells);
 				if ( targetItemSlot == null ) {
 					return null;
 				} else if ( targetItemSlot.item.amount >= i.amount ) {
@@ -176,7 +163,7 @@ class Recipe extends NinesliceWindow {
 		for ( i in recipe.ingreds ) {
 			var amountPitch = i.amount;
 			while( amountPitch > 0 ) {
-				var targetItemSlot = Player.inst.ui.inventory.invGrid.findItemKind(i.item, 1, []);
+				var targetItemSlot = Player.inst.ui.inventory.cellGrid.grid.findItemKind(i.item, 1, []);
 				if ( targetItemSlot == null ) {
 					return null;
 				} else if ( targetItemSlot.item.amount >= i.amount ) {
@@ -191,7 +178,7 @@ class Recipe extends NinesliceWindow {
 		}
 		for ( i in recipe.result ) {
 			var newItem = Item.fromCdbEntry(i.itemId, i.amount);
-			Player.inst.ui.inventory.invGrid.giveItem(newItem, Player.inst);
+			Player.inst.ui.inventory.cellGrid.giveItem(newItem);
 		}
 		return null;
 	}

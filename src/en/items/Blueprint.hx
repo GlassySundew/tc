@@ -8,29 +8,29 @@ class Blueprint extends Item {
 	public var onStructurePlace : EventSignal1<StructTile> = new EventSignal1();
 	public var onStructTileMove : EventSignal1<StructTile> = new EventSignal1();
 
-	public var blueprintScheme : BlueprintsKind;
+	public var blueprintScheme : Data.BlueprintsKind;
 
 	public var ghostStructure : StructureGhost;
 
-	public function new(cdbEntry : Data.ItemsKind, ?parent : Object) {
+	public function new( cdbEntry : Data.ItemsKind, ?parent : Object ) {
 		super(cdbEntry, parent);
 
 		if ( cdbEntry != null && this != null ) {
-			for (i in Data.blueprints.all) {
+			for ( i in Data.blueprints.all ) {
 				if ( i.itemId == cdbEntry ) {
 					blueprintScheme = i.id;
 				}
 			}
 		}
 
-		onStructTileMove.add((tile) -> {
+		onStructTileMove.add(( tile ) -> {
 			if ( ghostStructure != null ) {
 				ghostStructure.setFeetPos(tile.x, tile.z);
 				ghostStructure.offsetFootByCenter();
 				ghostStructure.offsetFootByTile();
 			}
 		});
-		onStructurePlace.add((tile) -> {
+		onStructurePlace.add(( tile ) -> {
 			if ( ghostStructure.canBePlaced ) {
 				amount--;
 				var ent = Structure.fromCdbEntry(Std.int(tile.x), Std.int(tile.z), Data.blueprints.get(blueprintScheme).structureId);
