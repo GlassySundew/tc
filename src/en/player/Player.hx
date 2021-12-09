@@ -195,7 +195,7 @@ class Player extends Entity {
 		super.customSerialize(ctx);
 
 		// holditem
-		if ( holdItem != null && holdItem.isInCursor()) {
+		if ( holdItem != null && holdItem.isInCursor() ) {
 			ctx.addString(Std.string(holdItem.cdbEntry));
 			ctx.addInt(holdItem.amount);
 		} else {
@@ -214,9 +214,11 @@ class Player extends Entity {
 		var holdItemAmt = ctx.getInt();
 
 		if ( holdItemCdb != "null" ) {
-			var item = Item.fromCdbEntry(Data.items.resolve(holdItemCdb).id, holdItemAmt);
-			item.containerEntity = this;
-			holdItem = item;
+			Game.inst.delayer.addF(() -> {
+				var item = Item.fromCdbEntry(Data.items.resolve(holdItemCdb).id, holdItemAmt);
+				item.containerEntity = this;
+				holdItem = item;
+			}, 1);
 		}
 	}
 
