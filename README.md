@@ -1,2 +1,2 @@
 # tc
-Total Condemn - sci-fi inspired sandbox farming simulator videogame made using haxe/heaps tech
+Total Condemn - sci-fi inspired sandbox farming simulator made using haxe/heaps tech
