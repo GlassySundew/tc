@@ -4,11 +4,32 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "aaa",
+      "type": "shell",
+      //   "group": {
+      //     "isDefault": true
+      //   },
+      "command": "echo Built at $(date +%T)",
+      "dependsOn": "default hxml"
+    },
+    {
+      "label": "build all",
+      "type": "shell",
+      "group": { "isDefault": true, "kind": "build" },
+      "command": "./buildall.sh",
+      "problemMatcher": [
+        "$haxe-absolute",
+        "$haxe",
+        "$haxe-error",
+        "$haxe-trace"
+      ]
+    },
+    {
+      "label": "default hxml",
       "type": "haxe",
       "args": "active configuration",
       "group": {
-        "kind": "build",
-        "isDefault": true
+        "kind": "build"
       },
       "presentation": {
         "echo": true,
@@ -29,6 +50,7 @@
       "label": "HL debug",
       "type": "hxml",
       "file": "hl.debug.hxml",
+      "group": "none",
       "presentation": {
         "echo": true,
         "reveal": "never",
@@ -65,8 +87,9 @@
     },
     {
       "label": "build server",
-      "type": "hxml",
-      "file": "hl.server.hxml",
+      "type": "shell",
+      "command": "haxe hl.server.hxml",
+      "group": "build",
       "presentation": {
         "echo": true,
         "reveal": "never",
@@ -74,25 +97,40 @@
         "panel": "shared",
         "showReuseMessage": true,
         "clear": false
-      },
-      "problemMatcher": [
-        "$haxe-absolute",
-        "$haxe",
-        "$haxe-error",
-        "$haxe-trace"
-      ]
+      }
     },
     {
+      "label": "build server hxml",
       "type": "hxml",
-      "file": "hl.debug copy.hxml",
-      "problemMatcher": [
-        "$haxe-absolute",
-        "$haxe",
-        "$haxe-error",
-        "$haxe-trace"
-      ],
+      "file": "hl.server.hxml",
       "group": "build",
-      "label": "haxe: hl.debug copy.hxml"
+      "presentation": {
+        "echo": true,
+        "reveal": "never",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      }
+    },
+    {
+      "label": "run hl",
+      "type": "shell",
+      "command": "clear && hl bin/game.hl",
+      "runOptions": {
+        "instanceLimit": 2
+      }
+    },
+    {
+      "type": "shell",
+      "label": "run server",
+      "command": "hl bin/server.hl",
+      "dependsOn": "kill hl"
+    },
+    {
+      "type": "shell",
+      "label": "kill hl",
+      "command": "killall -9 hl || :"
     }
   ]
 }

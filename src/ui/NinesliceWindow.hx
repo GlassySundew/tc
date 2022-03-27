@@ -1,8 +1,6 @@
 package ui;
 
 import h2d.Object;
-import h2d.Tile;
-import haxe.Constraints.Constructible;
 
 typedef NinesliceConf = {
 	var atlasName : String;
@@ -30,8 +28,9 @@ class NinesliceWindow extends Window {
 		super(parent);
 	}
 
-	public override function initLoad( ?parent : Null<h2d.Object> ) {
+	public override function initLoad() {
 		var nineSliceConf = nineSliceFromConf(background);
+
 		windowComp = Type.createInstance(Type.resolveClass(childType), [
 			new HSprite(Assets.ui, nineSliceConf.atlasName).tile,
 			nineSliceConf.bl,
@@ -54,6 +53,6 @@ class NinesliceWindow extends Window {
 		});
 		windowComp.window.toggleVisible = toggleVisible;
 
-		super.initLoad(parent);
+		super.initLoad();
 	}
 }

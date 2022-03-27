@@ -4,12 +4,12 @@ package en;
 class StructureGhost extends Structure {
 	public var canBePlaced : Bool = false;
 
-	public function new( cdbEntry : Data.StructuresKind ) {
+	public function new( cdbEntry : Data.StructureKind ) {
 		spr = new HSprite(Assets.structures, entParent);
-		spr.set('${Data.structures.get(cdbEntry).id}');
+		spr.set('${Data.structure.get(cdbEntry).id}');
 
 		super(0, 0, cdbEntry);
-		
+
 		toBeCollidedAgainst = false;
 
 		interact.onPushEvent.removeAll();
@@ -21,7 +21,7 @@ class StructureGhost extends Structure {
 
 		cd.setS("colorMaintain", 1 / 0);
 
-		Level.inst.game.applyTmxObjOnEnt(this);
+		GameClient.inst.applyTmxObjOnEnt(this);
 	}
 
 	public function checkIfValidToPlace() {

@@ -1,3 +1,4 @@
+import dn.heaps.slib.HSprite;
 import h3d.Vector;
 import h3d.scene.RenderContext;
 import h2d.Tile;
@@ -32,9 +33,9 @@ class Parallax extends Object {
 		mesh.material.mainPass.depth(false, LessEqual);
 
 		Main.inst.delayer.addF(() -> {
-			if ( Game.inst != null ) {
-				cameraX = Game.inst.camera.x;
-				cameraY = Game.inst.camera.y;
+			if ( GameClient.inst != null ) {
+				cameraX = GameClient.inst.camera.x;
+				cameraY = GameClient.inst.camera.y;
 			}
 		}, 2);
 		mesh.scale(.5);
@@ -69,15 +70,15 @@ class Parallax extends Object {
 
 	override function sync( ctx : RenderContext ) {
 		super.sync(ctx);
-		if ( Level.inst != null && Level.inst.game != null ) {
-			var deltaX = Level.inst.game.camera.x - cameraX;
-			var deltaY = Level.inst.game.camera.y - cameraY;
+		if ( Level.inst != null && GameClient.inst != null ) {
+			var deltaX = GameClient.inst.camera.x - cameraX;
+			var deltaY = GameClient.inst.camera.y - cameraY;
 
 			mesh.tile.scrollDiscrete(deltaX * parallaxEffect.x, deltaY * parallaxEffect.y);
 			mesh.tile = mesh.tile;
 
-			cameraX = Level.inst.game.camera.x;
-			cameraY = Level.inst.game.camera.y;
+			cameraX = GameClient.inst.camera.x;
+			cameraY = GameClient.inst.camera.y;
 		}
 	}
 }

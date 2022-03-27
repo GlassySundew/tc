@@ -1,0 +1,6 @@
+-cp tests
+-lib travix
+-lib tink_unittest
+-lib helder.set
+-main RunTests
+-dce full

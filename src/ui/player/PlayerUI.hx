@@ -1,15 +1,16 @@
 package ui.player;
 
-import h2d.Object;
-import Game.LevelLoadPlayerConfig;
+import GameClient.LevelLoadPlayerConfig;
 import dn.Process;
 import en.player.Player;
-import format.tmx.Data.TmxMap;
 import h2d.Flow;
 import h2d.Layers;
+import h2d.Object;
 import h3d.Vector;
 import tools.Settings;
-import ui.InventoryGrid.CellGrid;
+import ui.InventoryGrid.InventoryCell;
+import ui.InventoryGrid.InventoryCellFlow;
+import ui.InventoryGrid.UICellGrid;
 import ui.domkit.SideComp;
 
 enum JumpDirection {
@@ -30,17 +31,28 @@ class PlayerUI extends Process {
 
 	var teleport : Button;
 
-	public function new( parent : Layers ) {
-		super(Game.inst);
+	/**
+		всегда последний массив в инвентаре
+	**/
+	public var beltLayer(get, never) : Array<InventoryCellFlow>;
 
-		createRootInLayers(Game.inst.root, Const.DP_UI);
+	function get_beltLayer() : Array<InventoryCellFlow> {
+		return player.cellGrid.flowGrid[player.cellGrid.flowGrid.length - 1];
+	}
+
+	var player : Player;
+	public function new( parent : Layers, player : Player ) {
+		super(GameClient.inst);
+		this.player = player;
+
+		createRootInLayers(GameClient.inst.root, Const.DP_UI);
 
 		baseFlow = new Flow(root);
 
-		if ( Player.inst.cellGrid == null ) Player.inst.cellGrid = new CellGrid(5, 6, 18, 18, Player.inst);
+		player.cellGrid = new UICellGrid(player.inventory, 20, 20);
 
-		inventory = new Inventory(Player.inst.cellGrid, root);
-		inventory.containmentEntity = Player.inst;
+		inventory = new Inventory(player.cellGrid, root);
+		inventory.containmentEntity = player;
 
 		inventory.recenter();
 
@@ -52,7 +64,7 @@ class PlayerUI extends Process {
 		root.add(inventory.win, Const.DP_UI);
 		if ( Settings.params.inventoryVisible ) inventory.toggleVisible();
 
-		belt = new Belt(Player.inst.cellGrid.grid[Player.inst.cellGrid.grid.length - 1], root);
+		belt = new Belt(beltLayer, root);
 		root.add(belt, Const.DP_UI_FRONT);
 
 		topLeft = new SideComp(Top, Left, root);
@@ -123,7 +135,7 @@ class PlayerUI extends Process {
 				case Up: true;
 				case Down: false;
 			}
-			Game.inst.startLevel(name, playerLoadConf);
+			// GameClient.inst.startLevel(name, playerLoadConf);
 		});
 	}
 
@@ -140,7 +152,7 @@ class PlayerUI extends Process {
 }
 
 class PlayerCrafting extends Crafting {
-	public function new( source : Data.Recipes_recipe_source, ?parent : Object ) {
+	public function new( source : Data.Recipe_recipe_source, ?parent : Object ) {
 		super(source, parent);
 
 		windowComp.window.onDrag.add(( x, y ) -> {

@@ -1,5 +1,6 @@
 package format.tmx;
 
+import hxbit.Serializable;
 import format.tmx.Data.TmxImage;
 import format.tmx.Data.TmxTileLayer;
 import haxe.io.Bytes;
@@ -36,37 +37,37 @@ enum TmxStaggerAxis {
 }
 /** General .tmx map file */
 @:structInit
-class TmxMap {
+class TmxMap implements Serializable {
 	/** The TMX format version, generally 1.0. */
-	public var version : String;
+	@:s public var version : String;
 	/** The Tiled version used to save the file (since Tiled 1.0.1). May be a date (for snapshot builds). */
-	public var tiledVersion : String;
+	@:s public var tiledVersion : String;
 	/** Map orientation. */
-	public var orientation : TmxOrientation;
+	@:s public var orientation : TmxOrientation;
 	/** The map width in tiles. */
-	public var width : Int;
+	@:s public var width : Int;
 	/** The map height in tiles. */
-	public var height : Int;
+	@:s public var height : Int;
 	/**
 	 * The width of a tile.
 	 * 
 	 * The tilewidth and tileheight properties determine the general grid size of the map.  
 	 * The individual tiles may have different sizes. Larger tiles will extend at the top and right (anchored to the bottom left).
 	**/
-	public var tileWidth : Int;
+	@:s public var tileWidth : Int;
 	/**
 	 * The height of a tile.
 	 * 
 	 * The tilewidth and tileheight properties determine the general grid size of the map.  
 	 * The individual tiles may have different sizes. Larger tiles will extend at the top and right (anchored to the bottom left).
 	 */
-	public var tileHeight : Int;
+	@:s public var tileHeight : Int;
 	/** The background color of the map. Since 0.9, optional. */
-	@:optional public var backgroundColor : Int;
+	@:s @:optional public var backgroundColor : Int;
 	/** The order in which tiles on tile layers are rendered. Since 0.10, but only for orthogonal orientation. */
-	@:optional public var renderOrder : TmxRenderOrder;
+	@:s @:optional public var renderOrder : TmxRenderOrder;
 	/** For staggered and hexagonal maps, determines whether the "even" or "odd" indexes along the staggered axis are shifted. Since 0.11 */
-	@:optional public var staggerIndex : TmxStaggerIndex;
+	@:s @:optional public var staggerIndex : TmxStaggerIndex;
 	/**
 	 * For staggered and hexagonal maps, determines which axis (x or y) is staggered. (since 0.11);
 	 * Ex staggerDirection.
@@ -75,21 +76,21 @@ class TmxMap {
 	/** Only for hexagonal maps. Determines the width or height (depending on the staggered axis) of the tile's edge, in pixels. Since 0.11 */
 	@:optional public var hexSideLength : Int;
 	/** Stores the next available ID for new objects. This number is stored to prevent reuse of the same ID after objects have been removed. (since 0.11) */
-	@:optional public var nextObjectId : Int;
+	@:s @:optional public var nextObjectId : Int;
 	/**  Stores the next available ID for new layers. This number is stored to prevent reuse of the same ID after layers have been removed. (since 1.2)
 	 */
-	@:optional public var nextLayerId : Int;
+	@:s @:optional public var nextLayerId : Int;
 	/** Properties of the map */
-	@:optional public var properties : TmxProperties; // Map<String, String>;
+	@:s @:optional public var properties : TmxProperties; // Map<String, String>;
 
 	/** Tilesets used in map */
-	public var tilesets : Array<TmxTileset>;
+	@:s public var tilesets : Array<TmxTileset>;
 	/** Array of all layers in map. Tile layers, object groups and image layers.*/
-	public var layers : Array<TmxLayer>;
+	@:s public var layers : Array<TmxLayer>;
 	/** Is that map infinite? */
-	public var infinite : Bool;
+	@:s public var infinite : Bool;
 	/** Local path of the TmxMap supplied during parsing. **/
-	public var localPath : Null<String>;
+	@:s public var localPath : Null<String>;
 }
 /**
  * Tileset  
@@ -99,98 +100,98 @@ class TmxMap {
  * Since Tiled 0.15, image collection tilesets do not necessarily number their tiles consecutively since gaps can occur when removing tiles.
  */
 @:structInit
-class TmxTileset {
+class TmxTileset implements Serializable {
 	/** The first global tile ID of this tileset (this global ID maps to the first tile in this tileset). */
-	@:optional public var firstGID : Null<Int>;
+	@:s @:optional public var firstGID : Null<Int>;
 	/** If this tileset is stored in an external TSX (Tile Set XML) file, this attribute refers to that file. That TSX file has the same structure as the <tileset> element described here. (There is the firstgid attribute missing and this source attribute is also not there. These two attributes are kept in the TMX map, since they are map specific.) */
-	@:optional public var source : String;
+	@:s @:optional public var source : String;
 	/** The name of this tileset. */
-	@:optional public var name : String;
+	@:s @:optional public var name : String;
 	/** The (maximum) width of the tiles in this tileset. */
-	@:optional public var tileWidth : Null<Int>;
+	@:s @:optional public var tileWidth : Null<Int>;
 	/** The (maximum) height of the tiles in this tileset. */
-	@:optional public var tileHeight : Null<Int>;
+	@:s @:optional public var tileHeight : Null<Int>;
 	/** The spacing in pixels between the tiles in this tileset (applies to the tileset image). */
-	@:optional public var spacing : Null<Int>;
+	@:s @:optional public var spacing : Null<Int>;
 	/** The margin around the tiles in this tileset (applies to the tileset image). */
-	@:optional public var margin : Null<Int>;
+	@:s @:optional public var margin : Null<Int>;
 	/** The number of tiles in this tileset (since 0.13) */
-	@:optional public var tileCount : Int;
+	@:s @:optional public var tileCount : Int;
 	/** The number of tile columns in the tileset. For image collection tilesets it is editable and is used when displaying the tileset. (since 0.15) */
-	@:optional public var columns : Int;
+	@:s @:optional public var columns : Int;
 	/** This element is used to specify an offset in pixels, to be applied when drawing a tile from the related tileset. When not present, no offset is applied. Since 0.8 */
-	@:optional public var tileOffset : TmxTileOffset;
+	@:s @:optional public var tileOffset : TmxTileOffset;
 	/** Since 0.8 */
-	@:optional public var properties : TmxProperties; // Map<String, String>;
+	@:s @:optional public var properties : TmxProperties; // Map<String, String>;
 	/**
 	 * As of the current version of Tiled Qt, each tileset has a single image associated with it,  
 	 * which is cut into smaller tiles based on the attributes defined on the tileset element.  
 	 * Later versions may add support for adding multiple images to a single tileset, as is possible in Tiled Java.
 	 */
-	@:optional public var image : TmxImage;
+	@:s @:optional public var image : TmxImage;
 	/** Terrain type defines. Since 0.9 */
-	@:optional public var terrainTypes : Array<TmxTerrain>;
+	@:s @:optional public var terrainTypes : Array<TmxTerrain>;
 	/** Extended tiles data.  */
-	@:optional public var tiles : Array<TmxTilesetTile>;
+	@:s @:optional public var tiles : Array<TmxTilesetTile>;
 	/** Since 1.0 */
-	@:optional public var grid : TmxTilesetGrid;
+	@:s @:optional public var grid : TmxTilesetGrid;
 	/** Since 1.1 */
-	@:optional public var wangSets : Array<TmxWangSet>;
+	@:s @:optional public var wangSets : Array<TmxWangSet>;
 }
 /** This element is only used in case of isometric orientation, and determines how tile overlays for terrain and collision information are rendered. */
 @:structInit
-class TmxTilesetGrid {
+class TmxTilesetGrid implements Serializable {
 	/** Orientation of the grid for the tiles in this tileset (orthogonal or isometric) */
-	public var orientation : TmxOrientation;
+	@:s public var orientation : TmxOrientation;
 	/* Width of a grid cell */
-	public var width : Int;
+	@:s public var width : Int;
 	/* Height of a grid cell */
-	public var height : Int;
+	@:s public var height : Int;
 }
 /** This element is used to specify an offset in pixels, to be applied when drawing a tile from the related tileset. When not present, no offset is applied. */
 @:structInit
-class TmxTileOffset {
+class TmxTileOffset implements Serializable {
 	/** Horizontal offset in pixels */
-	public var x : Int;
+	@:s public var x : Int;
 	/** Vertical offset in pixels (positive is down) */
-	public var y : Int;
+	@:s public var y : Int;
 }
 /** Defines a list of corner colors and a list of edge colors, and any number of Wang tiles using these colors. */
 @:structInit
-class TmxWangSet {
+class TmxWangSet implements Serializable {
 	/** The name of the Wang set. */
-	public var name : String;
+	@:s public var name : String;
 	/** The tile ID of the tile representing this Wang set. */
-	public var tile : Int;
+	@:s public var tile : Int;
 	/** A color that can be used to define the corner of a Wang tile. */
-	public var corners : Array<TmxWangSetColor>;
+	@:s public var corners : Array<TmxWangSetColor>;
 	/** A color that can be used to define the edge of a Wang tile. */
-	public var edges : Array<TmxWangSetColor>;
+	@:s public var edges : Array<TmxWangSetColor>;
 	/** Defines a Wang tile, by referring to a tile in the tileset and associating it with a certain Wang ID. */
-	public var tiles : Array<TmxWangSetTile>;
+	@:s public var tiles : Array<TmxWangSetTile>;
 }
 /** A color that can be used to define the corner or an edge of a Wang tile. */
 @:structInit
-class TmxWangSetColor {
+class TmxWangSetColor implements Serializable {
 	/** The name of this color. */
-	public var name : String;
+	@:s public var name : String;
 	/** The color in #RRGGBB format (example: #c17d11). */
-	public var color : Int;
+	@:s public var color : Int;
 	/** The tile ID of the tile representing this color. */
-	public var tile : Int;
+	@:s public var tile : Int;
 	/** The relative probability that this color is chosen over others in case of multiple options. */
-	public var probability : Float;
+	@:s public var probability : Float;
 }
 /** Defines a Wang tile, by referring to a tile in the tileset and associating it with a certain Wang ID. */
 @:structInit
-class TmxWangSetTile {
+class TmxWangSetTile implements Serializable {
 	/** The tile ID. */
-	public var tileID : Int;
+	@:s public var tileID : Int;
 	/**
 	 * The Wang ID, which is a 32-bit unsigned integer stored in the format 0xCECECECE
 	 * (where each C is a corner color and each E is an edge color, from right to left clockwise, starting with the top edge)
 	 */
-	public var wangID : String;
+	@:s public var wangID : String;
 }
 /**
  * As of the current version of Tiled Qt, each tileset has a single image associated with it,  
@@ -198,82 +199,82 @@ class TmxWangSetTile {
  * Later versions may add support for adding multiple images to a single tileset, as is possible in Tiled Java.
  */
 @:structInit
-class TmxImage {
+class TmxImage implements Serializable {
 	/** Used for embedded images, in combination with a data child element. Valid values are file extensions like png, gif, jpg, bmp, etc. (since 0.9.0) */
-	@:optional public var format : String;
+	@:s @:optional public var format : String;
 	/** Used by some versions of Tiled Java. Deprecated and unsupported by Tiled Qt. */
-	@:optional public var id : String;
+	@:s @:optional public var id : String;
 	/** The reference to the tileset image file (Tiled supports most common image formats). */
-	public var source : String;
+	@:s public var source : String;
 	/**
 	 * Defines a specific color that is treated as transparent (example value: "#FF00FF" for magenta). 
 	 * Up until Tiled 0.10 (upd: 0.12), this value is written out without a # but this is planned to change.
 	 */
-	@:optional public var transparent : Null<Int>;
+	@:s @:optional public var transparent : Null<Int>;
 	/** The image width in pixels (optional, used for tile index correction when the image changes) */
-	@:optional public var width : Null<Int>;
+	@:s @:optional public var width : Null<Int>;
 	/** The image height in pixels (optional) */
-	@:optional public var height : Null<Int>;
+	@:s @:optional public var height : Null<Int>;
 	/** Since 0.9 */
-	@:optional public var data : TmxData;
+	@:s @:optional public var data : TmxData;
 }
 
 @:structInit
-class TmxTerrain {
+class TmxTerrain implements Serializable {
 	/** The name of the terrain type. */
-	public var name : String;
+	@:s public var name : String;
 	/** The local tile-id of the tile that represents the terrain visually. */
-	public var tile : Int;
+	@:s public var tile : Int;
 
-	@:optional public var properties : TmxProperties; // Map<String, String>;
+	@:s @:optional public var properties : TmxProperties; // Map<String, String>;
 }
 
 @:structInit
-class TmxTilesetTile {
+class TmxTilesetTile implements Serializable {
 	/** The local tile ID within its tileset. */
-	public var id : Int;
+	@:s public var id : Int;
 
-	@:optional public var type : String;
+	@:s @:optional public var type : String;
 	/**
 	 * Defines the terrain type of each corner of the tile,
 	 * given as comma-separated indexes in the terrain types array in the order 
 	 * top-left, top-right, bottom-left, bottom-right. Leaving out a value means
 	 * that corner has no terrain. (optional) (since 0.9.0)
 	 */
-	@:optional public var terrain : String;
+	@:s @:optional public var terrain : String;
 	/**
 	 * A percentage indicating the probability that this tile is chosen when it
 	 * competes with others while editing with the terrain tool. (optional) (since 0.9.0)
 	 */
-	@:optional public var probability : Float;
+	@:s @:optional public var probability : Float;
 
-	@:optional public var properties : TmxProperties; // Map<String, String>;
+	@:s @:optional public var properties : TmxProperties; // Map<String, String>;
 	/**
 	 * Since 0.9
 	 */
-	@:optional public var image : TmxImage;
+	@:s @:optional public var image : TmxImage;
 	/**
 	 * Since 0.10.
 	 * This group represents collision of tile and never contains Tile object type.
 	 */
-	@:optional public var objectGroup : TmxObjectGroup;
+	@:s @:optional public var objectGroup : TmxObjectGroup;
 	/**
 	 * Since 0.10.
 	 * Present, if tile does not static and contains animation.  
 	 * Contains a list of animation frames.  
 	 * As of Tiled 0.10, each tile can have exactly one animation associated with it. In the future, there could be support for multiple named animations on a tile.
 	 */
-	@:optional public var animation : Array<TmxTilesetTileFrame>;
+	@:s @:optional public var animation : Array<TmxTilesetTileFrame>;
 }
 /**
  * Animation frame of a single tile in tileset.
  */
 @:structInit
-class TmxTilesetTileFrame {
+class TmxTilesetTileFrame implements Serializable {
 	/** The local ID of a tile within the parent tileset. */
-	public var tileId : Int;
+	@:s public var tileId : Int;
 	/** How long (in milliseconds) this frame should be displayed before advancing to the next frame. */
-	public var duration : Int;
+	@:s public var duration : Int;
 }
 
 enum TmxLayer {
@@ -287,53 +288,53 @@ enum TmxLayer {
  * Its attributes offsetx, offsety, opacity and visible recursively affect child layers.
  */
 @:structInit
-class TmxGroup {
+class TmxGroup implements Serializable {
 	/** Unique ID of the layer. Each layer that added to a map gets a unique id. Even if a layer is deleted, no layer ever gets the same ID. Can not be changed in Tiled. (since Tiled 1.2) */
-	public var id : Int;
+	@:s public var id : Int;
 	/** The name of the group layer. */
-	public var name : String;
+	@:s public var name : String;
 	/** Rendering offset of the group layer in pixels. Defaults to 0. */
-	public var offsetX : Int;
+	@:s public var offsetX : Int;
 	/** Rendering offset of the group layer in pixels. Defaults to 0. */
-	public var offsetY : Int;
+	@:s public var offsetY : Int;
 	/** The opacity of the layer as a value from 0 to 1. Defaults to 1. */
-	public var opacity : Float;
+	@:s public var opacity : Float;
 	/** Whether the layer is shown (1) or hidden (0). Defaults to 1. */
-	public var visible : Bool;
+	@:s public var visible : Bool;
 
-	public var properties : TmxProperties;
+	@:s public var properties : TmxProperties;
 
-	public var layers : Array<TmxLayer>;
+	@:s public var layers : Array<TmxLayer>;
 }
 
-class TmxBaseLayer {
+class TmxBaseLayer implements Serializable {
 	/** Unique ID of the layer. Each layer that added to a map gets a unique id. Even if a layer is deleted, no layer ever gets the same ID. Can not be changed in Tiled. (since Tiled 1.2) */
-	public var id : Int;
+	@:s public var id : Int;
 	/** The name of the layer. */
-	public var name : String;
+	@:s public var name : String;
 	/** The x coordinate of the layer in tiles. Defaults to 0 and can no longer be changed in Tiled Qt. (Except ImageLayer) */
-	public var x : Null<Float>;
+	@:s public var x : Null<Float>;
 	/** The y coordinate of the layer in tiles. Defaults to 0 and can no longer be changed in Tiled Qt. (Except ImageLayer) */
-	public var y : Null<Float>;
+	@:s public var y : Null<Float>;
 	/** The width of the layer in tiles. Traditionally required, but as of Tiled Qt always the same as the map width. */
-	public var width : Null<Int>;
+	@:s public var width : Null<Int>;
 	/** The height of the layer in tiles. Traditionally required, but as of Tiled Qt always the same as the map height. */
-	public var height : Null<Int>;
+	@:s public var height : Null<Int>;
 	/** The opacity of the layer as a value from 0 to 1. Defaults to 1. */
-	public var opacity : Null<Float>;
+	@:s public var opacity : Null<Float>;
 	/** Whether the layer is shown (1) or hidden (0). Defaults to 1. */
-	public var visible : Null<Bool>;
+	@:s public var visible : Null<Bool>;
 	/** Rendering offset for this layer in pixels. Defaults to 0. (since 0.14) */
-	public var offsetX : Null<Int>;
+	@:s public var offsetX : Null<Int>;
 	/** Rendering offset for this layer in pixels. Defaults to 0. (since 0.14) */
-	public var offsetY : Null<Int>;
+	@:s public var offsetY : Null<Int>;
 	/** A color that is multiplied with any graphics drawn by this layer. (since 1.4) */
-	public var tintColor : Int;
+	@:s public var tintColor : Int;
 
-	public var properties : TmxProperties; // Map<String, String>;
+	@:s public var properties : TmxProperties; // Map<String, String>;
 
 	public function new( id : Int, name : String, x : Null<Float>, y : Null<Float>, offsetX : Null<Int>, offsetY : Null<Int>, width : Null<Int>,
-			height : Null<Int>, opacity : Null<Float>, visible : Bool, tintColor : Null<Int>, properties : TmxProperties ) {
+		height : Null<Int>, opacity : Null<Float>, visible : Bool, tintColor : Null<Int>, properties : TmxProperties ) {
 		this.id = id;
 		this.name = name;
 		this.x = x;
@@ -352,22 +353,22 @@ class TmxBaseLayer {
  * A layer consisting of a single image.
  * Since 0.15 `x` and `y` position of layer is defined via `offsetX` and `offsetY`.
  */
-class TmxImageLayer extends TmxBaseLayer {
-	@:optional public var image : TmxImage;
+class TmxImageLayer extends TmxBaseLayer implements Serializable {
+	@:s @:optional public var image : TmxImage;
 
 	public function new( image : TmxImage, id : Int, name : String, x : Null<Float>, y : Null<Float>, offsetX : Null<Int>, offsetY : Null<Int>,
-			width : Null<Int>, height : Null<Int>, opacity : Null<Float>, visible : Bool, tintColor : Null<Int>, properties : TmxProperties ) {
+		width : Null<Int>, height : Null<Int>, opacity : Null<Float>, visible : Bool, tintColor : Null<Int>, properties : TmxProperties ) {
 		super(id, name, x, y, offsetX, offsetY, width, height, opacity, visible, tintColor, properties);
 		this.image = image;
 	}
 }
 
 @:structInit
-class TmxTileLayer extends TmxBaseLayer {
-	@:optional public var data : TmxData;
+class TmxTileLayer extends TmxBaseLayer implements Serializable {
+	@:s @:optional public var data : TmxData;
 
 	public function new( data : TmxData, id : Int, name : String, x : Null<Float>, y : Null<Float>, offsetX : Null<Int>, offsetY : Null<Int>,
-			width : Null<Int>, height : Null<Int>, opacity : Null<Float>, visible : Bool, tintColor : Null<Int>, properties : TmxProperties ) {
+		width : Null<Int>, height : Null<Int>, opacity : Null<Float>, visible : Bool, tintColor : Null<Int>, properties : TmxProperties ) {
 		super(id, name, x, y, offsetX, offsetY, width, height, opacity, visible, tintColor, properties);
 		this.data = data;
 	}
@@ -408,33 +409,33 @@ enum TmxDataCompression {
  * firstgid that is still lower or equal than the gid. The tilesets are always stored with increasing firstgids.
  */
 @:structInit
-class TmxData {
+class TmxData implements Serializable {
 	/** The encoding used to encode the tile layer data. When used, it can be "base64" and "csv" at the moment. */
-	@:optional public var encoding : TmxDataEncoding;
+	@:s @:optional public var encoding : TmxDataEncoding;
 	/** The compression used to compress the tile layer data. Tiled Qt supports "gzip" and "zlib". Optional */
-	@:optional public var compression : TmxDataCompression;
+	@:s @:optional public var compression : TmxDataCompression;
 	/** Decoded tile data */
-	@:optional public var tiles : Array<TmxTile>;
+	@:s @:optional public var tiles : Array<TmxTile>;
 	/** Infinite maps chunk data */
-	@:optional public var chunks : Array<TmxChunk>;
+	@:s @:optional public var chunks : Array<TmxChunk>;
 	/** Raw data. Exists for non-tile-layer data objects. */
-	@:optional public var data : Bytes;
+	@:s @:optional public var data : Bytes;
 }
 /**
  * This is currently added only for infinite maps. The contents of a chunk element is same as that of 
  * the data element, except it stores the data of the area specified in the attributes. */
 @:structInit
-class TmxChunk {
+class TmxChunk implements Serializable {
 	/** The x coordinate of the chunk in tiles. */
-	public var x : Int;
+	@:s public var x : Int;
 	/** The y coordinate of the chunk in tiles. */
-	public var y : Int;
+	@:s public var y : Int;
 	/** The width of the chunk in tiles. */
-	public var width : Int;
+	@:s public var width : Int;
 	/** The height of the chunk in tiles. */
-	public var height : Int;
+	@:s public var height : Int;
 	/** Decoded tile data */
-	public var tiles : Array<TmxTile>;
+	@:s public var tiles : Array<TmxTile>;
 }
 /** Single tile in tile layer. */
 abstract TmxTile( Int ) {
@@ -479,17 +480,17 @@ enum TmxObjectGroupDrawOrder {
 	Unknown( value : String );
 }
 /** Layer representing a group of objects. */
-class TmxObjectGroup extends TmxBaseLayer {
+class TmxObjectGroup extends TmxBaseLayer implements Serializable {
 	/** The color used to display the objects in this group. */
-	public var color : Null<Int>;
+	@:s public var color : Null<Int>;
 	/** Whether the objects are drawn according to the order of appearance ("index") or sorted by their y-coordinate ("topdown"). Defaults to "topdown". */
-	public var drawOrder : TmxObjectGroupDrawOrder;
+	@:s public var drawOrder : TmxObjectGroupDrawOrder;
 	/** List of all objects. */
-	public var objects : Array<TmxObject>;
+	@:s public var objects : Array<TmxObject>;
 
 	public function new( drawOrder : TmxObjectGroupDrawOrder, objects : Array<TmxObject>, color : Null<Int>, id : Int, name : String, x : Null<Float>,
-			y : Null<Float>, offsetX : Null<Int>, offsetY : Null<Int>, width : Null<Int>, height : Null<Int>, opacity : Null<Float>, visible : Bool,
-			tintColor : Null<Int>, properties : TmxProperties ) {
+		y : Null<Float>, offsetX : Null<Int>, offsetY : Null<Int>, width : Null<Int>, height : Null<Int>, opacity : Null<Float>, visible : Bool,
+		tintColor : Null<Int>, properties : TmxProperties ) {
 		super(id, name, x, y, offsetX, offsetY, width, height, opacity, visible, tintColor, properties);
 		this.color = color;
 		this.drawOrder = drawOrder;
@@ -498,9 +499,9 @@ class TmxObjectGroup extends TmxBaseLayer {
 }
 /** Utility for x/y object. Used for Polygon and Polyline object types.*/
 @:structInit
-class TmxPoint {
-	public var x : Float;
-	public var y : Float;
+class TmxPoint implements Serializable {
+	@:s public var x : Float;
+	@:s public var y : Float;
 }
 /**
  * Type of the object.
@@ -525,75 +526,72 @@ enum TmxObjectType {
 }
 
 @:structInit
-class TmxObject {
+class TmxObject implements Serializable {
 	/** Id of the object. Each object that is placed on map gets unique id. And even if object was deleted no one gets it's id again. Can not be changed in Tiled Qt. */
-	public var id : Int;
+	@:s public var id : Int;
 	/** The name of the object. An arbitrary string. */
-	@:optional public var name : String;
+	@:s @:optional public var name : String;
 	/** The type of the object. An arbitrary string. */
-	@:optional public var type : String;
+	@:s @:optional public var type : String;
 	/** The x coordinate of the object in pixels. */
-	public var x : Float;
+	@:s public var x : Float;
 	/** The y coordinate of the object in pixels. */
-	public var y : Float;
+	@:s public var y : Float;
 	/** The width of the object in pixels (defaults to 0). */
-	@:optional public var width : Float;
+	@:s @:optional public var width : Float;
 	/** The height of the object in pixels (defaults to 0). */
-	@:optional public var height : Float;
+	@:s @:optional public var height : Float;
 	/** The rotation of the object in degrees clockwise (defaults to 0). (Since 0.10) */
-	@:optional public var rotation : Float;
+	@:s @:optional public var rotation : Float;
 	/** Whether the object is shown (1) or hidden (0). Defaults to 1. (since 0.9.0) */
-	@:optional public var visible : Bool;
+	@:s @:optional public var visible : Bool;
 	/** Helper type to easily detect what exactly is that object. */
-	public var objectType : TmxObjectType;
+	@:s public var objectType : TmxObjectType;
 	/** Object properties. */
-	@:optional public var properties : TmxProperties; // Map<String, String>;
+	@:s @:optional public var properties : TmxProperties; // Map<String, String>;
 
 	/** Is tile flipped horizontally? Default: false */
-	@:optional public var flippedHorizontally : Bool;
+	@:s @:optional public var flippedHorizontally : Bool;
 	/** Is tile flipped vertically? Default: false */
-	@:optional public var flippedVertically : Bool;
+	@:s @:optional public var flippedVertically : Bool;
 	/** A reference to a template file (optional). */
-	@:optional public var template : String;
+	@:s @:optional public var template : String;
 }
 /** Used to mark an object as a text object. Contains the actual text as character data. */
 @:structInit
-class TmxText {
+class TmxText implements Serializable {
 	/** The font family used (default: “sans-serif”) */
-	public var fontFamily : String;
+	@:s public var fontFamily : String;
 	/** The size of the font in pixels (not using points, because other sizes in the TMX format are also using pixels) (default: 16) */
-	public var pixelSize : Int; // TODO: Check if int or float
+	@:s public var pixelSize : Int; // TODO: Check if int or float
 	/** Whether word wrapping is enabled (1) or disabled (0). Defaults to 0. */
-	public var wrap : Bool;
+	@:s public var wrap : Bool;
 	/** Color of the text in #AARRGGBB or #RRGGBB format (default: #000000) */
-	public var color : Int;
+	@:s public var color : Int;
 	/** Whether the font is bold (1) or not (0). Defaults to 0. */
-	public var bold : Bool;
+	@:s public var bold : Bool;
 	/** Whether the font is italic (1) or not (0). Defaults to 0. */
-	public var italic : Bool;
+	@:s public var italic : Bool;
 	/** Whether a line should be drawn below the text (1) or not (0). Defaults to 0. */
-	public var underline : Bool;
+	@:s public var underline : Bool;
 	/** Whether a line should be drawn through the text (1) or not (0). Defaults to 0. */
-	public var strikeout : Bool;
+	@:s public var strikeout : Bool;
 	/** Whether kerning should be used while rendering the text (1) or not (0). Default to 1. */
-	public var kerning : Bool;
+	@:s public var kerning : Bool;
 	/** Horizontal alignment of the text within the object (left (default), center, right or justify (since Tiled 1.2.1)) */
-	public var halign : TmxHAlign;
+	@:s public var halign : TmxHAlign;
 	/** Vertical alignment of the text within the object (top (default), center or bottom) */
-	public var valign : TmxVAlign;
+	@:s public var valign : TmxVAlign;
 	/** Actual text of object */
-	public var text : String;
+	@:s public var text : String;
 }
 
 @:enum
 abstract TmxHAlign( String ) from String to String {
 
 	var Left = "left";
-
 	var Center = "center";
-
 	var Right = "right";
-
 	var Justify = "justify";
 }
 
@@ -601,9 +599,7 @@ abstract TmxHAlign( String ) from String to String {
 abstract TmxVAlign( String ) from String to String {
 
 	var Top = "top";
-
 	var Center = "center";
-
 	var Bottom = "bottom";
 }
 
@@ -633,13 +629,13 @@ abstract TmxProperties( ImplTmxProperties ) {
 	}
 }
 
-private class ImplTmxProperties {
-	private var names : Array<String>;
-	private var types : Array<TmxPropertyType>;
-	private var strings : Array<String>; // file
-	private var cache : Array<Null<Int>>;
-	private var ints : Array<Int>; // color
-	private var floats : Array<Float>;
+private class ImplTmxProperties implements Serializable {
+	@:s private var names : Array<String>;
+	@:s private var types : Array<TmxPropertyType>;
+	@:s private var strings : Array<String>; // file
+	@:s private var cache : Array<Null<Int>>;
+	@:s private var ints : Array<Int>; // color
+	@:s private var floats : Array<Float>;
 
 	// private var bools:Array<Bool>;
 

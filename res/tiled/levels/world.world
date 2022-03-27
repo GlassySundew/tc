@@ -1,5 +1,12 @@
 {
     "maps": [
+        {
+            "fileName": "ship_pascal.tmx",
+            "height": 516,
+            "width": 1032,
+            "x": 0,
+            "y": 0
+        }
     ],
     "onlyShowAdjacentMaps": false,
     "type": "world"

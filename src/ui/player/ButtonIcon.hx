@@ -1,5 +1,6 @@
 package ui.player;
 
+import dn.heaps.slib.HSprite;
 import ui.domkit.ButtonIconComp;
 import dn.Process;
 import h2d.Tile;
@@ -22,12 +23,12 @@ class ButtonIcon extends Object {
 		this.y = y;
 		centerFlow = new h2d.Flow(this);
 		centerFlow.setScale(1 / Const.UI_SCALE);
-		Game.inst.root.add(centerFlow, Const.DP_UI);
+		GameClient.inst.root.add(centerFlow, Const.DP_UI);
 
 		buttonSpr = Assets.ui.h_getAndPlay("keyboard_icon", 99999, false, this);
-		buttonSpr.anim.setSpeed(0.025 * Game.inst.tmod);
+		buttonSpr.anim.setSpeed(0.025 * GameClient.inst.tmod);
 
-		Game.inst.root.add(this, Const.DP_UI);
+		GameClient.inst.root.add(this, Const.DP_UI);
 		container = new ButtonIconComp(centerFlow);
 		buttonSpr.visible = false;
 		buttonSpr.setCenterRatio();

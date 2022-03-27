@@ -1,14 +1,15 @@
 package;
 
-import mapgen.MapGen;
-import tools.Save;
 import cherry.soup.EventSignal.EventSignal0;
-import dn.M;
 import dn.Process;
 import en.player.Player;
 import hxd.Key;
+import tools.Save;
 import tools.Settings;
 
+/**
+	client-side only
+**/
 @:publicFields
 class Main extends Process {
 	public static var inst : Main;
@@ -21,6 +22,7 @@ class Main extends Process {
 
 	public function new( s : h2d.Scene ) {
 		super();
+
 		inst = this;
 		createRoot(s);
 
@@ -39,10 +41,11 @@ class Main extends Process {
 			//
 			delayer.addS("cdb", function () {
 				Data.load(hxd.Res.data.entry.getBytes().toString());
-				if ( Game.inst != null ) Game.inst.onCdbReload();
+				if ( GameClient.inst != null ) GameClient.inst.onCdbReload();
 			}, 0.2);
 		});
 		#end
+
 		Boot.inst.renderer = new CustomRenderer();
 		Boot.inst.s3d.renderer = Boot.inst.renderer;
 		Boot.inst.renderer.depthColorMap = hxd.Res.gradients.test.toTexture();
@@ -95,30 +98,15 @@ class Main extends Process {
 			onClose.dispatch();
 			return true;
 		}
-		save = new Save();
 
 		delayer.addF(start, 1);
+
+		// var bmp = new Bitmap(Tile.fromColor(0xffffff, 256, 256), Boot.inst.s2d);
+		// bmp.filter = new Shader(new CornersRounder());
 	}
 
 	function start() {
-		// Music
-		#if !debug
-		// Assets.playMusic();
-		#end
-		#if debug
 		new MainMenu(Boot.inst.s2d);
-
-		// var autoMapper = new mapgen.AutoMap("tiled/levels/rules.txt");
-		// var mapGen = new MapGen(resolveMap('procgen/asteroids.tmx'), autoMapper);
-		// var applicableMap = autoMapper.applyRulesToMap(resolveMap('asteroid.tmx'));
-
-		// startGame();
-
-		// Game.inst.startLevel("bridge.tmx");
-		// Game.inst.startLevelFromParsedTmx(applicableMap, "test.tmx", {});
-		#else
-		new MainMenu(Boot.inst.s2d);
-		#end
 	}
 
 	public function toggleFullscreen() {
@@ -128,30 +116,33 @@ class Main extends Process {
 		Settings.params.fullscreen = s.displayMode == Fullscreen;
 		#end
 	}
-	/** single-player **/
-	public function startGame( ?seed : String ) {
-		if ( Game.inst != null ) {
-			Game.inst.destroy();
-			@:privateAccess Process._garbageCollector(Process.ROOTS);
-			new Game(seed);
-		} else
-			new Game(seed);
-	}
 
-	public function startGameClient() {
+	public function startGame( ?seed : String ) {
 		if ( GameClient.inst != null ) {
 			GameClient.inst.destroy();
 			@:privateAccess Process._garbageCollector(Process.ROOTS);
-			new GameClient();
-		} else
-			new GameClient();
+		}
+		new Client();
+		new GameClient();
+	}
+
+	@:deprecated
+	public function startClient() {
+		if ( Client.inst != null ) {
+			Client.inst.destroy();
+			@:privateAccess Process._garbageCollector(Process.ROOTS);
+		}
+		new Client();
 	}
 
 	override function onResize() {
 		super.onResize();
 
-		if ( Const.AUTO_SCALE_TARGET_WID > 0 ) Const.UI_SCALE = M.ceil(h() / Const.AUTO_SCALE_TARGET_WID); else if ( Const.AUTO_SCALE_TARGET_HEI > 0 )
-			Const.UI_SCALE = M.floor(h() / Const.AUTO_SCALE_TARGET_HEI);
+		// if ( Const.AUTO_SCALE_TARGET_WID > 0 )
+		// 	Const.UI_SCALE = M.ceil(h() / Const.AUTO_SCALE_TARGET_WID);
+		// else if ( Const.AUTO_SCALE_TARGET_HEI > 0 )
+		// 	Const.UI_SCALE = M.floor(h() / Const.AUTO_SCALE_TARGET_HEI);
+
 		root.setScale(Const.UI_SCALE);
 	}
 

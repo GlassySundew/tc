@@ -19,7 +19,7 @@ class Workbench extends Structure {
 		super.init(x, z, tmxObj);
 		ca = Main.inst.controller.createAccess("workbench");
 
-		Game.inst.delayer.addF(() -> {
+		GameClient.inst.delayer.addF(() -> {
 
 			crafting = new Crafting(Workbench, Player.inst.ui.root);
 			crafting.recenter();

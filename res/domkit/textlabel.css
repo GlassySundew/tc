@@ -1,9 +1,11 @@
-.backgroundHolder {
+/* .backgroundHolder {
   position: absolute;
   padding-bottom: 1;
-}
+} */
 
-.containerFlow {
-  position: absolute;
-}
 
+textLabel {
+	padding: 2;
+	padding-bottom: 5;
+	background: rgba(0, 0, 0, 0.389);
+}

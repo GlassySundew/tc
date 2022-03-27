@@ -2,19 +2,20 @@ import h2d.Sprite;
 import dn.heaps.HParticle;
 import dn.Tweenie;
 
-
 class Fx extends dn.Process {
 	public var pool : ParticlePool;
 
-	public var bgAddSb    : h2d.SpriteBatch;
-	public var bgNormalSb    : h2d.SpriteBatch;
-	public var topAddSb       : h2d.SpriteBatch;
-	public var topNormalSb    : h2d.SpriteBatch;
+	public var bgAddSb : h2d.SpriteBatch;
+	public var bgNormalSb : h2d.SpriteBatch;
+	public var topAddSb : h2d.SpriteBatch;
+	public var topNormalSb : h2d.SpriteBatch;
 
-	var game(get,never) : Game; inline function get_game() return Game.inst;
+	var game(get, never) : GameClient;
+
+	inline function get_game() return GameClient.inst;
 
 	public function new() {
-		super(Game.inst);
+		super(GameClient.inst);
 
 		// pool = new ParticlePool(Assets.tiles.tile, 2048, Const.FPS);
 
@@ -46,8 +47,6 @@ class Fx extends dn.Process {
 		topAddSb.remove();
 		topNormalSb.remove();
 	}
-
-
 
 	override function update() {
 		super.update();

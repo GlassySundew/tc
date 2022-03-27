@@ -28,11 +28,14 @@ class WindowComp extends Flow implements h2d.domkit.Object implements WindowComp
 		<window class="window_root" layout="vertical">
 			<flow class="dragable_comp" public id="dragable_comp" />
 			<flow class="close_button" public id="close_button" />
-			<textLabel("window") class="windowLabel" public id="windowLabel" />
+			<textLabel("window", null, style) class="windowLabel" public id="windowLabel" />
 		</window>;
 
 	public function new( tile : h2d.Tile, bl : Int, bt : Int, br : Int, bb : Int, parent : Null<h2d.Object> ) {
 		super(parent);
+		
+		style = new h2d.domkit.Style();
+
 		initComponent();
 
 		window = this;
@@ -44,8 +47,7 @@ class WindowComp extends Flow implements h2d.domkit.Object implements WindowComp
 
 		backgroundTile = tile;
 
-		style = new h2d.domkit.Style();
-		style.load(hxd.Res.domkit.window, true);
+		style.load(hxd.Res.domkit.window);
 		style.addObject(this);
 	}
 

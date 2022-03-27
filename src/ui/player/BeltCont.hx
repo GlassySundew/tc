@@ -1,5 +1,8 @@
 package ui.player;
 
+import shader.CornersRounder;
+import h2d.Tile;
+import h2d.Object;
 import h2d.RenderContext;
 import h2d.filter.Shader;
 import h2d.filter.Outline;
@@ -11,28 +14,19 @@ import h2d.Font;
 class BeltCont extends h2d.Flow implements h2d.domkit.Object {
 	static var SRC =
 		<beltCont>
-			<flow class="beltSlot" public id="beltSlot">
-				<flow class="backgroundHolder" public id="backgroundHolder" />
-				<flow class="itemContainer" public id="itemContainer" />
-				<flow class="hotkeyContainer">
-					<text class="beltSlotNumber" public id="beltSlotNumber" text={Std.string(slotNumber)} font={font} />
-				</flow>
+			<flow class="backgroundFlow" public id="backgroundFlow" />
+			<flow class="itemContainer" public id="itemContainer" />
+			<flow class="hotkeyFlow">
+				<text class="beltSlotNumber" public id="beltSlotNumber" text={Std.string(slotNumber)} font={font} />
 			</flow>
 		</beltCont>;
-	var outline : Outline;
-	public var backgroundColor(default, set) : Int;
-
-	function set_backgroundColor(v : Int) {
-		outline.color = v;
-		var alpha = Color.getAlpha(v);
-		backgroundHolder.backgroundTile = h2d.Tile.fromColor(v, 1, 1, alpha / 255);
-		return v;
-	}
-
 	public function new(?font : Font, ?slotNumber : Int, ?parent) {
 		super(parent);
 		initComponent();
-		outline = new Outline(2);
-		backgroundHolder.filter = outline;
+
+		ShadowedText.addTextOutlineTo(beltSlotNumber);
+		
+		var shader = new CornersRounder(6);
+		backgroundFlow.filter = new Shader(shader);
 	}
 }

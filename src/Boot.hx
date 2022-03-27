@@ -1,6 +1,5 @@
-import hx.concurrent.executor.Executor;
-import mapgen.MapGen;
 import h2d.Scene;
+import tools.Save;
 
 class Boot extends hxd.App {
 	public static var inst : Boot;
@@ -14,6 +13,10 @@ class Boot extends hxd.App {
 
 	// Engine ready
 	override function init() {
+		Env.init();
+		Settings.init();
+		Save.initFields();
+
 		haxe.Log.trace = function ( v : Dynamic, ?infos : haxe.PosInfos ) {
 			#if hx_concurrent
 			var str = formatOutput(v, infos);
@@ -29,6 +32,19 @@ class Boot extends hxd.App {
 		#if !debug
 		hl.UI.closeConsole();
 		#end
+
+		sys.thread.Thread.create(() -> {
+			switch Env.system {
+				case Windows:
+					Sys.command(".\tc.exe server.hl");
+				default:
+					#if debug
+					Sys.command("hl bin/server.hl");
+					#else
+					Sys.command("./tc server.hl");
+					#end
+			};
+		});
 
 		inst = this;
 		entParent = new Scene();

@@ -1,5 +1,6 @@
 package ui.domkit;
 
+import dn.heaps.slib.HSprite;
 import h2d.Tile;
 import hxd.Res;
 import hxd.res.Resource;
@@ -23,9 +24,9 @@ class IngredComp extends Flow implements Object implements WindowCompI {
 
 	static var sheet : Resource;
 
-	var ingred : Data.Recipes_ingreds;
+	var ingred : Data.Recipe_ingred;
 	/**
-		@param rest : Data.Recipes_ingreds type, displayed icon
+		@param rest : Data.Recipe_ingred type, displayed icon
 	**/
 	public function new( backgroundTile : h2d.Tile, bl : Int, bt : Int, br : Int, bb : Int, ?parent : Null<h2d.Object>, rest : haxe.Rest<Dynamic> ) {
 		ingred = rest[0];

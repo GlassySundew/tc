@@ -1,12 +1,11 @@
 package tools;
 
 import dn.Process;
-import haxe.CallStack;
-import hx.concurrent.executor.Executor;
-import haxe.crypto.Base64;
 import en.player.Player;
+import format.tmx.Data.TmxMap;
 import haxe.Unserializer;
-import haxe.io.Bytes;
+import haxe.crypto.Base64;
+import hx.concurrent.executor.Executor;
 import hxbit.Serializer;
 import hxd.File;
 import hxd.Res;
@@ -14,19 +13,25 @@ import sys.FileSystem;
 import sys.db.Connection;
 import sys.db.Sqlite;
 
-typedef CachedLevel = {
+typedef SavedLevel = {
 	public var id : Int;
 	public var name : String;
 	public var tmx : String;
 }
 
-typedef CachedEntity = {
+typedef SavedEntity = {
 	public var id : Int;
+
 	/** basically just a class name, i.e. 'en.player.Player' **/
 	public var name : String;
 	public var blob : String;
 	public var level_id : Null<Int>;
 }
+
+typedef SavedPlayer = SavedEntity & {
+	public var nickname : String;
+}
+
 /** for proper work .hdll libs of sqlite of the latest version need to be compiled(amalgamation) and also with URI enabled **/
 class Save {
 	public static var inst : Save;
@@ -35,11 +40,17 @@ class Save {
 	public var currentFilePath(get, never) : String;
 	public var transacting : Bool = false;
 
+	public static var saveDirectory : String;
+
 	function get_currentFilePath() {
-		return SAVEPATH + currentFile + Const.SAVEFILE_EXT;
+		return saveDirectory + currentFile + Const.SAVEFILE_EXT;
 	}
 
 	public var currentFile : String;
+
+	public static function initFields() {
+		saveDirectory = SAVEPATH + "save/";
+	}
 
 	public function new() {
 		inst = this;
@@ -146,8 +157,10 @@ class Save {
 	}
 
 	public function makeFreshSave( fileName : String ) {
-		if ( File.exists(SAVEPATH + fileName + Const.SAVEFILE_EXT) ) {
-			File.delete(SAVEPATH + fileName + Const.SAVEFILE_EXT);
+		sys.FileSystem.createDirectory(haxe.io.Path.directory(saveDirectory));
+
+		if ( File.exists(saveDirectory + fileName + Const.SAVEFILE_EXT) ) {
+			File.delete(saveDirectory + fileName + Const.SAVEFILE_EXT);
 		}
 
 		if ( sqlite != null && isDbLocatedInMemory("maindb") ) {
@@ -161,12 +174,13 @@ class Save {
 		}
 
 		var sqliteNew = Sqlite.open("");
-		sqliteNew.request('attach ${sqliteNew.quote(SAVEPATH + fileName + Const.SAVEFILE_EXT)} as new');
+		sqliteNew.request('attach ${sqliteNew.quote(saveDirectory + fileName + Const.SAVEFILE_EXT)} as new');
 		fillDbWithScheme(sqliteNew, "new");
 		sqliteNew.close();
 
 		if ( sqlite != null ) sqlite.close();
-		sqlite = Sqlite.open(SAVEPATH + fileName + Const.SAVEFILE_EXT);
+
+		sqlite = Sqlite.open(saveDirectory + fileName + Const.SAVEFILE_EXT);
 		transacting = false;
 		sqlite.request("PRAGMA journal_mode = memory");
 		sqlite.request("PRAGMA read_uncommitted=1");
@@ -175,7 +189,7 @@ class Save {
 
 	public function bakSave( fileName : String ) {
 		// deleting old bak
-		if ( File.exists(SAVEPATH + fileName + Const.SAVEFILE_EXT + ".bak") ) File.delete(SAVEPATH + fileName + Const.SAVEFILE_EXT + ".bak");
+		if ( File.exists(saveDirectory + fileName + Const.SAVEFILE_EXT + ".bak") ) File.delete(saveDirectory + fileName + Const.SAVEFILE_EXT + ".bak");
 
 		var executor = Executor.create(1);
 		var i = 0;
@@ -183,8 +197,8 @@ class Save {
 			i++;
 			if ( i > 10 ) return;
 
-			if ( File.exists(SAVEPATH + fileName + Const.SAVEFILE_EXT) ) {
-				sys.io.File.copy(SAVEPATH + fileName + Const.SAVEFILE_EXT, SAVEPATH + fileName + Const.SAVEFILE_EXT + '.bak');
+			if ( File.exists(saveDirectory + fileName + Const.SAVEFILE_EXT) ) {
+				sys.io.File.copy(saveDirectory + fileName + Const.SAVEFILE_EXT, saveDirectory + fileName + Const.SAVEFILE_EXT + '.bak');
 				executor.stop();
 			}
 		};
@@ -200,11 +214,11 @@ class Save {
 			#end
 		}
 
-		sqlite.request('attach database ${sqlite.quote(SAVEPATH + file + Const.SAVEFILE_EXT)} as maindb');
+		sqlite.request('attach database ${sqlite.quote(saveDirectory + file + Const.SAVEFILE_EXT)} as maindb');
 	}
 
 	public function saveGame( fileName : String ) {
-		var targetFilePath = SAVEPATH + fileName + Const.SAVEFILE_EXT;
+		var targetFilePath = saveDirectory + fileName + Const.SAVEFILE_EXT;
 
 		if ( isDbLocatedInMemory("maindb") ) {
 			// debug scenario when entry point was not in main menu(i.e. scripted to load level)
@@ -212,7 +226,7 @@ class Save {
 				bakSave(fileName);
 				File.delete(targetFilePath);
 			}
-			saveLevel(Level.inst);
+			saveAllLevels();
 			commitChanges();
 			sqlite.request('vacuum maindb into ${sqlite.quote(targetFilePath)}');
 			startTransaction();
@@ -227,7 +241,7 @@ class Save {
 			// чтобы сохранить изменения и поменять сохранённый файл на тот, в который мы хотим сохраниться, затем первый файл вернуть в прежнее состояние
 			sys.io.File.copy(currentFilePath, currentFilePath + ".swap");
 
-			saveLevel(Level.inst);
+			saveAllLevels();
 			commitChanges();
 
 			sys.io.File.copy(currentFilePath, targetFilePath);
@@ -238,14 +252,14 @@ class Save {
 			startTransaction();
 		}
 
-		saveLevel(Level.inst);
+		saveAllLevels();
 
 		// saving general game data, such as celestial map
 		var s = new hxbit.Serializer();
-		var bytes = s.serialize(Game.inst);
+		var bytes = s.serialize(GameServer.inst);
 
 		sqlite.request('insert into maindb.game (blob) values(
-            ${sqlite.quote(Base64.encode(bytes))}
+            ${sqlite.quote(haxe.crypto.Base64.encode(bytes))}
         )');
 
 		commitChanges();
@@ -255,12 +269,18 @@ class Save {
 		startTransaction();
 	}
 
-	public function saveLevel( level : Level ) : CachedLevel {
+	public function saveAllLevels() {
+		for ( i in GameServer.inst.levels )
+			saveLevel(i);
+	}
+
+	public function saveLevel( level : ServerLevel ) : SavedLevel {
 		// checking if maindb attached
 		if ( isMainDbAttached() ) {
 			// dropping "entities" tmx layer in favor of previously saved layer
-			var tmxMap : format.tmx.Data.TmxMap = Unserializer.run(haxe.Serializer.run(level.data));
+			var tmxMap : format.tmx.Data.TmxMap = Unserializer.run(haxe.Serializer.run(level.tmxMap));
 			var entitiesTmxLayer = tmxMap.getLayersByName('entities');
+			
 			if ( entitiesTmxLayer != null )
 				for ( i in entitiesTmxLayer )
 					switch i {
@@ -275,7 +295,7 @@ class Save {
 			// if ( cachedLevel != null )
 			level.sqlId = cachedLevel.id;
 
-			for ( i in Entity.ALL ) {
+			for ( i in Entity.ServerALL ) {
 				if ( i.level.sqlId == level.sqlId ) {
 					saveEntity(i);
 				}
@@ -285,8 +305,9 @@ class Save {
 		return null;
 	}
 
-	public function upsertLevelMap( name : String, tmxMap : format.tmx.Data.TmxMap ) : CachedLevel {
-		var levelBlob = sqlite.quote(Base64.encode(Bytes.ofString(haxe.Serializer.run(tmxMap))));
+	public function upsertLevelMap( name : String, tmxMap : format.tmx.Data.TmxMap ) : SavedLevel {
+		var s = new Serializer();
+		var levelBlob = sqlite.quote(Base64.encode(s.serialize(tmxMap)));
 
 		var query = sqlite.request('
 			insert into maindb.rooms (name, tmx) values(
@@ -312,27 +333,33 @@ class Save {
 
 		// we remain a shallow copy of the player saying only their feet if we want to know them when we will be bringing this player back again on this level
 		if ( Std.isOfType(entity, Player) ) {
-			if ( sqlite.request('select * from maindb.entities where name = "player_shallow_feet" and level_id = ${entity.level.sqlId}').hasNext() )
+			if ( sqlite.request('
+					select * from maindb.entities 
+						where name = "player_shallow_feet" 
+							and level_id = ${entity.level.sqlId}').hasNext() )
+
 				sqlite.request('
-						update maindb.entities set 
-							blob = "${entity.footX}_${entity.footY}"
-						where 
-							name = "player_shallow_feet"
-							and level_id = ${entity.level.sqlId}
+					update maindb.entities set 
+						blob = "${entity.footX}_${entity.footY}"
+					where 
+						name = "player_shallow_feet"
+						and level_id = ${entity.level.sqlId}
 				')
 			else
+
 				sqlite.request('
-						insert into maindb.entities (name, blob, level_id) values(
-							"player_shallow_feet",
-							"${entity.footX}_${entity.footY}",
-							${entity.level.sqlId}
-						)
+					insert into maindb.entities (name, blob, level_id) values(
+						"player_shallow_feet",
+						"${entity.footX}_${entity.footY}",
+						${entity.level.sqlId}
+					)
 				');
 		}
 
 		if ( entity.sqlId != null ) {
 			// this entity has been previously saved and is bling updated to db
-			sqlite.request('update maindb.entities set
+			sqlite.request('
+				update maindb.entities set
 					name = ${sqlite.quote(Std.string(entity))},
 					blob = ${sqlite.quote(Base64.encode(bytes))},
 					level_id = ${entity.level.sqlId}
@@ -350,6 +377,15 @@ class Save {
 		}
 	}
 
+	public function getPlayerByNickname( nickname : String ) : SavedPlayer {
+		return
+			sqlite.request('
+				select * from maindb.players as players 
+					inner join maindb.entities as entities 
+						on players.entity_id == entities.id
+			').next();
+	}
+
 	// TODO only singleplayer or server-side
 	public function loadGame( fileName : String ) {
 		rollbackChanges();
@@ -361,13 +397,13 @@ class Save {
 
 		if ( savedGame.hasNext() ) {
 			// we do have some saved game
-			if ( Game.inst != null ) {
-				Game.inst.destroy();
+			if ( GameServer.inst != null ) {
+				GameServer.inst.destroy();
 				@:privateAccess Process._garbageCollector(Process.ROOTS);
 			}
 
 			var u = new Serializer();
-			u.unserialize(Base64.decode(savedGame.next().blob), Game);
+			u.unserialize(Base64.decode(savedGame.next().blob), GameServer);
 		} else
 			Main.inst.startGame();
 
@@ -375,13 +411,13 @@ class Save {
 		rollbackChanges();
 		startTransaction();
 
-		Game.inst.startLevel(loadLevelWithPlayerSingle().name, {});
+		GameServer.inst.startLevel(loadLevelWithPlayerSingle().name, {});
 
 		currentFile = fileName;
 	}
 
 	// Search for a room where player is saved in and loads it
-	public function loadLevelWithPlayerSingle() : CachedLevel {
+	public function loadLevelWithPlayerSingle() : SavedLevel {
 		var playerEntry = sqlite.request('select * from maindb.entities where name = "en.player.Player"');
 		if ( playerEntry.length > 1 ) trace("loading singleplayer but more than 1 player found...");
 
@@ -389,7 +425,7 @@ class Save {
 		return cachedLevel;
 	}
 
-	public function loadSavedEntities( level : CachedLevel ) {
+	public function loadSavedEntities( level : SavedLevel ) {
 		var entities = sqlite.request('
 			select * from maindb.entities 
 				where level_id = ${level.id} 
@@ -400,9 +436,9 @@ class Save {
 		if ( entities.hasNext() ) for ( i in entities ) loadEntity(i);
 	}
 
-	public function getSavedLevel( level : CachedLevel ) : format.tmx.Data.TmxMap {
-
-		var loadedLevel = Unserializer.run(Base64.decode(level.tmx).toString());
+	public function getSavedLevel( level : SavedLevel ) : format.tmx.Data.TmxMap {
+		var s = new Serializer();
+		var loadedLevel = s.unserialize(Base64.decode(level.tmx), TmxMap);
 		// loadedLevel.sqlId = Std.int(level.id);
 
 		loadSavedEntities(level);
@@ -410,7 +446,7 @@ class Save {
 		return loadedLevel;
 	}
 
-	public function getLevelByName( name : String ) : CachedLevel {
+	public function getLevelByName( name : String ) : SavedLevel {
 		var query = sqlite.request('select * from maindb.rooms where name = "${name}"');
 		return query.hasNext() ? query.next() : null;
 	}
@@ -436,29 +472,32 @@ class Save {
 	}
 
 	// used to load saved player to new-loaded .tmx locations
-	public function bringPlayerToLevel( level : CachedLevel ) {
+	public function bringPlayerToLevel( level : SavedLevel ) {
 		return sqlite.request('update maindb.entities set level_id = ${level.id} where name = "en.player.Player" returning *');
 	}
 
-	public function playerSavedOn( level : Level ) : CachedEntity {
+	public function playerSavedOn( level : ServerLevel ) : SavedEntity {
 		return sqlite.request('select * from maindb.entities where name = "en.player.Player" and level_id = ${level.sqlId}').next();
 	}
 
 	public function getPlayerShallowFeet( player : Player ) {
 		return sqlite.request('select * from maindb.entities where name = "player_shallow_feet" and level_id = ${player.level.sqlId}').next();
 	}
+
 	/**basically a fix for entity duplicates when disposing**/
 	public function removeEntityById( id : Int ) {
 		sqlite.request('delete from maindb.entities where id=$id');
 	}
 
-	public function loadEntity( entity : CachedEntity ) {
+	public function loadEntity( entity : SavedEntity ) : Entity {
 		try {
 			var u = new Serializer();
 			var ent = cast(u.unserialize(Base64.decode(entity.blob), Type.resolveClass(entity.name)), Entity);
 			ent.sqlId = entity.id;
+			return ent;
 		} catch( e:Dynamic ) {
 			trace("error while unserializing entity: " + e, haxe.CallStack.toString(haxe.CallStack.exceptionStack()));
 		}
+		return null;
 	}
 }

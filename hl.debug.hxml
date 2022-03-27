@@ -1,16 +1,18 @@
 
 -debug
+
 -hl bin/game.hl
+# -D hl-profile
+
 hl.sdl.hxml
 
--D linux
-
--D hl-profile
-
-
-# -D depth_debug
-# -D colliders_debug
-# -D entity_centers
+-D depth_debug
+-D colliders_debug
+-D entity_centers_debug
+-D interactive_debug
 # -D sqlite_debug_verbose
 # -D display_proto
 # -D hx_concurrent
+-D network_debug
+
+# --connect 6010 

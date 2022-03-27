@@ -9,7 +9,7 @@ import hxd.Event;
 import hxd.Key in K;
 /** Использует inv как хранилище для растений **/
 class Hydroponics extends Structure {
-	public function new( ?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : Data.StructuresKind ) {
+	public function new( ?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : Data.StructureKind ) {
 		super(x, z, tmxObj, hydroponics);
 	}
 
@@ -30,11 +30,9 @@ class Hydroponics extends Structure {
 		// cellGrid.giveItem(new en.Item(plant), this, true, false);
 		#end
 
-		#if !headless
 		interact.onTextInput = function ( e : Event ) {
 			if ( K.isPressed(K.E) ) dropGrownPlant();
 		}
-		#end
 	}
 
 	function dropGrownPlant() {

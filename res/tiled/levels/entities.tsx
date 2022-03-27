@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.5" tiledversion="1.7.2" name="entities" tilewidth="144" tileheight="134" tilecount="15" columns="10" backgroundcolor="#171717">
+<tileset version="1.8" tiledversion="1.8.1" name="entities" tilewidth="144" tileheight="134" tilecount="15" columns="10" backgroundcolor="#171717">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="2">
   <properties>
@@ -75,7 +75,7 @@
   </properties>
   <image width="48" height="72" source="separated/structures/door0.png"/>
   <objectgroup draworder="index" id="3">
-   <object id="5" name="center" x="20" y="58">
+   <object id="5" name="center" x="19" y="57">
     <point/>
    </object>
    <object id="6" x="10" y="63">
@@ -146,7 +146,7 @@
    <object id="4" x="25" y="58">
     <polygon points="0,0 -22,-11 -14,-15 8,-4"/>
    </object>
-   <object id="5" name="center" x="21" y="49">
+   <object id="5" name="center" x="20" y="49">
     <point/>
    </object>
   </objectgroup>
@@ -159,6 +159,9 @@
   <objectgroup draworder="index" id="3">
    <object id="4" x="22" y="44">
     <polygon points="0,0 20,-10 8,-16 -12,-6"/>
+   </object>
+   <object id="5" name="center" x="25" y="36">
+    <point/>
    </object>
   </objectgroup>
  </tile>

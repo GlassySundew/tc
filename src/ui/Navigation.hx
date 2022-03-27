@@ -1,10 +1,7 @@
 package ui;
 
-import haxe.macro.Expr;
-import h2d.filter.Bloom;
-import h2d.filter.Ambient;
-import haxe.CallStack;
-import UniformPoissonDisc.UniformPoissonDisk;
+import dn.Tweenie.Tween;
+import tools.UniformPoissonDisc.UniformPoissonDisk;
 import cherry.soup.EventSignal.EventSignal0;
 import en.player.Player;
 import format.tmx.Data.TmxMap;
@@ -12,13 +9,14 @@ import h2d.Graphics;
 import h2d.Object;
 import h2d.Tile;
 import h2d.col.Point;
-import h2d.filter.Blur;
+import h2d.filter.Bloom;
 import h3d.mat.Texture;
 import haxe.Unserializer;
 import haxe.crypto.Base64;
 import haxe.ds.Map;
 import hx.concurrent.Future.FutureResult;
 import hx.concurrent.executor.Executor;
+import hxbit.NetworkSerializable;
 import hxbit.Serializable;
 import hxbit.Serializer;
 import mapgen.MapGen;
@@ -36,14 +34,53 @@ abstract NavigationFields( Array<NavigationField> ) {
 	inline function get( key : Int ) return this[key];
 
 	public inline function push( field : NavigationField ) {
-		@:privateAccess Navigation.inst.bodiesContainer.addChild(field.object);
+		if ( Navigation.clientInst != null )
+			@:privateAccess Navigation.clientInst.navWin.bodiesContainer.addChild(field.object);
 		this.push(field);
 	}
 }
+/** 
+	should only be instanced server-side,
+	singleton is always synchronized over network with all players
+**/
+class Navigation implements NetworkSerializable {
+	public static var serverInst : Navigation;
+	public static var clientInst : Navigation;
 
-class Navigation extends NinesliceWindow {
-	public static var inst : Navigation;
+	public var navWin : NavigationWindow;
 
+	@:s public var fields : NavigationFields;
+
+	public function new() {
+		serverInst = this;
+		init();
+		fields = new NavigationFields([]);
+	}
+
+	function init() {}
+
+	public function alive() {
+		clientInst = this;
+		init();
+		navWin = new NavigationWindow(
+			Const.jumpReach,
+			Client.inst.seed
+		);
+	}
+
+	public function getTargetById( id : String ) : NavigationTarget {
+		for ( field in fields ) {
+			for ( target in field.targets ) {
+				if ( target.id == id ) return target;
+			}
+		}
+		return null;
+	}
+}
+/**
+	should only be instanced on client-side
+**/
+class NavigationWindow extends NinesliceWindow {
 	var ca : dn.heaps.Controller.ControllerAccess;
 	var navMask : FixedScrollArea;
 	var bodiesContainer : Object;
@@ -55,8 +92,6 @@ class Navigation extends NinesliceWindow {
 	function set_locked( locked : Bool ) : Bool {
 		return this.locked = locked;
 	}
-
-	@:s public var fields : NavigationFields = new NavigationFields([]);
 
 	public static var playersHeads : Map<Player, Object> = [];
 	/** твинеры для бошек игроков **/
@@ -81,9 +116,8 @@ class Navigation extends NinesliceWindow {
 		this.jumpReach = jumpReach;
 	}
 
-	override function initLoad( ?parent : Object ) {
-		super.initLoad(parent);
-		inst = this;
+	override function initLoad() {
+		super.initLoad();
 
 		windowComp.window.windowLabel.labelTxt.text = "Navigation console";
 		var navigationComp = cast(windowComp, NavigationComp);
@@ -104,7 +138,7 @@ class Navigation extends NinesliceWindow {
 
 		scroller.onClickEvent.add(( _ ) -> NavigationTarget.disposeArrowButton());
 		// belt lock
-		Game.inst.delayer.addF(() -> {
+		GameClient.inst.delayer.addF(() -> {
 			if ( backgroundInter != null ) {
 				backgroundInter.onOverEvent.add(( e ) -> {
 					if ( Player.inst != null ) Player.inst.lockBelt();
@@ -113,22 +147,24 @@ class Navigation extends NinesliceWindow {
 					if ( Player.inst != null ) Player.inst.unlockBelt();
 				});
 			}
+			for ( field in Navigation.clientInst.fields )
+				bodiesContainer.addChild(field.object);
 		}, 2);
 
 		scroller.propagateEvents = true;
 		recenter();
 
 		toggleVisible();
-		if ( parent != null ) {
+		
 			refreshLinks(Const.jumpReach);
-		}
+
 
 		NavigationTarget.onClick = ( x, y ) -> {
 			var time = 500; // ms
 
 			scroller.visible = false;
-			Game.inst.tw.createMs(navMask.scrollX, Std.int((x) / Const.UI_SCALE - navMask.width / 2), time);
-			Game.inst.tw.createMs(navMask.scrollY, Std.int((y) / Const.UI_SCALE - navMask.height / 2), time).end(
+			GameClient.inst.tw.createMs(navMask.scrollX, Std.int((x) / Const.UI_SCALE - navMask.width / 2), time);
+			GameClient.inst.tw.createMs(navMask.scrollY, Std.int((y) / Const.UI_SCALE - navMask.height / 2), time).end(
 				() -> {
 					scroller.visible = true;
 				}
@@ -153,7 +189,7 @@ class Navigation extends NinesliceWindow {
 
 		if ( Player.inst != null )
 			// focus on player's cluster
-			for ( field in fields ) {
+			for ( field in Navigation.clientInst.fields ) {
 				if ( Lambda.exists(
 					field.targets,
 					( target ) -> target.id == Player.inst.residesOnId) ) {
@@ -167,7 +203,7 @@ class Navigation extends NinesliceWindow {
 
 		if ( playersHeads[Player.inst] == null ) {
 			// adding player's head
-			for ( field in fields ) {
+			for ( field in Navigation.clientInst.fields ) {
 				for ( target in field.targets ) {
 					if ( target.id == Player.inst.residesOnId ) {
 						var head = new HSprite(Assets.ui, "player_head", target.object);
@@ -180,7 +216,7 @@ class Navigation extends NinesliceWindow {
 		}
 
 		if ( playersHeads[Player.inst] != null ) {
-			for ( field in fields ) {
+			for ( field in Navigation.clientInst.fields ) {
 				for ( target in field.targets ) {
 					if ( target.id == Player.inst.residesOnId ) {
 						target.object.addChild(playersHeads[Player.inst]);
@@ -192,14 +228,14 @@ class Navigation extends NinesliceWindow {
 			}
 		}
 
-		for ( field in fields ) {
+		for ( field in Navigation.clientInst.fields ) {
 			for ( target in field.targets ) {
 				for ( link in target.links ) link.graphics.remove();
 				target.links = [];
 			}
 		}
 
-		for ( field in fields ) {
+		for ( field in Navigation.clientInst.fields ) {
 			for ( i => targetI in field.targets ) {
 				for ( j => targetJ in field.targets ) {
 					if ( i < j // && !(Lambda.exists(targetI.links, ( link ) -> link.target == targetJ)
@@ -241,26 +277,6 @@ class Navigation extends NinesliceWindow {
 		}
 	}
 
-	@:keep
-	public override function customSerialize( ctx : hxbit.Serializer ) {
-		super.customSerialize(ctx);
-	}
-
-	@:keep
-	public override function customUnserialize( ctx : hxbit.Serializer ) {
-		inst = this;
-		super.customUnserialize(ctx);
-	}
-
-	public function getTargetById( id : String ) : NavigationTarget {
-		for ( field in fields ) {
-			for ( target in field.targets ) {
-				if ( target.id == id ) return target;
-			}
-		}
-		return null;
-	}
-
 	override function postUpdate() {
 		super.postUpdate();
 
@@ -278,7 +294,6 @@ class Navigation extends NinesliceWindow {
 
 	override function onDispose() {
 		super.onDispose();
-		inst = null;
 		flushHeads();
 	}
 }
@@ -311,10 +326,11 @@ class NavigationField implements Serializable {
 
 		targets = [];
 		var points : Array<Point> = genAsteroidField(
-			Navigation.fieldWidth,
-			Navigation.fieldHeight,
+			NavigationWindow.fieldWidth,
+			NavigationWindow.fieldHeight,
 			seed + 'field:$fieldX,$fieldY'
 		);
+
 		var random = new Random();
 		random.setStringSeed(seed);
 
@@ -322,10 +338,10 @@ class NavigationField implements Serializable {
 			var target : NavigationTarget = null;
 			target = new NavigationTarget(
 				random.choice([
-					Data.Navigation_targetsKind.asteroid0,
-					Data.Navigation_targetsKind.asteroid1,
-					Data.Navigation_targetsKind.asteroid2,
-					Data.Navigation_targetsKind.asteroid3
+					Data.Navigation_targetKind.asteroid0,
+					Data.Navigation_targetKind.asteroid1,
+					Data.Navigation_targetKind.asteroid2,
+					Data.Navigation_targetKind.asteroid3
 				]),
 				seed,
 				Std.int(pt.x),
@@ -356,7 +372,7 @@ class NavigationField implements Serializable {
 class NavigationTarget implements Serializable {
 	var celestialObject : Button;
 
-	@:s public var cdbEntry : Data.Navigation_targetsKind;
+	@:s public var cdbEntry : Data.Navigation_targetKind;
 
 	@:s public var id : String;
 	/** string, под которым лежит карта в базе данных **/
@@ -382,7 +398,7 @@ class NavigationTarget implements Serializable {
 		@param x needed for generating id
 		@param y needed for generating id
 	**/
-	public function new( cdbEntry : Data.Navigation_targetsKind, seed : String, x : Int, y : Int, ?parent : Object ) {
+	public function new( cdbEntry : Data.Navigation_targetKind, seed : String, x : Int, y : Int, ?parent : Object ) {
 		this.cdbEntry = cdbEntry;
 		this.seed = seed;
 
@@ -399,7 +415,7 @@ class NavigationTarget implements Serializable {
 
 		createGenerator();
 
-		var sprite = new HSprite(Assets.ui, Data.navigation_targets.get(cdbEntry).atlas_name);
+		var sprite = new HSprite(Assets.ui, Data.navigation_target.get(cdbEntry).atlas_name);
 
 		// selected frame
 		var selectedTex = new Texture(Std.int(sprite.tile.width), Std.int(sprite.tile.height), [Target]);
@@ -412,7 +428,7 @@ class NavigationTarget implements Serializable {
 		celestialObject.propagateEvents = true;
 
 		celestialObject.onClickEvent.add(( e ) -> {
-			if ( Navigation.inst.locked ) return;
+			if ( Navigation.clientInst.navWin.locked ) return;
 
 			// when click, all other arrow buttons must be removed
 			disposeArrowButton();
@@ -448,38 +464,39 @@ class NavigationTarget implements Serializable {
 	function travelToThis() {
 		disposeArrowButton();
 		Player.inst.ui.unprepareTeleport();
-		Navigation.inst.locked = true;
+		if ( Navigation.clientInst != null )
+			Navigation.clientInst.navWin.locked = true;
 
 		// creating tweener for head
 		createTweener(Player.inst, new h3d.col.Point(object.x, object.y));
 	}
 
 	function createTweener( player : Player, to : h3d.col.Point ) {
-		var wherePlayerIs = Navigation.playersHeads[player].parent;
+		var wherePlayerIs = NavigationWindow.playersHeads[player].parent;
 		var time = M.dist(wherePlayerIs.x, wherePlayerIs.y, to.x, to.y) * 50;
 
-		Navigation.headsTweeners[player] = {
-			xTw : Game.inst.tw.createMs(
-				Navigation.playersHeads[player].x,
-				Std.int(to.x - Navigation.playersHeads[player].parent.x),
+		NavigationWindow.headsTweeners[player] = {
+			xTw : GameClient.inst.tw.createMs(
+				NavigationWindow.playersHeads[player].x,
+				Std.int(to.x - NavigationWindow.playersHeads[player].parent.x),
 				time),
-			yTw : Game.inst.tw.createMs(
-				Navigation.playersHeads[player].y,
-				Std.int(to.y - Navigation.playersHeads[player].parent.y),
+			yTw : GameClient.inst.tw.createMs(
+				NavigationWindow.playersHeads[player].y,
+				Std.int(to.y - NavigationWindow.playersHeads[player].parent.y),
 				time)
 		};
 
-		Game.inst.delayer.addMs(() -> {
+		GameClient.inst.delayer.addMs(() -> {
 			stopHeadTweeners(player);
 			Player.inst.residesOnId = id;
 			Player.inst.checkTeleport();
-			Navigation.inst.refreshLinks(Const.jumpReach);
-			Navigation.inst.locked = false;
+			Navigation.clientInst.navWin.refreshLinks(Const.jumpReach);
+			Navigation.clientInst.navWin.locked = false;
 		}, time);
 	}
 
 	public function stopHeadTweeners( player : Player ) {
-		var head = Navigation.headsTweeners[player];
+		var head = NavigationWindow.headsTweeners[player];
 
 		if ( head.xTw != null ) {
 			head.xTw.endWithoutCallbacks();
@@ -509,7 +526,7 @@ class NavigationTarget implements Serializable {
 
 		generator = new AsteroidGenerator(bodyLevelName);
 
-		Game.inst.delayer.addF(() -> {
+		GameClient.inst.delayer.addF(() -> {
 			initLoad(seed, x, y);
 		}, 1);
 	}

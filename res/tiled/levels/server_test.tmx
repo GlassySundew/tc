@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="2020.11.25" orientation="isometric" renderorder="right-down" compressionlevel="0" width="24" height="24" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#bababa" nextlayerid="433" nextobjectid="7875">
+<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-down" compressionlevel="0" width="24" height="24" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#bababa" nextlayerid="433" nextobjectid="7876">
  <tileset firstgid="1" source="alpha.tsx"/>
- <tileset firstgid="64" source="entities.tsx"/>
+ <tileset firstgid="152" source="entities.tsx"/>
  <layer id="54" name="proto" width="24" height="24" opacity="0.58">
   <data encoding="base64" compression="zlib">
    eAHTZmBg0B7Fo2EwhNOAOtDtyJja6RnZbBB71HzUMBjq4UPt+Bw1DzV9jIbHaHgM1jQAAEmuYGE=
@@ -1545,6 +1545,6 @@
   <object id="7874" x="192" y="288" width="24" height="24"/>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="631" name="player" gid="66" x="253.5" y="254.5" width="32" height="32"/>
+  <object id="631" template="player.tx" x="253.5" y="254.5"/>
  </objectgroup>
 </map>

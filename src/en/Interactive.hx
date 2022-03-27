@@ -1,5 +1,8 @@
 package en;
 
+import h3d.scene.Mesh;
+import ch2.ui.FPS.GraphShader;
+import en.player.Player;
 import format.tmx.Data.TmxObject;
 import h2d.Object;
 import h2d.filter.Glow;
@@ -14,13 +17,14 @@ import hxd.IndexBuffer;
 import ui.InventoryGrid;
 import ui.player.ButtonIcon;
 import ui.s3d.EventInteractive;
+
 /**
 	An interactive entity
 **/
 @:keep
 class Interactive extends Entity {
 	public var interact : EventInteractive;
-	@:s public var interactable(default, set) : Bool = false;
+	public var interactable(default, set) : Bool = false;
 
 	inline function set_interactable( v : Bool ) {
 		if ( !v ) {
@@ -51,7 +55,11 @@ class Interactive extends Entity {
 
 	public override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
 		super.init(x, z, tmxObj);
-		#if !headless
+	}
+
+	override function alive() {
+		super.alive();
+
 		var pixels = Pixels.fromBytes(tex.capturePixels().bytes, Std.int(spr.tile.width), Std.int(spr.tile.height));
 		points = new MarchingSquares(pixels).march();
 		polygonized = (EarCut.triangulate(points));
@@ -67,6 +75,11 @@ class Interactive extends Entity {
 
 		polyPrim = new Polygon(translatedPoints, idx);
 		interact = new EventInteractive(polyPrim.getCollider(), mesh);
+
+		#if interactive_debug
+		debugInteract();
+		#end
+
 		interact.rotate(-0.01, hxd.Math.degToRad(180), hxd.Math.degToRad(90));
 
 		if ( tmxObj != null && tmxObj.flippedHorizontally ) interact.scaleX = -1;
@@ -76,7 +89,25 @@ class Interactive extends Entity {
 		if ( highlightColor == null ) highlightColor = "ffffffff";
 
 		filter = new h2d.filter.Glow(Color.hexToInt(highlightingColor != null ? highlightingColor : highlightColor), 1.2, 4, 1, 1.5, true);
-		#end
+
+		GameClient.inst.delayer.addF(() -> {
+			interactCheck();
+			rebuildInteract();
+		}, 1);
+	}
+
+	function debugInteract() {
+		polyPrim.addUVs();
+		polyPrim.addNormals();
+
+		var isoDebugMesh = new Mesh(polyPrim, interact);
+		// isoDebugMesh.rotate(0, M.toRad(180), M.toRad(90));
+		isoDebugMesh.material.color.setColor(0xc09900);
+		isoDebugMesh.material.shadows = false;
+		isoDebugMesh.material.mainPass.wireframe = true;
+		isoDebugMesh.material.mainPass.depth(true, Less);
+
+		isoDebugMesh.y = -.5;
 	}
 
 	function activateInteractive() {
@@ -88,7 +119,8 @@ class Interactive extends Entity {
 			return false;
 	}
 
-	function isInPlayerRange() return distPolyToPt(player) <= useRange;
+	function isInPlayerRange() return distPolyToPt(Player.inst) <= useRange;
+
 	/**only x flipping is supported yet**/
 	public function rebuildInteract() {
 		@:privateAccess polyPrim.translate(-polyPrim.translatedX, 0, -polyPrim.translatedZ);
@@ -127,15 +159,17 @@ class Interactive extends Entity {
 	}
 
 	function updateInteract() {
-		#if !headless
 		if ( interactable ) updateKeyIcon();
-		if ( interact != null && player != null && player.isMoving() )
-			interact.visible =
-				interactable
-				&& player != null
-				&& !player.destroyed
-				&& isInPlayerRange();
-		#end
+		if ( interact != null && Player.inst != null && Player.inst.isMoving )
+			interactCheck();
+	}
+
+	function interactCheck() {
+		interact.visible =
+			interactable
+			&& Player.inst != null
+			&& !Player.inst.destroyed
+			&& isInPlayerRange();
 	}
 
 	function updateKeyIcon() {

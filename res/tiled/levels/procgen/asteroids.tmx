@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-up" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="69" nextobjectid="185">
+<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-up" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#1a1a1a" nextlayerid="69" nextobjectid="186">
  <tileset firstgid="1" source="../alpha.tsx"/>
  <tileset firstgid="152" source="../entities.tsx"/>
  <group id="2" name="start0">
@@ -67,11 +67,11 @@
   </data>
   </layer>
   <objectgroup id="68" name="entities">
-   <object id="180" gid="155" x="111" y="437" width="48" height="48"/>
-   <object id="181" gid="156" x="159" y="413" width="48" height="36"/>
-   <object id="182" gid="156" x="111" y="413" width="48" height="36"/>
-   <object id="183" gid="156" x="87" y="437" width="48" height="36"/>
-   <object id="184" gid="159" x="111" y="461" width="48" height="36"/>
+   <object id="180" gid="155" x="120" y="432" width="48" height="48"/>
+   <object id="181" gid="156" x="168" y="408" width="48" height="36"/>
+   <object id="182" gid="156" x="120" y="408" width="48" height="36"/>
+   <object id="183" gid="156" x="96" y="432" width="48" height="36"/>
+   <object id="184" gid="159" x="120" y="456" width="48" height="36"/>
   </objectgroup>
  </group>
 </map>

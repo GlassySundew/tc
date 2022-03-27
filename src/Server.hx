@@ -1,153 +1,168 @@
-import Message.PlayerInit;
-import Message.MapLoad;
-import Message.MessageType;
-import h2d.Scene;
-import en.player.Player;
-import h3d.Engine;
-import hxd.System;
+import net.ClientController;
+import hxd.File;
+import tools.Save;
+import hxbit.NetworkHost.NetworkClient;
+import cherry.soup.EventSignal.EventSignal2;
+import ui.Navigation;
 import dn.Process;
-import hxd.net.Socket;
-import hxbit.NetworkHost;
+import en.player.Player;
 import hxd.net.SocketHost;
+import Message;
 
-using Server.SocketHostExtender;
-
+/**
+	server-side
+	network host setup
+**/
 class Server extends Process {
-	static var parsedPort = Std.parseInt(Sys.getEnv("PORT"));
+	public static var inst : Server;
+
+	static var parsedPort = Std.parseInt( Sys.getEnv( "PORT" ) );
 	static var PORT : Int = parsedPort != null ? parsedPort : 6676;
 	static var HOST = "0.0.0.0";
 
 	public var host : SocketHost;
-	public var event : hxd.WaitEvent;
 	public var uid : Int;
 
-	public static var game : GameServer;
-	public static var inst : Server;
+	public var game : GameServer;
 
-	var isDisposed : Bool;
-
-	static public function main() : Void {
-		inst = new Server();
-	}
-
-	public function new() {
+	public function new( ?seed : String ) {
 		super();
+		inst = this;
 
-		isDisposed = false;
-		hxd.System.start(function() {
-			setup();
-		});
+		Env.init();
+		Settings.init();
+		Save.initFields();
+
+		if ( seed == null ) seed = Random.string( 10 );
+
+		new Save();
+
+		if ( GameServer.inst != null ) {
+			GameServer.inst.destroy();
+			game = new GameServer( seed );
+		} else
+			game = new GameServer( seed );
+
+		startServer();
 	}
 
-	@:dox(show)
-	function loadAssets(onLoaded : Void -> Void) {
-		onLoaded();
-	}
+	/**
+		added in favor of unserializing
 
-	function setup() {
-		loadAssets(function() {
-			mainLoop();
-			hxd.System.setLoop(mainLoop);
+		@param mockConstructor if true, then we will execute dn.Process constructor clause
+	**/
+	public function initLoad( ?mockConstructor = true ) {
+		if ( mockConstructor ) {
+			init();
 
-			startServer();
-
-			@:privateAccess new h3d.Engine();
-			engine.init();
-
-			entParent = new Scene();
-
-			if ( GameServer.inst != null ) {
-				GameServer.inst.destroy();
-				game = new GameServer();
-			} else
-				game = new GameServer();
-		});
-	}
-
-	function mainLoop() {
-		hxd.Timer.update();
-		if ( isDisposed ) return;
-		updateFixed(hxd.Timer.dt);
-		if ( isDisposed ) return;
-	}
-
-	function startServer() {
-		event = new hxd.WaitEvent();
-		host = new hxd.net.SocketHost();
-		host.setLogger(function(msg) log(msg));
-
-		@:privateAccess host.waitFixed(HOST, PORT, function(c) {
-			log("Client Connected");
-		}, function(c : SocketClient) {
-			try {
-				// cast(c.ownerObject, Cursor).dispose();
-				host.unregister(c.ownerObject);
-			}
-			catch( e:Dynamic ) {}
-		});
-
-		host.onTypedMessage((c, msg : Message) -> {
-			switch( msg.type ) {
-				case playerInit:
-					var uid : Int = cast(msg, PlayerInit).uid;
-					log("Client identified (" + uid + "nickname: " + cast(msg, PlayerInit).nickname + ")");
-					var cursorClient = new Player(GameServer.inst.tmxMap.properties.getFloat("playerX"),
-						GameServer.inst.tmxMap.properties.getFloat("playerY"), uid, cast(msg, PlayerInit).nickname);
-					// game.applyTmxObjOnEnt(cursorClient);
-					host.sendMessage(new MapLoad(GameServer.inst.lvlName, GameServer.inst.tmxMap), c);
-					c.ownerObject = cursorClient;
-					c.sync();
-
-				// cursorClient.footX = 2448;
-				// cursorClient.footY = 1933;
-				default:
-			}
-		});
-		host.onUnregister = function(c) {
-			log('unregistered ' + c);
+			if ( parent == null ) Process.ROOTS.push( this ); else
+				parent.addChild( this );
 		}
 
-		log("Server Started");
-		host.makeAlive();
+		inst = this;
+	}
+
+	public var onTypedMessage : EventSignal2<NetworkClient, Message> = new EventSignal2();
+
+	function startServer() {
+		host = new hxd.net.SocketHost();
+		host.setLogger( function ( msg ) {
+			#if network_debug
+			log( msg );
+			#end
+		} );
+
+		try {
+			@:privateAccess
+			host.waitFixed( HOST, PORT,
+				function ( c ) {
+					log( "Client Connected" );
+				},
+				function ( c : SocketClient ) {
+					try {
+						// cast(c.ownerObject, Cursor).dispose();
+						trace( "error occured" );
+						host.unregister( c.ownerObject );
+					}
+					catch( e : Dynamic ) {}
+				}
+			);
+
+			onTypedMessage.add( ( c, msg : Message ) -> {
+
+				switch( msg ) {
+					case PlayerBoot( uid, nickname ):
+
+						log( "Client identified ( uid:" + uid + " nickname: " + nickname + ")" );
+
+						var clientController = new ClientController();
+						c.ownerObject = clientController;
+
+						host.sendMessage( WorldInfo( game.seed ), c );
+
+						var savedPlayerByNickname = null;
+						//  Save.inst.getPlayerByNickname(nickname);
+
+						var player : Player = null;
+						if ( savedPlayerByNickname != null ) {
+							// loading level
+
+							// Save.inst.load
+							// loading this bastard
+							player = Save.inst.loadEntity( savedPlayerByNickname ).as( Player );
+						} else {
+							// slapping new player in entrypoint
+							player = game.initializePlayer( nickname, uid );
+						}
+
+						// host.sendTypedMessage(MapLoad(player.level));
+
+						// game.applyTmxObjOnEnt(cursorClient);
+						// host.sendMessage(MapLoad(GameServer.inst.lvlName, GameServer.inst.tmxMap), c);
+
+						clientController.player = player;
+						clientController.level = player.level;
+						clientController.uid = uid;
+						c.sync();
+
+					case SaveSystemOrder( type ):
+						switch type {
+							case CreateNewSave( name ):
+								tools.Save.inst.makeFreshSave( name );
+							case SaveGame( name ):
+								tools.Save.inst.saveGame( name );
+							case DeleteSave( name ):
+								File.delete( Settings.SAVEPATH + name + Const.SAVEFILE_EXT );
+						}
+
+					default:
+				}
+			} );
+
+			host.onMessage = onTypedMessage.dispatch;
+
+			// onTypedMessage.dispatch
+
+			host.onUnregister = function ( c ) {
+				log( 'unregistered ' + c );
+			}
+
+			log( "Server Started" );
+			host.makeAlive();
+			host.flush();
+		}
+		catch( e : Dynamic ) {
+			trace( "port is already taken, server will not be booted..." );
+		}
+	}
+
+	override function update() {
+		super.update();
 		host.flush();
 	}
 
-	public function log(s : String, ?pos : haxe.PosInfos) {
-		pos.fileName = (host.isAuth ? "[S]" : "[C]") + " " + pos.fileName;
-		haxe.Log.trace(s, pos);
-	}
-
-	var speed = 1.0;
-
-	@:dox(show)
-	function updateFixed(dt : Float) {
-		super.update();
-		var tmod = hxd.Timer.tmod * speed;
-		dn.Process.updateAll(tmod);
-		if ( host != null ) host.flush();
-	}
-
-	function dispose() {
-		isDisposed = true;
-	}
-}
-
-class SocketHostExtender {
-	static public function waitFixed(sHost : SocketHost, host : String, port : Int, ?onConnected : NetworkClient -> Void,
-			?onError : SocketClient -> Void) @:privateAccess {
-		sHost.close();
-		sHost.isAuth = false;
-		sHost.socket = new Socket();
-		sHost.self = new SocketClient(sHost, null);
-		sHost.socket.bind(host, port, function(s) {
-			var c = new SocketClient(sHost, s);
-			sHost.pendingClients.push(c);
-			s.onError = function(_) {
-				if ( onError != null ) onError(c);
-				c.stop();
-			}
-			if ( onConnected != null ) onConnected(c);
-		});
-		sHost.isAuth = true;
+	public function log( s : String, ?pos : haxe.PosInfos ) {
+		pos.fileName = ( host.isAuth ? "[S]" : "[C]" ) + " " + pos.fileName;
+		haxe.Log.trace( s, pos );
 	}
 }

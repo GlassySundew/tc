@@ -15,7 +15,7 @@
 .content_flow {
   padding-left: 7;
   padding-right: 8;
-  padding-top: 3;
+  /* padding-top: 3; */
   padding-bottom: 8;
   layout: horizontal;
 }

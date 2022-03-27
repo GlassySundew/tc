@@ -1,306 +1,322 @@
-import ui.ShadowedText;
-import ui.PauseMenu;
-import MainMenu.TextButton;
-import h2d.Text;
-import h2d.Flow;
+import haxe.CallStack;
+import net.ClientController;
+import en.Entity;
 import Level.StructTile;
-import Message.MapLoad;
-import Message.PlayerInit;
 import cherry.soup.EventSignal.EventSignal0;
 import differ.math.Vector;
 import differ.shapes.Circle;
 import differ.shapes.Polygon;
 import dn.Process;
 import en.player.Player;
+import format.tmx.*;
 import format.tmx.Data;
 import h3d.scene.CameraController;
+import h3d.scene.Object;
+import haxe.Unserializer;
+import hxbit.Serializer;
+import tools.Save;
 import tools.Settings;
+import ui.Hud;
+import ui.Navigation;
+import ui.PauseMenu;
 
-class GameClient extends Process implements IGame {
-	// static var HOST = "0.0.0.0";
-	static var HOST = "78.24.222.152";
-	static var PORT = 6676;
+/** 
+	@param manual debug parameter, if true, player will not be kept and will be load clear from tmx entity named 'player'
+	@param acceptTmxPlayerCoord same as manual, but the existing player instance wont be thrown off and only coords from tmx object 'player' will be applied to loaded player instance
+	@param acceptSqlPlayerCoord we are keeping player sql entry on previously visited locations to only apply their coords to our existing Player instance if visiting them once again
+**/
+@:structInit
+class LevelLoadPlayerConfig {
+	public var manual : Bool;
+	public var acceptTmxPlayerCoord : Bool;
+	public var acceptSqlPlayerCoord : Bool;
 
-	public var network(get, never) : Bool;
+	public function new( ?manual = false, ?acceptTmxPlayerCoord = false, ?acceptSqlPlayerCoord = false ) {
+		this.manual = manual;
+		this.acceptTmxPlayerCoord = acceptTmxPlayerCoord;
+		this.acceptSqlPlayerCoord = acceptSqlPlayerCoord;
+	}
+}
 
-	inline function get_network() return false;
-
+/**
+	Логика игры на клиете
+**/
+class GameClient extends Process {
 	public static var inst : GameClient;
 
-	public var lvlName : String;
 	public var ca : dn.heaps.Controller.ControllerAccess;
 	public var camera : Camera;
 
 	private var cam : CameraController;
 
-	public var level : Level;
+	public var sLevel : ServerLevel;
+
+	var level : Level;
 
 	public var tmxMap : TmxMap;
 
-	public var host : hxd.net.SocketHost;
-	public var event : hxd.WaitEvent;
-	public var uid : Int;
 	public var player : en.player.Player;
+	public var hud : Hud;
+	public var fx : Fx;
 
 	public var structTiles : Array<StructTile> = [];
-	public var execAfterLvlLoad : EventSignal0 = new EventSignal0();
+
+	public var suspended : Bool = false;
+	public var pauseCycle : Bool = false;
+
+	public var navFieldsGenerated : Null<Int>;
+
+	public var clientController : ClientController;
+
+	#if game_tmod
+	var stats : h2d.Text;
+	#end
 
 	public function new() {
-		super(Main.inst);
+		super( Main.inst );
+
 		inst = this;
 
-		ca = Main.inst.controller.createAccess("game");
-		ca.setLeftDeadZone(0.2);
-		ca.setRightDeadZone(0.2);
+		// generating initial asteroids to have where to put player on
+		// we do not yet have need to save stuff about asteroids, temporal clause
 
-		createRootInLayers(Main.inst.root, Const.DP_BG);
+		// @:privateAccess
+		// Navigation.fields.push(new NavigationField(
+		// 	seed,
+		// 	0,
+		// 	0
+		// ));
+
+		// new Navigation(
+		// 	Const.jumpReach,
+		// 	'${GameClient.inst.seed}'
+		// );
+
+		#if game_tmod
+		stats = new Text( Assets.fontPixel, Boot.inst.s2d );
+		#end
+
+		ca = Main.inst.controller.createAccess( "game" );
+		ca.setLeftDeadZone( 0.2 );
+		ca.setRightDeadZone( 0.2 );
+
+		createRootInLayers( Main.inst.root, Const.DP_BG );
+
 		camera = new Camera();
-		// hud = new ui.Hud();
-
-		event = new hxd.WaitEvent();
-		host = new hxd.net.SocketHost();
-		host.setLogger(function ( msg ) trace(msg));
-		uid = 1 + Std.random(1000);
-		host.connect(HOST, PORT, function ( b ) {
-			if ( !b ) {
-				var infoFlow = new Flow(Boot.inst.s2d);
-				infoFlow.verticalAlign = Middle;
-				var textInfo = new ShadowedText(Assets.fontPixel, infoFlow);
-				textInfo.text = "Server is down, stay tuned... ";
-				var mainMenuBut : TextButton = null;
-				mainMenuBut = new TextButton("return back to menu", ( e ) -> {
-					mainMenuBut.cursor = Default;
-					infoFlow.remove();
-					destroy();
-					new MainMenu(Boot.inst.s2d);
-				}, infoFlow);
-
-				trace("Failed to connect to server");
-				return;
-			}
-			trace("Connected to server");
-
-			host.sendTypedMessage(new PlayerInit(uid, Settings.params.nickname));
-
-			// sys.thread.Thread.create(() -> {
-			// 	while( true ) {
-			// 		Sys.sleep(100);
-			// 		try {
-			// 			host.sendMessage({type: "ping", msg: uid});
-			// 		}
-			// 		catch( e:Dynamic ) {
-			// 			break;
-			// 		}
-			// 	}
-			// });
-		});
-		host.onTypedMessage(( c, msg : Message ) -> {
-			switch( msg.type ) {
-				case mapLoad:
-					var map = cast(msg, MapLoad);
-					loadMap(map.map);
-				default:
-			}
-		});
-		// host.onMessage = function(c, msg:Message) {
-		// 	switch( msg.type ) {
-		// 		case mapLoad:
-		// 			var map = cast(msg, MapLoad);
-		// 			loadMap(map.map);
-		// 			trace("ZHOPA");
-
-		// 		default:
-		// 	}
-		// }
-
-		host.onUnregister = function ( o ) {};
-
-		if ( player != null ) {}
-
-		@:privateAccess Main.inst.onClose.add(() -> {
-			try {
-				player.destroy();
-				host.unregister(player);
-			}
-			catch( e:Dynamic ) {
-				trace("error occured while cursor disposing: " + e);
-			}
-			host.flush();
-		});
 	}
 
-	public function loadMap( tmx : TmxMap ) {
+	public function onCdbReload() {}
+
+	public function restartLevel() {
+		// startLevel(lvlName);
+	}
+
+	public function startLevelFromParsedTmx( tmxMap : TmxMap, name : String ) {
+		this.tmxMap = tmxMap;
+		engine.clear( 0, 1 );
+
+		trace( "creating level" );
 		if ( level != null ) {
+			trace( "destroying level" );
 			level.destroy();
-			for ( e in Entity.ALL ) e.destroy();
 			gc();
 		}
-		tmxMap = tmx;
-		level = new Level(tmxMap);
+		level = new Level( tmxMap );
+
+		// получаем sql id для уровня
+		// var loadedLevel = Save.inst.saveLevel(level);
 
 		// Entity spawning
-		// CompileTime.importPackage("en");
-		// var entClasses = (CompileTime.getAllClasses(Entity));
+		CompileTime.importPackage( "en" );
+		var entClasses = CompileTime.getAllClasses( Entity );
 
-		// // Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity and puts name into spr group if not found
-		// function searchAndSpawnEnt(e : TmxObject) {
-		// 	// Парсим все классы - наследники en.Entity и спавним их
-		// 	for (eClass in entClasses) {
-		// 		eregCompTimeClass.match('$eClass'.toLowerCase());
-		// 		if ( eregCompTimeClass.match('$eClass'.toLowerCase()) && eregCompTimeClass.matched(1) == e.name ) {
-		// 			Type.createInstance(eClass, [e.x, e.y, e]);
-		// 			return;
-		// 		}
+		// Загрузка игрока при переходе в другую локацию
+		// Save.inst.bringPlayerToLevel(loadedLevel);
+		// var cachedPlayer = Save.inst.playerSavedOn(level);
+
+		// if ( cachedPlayer != null ) {
+		// 	// это значит, что инстанс игрока был ранее создан и делать нового не надо
+		// 	for ( e in level.entities ) if ( playerLoadConf.manual
+		// 		|| (
+		// 			!e.properties.existsType("className", PTString)
+		// 			|| e.properties.getString("className") != "en.player.$Player"
+		// 		) ) {
+		// 			searchAndSpawnEnt(e, entClasses);
 		// 	}
-		// 	switch( e.objectType ) {
-		// 		case OTTile(gid):
-		// 			var source = Tools.getTileByGid(tmxMap, gid).image.source;
-		// 			if ( eregFileName.match(source) ) {
-		// 				new SpriteEntity(e.x, e.y, eregFileName.matched(1), e);
-		// 				return;
-		// 			}
-		// 		default:
-		// 	}
+		// 	Save.inst.loadEntity(cachedPlayer);
+		// } else {
+		// 	for ( e in level.entities )
+		// 		searchAndSpawnEnt(e, entClasses);
 		// }
-		// for (e in level.entities) searchAndSpawnEnt(e);
+
+		// player = Player.inst;
+
+		// if ( playerLoadConf.acceptTmxPlayerCoord ) {
+		// 	delayer.addF(() -> {
+		// 		var playerEnt : TmxObject = null;
+		// 		for ( e in level.entitiesTmxObj )
+		// 			if (
+		// 				!e.properties.existsType("className", PTString)
+		// 				|| e.properties.getString("className") == "en.player.$Player"
+		// 			)
+		// 				playerEnt = e;
+		// 		if ( playerEnt != null )
+		// 			player.setFeetPos(
+		// 				level.cartToIsoLocal(playerEnt.x, playerEnt.y).x,
+		// 				level.cartToIsoLocal(playerEnt.x, playerEnt.y).y
+		// 			);
+
+		// 		targetCameraOnPlayer();
+		// 	}, 1);
+		// }
+
+		// if ( playerLoadConf.acceptSqlPlayerCoord ) {
+		// 	delayer.addF(() -> {
+		// 		var playerEnt = Save.inst.getPlayerShallowFeet(player);
+		// 		if ( playerEnt != null ) {
+		// 			var blob = '${playerEnt.blob}'.split("_");
+		// 			player.setFeetPos(Std.parseInt(blob[0]), Std.parseInt(blob[1]));
+		// 		}
+		// 		targetCameraOnPlayer();
+		// 	}, 1);
+		// }
+
+		delayer.addF(() -> {
+			hideStrTiles();
+			Process.resizeAll();
+		}, 10 );
 
 		// applyTmxObjOnEnt();
 
-		player = Player.inst;
+		targetCameraOnPlayer();
+		return level;
+	}
 
+	public function targetCameraOnPlayer() {
 		camera.target = player;
 		camera.recenter();
 	}
 
 	public function applyTmxObjOnEnt( ?ent : Null<Entity> ) {
 		// если ent не определён, то на все Entity из массива ALL будут добавлены TmxObject из тайлсета с названием colls
+
 		// parsing collision objects from 'colls' tileset
+		var entitiesTs : TmxTileset = null;
+
 		for ( tileset in tmxMap.tilesets ) {
-			var ereg = ~/(^[^.]*)+/; // regexp to take tileset name
-			if ( ereg.match(tileset.source) && ereg.matched(1) == 'colls' ) for ( tile in tileset.tiles ) {
-				if ( eregFileName.match(tile.image.source) ) {
-					var ents = ent != null ? [ent] : Entity.ALL;
-					for ( ent in ents ) {
-						if ( (tile.objectGroup != null && eregClass.match('$ent'.toLowerCase()))
-							&& ((eregClass.matched(1) == eregFileName.matched(1)
-								&& tile.objectGroup.objects.length > 0
-								|| (Std.isOfType(ent, SpriteEntity)
-									&& eregFileName.matched(1) == ent.spr.groupName))) /*&& ent.collisions.length == 0*/ ) {
-							var centerSet = false;
-							for ( obj in tile.objectGroup.objects ) { // Засовываем объекты для детекта коллизий по Entity
-								var params = {
-									x : M.round(obj.x) + ent.footX,
-									y : M.round(obj.y) + ent.footY,
-									width : M.round(obj.width),
-									height : M.round(obj.height)
-								};
-								var xCent = 0.;
-								var yCent = 0.;
-								function unsetCenter() {
-									ent.footX -= M.round((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width);
-									ent.footY += (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height;
-								}
+			if ( StringTools.contains( tileset.source, "entities" ) ) {
+				entitiesTs = tileset;
+			}
+		}
 
-								function setCenter() {
-									var pivotX = ((obj.x + xCent)) / ent.spr.tile.width;
-									var pivotY = ((obj.y + yCent)) / ent.spr.tile.height;
-									pivotX = (ent.tmxObj != null && ent.tmxObj.flippedVertically) ? 1 - pivotX : pivotX;
-									if ( obj.name == "center" ) {
-										ent.mesh.xOff = -(pivotX - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
-										ent.mesh.yOff = (pivotY - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
-										#if depth_debug
-										ent.mesh.renewDebugPts();
-										#end
+		var ents = ent != null ? [ent] : Entity.ALL;
+
+		for ( tile in entitiesTs.tiles ) {
+			if ( eregFileName.match( tile.image.source ) ) {
+				var picName = {
+					if ( tile.properties.existsType( "className", PTString ) ) {
+						var className = tile.properties.getString( "className" );
+						eregCompTimeClass.match( className );
+						eregCompTimeClass.matched( 1 ).toLowerCase();
+					} else
+						eregFileName.matched( 1 );
+				}
+
+				for ( ent in ents ) {
+					eregClass.match( '$ent'.toLowerCase() );
+					var entityName = eregClass.matched( 1 );
+
+					if ( entityName == picName
+						|| ent.spr.groupName == picName ) {
+
+						// соотношение, которое в конце будет применено к entity
+						var center = new Vector();
+
+						for ( obj in tile.objectGroup.objects ) {
+							switch obj.objectType {
+								case OTRectangle:
+								case OTEllipse:
+									var shape = new differ.shapes.Circle( 0, 0, obj.width / 2 );
+									var cent = new Vector(
+										obj.width / 2,
+										obj.height / 2
+									);
+
+									ent.collisions.set( shape,
+										{
+											cent : new differ.math.Vector( cent.x, cent.y ),
+											offset : new differ.math.Vector( obj.x + cent.x, obj.y + cent.y )
+										} );
+
+									if ( center.x == 0 && center.y == 0 ) {
+										center.x = cent.x + obj.x;
+										center.y = cent.y + obj.y;
 									}
+								case OTPoint:
+									switch obj.name {
+										case "center":
+											center.x = obj.x;
+											center.y = obj.y;
+									}
+								case OTPolygon( points ):
+									var pts = makePolyClockwise( points );
+									rotatePoly( obj, pts );
 
-									ent.setPivot(pivotX, pivotY);
-									ent.footX += M.round((ent.spr.pivot.centerFactorX - .5) * ent.spr.tile.width);
-									ent.footY -= (ent.spr.pivot.centerFactorY) * ent.spr.tile.height - ent.spr.tile.height;
-								}
-								switch( obj.objectType ) {
-									case OTEllipse:
-										var shape = new differ.shapes.Circle(0, 0, params.width / 2);
-										shape.scaleY = params.height / params.width;
-										xCent = M.round(obj.width / 2);
-										yCent = M.round(obj.height / 2);
-										ent.collisions.set(shape,
-											{ cent : new h3d.Vector(xCent, yCent), offset : new h3d.Vector(obj.x + xCent, -obj.y - yCent) });
-									case OTRectangle:
-										// Точка парсится как OTRectangle, точка с названием center будет обозначать центр
-										ent.collisions.set(Polygon.rectangle(params.x, params.y, params.width, params.height),
-											{ cent : new h3d.Vector(), offset : new h3d.Vector() });
-									case OTPolygon(points):
-										var pts = makePolyClockwise(points);
-										var verts : Array<Vector> = [];
-										for ( i in pts ) {
-											verts.push(new Vector((i.x), (-i.y)));
+									var cent = getProjectedDifferPolygonRect( obj, points );
+
+									var verts : Array<Vector> = [];
+									for ( i in pts ) verts.push( new Vector( i.x, i.y ) );
+
+									var poly = new Polygon( 0, 0, verts );
+
+									poly.scaleY = -1;
+									ent.collisions.set(
+										poly,
+										{
+											cent : new differ.math.Vector( cent.x, cent.y ),
+											offset : new differ.math.Vector( obj.x, obj.y )
 										}
-										var yArr = verts.copy();
-										yArr.sort(function ( a, b ) return (a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0));
-										var xArr = verts.copy();
-										xArr.sort(function ( a, b ) return (a.x < b.x) ? -1 : ((a.x > b.x) ? 1 : 0));
+									);
 
-										// xCent и yCent - половины ширины и высоты неповёрнутого полигона соответственно
-										xCent = M.round((xArr[xArr.length - 1].x + xArr[0].x) * .5);
-										yCent = -M.round((yArr[yArr.length - 1].y + yArr[0].y) * .5);
-
-										// c - радиус от начальной точки поли до центра поли
-										var c = Math.sqrt(M.pow(xCent, 2) + M.pow(yCent, 2));
-										// alpha - угол между начальной точкой неповёрнутого полигона и центром полигона
-										var alpha = Math.atan(yCent / xCent);
-
-										// xCent и yCent в данный момент - проекции отрезка, соединяющего начальную точку полигона и центр полигона на оси x и y соответственно
-										yCent = -c * (Math.sin(M.toRad(-obj.rotation) - alpha));
-										xCent = c * (Math.cos(M.toRad(-obj.rotation) - alpha));
-
-										var poly = new Polygon(0, 0, verts);
-										poly.rotation = -obj.rotation;
-
-										// vertical flipping
-										if ( ent.tmxObj != null && ent.tmxObj.flippedVertically ) poly.scaleX = -1;
-										var xOffset = poly.scaleX < 0 ? ent.spr.tile.width - obj.x : obj.x;
-										var yOffset = -obj.y;
-										ent.collisions.set(poly, { cent : new h3d.Vector(xCent, -yCent), offset : new h3d.Vector(xOffset, yOffset) });
-									case OTPoint:
-										if ( obj.name == "center" ) {
-											if ( centerSet ) unsetCenter();
-											setCenter();
-											centerSet = true;
-										}
-									default:
-								}
-
-								if ( !centerSet ) {
-									setCenter();
-									centerSet = true;
-								} else {
-									var pivotX = ((obj.x + xCent)) / ent.spr.tile.width;
-									var pivotY = ((obj.y + yCent)) / ent.spr.tile.height;
-									pivotX = (ent.tmxObj != null && ent.tmxObj.flippedVertically) ? 1 - pivotX : pivotX;
-									ent.mesh.xOff = (pivotX - ent.spr.pivot.centerFactorX) * ent.spr.tile.width;
-									ent.mesh.yOff = -(pivotY - ent.spr.pivot.centerFactorY) * ent.spr.tile.height;
-									#if depth_debug
-									ent.mesh.renewDebugPts();
-									#end
-								}
+									if ( center.x == 0 && center.y == 0 ) {
+										center.x = cent.x + obj.x;
+										center.y = cent.y + obj.y;
+									}
+								default:
 							}
-							try
-								cast(ent, Interactive).rebuildInteract()
-							catch( e:Dynamic ) {}
-							if ( ent.tmxObj != null && ent.tmxObj.flippedVertically && ent.mesh.isLong ) ent.mesh.flipX();
-							if ( Std.isOfType(ent, SpriteEntity) && tile.properties.exists("interactable") ) {
-								cast(ent, SpriteEntity).interactable = tile.properties.getBool("interactable");
-							}
+						}
+
+						// ending serving this particular entity 'ent' here
+						var pivotX = (center.x) / ent.tmxObj.width;
+						var pivotY = (center.y) / ent.tmxObj.height;
+
+						// ent.setPivot(pivotX, pivotY);
+
+						var actualX = ent.tmxObj.width / 2;
+						var actualY = ent.tmxObj.height;
+
+						ent.footX -= actualX - pivotX * ent.tmxObj.width;
+						ent.footY += actualY - pivotY * ent.tmxObj.height;
+
+						#if depth_debug
+						ent.mesh.renewDebugPts();
+						#end
+
+						try {
+							cast(ent, Interactive).rebuildInteract();
+						}
+						catch( e:Dynamic ) {}
+
+						if ( Std.isOfType( ent, SpriteEntity ) && tile.properties.exists( "interactable" ) ) {
+							cast(ent, SpriteEntity).interactable = tile.properties.getBool( "interactable" );
 						}
 					}
 				}
 			}
 		}
-		execAfterLvlLoad.dispatch();
-		execAfterLvlLoad.removeAll();
 	}
 
-	function gc() {
+	public function gc() {
 		if ( Entity.GC == null || Entity.GC.length == 0 ) return;
 
 		for ( e in Entity.GC ) e.dispose();
@@ -309,8 +325,16 @@ class GameClient extends Process implements IGame {
 
 	override function onDispose() {
 		super.onDispose();
+		if ( Player.inst != null ) {
+			Player.inst.saveSettings();
+		}
+		Settings.saveSettings();
 
 		inst = null;
+
+		#if game_tmod
+		if ( stats != null ) stats.remove();
+		#end
 
 		if ( camera != null ) camera.destroy();
 		for ( e in Entity.ALL ) e.destroy();
@@ -319,8 +343,18 @@ class GameClient extends Process implements IGame {
 		if ( PauseMenu.inst != null ) PauseMenu.inst.destroy();
 	}
 
+	public override function onResize() {
+		super.onResize();
+	}
+
 	override function update() {
 		super.update();
+
+		#if game_tmod
+		stats.text = "tmod: " + tmod;
+		#end
+
+		pauseCycle = false;
 
 		// Updates
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.preUpdate();
@@ -328,8 +362,6 @@ class GameClient extends Process implements IGame {
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.postUpdate();
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.frameEnd();
 		gc();
-
-		host.flush();
 	}
 
 	public function showStrTiles() {
@@ -338,5 +370,93 @@ class GameClient extends Process implements IGame {
 
 	public function hideStrTiles() {
 		for ( i in structTiles ) i.visible = false;
+	}
+
+	override function pause() {
+		super.pause();
+		// if ( Player.inst != null && Player.inst.holdItem != null ) Player.inst.holdItem.visible = false;
+	}
+
+	override function resume() {
+		super.resume();
+		// if ( Player.inst != null && Player.inst.holdItem != null ) Player.inst.holdItem.visible = true;
+	}
+
+	public function suspendGame() {
+		if ( suspended ) return;
+
+		suspended = true;
+		dn.heaps.slib.SpriteLib.DISABLE_ANIM_UPDATES = true;
+
+		// Pause other process
+		for ( p in Process.ROOTS ) if ( p != this ) p.pause();
+
+		// Create mask
+		root.visible = true;
+		root.removeChildren();
+	}
+
+	public function resumeGame() {
+		if ( !suspended ) return;
+		dn.heaps.slib.SpriteLib.DISABLE_ANIM_UPDATES = false;
+
+		delayer.addF( function () {
+			root.visible = false;
+			root.removeChildren();
+		}, 1 );
+		suspended = false;
+
+		for ( p in Process.ROOTS ) if ( p != this ) p.resume();
+	}
+
+	public function toggleGamePause() {
+		if ( suspended ) {
+			resumeGame();
+		} else
+			suspendGame();
+	}
+}
+
+// debug stuff
+class AxesHelper extends h3d.scene.Graphics {
+	public function new( ?parent : h3d.scene.Object, size = 2.0, colorX = 0xEB304D, colorY = 0x7FC309, colorZ = 0x288DF9, lineWidth = 2.0 ) {
+		super( parent );
+
+		material.props = h3d.mat.MaterialSetup.current.getDefaults( "ui" );
+
+		lineShader.width = lineWidth;
+
+		setColor( colorX );
+		lineTo( size, 0, 0 );
+
+		setColor( colorY );
+		moveTo( 0, 0, 0 );
+		lineTo( 0, size, 0 );
+
+		setColor( colorZ );
+		moveTo( 0, 0, 0 );
+		lineTo( 0, 0, size );
+	}
+}
+
+class GridHelper extends h3d.scene.Graphics {
+	public function new( ?parent : Object, size = 10.0, divisions = 10, color1 = 0x444444, color2 = 0x888888, lineWidth = 1.0 ) {
+		super( parent );
+
+		material.props = h3d.mat.MaterialSetup.current.getDefaults( "ui" );
+
+		lineShader.width = lineWidth;
+
+		var hsize = size / 2;
+		var csize = size / divisions;
+		var center = divisions / 2;
+		for ( i in 0...divisions + 1 ) {
+			var p = i * csize;
+			setColor( (i != 0 && i != divisions && i % center == 0) ? color2 : color1 );
+			moveTo(-hsize + p, -hsize, 0 );
+			lineTo(-hsize + p, -hsize + size, 0 );
+			moveTo(-hsize, -hsize + p, 0 );
+			lineTo(-hsize + size, -hsize + p, 0 );
+		}
 	}
 }

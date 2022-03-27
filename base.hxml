@@ -1,9 +1,12 @@
 -cp src
 -cp .
 -cp vendor/format-tiled/
+-cp vendor/
+-cp vendor/set/src
 
--lib differ
--lib hide
+-dce full
+
+# -lib hide
 -lib domkit
 -lib heaps
 -lib Heeps
@@ -11,7 +14,7 @@
 -lib hxbit
 -lib deepnightLibs
 -lib compiletime
--lib oauth
+# -lib oauth
 -lib random
 -lib seedyrng
 -lib haxe-concurrent
@@ -21,4 +24,5 @@
 -cp src/helper
 --macro Helper.init()
 
--dce full
+
+-D no-deprecation-warnings

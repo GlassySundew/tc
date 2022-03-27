@@ -1,10 +1,6 @@
 package tools;
 
-import ui.NinesliceWindow.NinesliceConf;
-import haxe.Serializer;
-import seedyrng.Random;
-import hxd.res.Resource;
-import ui.domkit.WindowComp.WindowCompI;
+import hxd.net.Socket;
 import cdb.Types.TilePos;
 import format.tmx.*;
 import format.tmx.Data;
@@ -15,14 +11,17 @@ import h2d.Tile;
 import h3d.Vector;
 import hxbit.NetworkHost.NetworkClient;
 import hxd.Res;
+import hxd.net.SocketHost;
 import hxd.res.Any;
 import hxd.res.Loader;
+import seedyrng.Random;
+import ui.NinesliceWindow.NinesliceConf;
 
-using Util.LoaderExtender;
 
 @:publicFields
 @:expose
 class Util {
+
 	/**Regex to get class name provided by CompileTime libs, i.e. en.$Entity -> Entity **/
 	static var eregCompTimeClass = ~/\$([a-zA-Z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
 
@@ -31,15 +30,17 @@ class Util {
 
 	/** regex to match automapping inputnot rules **/
 	static var eregAutoMapInputNotLayer = ~/(?:input)not_([a-z]+)$/gi;
+
 	/** Regex to get '$this' class name i.e. en.Entity -> Entity **/
 	static var eregClass = ~/\.([a-z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
 
 	/** Регулярка чтобы взять из абсолютного пути название файла без расширения .png **/
 	static var eregFileName = ~/\/([a-z_0-9]+)\./;
 
-	inline static function loadTileFromCdb( cdbTile : TilePos ) : Tile {
-		return Res.loader.loadParentalFix(cdbTile.file).toTile().sub(cdbTile.x * cdbTile.size, cdbTile.y * cdbTile.size, cdbTile.size, cdbTile.size);
-	}
+	// @:deprecated
+	// inline static function loadTileFromCdb( cdbTile : TilePos ) : Tile {
+	// 	return Res.loader.loadParentalFix(cdbTile.file).toTile().sub(cdbTile.x * cdbTile.size, cdbTile.y * cdbTile.size, cdbTile.size, cdbTile.size);
+	// }
 
 	inline static function makePolyClockwise( points : Array<TmxPoint> ) {
 		var pts = points.copy();
@@ -75,11 +76,7 @@ class Util {
 	inline static function get_hScaled() return Std.int(Boot.inst.s2d.height / Const.UI_SCALE);
 
 	inline static function getTileFromSeparatedTsx( tile : TmxTilesetTile ) : Tile {
-		// #if pak
-		return Res.loader.loadParentalFix(Const.LEVELS_PATH + tile.image.source).toTile();
-		// #else
-		// return Res.loader.load(Const.LEVELS_PATH + tile.image.source).toTile();
-		// #end
+		return Res.loader.load(haxe.io.Path.normalize(Const.LEVELS_PATH + tile.image.source)).toTile();
 	}
 
 	inline static function getTileSource( gid : Int, tileset : TmxTileset ) : TmxTilesetTile {
@@ -94,7 +91,7 @@ class Util {
 		return ( name : String ) -> {
 			var cached : TmxTileset = tsx.get(name);
 			if ( cached != null ) return cached;
-			cached = r.readTSX(Xml.parse(Res.loader.loadParentalFix(Const.LEVELS_PATH + name).entry.getText()));
+			cached = r.readTSX(Xml.parse(Res.loader.load(haxe.io.Path.normalize(Const.LEVELS_PATH + name)).entry.getText()));
 			tsx.set(name, cached);
 			return cached;
 		}
@@ -201,7 +198,16 @@ class ReverseArrayKeyValueIterator<T> {
 	}
 }
 
+class MathUtil {
 
+	/**
+		Uses Math.round to fix a floating point number to a set precision.
+	**/
+	public static function round( number : Float, ?precision = 2 ) : Float {
+		number *= Math.pow(10, precision);
+		return Math.round(number) / Math.pow(10, precision);
+	}
+}
 
 class SeedyRandomExtender {
 	public static function seededString( r : Random, length : Int, ?charactersToUse = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" ) {
@@ -255,6 +261,7 @@ class TmxLayerExtender {
 		}
 		return null;
 	}
+
 	/** Localises all objects of this layer to be local to certain object of this layer **/
 	public static function localBy( tmxLayer : TmxLayer, target : TmxObject ) {
 		switch( tmxLayer ) {
@@ -279,18 +286,29 @@ class TmxLayerExtender {
 }
 
 class SocketHostExtender {
+	static public function waitFixed( sHost : SocketHost, host : String, port : Int, ?onConnected : NetworkClient -> Void,
+		?onError : SocketClient -> Void ) @:privateAccess {
+
+		sHost.close();
+		sHost.isAuth = false;
+		sHost.socket = new Socket();
+		sHost.self = new SocketClient(sHost, null);
+		sHost.socket.bind(host, port, function ( s ) {
+			var c = new SocketClient(sHost, s);
+			sHost.pendingClients.push(c);
+			s.onError = function ( _ ) {
+				if ( onError != null ) onError(c);
+				c.stop();
+			}
+			if ( onConnected != null ) onConnected(c);
+		});
+		sHost.isAuth = true;
+	}
+
 	public static function sendTypedMessage( sHost : hxd.net.SocketHost, msg : Message, ?to : NetworkClient ) sHost.sendMessage(msg, to);
 
 	public static dynamic function onTypedMessage( sHost : hxd.net.SocketHost, onMessage : NetworkClient -> Message -> Void ) {
 		sHost.onMessage = onMessage;
-	}
-}
-
-class LoaderExtender {
-	// unsafe crutch, removes ../ from path, use only if you you have link to the folder upper in dir
-	public static function loadParentalFix( loader : Loader, path : String ) : Any {
-		while( StringTools.contains(path, "../") )path = StringTools.replace(path, "../", "");
-		return new Any(loader, loader.fs.get(path));
 	}
 }
 

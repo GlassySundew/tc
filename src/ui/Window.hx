@@ -7,42 +7,36 @@ import h2d.Layers;
 import h2d.Object;
 import ui.domkit.WindowComp.WindowCompI;
 
-class Window extends dn.Process implements Serializable {
+class Window extends dn.Process {
 	public static var ALL : Array<Window> = [];
 
 	var windowComp : WindowCompI;
 
 	public var win : Object;
+
 	/**backdround sprite**/
 	var backgroundInter : EventInteractive;
+
 	/**
 		@param parent is usually supposed to be Player.inst.ui
 	**/
 	public function new( ?parent : Object ) {
-		super(Game.inst);
+		super(GameClient.inst);
 
-		beforeInitLoad(parent);
-		initLoad(parent);
+		beforeLoad(parent);
+		initLoad();
+		afterLoad();
 	}
 
-	public function beforeInitLoad( ?parent : Object ) {
+	public function beforeLoad( ?parent : Object ) {
 		ALL.push(this);
 		win = new h2d.Object(parent);
-
-		Game.inst.delayer.addF(updateBackgroundInteractive, 1);
 	}
 
-	public function initLoad( ?parent : Object ) {}
+	public function initLoad() {}
 
-	@:keep
-	public function customSerialize( ctx : hxbit.Serializer ) {}
-
-	@:keep
-	public function customUnserialize( ctx : hxbit.Serializer ) {
-		Game.inst.delayer.addF(() -> {
-			beforeInitLoad();
-			initLoad();
-		}, 0);
+	public function afterLoad() {
+		updateBackgroundInteractive();
 	}
 
 	public function updateBackgroundInteractive() {

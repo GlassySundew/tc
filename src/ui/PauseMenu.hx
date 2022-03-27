@@ -24,7 +24,7 @@ class PauseMenu extends Process {
 
 		pauseContainer = new Object();
 
-		Game.inst.root.add(pauseContainer, Const.DP_UI_FRONT);
+		GameClient.inst.root.add(pauseContainer, Const.DP_UI_FRONT);
 
 		var backgroundFlowForInteractive = new Flow(pauseContainer);
 		backgroundFlowForInteractive.fillHeight = true;
@@ -63,21 +63,21 @@ class PauseMenu extends Process {
 				exit();
 			}, vertFlow);
 
-			var saveGame : Object = null;
-			saveGame = new TextButton("save game", ( e ) -> {
-				// Main.inst.save.saveGame();
+			var saveGameClient : Object = null;
+			saveGameClient = new TextButton("save game", ( e ) -> {
+				// Main.inst.save.saveGameClient();
 				var saveMan = new SaveManager(Save, pauseContainer);
-				saveMan.x = saveGame.x + saveGame.getSize().xMax + 20;
-				// saveMan.y = saveGame.y;
+				saveMan.x = saveGameClient.x + saveGameClient.getSize().xMax + 20;
+				// saveMan.y = saveGameClient.y;
 			}, vertFlow);
 
 			var loadObj : Object = null;
 			loadObj = new TextButton("load game", ( e ) -> {
 				// exit();
-				// Main.inst.save.loadGame();
+				// Main.inst.save.loadGameClient();
 				var loadMan = new SaveManager(Load, pauseContainer);
 				loadMan.x = loadObj.x + loadObj.getSize().xMax + 20;
-				// loadMan.y = loadGame.y;
+				// loadMan.y = loadGameClient.y;
 
 				// "save/" + (Settings.saveFiles[0] == null ? "autosave" : Settings.saveFiles[0])
 			}, vertFlow);
@@ -87,8 +87,10 @@ class PauseMenu extends Process {
 			}, vertFlow);
 
 			new TextButton("exit to main menu", ( e ) -> {
-				Game.inst.destroy();
-				Save.inst.disconnect();
+				GameClient.inst.destroy();
+
+				// TODO make 
+				// Save.inst.disconnect();
 
 				new MainMenu(Boot.inst.s2d);
 				exit();
@@ -106,18 +108,18 @@ class PauseMenu extends Process {
 	override function postUpdate() {
 		super.postUpdate();
 
-		if ( Player.inst != null && Player.inst.ca.selectPressed() && !Game.inst.pauseCycle ) {
+		if ( Player.inst != null && Player.inst.ca.selectPressed() && !GameClient.inst.pauseCycle ) {
 			exit();
 		}
-		if ( Game.inst != null ) Game.inst.pauseCycle = false;
+		if ( GameClient.inst != null ) GameClient.inst.pauseCycle = false;
 	}
 
 	override function onDispose() {
 		super.onDispose();
 		pauseContainer.remove();
-		if ( Game.inst != null ) {
-			Game.inst.pauseCycle = true;
-			Game.inst.resume();
+		if ( GameClient.inst != null ) {
+			GameClient.inst.pauseCycle = true;
+			GameClient.inst.resume();
 		}
 	}
 

@@ -1,26 +1,21 @@
 package ui;
 
 class Hud extends dn.Process {
-	public var game(get, never):Game;
+	public var game(get, never) : GameClient;
 
 	inline function get_game()
-		return Game.inst;
+		return GameClient.inst;
 
-	public var fx(get, never):Fx;
+	public var fx(get, never) : Fx;
 
 	inline function get_fx()
-		return Game.inst.fx;
+		return GameClient.inst.fx;
 
-	public var level(get, never):Level;
-
-	inline function get_level()
-		return Game.inst.level;
-
-	var flow:h2d.Flow;
+	var flow : h2d.Flow;
 	var invalidated = true;
 
 	public function new() {
-		super(Game.inst);
+		super(GameClient.inst);
 
 		createRootInLayers(game.root, Const.DP_UI);
 
@@ -47,7 +42,7 @@ class Hud extends dn.Process {
 	override function postUpdate() {
 		super.postUpdate();
 
-		if (invalidated) {
+		if ( invalidated ) {
 			invalidated = false;
 			render();
 		}

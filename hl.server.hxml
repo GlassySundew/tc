@@ -1,9 +1,10 @@
+
+
 base.hxml
-
 -hl bin/server.hl
-
+-main ServerBoot
 
 -D linux
--D headless
+-D network_debug
 
--main Server
+--connect 6228

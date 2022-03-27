@@ -1,7 +1,7 @@
 {
 	"sheets": [
 		{
-			"name": "structures",
+			"name": "structure",
 			"columns": [
 				{
 					"typeStr": "0",
@@ -68,7 +68,7 @@
 					"hp": 3,
 					"isoWidth": 0.9,
 					"isoHeight": 0.6,
-					"use_range": 10,
+					"use_range": 20,
 					"interactable": true
 				},
 				{
@@ -165,17 +165,16 @@
 					"interactable": false
 				}
 			],
-			"props": {
-				"separatorTitles": [
-					"resources"
-				]
-			},
-			"separatorIds": [
-				"emerald"
+			"props": {},
+			"separators": [
+				{
+					"title": "resources",
+					"id": "emerald"
+				}
 			]
 		},
 		{
-			"name": "structures@drop",
+			"name": "structure@drop",
 			"props": {
 				"hide": true
 			},
@@ -183,7 +182,7 @@
 			"lines": [],
 			"columns": [
 				{
-					"typeStr": "6:items",
+					"typeStr": "6:item",
 					"name": "item"
 				},
 				{
@@ -193,7 +192,7 @@
 			]
 		},
 		{
-			"name": "items",
+			"name": "item",
 			"columns": [
 				{
 					"typeStr": "0",
@@ -312,19 +311,20 @@
 					"hit_range": 0
 				}
 			],
-			"props": {
-				"separatorTitles": [
-					"tools",
-					"blueprints"
-				]
-			},
-			"separatorIds": [
-				"axe",
-				"hydroponics"
+			"props": {},
+			"separators": [
+				{
+					"title": "tools",
+					"id": "axe"
+				},
+				{
+					"title": "blueprints",
+					"id": "hydroponics"
+				}
 			]
 		},
 		{
-			"name": "blueprints",
+			"name": "blueprint",
 			"columns": [
 				{
 					"typeStr": "0",
@@ -333,12 +333,12 @@
 					"scope": null
 				},
 				{
-					"typeStr": "6:items",
+					"typeStr": "6:item",
 					"name": "item",
 					"kind": null
 				},
 				{
-					"typeStr": "6:structures",
+					"typeStr": "6:structure",
 					"name": "structure",
 					"kind": null
 				}
@@ -364,7 +364,7 @@
 			"props": {}
 		},
 		{
-			"name": "recipes",
+			"name": "recipe",
 			"columns": [
 				{
 					"typeStr": "0",
@@ -377,7 +377,7 @@
 					"kind": "localizable"
 				},
 				{
-					"typeStr": "6:items",
+					"typeStr": "6:item",
 					"name": "item_icon"
 				},
 				{
@@ -386,7 +386,7 @@
 				},
 				{
 					"typeStr": "8",
-					"name": "ingreds"
+					"name": "ingred"
 				},
 				{
 					"typeStr": "8",
@@ -398,44 +398,44 @@
 					"id": "axe",
 					"name": "Axe",
 					"item_icon": "axe",
-					"ingreds": [
-						{
-							"item": "iron",
-							"amount": 2
-						}
-					],
 					"result": [
 						{
 							"item": "axe",
 							"amount": 1
 						}
 					],
-					"recipe_source": 3
+					"recipe_source": 3,
+					"ingred": [
+						{
+							"item": "iron",
+							"amount": 2
+						}
+					]
 				},
 				{
 					"id": "workbench",
 					"name": "Workbench",
 					"item_icon": "workbench",
-					"ingreds": [
-						{
-							"item": "iron",
-							"amount": 3
-						}
-					],
 					"result": [
 						{
 							"item": "workbench",
 							"amount": 1
 						}
 					],
-					"recipe_source": 1
+					"recipe_source": 1,
+					"ingred": [
+						{
+							"item": "iron",
+							"amount": 3
+						}
+					]
 				}
 			],
 			"separators": [],
 			"props": {}
 		},
 		{
-			"name": "navigation_targets",
+			"name": "navigation_target",
 			"columns": [
 				{
 					"typeStr": "0",
@@ -471,7 +471,7 @@
 			"props": {}
 		},
 		{
-			"name": "recipes@result",
+			"name": "recipe@result",
 			"props": {
 				"hide": true
 			},
@@ -479,7 +479,7 @@
 			"lines": [],
 			"columns": [
 				{
-					"typeStr": "6:items",
+					"typeStr": "6:item",
 					"name": "item"
 				},
 				{
@@ -489,7 +489,7 @@
 			]
 		},
 		{
-			"name": "recipes@ingreds",
+			"name": "recipe@ingred",
 			"props": {
 				"hide": true
 			},
@@ -497,7 +497,7 @@
 			"lines": [],
 			"columns": [
 				{
-					"typeStr": "6:items",
+					"typeStr": "6:item",
 					"name": "item"
 				},
 				{

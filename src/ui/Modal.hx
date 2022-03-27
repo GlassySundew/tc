@@ -15,7 +15,7 @@ class Modal extends ui.Window {
 
 		ALL.push(this);
 		modalIdx = COUNT++;
-		if ( modalIdx == 0 ) Game.inst.pause();
+		if ( modalIdx == 0 ) GameClient.inst.pause();
 
 		ca = Main.inst.controller.createAccess("modal", true);
 		mask = new h2d.Bitmap(h2d.Tile.fromColor(0x0, 1, 1, 0.6), root);
@@ -24,7 +24,7 @@ class Modal extends ui.Window {
 	}
 
 	public static function hasAny() {
-		for (e in ALL) if ( !e.destroyed ) return true;
+		for ( e in ALL ) if ( !e.destroyed ) return true;
 		return false;
 	}
 
@@ -33,11 +33,11 @@ class Modal extends ui.Window {
 		ca.dispose();
 		ALL.remove(this);
 		COUNT--;
-		if ( !hasAny() ) Game.inst.resume();
+		if ( !hasAny() ) GameClient.inst.resume();
 	}
 
 	function closeAllModals() {
-		for (e in ALL) if ( !e.destroyed ) e.close();
+		for ( e in ALL ) if ( !e.destroyed ) e.close();
 	}
 
 	override function onResize() {

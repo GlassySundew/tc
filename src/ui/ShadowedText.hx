@@ -1,5 +1,6 @@
 package ui;
 
+import dn.heaps.filter.PixelOutline;
 import h2d.Drawable;
 import h2d.Object;
 import h2d.filter.Outline;
@@ -9,16 +10,12 @@ class ShadowedText extends h2d.Text {
 	public function new( font : Font, ?parent : h2d.Object ) {
 		super(font, parent);
 
-		addTextOutlineTo(this);
+		smooth = false;
+		addTextOutlineTo(this); 
 	}
 
 	public static function addTextOutlineTo( drawable : Drawable ) {
-		var outline = new Outline(0.3, Color.rgbaToInt({
-			r : 1,
-			g : 1,
-			b : 1,
-			a : 100
-		}), 0.5);
+		var outline = new PixelOutline(0x000000, 0.8);
 		drawable.filter = outline;
 	}
 }

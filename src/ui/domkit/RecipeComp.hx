@@ -1,5 +1,6 @@
 package ui.domkit;
 
+import dn.heaps.slib.HSprite;
 import en.player.Player;
 import ui.domkit.WindowComp.WindowCompI;
 import hxd.res.Resource;
@@ -23,7 +24,7 @@ class RecipeComp extends Flow implements h2d.domkit.Object implements WindowComp
 
 	var iconSpr : HSprite;
 
-	public var recipe : Data.Recipes;
+	public var recipe : Data.Recipe;
 
 	static var SRC =
 	     <recipe-comp>

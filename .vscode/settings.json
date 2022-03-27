@@ -1,14 +1,25 @@
 {
-  "workbench.colorCustomizations": {
-    "titleBar.inactiveBackground": "#134e41",
-    "titleBar.activeBackground": "#1a6b59",
-    "titleBar.activeForeground": "#ffffff"
-  },
-  "python.formatting.provider": "yapf",
-  "python.pythonPath": "/usr/bin/python2",
-  "files.watcherExclude": {
-    "**/dump/**": true,
-    "**/*.pak": true,
-    "**/bin": true
-  }
+	"haxe.displayPort": 65228,
+	"workbench.colorCustomizations": {
+		"titleBar.inactiveBackground": "#134e41",
+		"titleBar.activeBackground": "#1a6b59",
+		"titleBar.activeForeground": "#ffffff"
+	},
+	"python.formatting.provider": "yapf",
+	"python.pythonPath": "/usr/bin/python2",
+	"files.watcherExclude": {
+		"**/dump/**": true,
+		"**/*.pak": true
+	},
+	"css.lint.emptyRules": "ignore",
+	"css.lint.fontFaceProperties": "ignore",
+	"css.lint.propertyIgnoredDueToDisplay": "ignore",
+	"css.lint.unknownAtRules": "ignore",
+	"css.lint.unknownProperties": "ignore",
+	"css.lint.vendorPrefix": "ignore",
+	"less.lint.propertyIgnoredDueToDisplay": "ignore",
+	"eslint.quiet": true
+	// ,
+	// "telemetry.enableTelemetry": false,
+	// "telemetry.enableCrashReporter": false
 }

@@ -1,58 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-down" compressionlevel="0" width="40" height="35" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#0f0f0f" nextlayerid="55" nextobjectid="768">
+<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-down" compressionlevel="0" width="12" height="15" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#0f0f0f" nextlayerid="55" nextobjectid="770">
  <tileset firstgid="1" source="alpha.tsx"/>
- <tileset firstgid="151" source="entities.tsx"/>
- <layer id="33" name="ground" width="40" height="35" offsetx="0" offsety="4">
+ <tileset firstgid="152" source="entities.tsx"/>
+ <layer id="33" name="ground" width="12" height="15" offsetx="0" offsety="4">
   <data encoding="base64" compression="zlib">
-   eAHt0UEGADAMBMA+sf9/TfUQel5CyoSSy8qarmUIECBAgAABAgQI5AI7j7Ynb7d67ceCA9VtquHkfm+32oMvECFAgAABAgQIfC9wAN+SBLE=
+   eAFjYBieIIAEb4HUwjAx2mBqibWDFPXIamFsYtw0qgYSAgADuQSx
   </data>
  </layer>
- <layer id="36" name="wallsAgri" width="40" height="35" visible="0" offsetx="-10" offsety="-1">
+ <layer id="36" name="wallsAgri" width="12" height="15" visible="0" offsetx="-10" offsety="-1">
   <data encoding="base64" compression="zlib">
-   eAHt0cEJADAIA8BM0zk7ul2h+FG4/IXkTIQAAQIECBAgQGCDwEnuhp4TOj6r0dGv957pfr11rgkQIECAAAECfwIF7jMBPw==
+   eAFjYBhaQI2BoYFaLgaaRRIYbOpJcvwIUQwATU4BPw==
   </data>
  </layer>
- <layer id="42" name="walls" width="40" height="35">
+ <layer id="42" name="walls" width="12" height="15">
   <data encoding="base64" compression="zlib">
-   eAHt0AENAAAAwqD3T20ON4hAYcCAAQMGDBgwYMCAAQMGDBgwYMCAAQOPAwMV4AAB
+   eAFjYBgFoyEwfEIAAALQAAE=
   </data>
  </layer>
  <objectgroup draworder="index" id="47" name="image">
-  <object id="743" gid="105" x="490" y="466" width="246" height="87"/>
-  <object id="744" gid="81" x="547" y="509" width="206" height="118"/>
+  <object id="743" gid="105" x="154" y="178" width="246" height="87"/>
+  <object id="744" gid="81" x="211" y="221" width="206" height="118"/>
  </objectgroup>
  <objectgroup id="34" name="obstacles" opacity="0.57">
-  <object id="692" x="552" y="480">
+  <object id="692" x="216" y="192">
    <polygon points="0.5,1.5 -23.5,-72.5 0.5,-72.5 24,0"/>
   </object>
-  <object id="696" x="456" y="408">
+  <object id="696" x="120" y="120">
    <polygon points="0,0 -24,72 -48,72 -20.5,-9.5"/>
   </object>
-  <object id="697" x="432" y="480">
+  <object id="697" x="96" y="192">
    <polygon points="0,0 0,48 -24,48 -24,0"/>
   </object>
-  <object id="698" x="432" y="504" width="120" height="24"/>
-  <object id="699" x="552" y="456" width="24" height="48"/>
-  <object id="736" x="456" y="408">
+  <object id="698" x="96" y="216" width="120" height="24"/>
+  <object id="699" x="216" y="168" width="24" height="48"/>
+  <object id="736" x="120" y="120">
    <polygon points="0,0 24.5,-36.5 10,-54 -19.5,-12.5"/>
   </object>
-  <object id="737" x="480.5" y="371.5">
+  <object id="737" x="144.5" y="83.5">
    <polygon points="0,0 21.5,0.5 33,-5 22,-22 -9,-23 -9,-11"/>
   </object>
-  <object id="739" x="502.5" y="371.5">
+  <object id="739" x="166.5" y="83.5">
    <polygon points="0,0 26,36 50,36 18,-8"/>
   </object>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="756" gid="164" x="582" y="490" width="114" height="134"/>
-  <object id="733" gid="168" x="504" y="504" width="48" height="66">
+  <object id="756" gid="165" x="246" y="202" width="114" height="134"/>
+  <object id="733" gid="169" x="168" y="216" width="48" height="66">
    <properties>
     <property name="to" type="file" value="ship_pascal.tmx"/>
    </properties>
   </object>
-  <object id="734" gid="153" x="503" y="457" width="48" height="48"/>
-  <object id="761" gid="165" x="528" y="408" width="48" height="48"/>
-  <object id="762" gid="166" x="504" y="408" width="144" height="60"/>
-  <object id="763" gid="167" x="504" y="408" width="48" height="48"/>
+  <object id="734" gid="154" x="167" y="169" width="48" height="48"/>
+  <object id="761" gid="166" x="192" y="120" width="48" height="48"/>
+  <object id="762" gid="167" x="168" y="120" width="144" height="60"/>
+  <object id="763" gid="168" x="168" y="120" width="48" height="48"/>
  </objectgroup>
 </map>

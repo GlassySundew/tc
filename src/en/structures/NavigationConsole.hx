@@ -7,31 +7,45 @@ import hxd.Event;
 import ui.Navigation;
 
 class NavigationConsole extends Structure {
-	var navigation : Navigation;
+	var navigation : NavigationWindow;
 	var ca : dn.heaps.Controller.ControllerAccess;
 
-	public function new( x : Float, y : Float, ?tmxObject : TmxObject, ?cdbEntry : Data.StructuresKind ) {
+	public function new( x : Float, y : Float, ?tmxObject : TmxObject, ?cdbEntry : Data.StructureKind ) {
 		super(x, y, tmxObject, cdbEntry);
 		interactable = true;
 	}
 
 	public override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
 		super.init(x, z, tmxObj);
+	}
 
-		#if !headless
-		Game.inst.delayer.addF(() -> {
-			navigation = if ( Navigation.inst != null ) {
-				Player.inst.ui.root.addChild(Navigation.inst.win);
-				Navigation.inst;
-			} else {
-				new Navigation(
+	override function alive() {
+		super.alive();
+
+		GameClient.inst.delayer.addF(() -> {
+			navigation = if ( Navigation.clientInst.navWin == null ) {
+				Navigation.clientInst.navWin = new NavigationWindow(
 					Const.jumpReach,
-					'${Game.inst.seed}',
+					Client.inst.seed,
+					Player.inst.ui.root
+				);
+			} else {
+				Player.inst.ui.root.addChild(Navigation.clientInst.navWin.win);
+				Navigation.clientInst.navWin;
+			}
+
+			if ( Navigation.clientInst != null ) {
+				Player.inst.ui.root.addChild(Navigation.clientInst.navWin.win);
+				Navigation.clientInst;
+			} else {
+				new NavigationWindow(
+					Const.jumpReach,
+					Client.inst.seed,
 					Player.inst.ui.root
 				);
 			}
 
-			Navigation.inst.updateBackgroundInteractive();
+			Navigation.clientInst.navWin.updateBackgroundInteractive();
 
 			ca = Main.inst.controller.createAccess("navigation");
 			interact.onTextInput = function ( e : Event ) {
@@ -40,38 +54,33 @@ class NavigationConsole extends Structure {
 				}
 			}
 		}, 2);
-		#end
 	}
 
-	@:keep
-	override function customSerialize( ctx : Serializer ) {
-		super.customSerialize(ctx);
-	}
+	// @:keep
+	// override function customSerialize( ctx : Serializer ) {
+	// 	super.customSerialize(ctx);
+	// }
 
-	@:keep
-	override function customUnserialize( ctx : Serializer ) {
-		super.customUnserialize(ctx);
-	}
+	// @:keep
+	// override function customUnserialize( ctx : Serializer ) {
+	// 	super.customUnserialize(ctx);
+	// }
 
 	override function dispose() {
-		#if !headless
 		if ( navigation != null ) {
 			navigation.win.remove();
 			navigation.flushHeads();
 		}
-		#end
 		super.dispose();
 	}
 
 	override function postUpdate() {
 		super.postUpdate();
-		#if !headless
 		if ( navigation != null
 			&& navigation.win.visible
 			&& Player.inst != null
-			&& Player.inst.isMoving()
+			&& Player.inst.isMoving
 			&& distPx(Player.inst) > useRange
 			&& navigation != null ) navigation.toggleVisible();
-		#end
 	}
 }

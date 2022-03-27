@@ -1,3 +1,4 @@
+import en.Entity;
 import dn.Process;
 import h3d.col.Bounds;
 import h3d.Vector;
@@ -32,7 +33,7 @@ class Camera extends dn.Process {
 	// public var hei(get, never):Int;
 
 	public function new( ?parent : Process ) {
-		super(parent == null ? Game.inst : parent);
+		super(parent == null ? GameClient.inst : parent);
 		x = y = 0;
 		dx = dy = 0;
 		updateCamera(M.round(x), M.round(y));
@@ -62,8 +63,8 @@ class Camera extends dn.Process {
 
 	public function recenter() {
 		if ( target != null ) {
-			x = target.centerX;
-			y = target.centerY;
+			x = target.footX;
+			y = target.footY;
 		}
 	}
 
@@ -90,8 +91,8 @@ class Camera extends dn.Process {
 				yMult = (M.fabs(target.dx) > 0.001 && M.fabs(target.dy) > 0.001) ? .5 : 1;
 				var s = 0.006;
 				var deadZone = 5;
-				var tx = target.footX;
-				var ty = target.footY;
+				var tx = target.footX.toFloat();
+				var ty = target.footY.toFloat();
 				var d = M.dist(x, y, tx, ty);
 				if ( d >= deadZone ) {
 					var a = Math.atan2(ty - y, tx - x);

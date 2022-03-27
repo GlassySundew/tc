@@ -1,11 +1,9 @@
-import ui.ShadowedText;
 import dn.Process;
 import h2d.Bitmap;
 import h2d.Flow;
 import h2d.Object;
 import h2d.RenderContext;
 import h2d.Tile;
-import h3d.Vector;
 import h3d.mat.Texture;
 import hxd.Event;
 import hxd.System;
@@ -13,6 +11,7 @@ import tools.Settings;
 import ui.Button;
 import ui.SaveManager;
 import ui.SecondaryMenu;
+import ui.ShadowedText;
 
 class MainMenu extends Process {
 	var parentFlow : Flow;
@@ -138,17 +137,18 @@ class MainMenu extends Process {
 
 		// new TextButton("login", ( _ ) -> {
 		// 	destroy();
-		// 	Main.inst.startGameClient();
+		// 	Main.inst.startClient();
 		// }, vertFlow);
 
 		var newGame : TextButton = null;
 		newGame = new TextButton("new game", ( _ ) -> {
 			var dialog : NewSaveDialog = null;
-			dialog = new NewSaveDialog(( e ) -> {
-				Main.inst.startGame("1000000");
-				Game.inst.startLevel("ship_pascal.tmx", {});
+			dialog = new NewSaveDialog(() -> {
+				Main.inst.startGame("100000");
+				
 				destroy();
-			}, Save, Main.inst.root);
+			}, Save, null, Main.inst.root);
+
 			Main.inst.root.add(dialog, Const.DP_UI + 2);
 			dialog.x = parentFlow.x;
 			dialog.y = newGame.y;
@@ -158,12 +158,15 @@ class MainMenu extends Process {
 			var loadObj : Object = null;
 			loadObj = new TextButton("load game", ( _ ) -> {
 				var loadMan = new SaveManager(Load, () -> {
+					Main.inst.startGame("1000000");
+
 					destroy();
 				}, parentFlow);
 				loadMan.x = loadObj.x + loadObj.getSize().xMax + 20;
 				parentFlow.getProperties(loadMan).isAbsolute = true;
 			}, vertFlow);
 		}
+
 		new TextButton("options", ( _ ) -> {
 			new OptionsMenu(parentFlow);
 		}, vertFlow);
@@ -185,8 +188,6 @@ class MainMenu extends Process {
 
 		Boot.inst.engine.backgroundColor = 0x0c0c0c;
 		onResize();
-
-		if ( tools.Save.inst != null ) tools.Save.inst.currentFile = null;
 	}
 
 	override function onResize() {
@@ -211,7 +212,6 @@ class TextButton extends ui.Button {
 	public function new( string : String, ?action : Event -> Void, ?colorDef : Int = 0xffffff, ?colorPressed : Int = 0x676767, ?parent ) {
 		var text = new ShadowedText(Assets.fontPixel);
 		text.color = Color.intToVector(colorDef);
-		text.smooth = true;
 		text.text = "  " + string;
 
 		var tex0 = new Texture(Std.int(text.textWidth), Std.int(text.textHeight), [Target]);
@@ -245,7 +245,6 @@ class OptionsMenu extends SecondaryMenu {
 		vertFlow.verticalSpacing = 10;
 
 		var mm = new ShadowedText(Assets.fontPixel, vertFlow);
-		mm.smooth = true;
 		mm.scale(1.5);
 		mm.text = "Options";
 

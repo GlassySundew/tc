@@ -20,7 +20,7 @@ import ui.domkit.ScrollbarComp;
 class Crafting extends NinesliceWindow {
 	var scrollable : ScrollArea;
 
-	public function new( source : Data.Recipes_recipe_source, ?parent : Object ) {
+	public function new( source : Data.Recipe_recipe_source, ?parent : Object ) {
 		super(CraftingComp, parent);
 
 		windowComp.window.windowLabel.labelTxt.text = "Crafting";
@@ -51,7 +51,7 @@ class Crafting extends NinesliceWindow {
 		var scroll = ( e : Event ) -> {
 			if ( e.kind == EWheel ) {
 				slider.value = scrollable.scrollY + e.wheelDelta * scrollable.scrollStep;
-				Game.inst.tw.createMs(scrollable.scrollY, slider.value, TLinear, 60);
+				GameClient.inst.tw.createMs(scrollable.scrollY, slider.value, TLinear, 60);
 			}
 		};
 
@@ -67,7 +67,7 @@ class Crafting extends NinesliceWindow {
 		recipeEntriesFlow.fillWidth = true;
 		scrollable.addChild(recipeEntriesFlow);
 
-		for ( recipe in Data.recipes.all ) {
+		for ( recipe in Data.recipe.all ) {
 			if ( recipe.recipe_source.has(source) ) {
 				var rec = new Recipe(recipe, recipeEntriesFlow);
 				rec.windowComp.window.minWidth = scrollable.width;
@@ -123,7 +123,7 @@ class Recipe extends NinesliceWindow {
 
 	var hint : IngredsHint;
 
-	public function new( recipe : Data.Recipes, ?parent : Object ) {
+	public function new( recipe : Data.Recipe, ?parent : Object ) {
 		super("craft_recipe", RecipeComp, parent, recipe);
 
 		// cast(windowComp, Recip)
@@ -131,7 +131,7 @@ class Recipe extends NinesliceWindow {
 
 		var recipeComp = Std.downcast(windowComp, RecipeComp);
 		recipeComp.onOver.add(( e ) -> {
-			hint = new IngredsHint(recipe, Game.inst.root);
+			hint = new IngredsHint(recipe, GameClient.inst.root);
 			if ( Player.inst != null ) Player.inst.lockBelt();
 		});
 		recipeComp.onOut.add(( e ) -> {
@@ -141,14 +141,14 @@ class Recipe extends NinesliceWindow {
 		recipeComp.craft = () -> craft(recipe);
 	}
 
-	public function craft( recipe : Data.Recipes ) {
-		// checking if player has requiredData.Items
-		for ( i in recipe.ingreds ) {
+	public function craft( recipe : Data.Recipe ) {
+		// checking if player has requiredData.Item
+		for ( i in recipe.ingred ) {
 			var checkedCells : Array<InventoryCell> = [];
 
 			var amountPitch = i.amount;
 			while( amountPitch > 0 ) {
-				var targetItemSlot = Player.inst.ui.inventory.cellGrid.grid.findItemKind(i.item, 1, checkedCells);
+				var targetItemSlot = Player.inst.inventory.findItemKind(i.item, 1, checkedCells);
 				if ( targetItemSlot == null ) {
 					return null;
 				} else if ( targetItemSlot.item.amount >= i.amount ) {
@@ -160,10 +160,10 @@ class Recipe extends NinesliceWindow {
 			}
 		}
 		// removing itemns from player inventory
-		for ( i in recipe.ingreds ) {
+		for ( i in recipe.ingred ) {
 			var amountPitch = i.amount;
 			while( amountPitch > 0 ) {
-				var targetItemSlot = Player.inst.ui.inventory.cellGrid.grid.findItemKind(i.item, 1, []);
+				var targetItemSlot = Player.inst.inventory.findItemKind(i.item, 1, []);
 				if ( targetItemSlot == null ) {
 					return null;
 				} else if ( targetItemSlot.item.amount >= i.amount ) {
@@ -171,14 +171,15 @@ class Recipe extends NinesliceWindow {
 					amountPitch = 0;
 				} else {
 					amountPitch -= targetItemSlot.item.amount;
-					targetItemSlot.item.remove();
+					if ( targetItemSlot.item.itemSprite != null )
+						targetItemSlot.item.itemSprite.remove();
 					targetItemSlot.item = null;
 				}
 			}
 		}
 		for ( i in recipe.result ) {
-			var newItem = Item.fromCdbEntry(i.itemId, i.amount);
-			Player.inst.ui.inventory.cellGrid.giveItem(newItem);
+			var newItem = Item.fromCdbEntry(i.itemId, Player.inst, i.amount);
+			Player.inst.inventory.giveItem(newItem);
 		}
 		return null;
 	}
@@ -188,14 +189,15 @@ class Recipe extends NinesliceWindow {
 		if ( hint != null ) hint.destroy();
 	}
 }
+
 /** Показывает ингредиенты **/
 class IngredsHint extends NinesliceWindow {
-	public function new( recipe : Data.Recipes, ?parent : Object ) {
+	public function new( recipe : Data.Recipe, ?parent : Object ) {
 		super("ingreds_hint", IngredsHintComp, parent, recipe);
 
 		var hintComp = Std.downcast(windowComp, IngredsHintComp);
 
-		for ( i in recipe.ingreds ) {
+		for ( i in recipe.ingred ) {
 			new Ingred(i, hintComp.ingreds_holder);
 		}
 		bringOnTopOfALL();
@@ -212,7 +214,7 @@ class IngredsHint extends NinesliceWindow {
 }
 
 class Ingred extends NinesliceWindow {
-	public function new( ingred : Data.Recipes_ingreds, ?parent : Object ) {
+	public function new( ingred : Data.Recipe_ingred, ?parent : Object ) {
 		super("craft_recipe", IngredComp, parent, ingred);
 
 		var ingredComp = Std.downcast(windowComp, IngredComp);

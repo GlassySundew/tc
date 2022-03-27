@@ -3,7 +3,7 @@ package ui.domkit;
 import haxe.CallStack;
 import ui.domkit.WindowComp.WindowCompI;
 import h2d.Bitmap;
-import ui.InventoryGrid.CellGrid;
+import ui.InventoryGrid.UICellGrid;
 import ui.domkit.TextLabelComp;
 import h2d.Flow;
 
@@ -17,13 +17,17 @@ class InventoryComp extends Flow implements h2d.domkit.Object implements WindowC
 					<flow class="slots_holder" layout="vertical" >
 						${ 
 							if ( cellGrid != null ) {
-								for ( y in 0...(removeLastRow ? cellGrid.height - 1 : cellGrid.height) ) {
+								for ( y in 0...getGridHeight() ) {
 									<flow class="hor_holder">
-									for ( x in 0...cellGrid.width ) {
-										<bitmap src={cellTile} class="inv_cell" public id="inv_cells[]">
-											<flow public id="item_holder[]" class="item_holder" position="absolute" />
-										</bitmap>
-									}
+										for ( x in 0...cellGrid.inventoryGrid.width ) {
+											<flow 
+												background={{tile : cellTile, borderB : 1, borderT : 1,borderR : 1, borderL : 1}} 
+												class="inv_cell"
+												public id="inv_cells[]"
+												min-width={cellGrid.cellWidth}
+												min-height={cellGrid.cellHeight}
+											/>
+										}
 									</flow>
 								}
 							}
@@ -32,13 +36,16 @@ class InventoryComp extends Flow implements h2d.domkit.Object implements WindowC
 			</window>
 		</inventoryComp>;
 
-	public var cellGrid:CellGrid;
+		/*<flow public id="item_holder[]" class="item_holder" position="absolute" />
+											</flow>*/
+	
+	public var cellGrid : UICellGrid;
 	public var removeLastRow:Bool = false;
 	
 		// ?removeLastRow:Bool = false,
 		// ?cellGrid : CellGrid, 
 		/**
-			@param rest cellGrid : CellGrid, removeLastRow : Bool
+			@param rest cellGrid : UICellGrid, removeLastRow : Bool
 		**/
 	public function new( backgroundTile : h2d.Tile, bl : Int, bt : Int, br : Int, bb : Int, ?parent : h2d.Object, ...rest : Dynamic ) {
 		super(parent);
@@ -54,25 +61,23 @@ class InventoryComp extends Flow implements h2d.domkit.Object implements WindowC
 		window.makeDragable();
 
 		window.style.load(hxd.Res.domkit.inventory);
-	}
-
-	override function reflow() {
+		window.style.allowInspect = true;
 
 		if(cellGrid != null)
-			for ( yI => y in cellGrid.grid) {
-				for ( xI => x in y ) {
+			for ( yi in 0...getGridHeight()) {
+				for ( xi => x in cellGrid.flowGrid[yi] ) {
 					try {
-						x.inter.onPushEvent.add((e) -> {
-							window.bringOnTopOfALL();
-						});
-						
-						item_holder[yI * cellGrid.width + xI].addChild(x);
-						item_holder[yI * cellGrid.width + xI].x = -Std.int((x.inter.width - inv_cells[yI * cellGrid.width + xI].tile.width ) / 2);
-						item_holder[yI * cellGrid.width + xI].y = -Std.int((x.inter.height - inv_cells[yI * cellGrid.height + xI].tile.height ) / 2);
-					} catch ( e : Dynamic ) {}
+						inv_cells[yi * cellGrid.inventoryGrid.width + xi].addChild(x);
+					} catch ( e ) {
+						for( i in CallStack.callStack()) {
+							trace(i);
+						}
+					}
 				}
 			}
+	}
 
-		super.reflow();
+	function getGridHeight() : Int {
+		return (removeLastRow ? cellGrid.inventoryGrid.height - 1 : cellGrid.inventoryGrid.height);
 	}
 }

@@ -1,5 +1,6 @@
 package en.structures;
 
+import en.player.Player;
 import format.tmx.Data.TmxObject;
 import hxbit.Serializer;
 import hxd.Event;
@@ -12,24 +13,28 @@ class Door extends Structure {
 		super.init(x, z, tmxObj);
 		if ( tmxObj != null && tmxObj.properties.exists("to") )
 			leadsTo = tmxObj.properties.getString("to");
-		interactable = true;
+	}
 
+	override function alive() {
+		super.alive();
+		GameClient.inst.delayer.addF(() -> {
+			interactable = true;
+		}, 10);
 
 		interact.onTextInputEvent.add(( e : Event ) -> {
 			if ( Key.isPressed(Key.E) ) {
 				turnOffHighlight();
 
 				if ( leadsTo != null ) {
-					var castedG = cast(Level.inst.game, Game);
-					var curLvl = castedG.lvlName;
+					var curLvl = GameClient.inst.sLevel.lvlName;
 
-					castedG.startLevel(leadsTo, {});
-					Game.inst.delayer.addF(() -> {
+					// GameClient.inst.startLevel(leadsTo, {});
+					GameClient.inst.delayer.addF(() -> {
 						var door = findDoor(curLvl);
 						if ( door != null ) {
 							interactable = true;
-							player.setFeetPos(door.footX, door.footY);
-							Game.inst.targetCameraOnPlayer();
+							Player.inst.setFeetPos(door.footX, door.footY);
+							GameClient.inst.targetCameraOnPlayer();
 						}
 					}, 1);
 				}
@@ -55,6 +60,8 @@ class Door extends Structure {
 			}
 		}
 		#if debug
+		trace("wrong door logic???");
+		
 		// throw "wrong door markup";
 		#end
 		return null;

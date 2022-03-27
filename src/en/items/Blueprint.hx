@@ -8,15 +8,15 @@ class Blueprint extends Item {
 	public var onStructurePlace : EventSignal1<StructTile> = new EventSignal1();
 	public var onStructTileMove : EventSignal1<StructTile> = new EventSignal1();
 
-	public var blueprintScheme : Data.BlueprintsKind;
+	public var blueprintScheme : Data.BlueprintKind;
 
 	public var ghostStructure : StructureGhost;
 
-	public function new( cdbEntry : Data.ItemsKind, ?parent : Object ) {
-		super(cdbEntry, parent);
+	public function new( cdbEntry : Data.ItemKind ) {
+		super(cdbEntry);
 
 		if ( cdbEntry != null && this != null ) {
-			for ( i in Data.blueprints.all ) {
+			for ( i in Data.blueprint.all ) {
 				if ( i.itemId == cdbEntry ) {
 					blueprintScheme = i.id;
 				}
@@ -33,25 +33,21 @@ class Blueprint extends Item {
 		onStructurePlace.add(( tile ) -> {
 			if ( ghostStructure.canBePlaced ) {
 				amount--;
-				var ent = Structure.fromCdbEntry(Std.int(tile.x), Std.int(tile.z), Data.blueprints.get(blueprintScheme).structureId);
-				Level.inst.game.applyTmxObjOnEnt(ent);
+				var ent = Structure.fromCdbEntry(Std.int(tile.x), Std.int(tile.z), Data.blueprint.get(blueprintScheme).structureId);
+				GameClient.inst.applyTmxObjOnEnt(ent);
 				if ( ghostStructure.flippedX ) ent.flipX();
 				ent.offsetFootByTile();
 			}
 		});
 
 		onPlayerHold.add(() -> {
-			#if !headless
-			Level.inst.game.showStrTiles();
-			ghostStructure = new StructureGhost(Data.blueprints.get(blueprintScheme).structureId);
-			#end
+			GameClient.inst.showStrTiles();
+			ghostStructure = new StructureGhost(Data.blueprint.get(blueprintScheme).structureId);
 		});
 
 		onPlayerRemove.add(() -> {
-			#if !headless
-			Level.inst.game.hideStrTiles();
+			GameClient.inst.hideStrTiles();
 			ghostStructure.destroy();
-			#end
 		});
 	}
 }

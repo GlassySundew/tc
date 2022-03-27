@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-up" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#afafaf" nextlayerid="68" nextobjectid="124">
+<map version="1.5" tiledversion="1.7.2" orientation="isometric" renderorder="right-up" width="100" height="100" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#afafaf" nextlayerid="68" nextobjectid="134">
  <properties>
   <property name="DeleteTiles" type="bool" value="true"/>
   <property name="MatchOutsideMap" type="bool" value="false"/>
@@ -65,7 +65,7 @@
   <object id="100" x="216" y="840" width="24" height="24"/>
   <object id="101" x="240" y="816" width="24" height="24"/>
   <object id="103" x="144" y="624" width="24" height="24"/>
-  <object id="104" x="288" y="504" width="24" height="24"/>
+  <object id="104" x="360" y="624" width="24" height="24"/>
   <object id="105" x="168" y="456" width="24" height="24"/>
   <object id="106" x="192" y="432" width="24" height="24"/>
   <object id="108" x="90" y="552">
@@ -74,5 +74,9 @@
   <object id="116" x="27" y="483">
    <polygon points="-3,-3 -3,5 5,-3"/>
   </object>
+  <object id="124" x="216" y="816" width="24" height="24"/>
+  <object id="125" x="192" y="456" width="24" height="24"/>
+  <object id="132" x="288" y="504" width="24" height="24"/>
+  <object id="133" x="384" y="864" width="24" height="24"/>
  </objectgroup>
 </map>

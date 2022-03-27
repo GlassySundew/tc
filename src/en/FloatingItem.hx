@@ -33,11 +33,15 @@ class FloatingItem extends Interactive {
 	}
 
 	override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
-		if ( spr == null ) spr = new HSprite(item.spr.lib, item.spr.groupName, entParent);
+		if ( spr == null ) spr = new HSprite(
+			Assets.items,
+			Data.item.get(item.cdbEntry).atlas_name,
+			entParent
+		);
 
 		super.init(x, z, tmxObj);
 
-		setPivot(0, 0);
+		setPivot();
 		spr.tile.getTexture().filter = Nearest;
 
 		mesh.remove();
@@ -138,7 +142,7 @@ class FloatingItem extends Interactive {
 		shadowBmp.drawTo(shadowTex);
 
 		var shape = new differ.shapes.Circle(0, 0, 4);
-		collisions.set(shape, { cent : new Vector(), offset : new Vector() });
+		collisions.set(shape, { cent : new differ.math.Vector(0, 0), offset : new differ.math.Vector(0, 0) });
 	}
 
 	// public static function
@@ -160,17 +164,17 @@ class FloatingItem extends Interactive {
 		shadowMesh.z = footY;
 
 		polyMesh.x = footX;
-		polyMesh.z = footY + 4 * Math.sin((Game.inst.ftime + startWave) / 34) + 10;
+		polyMesh.z = footY.toFloat() + 4 * Math.sin((GameClient.inst.ftime + startWave) / 34) + 10;
 
 		// polyMesh.y = 0.01;
 
 		polyMesh.rotate(0, 0, 0.016 * tmod);
-		deDepth.objZ = (polyMesh.z - footY) * Math.sin(-rotAngle);
+		deDepth.objZ = (polyMesh.z - footY.toFloat()) * Math.sin(-rotAngle);
 
 		if ( !isLocked() ) bumpAwayFrom(Player.inst, distPx(Player.inst) < 20 ? -.065 * tmod : 0);
 
-		if ( player != null && distPx(player) < 10 && !isLocked() ) {
-			player.ui.inventory.cellGrid.giveItem(item);
+		if ( Player.inst != null && distPx(Player.inst) < 10 && !isLocked() ) {
+			Player.inst.inventory.giveItem(item);
 			destroy();
 			if ( sqlId != null ) Save.inst.removeEntityById(sqlId);
 		}
@@ -185,30 +189,28 @@ class FloatingItem extends Interactive {
 		super.frameEnd();
 	}
 
-	@:keep
-	override function customSerialize( ctx : Serializer ) {
-		if ( item != null ) {
-			ctx.addString(Std.string(item.cdbEntry));
-			ctx.addInt(item.amount);
-		} else {
-			ctx.addString("null");
-			ctx.addInt(0);
-		}
-		super.customSerialize(ctx);
-	}
-
-	@:keep
-	override function customUnserialize( ctx : Serializer ) {
-		var itemCdb = ctx.getString();
-		var itemAmt = ctx.getInt();
-
-		if ( itemCdb != "null" ) {
-			var item = Item.fromCdbEntry(Data.items.resolve(itemCdb).id, itemAmt);
-			item.containerEntity = this;
-			this.item = item;
-		}
-		super.customUnserialize(ctx);
-	}
+	// @:keep
+	// override function customSerialize( ctx : Serializer ) {
+	// 	if ( item != null ) {
+	// 		ctx.addString(Std.string(item.cdbEntry));
+	// 		ctx.addInt(item.amount);
+	// 	} else {
+	// 		ctx.addString("null");
+	// 		ctx.addInt(0);
+	// 	}
+	// 	super.customSerialize(ctx);
+	// }
+	// @:keep
+	// override function customUnserialize( ctx : Serializer ) {
+	// 	var itemCdb = ctx.getString();
+	// 	var itemAmt = ctx.getInt();
+	// 	if ( itemCdb != "null" ) {
+	// 		var item = Item.fromCdbEntry(Data.item.resolve(itemCdb).id, itemAmt);
+	// 		item.containerEntity = this;
+	// 		this.item = item;
+	// 	}
+	// 	super.customUnserialize(ctx);
+	// }
 
 	function filterArray( array : Array<HxPoint> ) {
 		var i = 0;
