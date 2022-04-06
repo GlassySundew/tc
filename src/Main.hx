@@ -122,17 +122,20 @@ class Main extends Process {
 			GameClient.inst.destroy();
 			@:privateAccess Process._garbageCollector(Process.ROOTS);
 		}
+
 		new Client();
+		// Client.inst.sendMessage(SaveSystemOrder(CreateNewSave()));
+
 		new GameClient();
 	}
 
-	@:deprecated
-	public function startClient() {
-		if ( Client.inst != null ) {
-			Client.inst.destroy();
+	public function connect( ?seed : String ) {
+		if ( GameClient.inst != null ) {
+			GameClient.inst.destroy();
 			@:privateAccess Process._garbageCollector(Process.ROOTS);
 		}
 		new Client();
+		new GameClient();
 	}
 
 	override function onResize() {

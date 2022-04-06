@@ -24,6 +24,7 @@ class Server extends Process {
 	public var uid : Int;
 
 	public var game : GameServer;
+	public var onTypedMessage : EventSignal2<NetworkClient, Message> = new EventSignal2();
 
 	public function new( ?seed : String ) {
 		super();
@@ -32,6 +33,12 @@ class Server extends Process {
 		Env.init();
 		Settings.init();
 		Save.initFields();
+
+		#if( hl && pak )
+		hxd.Res.initPak();
+		#elseif( hl )
+		hxd.Res.initLocal();
+		#end
 
 		if ( seed == null ) seed = Random.string( 10 );
 
@@ -62,8 +69,6 @@ class Server extends Process {
 		inst = this;
 	}
 
-	public var onTypedMessage : EventSignal2<NetworkClient, Message> = new EventSignal2();
-
 	function startServer() {
 		host = new hxd.net.SocketHost();
 		host.setLogger( function ( msg ) {
@@ -78,18 +83,19 @@ class Server extends Process {
 				function ( c ) {
 					log( "Client Connected" );
 				},
-				function ( c : SocketClient ) {
+				function ( c : SocketClient, e : String ) {
 					try {
 						// cast(c.ownerObject, Cursor).dispose();
-						trace( "error occured" );
+						trace( "error occured: " + e );
 						host.unregister( c.ownerObject );
 					}
-					catch( e : Dynamic ) {}
+					catch( e : Dynamic ) {
+						trace( "error occured while unserizlizing " + e );
+					}
 				}
 			);
 
 			onTypedMessage.add( ( c, msg : Message ) -> {
-
 				switch( msg ) {
 					case PlayerBoot( uid, nickname ):
 
@@ -138,6 +144,16 @@ class Server extends Process {
 					default:
 				}
 			} );
+
+			#if debug
+			onTypedMessage.add( ( client, message ) -> {
+				switch( message ) {
+					case GetServerStatus:
+						host.sendMessage( ServerStatus( host.isAuth ), client );
+					default:
+				}
+			} );
+			#end
 
 			host.onMessage = onTypedMessage.dispatch;
 

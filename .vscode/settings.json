@@ -1,5 +1,5 @@
 {
-	"haxe.displayPort": 65228,
+	"haxe.displayPort": 64228,
 	"workbench.colorCustomizations": {
 		"titleBar.inactiveBackground": "#134e41",
 		"titleBar.activeBackground": "#1a6b59",
@@ -18,7 +18,23 @@
 	"css.lint.unknownProperties": "ignore",
 	"css.lint.vendorPrefix": "ignore",
 	"less.lint.propertyIgnoredDueToDisplay": "ignore",
-	"eslint.quiet": true
+	"eslint.quiet": true,
+	
+	"haxe.configurations": [
+		{
+			"label": "hl.debug.hxml",
+			"args": [
+				"hxml/debug/hl.debug.hxml"
+			]
+		},
+		{
+			"label": "hl.server.debug.hxml",
+			"args": [
+				"hxml/debug/hl.server.debug.hxml"
+			]
+		},
+	],
+	// "haxe.enableCompilationServer": false
 	// ,
 	// "telemetry.enableTelemetry": false,
 	// "telemetry.enableCrashReporter": false

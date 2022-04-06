@@ -1,4 +1,4 @@
-hl.sdl.hxml
+hxml/common/hl.sdl.hxml
 -hl redist/sdl_linux/hlboot.dat
 
 -D pak

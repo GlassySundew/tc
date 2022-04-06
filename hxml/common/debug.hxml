@@ -1,10 +1,4 @@
 
--debug
-
--hl bin/game.hl
-# -D hl-profile
-
-hl.sdl.hxml
 
 -D depth_debug
 -D colliders_debug
@@ -13,6 +7,6 @@ hl.sdl.hxml
 # -D sqlite_debug_verbose
 # -D display_proto
 # -D hx_concurrent
--D network_debug
+# -D network_debu
 
-# --connect 6010 
+-debug

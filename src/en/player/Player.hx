@@ -1,5 +1,6 @@
 package en.player;
 
+import net.ClientToServer.AClientToServer;
 import net.ClientController;
 import haxe.CallStack;
 import ch3.scene.TileSprite;
@@ -15,6 +16,12 @@ import ui.Navigation;
 import ui.PauseMenu;
 import ui.domkit.TextLabelComp;
 import ui.player.PlayerUI;
+
+enum abstract PlayerActionState( String ) from String to String {
+
+	var Running = "Running";
+	var Idle = "Idle";
+}
 
 class Player extends Entity {
 	public static var inst : Player;
@@ -34,9 +41,10 @@ class Player extends Entity {
 	@:s public var item : Item;
 	@:s public var clientController : ClientController;
 
+	@:s public var actionState : AClientToServer<PlayerActionState>;
+
 	function set_holdItem( v : en.Item ) : Item {
 
-		trace( "setting item ", GameClient.inst );
 		// for( i in CallStack.callStack())
 		// 	trace(i);
 
@@ -76,19 +84,6 @@ class Player extends Entity {
 	@:s public var uid : Int;
 	@:s public var sprGroup : String;
 
-	// override function set_netX( v : Float ) : Float {
-	// 	if ( inst != this ) {
-	// 		footX = v;
-	// 	}
-	// 	return super.set_netX( v );
-	// }
-	// override function set_netY( v : Float ) : Float {
-	// 	if ( inst != this ) {
-	// 		footY = v;
-	// 	}
-	// 	return super.set_netY( v );
-	// }
-
 	function set_residesOnId( v : String ) {
 		return residesOnId = v;
 	}
@@ -99,12 +94,15 @@ class Player extends Entity {
 		travelling = false;
 		onBoard = true;
 
+		actionState = new AClientToServer<PlayerActionState>( Idle );
+
 		super( x, z, tmxObj );
 
 		inventory = new InventoryGrid( 5, 6, this );
 		lock( 30 );
 
 		// new game here, thus setting player to a random asteroid in 0, 0 asteroid chunk, idk what to make it in multiplayer
+
 		// if ( Navigation.serverInst.fields.length > 0 ) {
 		// var r = new Random();
 		// 	r.setStringSeed(Server.inst.game.seed);
@@ -127,11 +125,10 @@ class Player extends Entity {
 		// netX = footX;
 		// netY = footY;
 
-
 		spr = new HSprite( Assets.player, entParent );
 		ca = Main.inst.controller.createAccess( "player" );
 		belt = Main.inst.controller.createAccess( "belt" );
-
+		
 		for ( i => dir in [
 			{ dir : "right", prio : 0 },
 			{ dir : "up_right", prio : 1 },
@@ -142,10 +139,14 @@ class Player extends Entity {
 			{ dir : "down", prio : 0 },
 			{ dir : "down_right", prio : 1 }
 		] ) {
-			spr.anim.registerStateAnim( "walk_" + dir.dir, dir.prio, ( 1 / 60 / 0.16 ), function () return isMoving && this.dir == i );
-			spr.anim.registerStateAnim( "idle_" + dir.dir, dir.prio, ( 1 / 60 / 0.16 ), function () return !isMoving && this.dir == i );
+			spr.anim.registerStateAnim( "walk_" + dir.dir, dir.prio, ( 1 / 60 / 0.16 ),
+				() -> return this.dir == i && actionState.getValue() == Running
+			);
+			spr.anim.registerStateAnim( "idle_" + dir.dir, dir.prio, ( 1 / 60 / 0.16 ),
+				() -> return this.dir == i && actionState.getValue() == Idle
+			);
 		}
-
+		
 		super.alive();
 
 		#if depth_debug
@@ -162,15 +163,15 @@ class Player extends Entity {
 			GameClient.inst.player = this;
 
 			sprFrame = { group : spr.groupName, frame : spr.frame };
-			
-			footX.clientToServerCond = footY.clientToServerCond = () -> true;
+
+			actionState.clientToServerCond = footX.clientToServerCond = footY.clientToServerCond = () -> true;
 		}
 
 		initNickname();
 		syncFrames();
 	}
 
-	override public function  networkAllow(
+	override public function networkAllow(
 		op : hxbit.NetworkSerializable.Operation,
 		propId : Int,
 		clientSer : hxbit.NetworkSerializable
@@ -287,8 +288,9 @@ class Player extends Entity {
 			ca.dispose();
 			belt.dispose();
 
-			if ( holdItem.itemSprite != null )
+			if ( holdItem != null && holdItem.itemSprite != null )
 				holdItem.itemSprite.remove();
+
 			holdItem = null;
 		}
 	}
@@ -350,6 +352,8 @@ class Player extends Entity {
 			// netX = footX;
 			// netY = footY;
 			// }
+
+			actionState.setValue( isMoving ? Running : Idle );
 		}
 
 		syncFrames();

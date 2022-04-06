@@ -18,7 +18,7 @@ import ui.Navigation.NavigationFields;
 class GameServer extends Process implements Serializable {
 	public static var inst : GameServer;
 
-	public var network(get, never) : Bool;
+	public var network( get, never ) : Bool;
 
 	inline function get_network() return false;
 
@@ -43,18 +43,12 @@ class GameServer extends Process implements Serializable {
 
 		this.seed = seed;
 
-		CompileTime.importPackage("en");
-		entClasses = CompileTime.getAllClasses(Entity);
-
-		#if( hl && pak )
-		hxd.Res.initPak();
-		#elseif( hl )
-		hxd.Res.initLocal();
-		#end
+		CompileTime.importPackage( "en" );
+		entClasses = CompileTime.getAllClasses( Entity );
 
 		levels = [];
 
-		Data.load(hxd.Res.data.entry.getText());
+		Data.load( hxd.Res.data.entry.getText() );
 
 		// new Navigation();
 
@@ -77,8 +71,8 @@ class GameServer extends Process implements Serializable {
 		if ( mockConstructor ) {
 			init();
 
-			if ( parent == null ) Process.ROOTS.push(this); else
-				parent.addChild(this);
+			if ( parent == null ) Process.ROOTS.push( this ); else
+				parent.addChild( this );
 		}
 
 		inst = this;
@@ -90,9 +84,9 @@ class GameServer extends Process implements Serializable {
 	public function initializePlayer( nickname : String, uid : Int ) : Player {
 		// our temporary entrypoint
 		var entryPointLevel = "ship_pascal.tmx";
-		var sLevel = startLevel(entryPointLevel, {});
+		var sLevel = startLevel( entryPointLevel, {} );
 		// раз игрок новый, то спавним его из tmxObject
-		var player = sasByName("en.player.$Player", entClasses, sLevel, [nickname, uid]).as(Player);
+		var player = sasByName( "en.player.$Player", entClasses, sLevel, [nickname, uid] ).as( Player );
 
 		return player;
 	}
@@ -102,21 +96,21 @@ class GameServer extends Process implements Serializable {
 			return levels[name];
 		// Save.inst.saveLevel(levels[name]);
 
-		var savedLevel = Save.inst.getLevelByName(name.split(".")[0]);
+		var savedLevel = Save.inst.getLevelByName( name.split( "." )[0] );
 
 		if ( savedLevel != null ) {
 			var s = new Serializer();
 			var sLevel = startLevelFromParsedTmx(
-				s.unserialize(haxe.crypto.Base64.decode(savedLevel.tmx), TmxMap),
+				s.unserialize( haxe.crypto.Base64.decode( savedLevel.tmx ), TmxMap ),
 				savedLevel.name,
 				playerLoadConf
 			);
-			levels[name].sqlId = Std.int(savedLevel.id);
-			Save.inst.loadSavedEntities(savedLevel);
+			levels[name].sqlId = Std.int( savedLevel.id );
+			Save.inst.loadSavedEntities( savedLevel );
 			return sLevel;
 		} else {
-			tmxMap = MapCache.inst.get(name);
-			return startLevelFromParsedTmx(tmxMap, name, playerLoadConf);
+			tmxMap = MapCache.inst.get( name );
+			return startLevelFromParsedTmx( tmxMap, name, playerLoadConf );
 		}
 	}
 
@@ -126,17 +120,17 @@ class GameServer extends Process implements Serializable {
 		var sLevel : ServerLevel = levels[name];
 
 		if ( sLevel == null ) {
-			sLevel = new ServerLevel(tmxMap);
+			sLevel = new ServerLevel( tmxMap );
 			levels[name] = sLevel;
-			sLevel.lvlName = lvlName = name.split('.')[0];
+			sLevel.lvlName = lvlName = name.split( '.' )[0];
 		}
 
 		// получаем sql id для уровня
-		var loadedLevel = Save.inst.saveLevel(sLevel);
+		var loadedLevel = Save.inst.saveLevel( sLevel );
 
 		// Загрузка игрока при переходе в другую локацию
-		Save.inst.bringPlayerToLevel(loadedLevel);
-		var cachedPlayer = Save.inst.playerSavedOn(sLevel);
+		Save.inst.bringPlayerToLevel( loadedLevel );
+		var cachedPlayer = Save.inst.playerSavedOn( sLevel );
 
 		if ( cachedPlayer != null ) {
 			// это значит, что инстанс игрока был ранее создан и делать нового не надо
@@ -149,10 +143,10 @@ class GameServer extends Process implements Serializable {
 			// 			var ent = searchAndSpawnEnt(e, entClasses);
 			// 			ent.level = level;
 			// 	}
-			Save.inst.loadEntity(cachedPlayer);
+			Save.inst.loadEntity( cachedPlayer );
 		} else {
 			for ( e in sLevel.entitiesTmxObj ) {
-				var ent = searchAndSpawnEnt(e, entClasses, sLevel, [], [Player]);
+				var ent = searchAndSpawnEnt( e, entClasses, sLevel, [], [Player] );
 				// if ( ent != null )
 
 				// 	ent.level = sLevel;
@@ -197,7 +191,7 @@ class GameServer extends Process implements Serializable {
 	public function customSerialize( ctx : hxbit.Serializer ) {
 		// navigation
 		var s = new hxbit.Serializer();
-		ctx.addBytes(s.serialize(Navigation.serverInst));
+		ctx.addBytes( s.serialize( Navigation.serverInst ) );
 	}
 
 	/** при десеаризации создается пустой инстанс Game, отсюда в Game.inst будет выгружены все параметры **/
@@ -207,7 +201,7 @@ class GameServer extends Process implements Serializable {
 
 		// navigation
 		var s = new Serializer();
-		s.unserialize(ctx.getBytes(), Navigation);
+		s.unserialize( ctx.getBytes(), Navigation );
 	}
 
 	/** 
@@ -218,9 +212,9 @@ class GameServer extends Process implements Serializable {
 		for ( obj in sLevel.entitiesTmxObj ) {
 
 			if ( obj.name == name
-				|| (obj.properties.existsType("className", PTString)
-					&& obj.properties.getString("className") == name) ) {
-				return searchAndSpawnEnt(obj, entClasses, sLevel, args);
+				|| ( obj.properties.existsType( "className", PTString )
+					&& obj.properties.getString( "className" ) == name ) ) {
+				return searchAndSpawnEnt( obj, entClasses, sLevel, args );
 			}
 		}
 
@@ -238,52 +232,52 @@ class GameServer extends Process implements Serializable {
 		if ( tmxMap.orientation == Isometric ) {
 			// все объекты в распаршенных слоях уже с конвертированными координатами
 			// entities export lies ahead
-			isoX = sLevel.cartToIsoLocal(e.x, e.y).x;
-			isoY = sLevel.cartToIsoLocal(e.x, e.y).y;
+			isoX = sLevel.cartToIsoLocal( e.x, e.y ).x;
+			isoY = sLevel.cartToIsoLocal( e.x, e.y ).y;
 		}
 
 		var tsTile : TmxTilesetTile = null;
 
 		switch e.objectType {
-			case OTTile(gid):
-				tsTile = Tools.getTileByGid(tmxMap, gid);
+			case OTTile( gid ):
+				tsTile = Tools.getTileByGid( tmxMap, gid );
 			default:
 				"";
 		}
 
 		// Парсим все классы - наследники en.Entity и спавним их
 		for ( eClass in entClasses ) {
-			if ( exclude.contains(eClass) ) continue;
+			if ( exclude.contains( eClass ) ) continue;
 
 			// смотрим во всех наследников Entity и спавним, если совпадает. Если не совпадает, то
 			// значит что потом мы смотрим настройку className тайла из тайлсета, который мы пытаемся заспавнить
 			if ( (
-				eregCompTimeClass.match('$eClass'.toLowerCase())
-				&& eregCompTimeClass.matched(1) == e.name
+				eregCompTimeClass.match( '$eClass'.toLowerCase() )
+				&& eregCompTimeClass.matched( 1 ) == e.name
 			)
 				|| (
-					tsTile.properties.existsType("className", PTString)
-					&& tsTile.properties.getString("className") == '$eClass'
+					tsTile.properties.existsType( "className", PTString )
+					&& tsTile.properties.getString( "className" ) == '$eClass'
 				)
 			) {
 				var totalArgs : Array<Dynamic> = [isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, e];
-				totalArgs = totalArgs.concat(args);
-				resultEntity = Type.createInstance(eClass, totalArgs);
+				totalArgs = totalArgs.concat( args );
+				resultEntity = Type.createInstance( eClass, totalArgs );
 			}
 		}
 
 		// если не найдено подходящего класса, то спавним spriteEntity, который является просто спрайтом
-		if ( resultEntity == null 
-			&& eregFileName.match(tsTile.image.source)
-			&& !tsTile.properties.existsType("className", PTString) ) {
+		if ( resultEntity == null
+			&& eregFileName.match( tsTile.image.source )
+			&& !tsTile.properties.existsType( "className", PTString ) ) {
 			return {
-				resultEntity = new SpriteEntity(isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, eregFileName.matched(1), e);
+				resultEntity = new SpriteEntity( isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, eregFileName.matched( 1 ), e );
 			}
 		}
 
 		if ( resultEntity != null ) {
 			resultEntity.level = sLevel;
-			sLevel.entities.push(resultEntity);
+			sLevel.entities.push( resultEntity );
 		}
 
 		return resultEntity;
@@ -296,7 +290,7 @@ class GameServer extends Process implements Serializable {
 		var entitiesTs : TmxTileset = null;
 
 		for ( tileset in tmxMap.tilesets ) {
-			if ( StringTools.contains(tileset.source, "entities") ) {
+			if ( StringTools.contains( tileset.source, "entities" ) ) {
 				entitiesTs = tileset;
 			}
 		}
@@ -304,24 +298,24 @@ class GameServer extends Process implements Serializable {
 		var ents = ent != null ? [ent] : Entity.ServerALL;
 
 		for ( tile in entitiesTs.tiles ) {
-			if ( eregFileName.match(tile.image.source) ) {
+			if ( eregFileName.match( tile.image.source ) ) {
 				var picName = {
-					if ( tile.properties.existsType("className", PTString) ) {
-						var className = tile.properties.getString("className");
-						eregCompTimeClass.match(className);
-						eregCompTimeClass.matched(1).toLowerCase();
+					if ( tile.properties.existsType( "className", PTString ) ) {
+						var className = tile.properties.getString( "className" );
+						eregCompTimeClass.match( className );
+						eregCompTimeClass.matched( 1 ).toLowerCase();
 					} else
-						eregFileName.matched(1);
+						eregFileName.matched( 1 );
 				}
 
 				for ( ent in ents ) {
-					eregClass.match('$ent'.toLowerCase());
-					var entityName = eregClass.matched(1);
+					eregClass.match( '$ent'.toLowerCase() );
+					var entityName = eregClass.matched( 1 );
 
 					var objx = 0.;
 
 					if ( entityName == picName
-						|| (ent.sprFrame != null && ent.sprFrame.group == picName) ) {
+						|| ( ent.sprFrame != null && ent.sprFrame.group == picName ) ) {
 
 						// соотношение, которое в конце будет применено к entity
 						var center = new Vector();
@@ -330,17 +324,17 @@ class GameServer extends Process implements Serializable {
 							switch obj.objectType {
 								case OTRectangle:
 								case OTEllipse:
-									var shape = new differ.shapes.Circle(0, 0, obj.width / 2);
+									var shape = new differ.shapes.Circle( 0, 0, obj.width / 2 );
 									var cent = new Vector(
 										obj.width / 2,
 										obj.height / 2
 									);
 
-									ent.collisions.set(shape,
+									ent.collisions.set( shape,
 										{
-											cent : new differ.math.Vector(cent.x, cent.y),
-											offset : new differ.math.Vector(obj.x + cent.x, obj.y + cent.y)
-										});
+											cent : new differ.math.Vector( cent.x, cent.y ),
+											offset : new differ.math.Vector( obj.x + cent.x, obj.y + cent.y )
+										} );
 
 									if ( center.x == 0 && center.y == 0 ) {
 										center.x = cent.x + obj.x;
@@ -352,23 +346,23 @@ class GameServer extends Process implements Serializable {
 											center.x = obj.x;
 											center.y = obj.y;
 									}
-								case OTPolygon(points):
-									var pts = makePolyClockwise(points);
-									rotatePoly(obj, pts);
+								case OTPolygon( points ):
+									var pts = makePolyClockwise( points );
+									rotatePoly( obj, pts );
 
-									var cent = getProjectedDifferPolygonRect(obj, points);
+									var cent = getProjectedDifferPolygonRect( obj, points );
 
 									var verts : Array<Vector> = [];
-									for ( i in pts ) verts.push(new Vector(i.x, i.y));
+									for ( i in pts ) verts.push( new Vector( i.x, i.y ) );
 
-									var poly = new Polygon(0, 0, verts);
+									var poly = new Polygon( 0, 0, verts );
 
 									poly.scaleY = -1;
 									ent.collisions.set(
 										poly,
 										{
-											cent : new differ.math.Vector(cent.x, cent.y),
-											offset : new differ.math.Vector(obj.x, obj.y)
+											cent : new differ.math.Vector( cent.x, cent.y ),
+											offset : new differ.math.Vector( obj.x, obj.y )
 										}
 									);
 									objx = obj.x;
@@ -387,23 +381,24 @@ class GameServer extends Process implements Serializable {
 
 						ent.pivot = { x : pivotX, y : pivotY };
 
-						var actualX = Std.int(ent.tmxObj.width) >> 1;
-						var actualY = Std.int(ent.tmxObj.height);
+						var actualX = Std.int( ent.tmxObj.width ) >> 1;
+						var actualY = Std.int( ent.tmxObj.height );
 
 						ent.footX -= actualX - pivotX;
 						ent.footY += actualY - pivotY;
 
 						#if depth_debug
-						ent.mesh.renewDebugPts();
+						if ( ent.mesh != null )
+							ent.mesh.renewDebugPts();
 						#end
 
 						try {
-							cast(ent, Interactive).rebuildInteract();
+							cast( ent, Interactive ).rebuildInteract();
 						}
-						catch( e:Dynamic ) {}
+						catch( e : Dynamic ) {}
 
-						if ( Std.isOfType(ent, SpriteEntity) && tile.properties.exists("interactable") ) {
-							cast(ent, SpriteEntity).interactable = tile.properties.getBool("interactable");
+						if ( Std.isOfType( ent, SpriteEntity ) && tile.properties.exists( "interactable" ) ) {
+							cast( ent, SpriteEntity ).interactable = tile.properties.getBool( "interactable" );
 						}
 					}
 				}

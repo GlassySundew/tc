@@ -16,7 +16,7 @@
 		"text": "build all",
 		"color": "#47a3ff",
 		"commandType": "palette",
-		"command": "workbench.action.tasks.runTask|build all",
+		"command": "workbench.action.tasks.runTask|build all and display time",
 		"alignment": "right",
 		"skipTerminateQuickPick": false,
 		"priority": -12

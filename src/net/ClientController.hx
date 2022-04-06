@@ -42,9 +42,6 @@ class ClientController implements hxbit.NetworkSerializable {
 	}
 
 	function set_level( level : ServerLevel ) {
-		if ( GameClient.inst != null && level != null )
-			trace( "trying to set level " + isOwner + Client.inst.uid, uid );
-
 		if ( GameClient.inst != null && level != null && isOwner ) {
 
 			GameClient.inst.delayer.addF(() -> {

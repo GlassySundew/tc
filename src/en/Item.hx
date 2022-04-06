@@ -27,7 +27,7 @@ class Item implements NetworkSerializable {
 	public var containerEntity : Entity;
 	public var itemPresense : ItemPresense;
 
-	public var isDisposed : Bool;
+	@:s public var isDisposed : Bool;
 
 	public var itemSprite : ItemSprite;
 
@@ -41,10 +41,10 @@ class Item implements NetworkSerializable {
 	inline public function isSameTo( item : Item ) : Bool return '${item}' == '$this' && item.cdbEntry == cdbEntry;
 
 	public function new( cdbEntry : Data.ItemKind ) {
-
 		this.cdbEntry = cdbEntry;
-		enableReplication = true;
 		isDisposed = false;
+
+		enableReplication = true;
 	}
 
 	inline public function dispose() {

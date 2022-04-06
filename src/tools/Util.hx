@@ -287,7 +287,7 @@ class TmxLayerExtender {
 
 class SocketHostExtender {
 	static public function waitFixed( sHost : SocketHost, host : String, port : Int, ?onConnected : NetworkClient -> Void,
-		?onError : SocketClient -> Void ) @:privateAccess {
+		?onError : SocketClient -> String -> Void ) @:privateAccess {
 
 		sHost.close();
 		sHost.isAuth = false;
@@ -296,8 +296,8 @@ class SocketHostExtender {
 		sHost.socket.bind(host, port, function ( s ) {
 			var c = new SocketClient(sHost, s);
 			sHost.pendingClients.push(c);
-			s.onError = function ( _ ) {
-				if ( onError != null ) onError(c);
+			s.onError = function ( e ) {
+				if ( onError != null ) onError(c, e);
 				c.stop();
 			}
 			if ( onConnected != null ) onConnected(c);

@@ -1,3 +1,4 @@
+import Client.DebugClient;
 import dn.Process;
 import h2d.Bitmap;
 import h2d.Flow;
@@ -22,24 +23,26 @@ class MainMenu extends Process {
 	var parents2d : Object;
 	var blackOverlay : Bitmap;
 
+	var isHostDebug : ShadowedText;
+
 	public function new( ?parent : Object ) {
-		super(Main.inst);
+		super( Main.inst );
 
 		this.parents2d = parent;
 
 		parentFlow = new Flow();
 
-		Main.inst.root.add(parentFlow, Const.DP_BG);
+		Main.inst.root.add( parentFlow, Const.DP_BG );
 
-		camera = new Camera(this);
+		camera = new Camera( this );
 
-		vertFlow = new Flow(parentFlow);
-		socialFlow = new Flow(parentFlow);
-		planetFlow = new Object(parentFlow);
+		vertFlow = new Flow( parentFlow );
+		socialFlow = new Flow( parentFlow );
+		planetFlow = new Object( parentFlow );
 
-		parentFlow.getProperties(vertFlow).isAbsolute = true;
-		parentFlow.getProperties(socialFlow).isAbsolute = true;
-		parentFlow.getProperties(planetFlow).isAbsolute = true;
+		parentFlow.getProperties( vertFlow ).isAbsolute = true;
+		parentFlow.getProperties( socialFlow ).isAbsolute = true;
+		parentFlow.getProperties( planetFlow ).isAbsolute = true;
 
 		/*
 			var riversBmp = new Bitmap(Tile.fromTexture(new Texture(100, 100)).center(), planetFlow);
@@ -91,49 +94,49 @@ class MainMenu extends Process {
 		socialFlow.paddingBottom = 7;
 		socialFlow.horizontalSpacing = 9;
 
-		var disco0 = new HSprite(Assets.ui, "discord0");
-		var disco1 = new HSprite(Assets.ui, "discord1");
-		var disco2 = new HSprite(Assets.ui, "discord2");
+		var disco0 = new HSprite( Assets.ui, "discord0" );
+		var disco1 = new HSprite( Assets.ui, "discord1" );
+		var disco2 = new HSprite( Assets.ui, "discord2" );
 
-		var disco = new Button([disco0.tile, disco1.tile, disco2.tile], socialFlow);
-		disco.scale(.5);
-		disco.onClickEvent.add(( _ ) -> {
-			System.openURL("https://discord.gg/8v2DFd6");
-		});
+		var disco = new Button( [disco0.tile, disco1.tile, disco2.tile], socialFlow );
+		disco.scale( .5 );
+		disco.onClickEvent.add( ( _ ) -> {
+			System.openURL( "https://discord.gg/8v2DFd6" );
+		} );
 
-		var twitter0 = new HSprite(Assets.ui, "twitter0");
-		var twitter1 = new HSprite(Assets.ui, "twitter1");
-		var twitter2 = new HSprite(Assets.ui, "twitter2");
+		var twitter0 = new HSprite( Assets.ui, "twitter0" );
+		var twitter1 = new HSprite( Assets.ui, "twitter1" );
+		var twitter2 = new HSprite( Assets.ui, "twitter2" );
 
-		var twitter = new Button([twitter0.tile, twitter1.tile, twitter2.tile], socialFlow);
-		twitter.scale(.5);
-		twitter.onClickEvent.add(( _ ) -> {
-			System.openURL("https://twitter.com/GlassySundew");
-		});
+		var twitter = new Button( [twitter0.tile, twitter1.tile, twitter2.tile], socialFlow );
+		twitter.scale( .5 );
+		twitter.onClickEvent.add( ( _ ) -> {
+			System.openURL( "https://twitter.com/GlassySundew" );
+		} );
 
-		socialFlow.addSpacing(-4);
+		socialFlow.addSpacing( -4 );
 
-		var vk0 = new HSprite(Assets.ui, "vk0");
-		var vk1 = new HSprite(Assets.ui, "vk1");
-		var vk2 = new HSprite(Assets.ui, "vk2");
+		var vk0 = new HSprite( Assets.ui, "vk0" );
+		var vk1 = new HSprite( Assets.ui, "vk1" );
+		var vk2 = new HSprite( Assets.ui, "vk2" );
 
-		var vk = new Button([vk0.tile, vk1.tile, vk2.tile], socialFlow);
-		vk.scale(.5);
-		vk.onClickEvent.add(( _ ) -> {
-			System.openURL("https://vk.com/totalcondemn");
-		});
-		socialFlow.getProperties(vk).offsetY = -1;
+		var vk = new Button( [vk0.tile, vk1.tile, vk2.tile], socialFlow );
+		vk.scale( .5 );
+		vk.onClickEvent.add( ( _ ) -> {
+			System.openURL( "https://vk.com/totalcondemn" );
+		} );
+		socialFlow.getProperties( vk ).offsetY = -1;
 
 		vertFlow.paddingLeft = 10;
 		vertFlow.verticalAlign = Middle;
 		vertFlow.layout = Vertical;
 		vertFlow.verticalSpacing = 1;
 
-		var mm = new ShadowedText(Assets.fontPixel, vertFlow);
-		mm.scale(1.5);
+		var mm = new ShadowedText( Assets.fontPixel, vertFlow );
+		mm.scale( 1.5 );
 		mm.text = "Total condemn";
 
-		vertFlow.addSpacing(10);
+		vertFlow.addSpacing( 10 );
 
 		// new TextButton("login", ( _ ) -> {
 		// 	destroy();
@@ -141,63 +144,94 @@ class MainMenu extends Process {
 		// }, vertFlow);
 
 		var newGame : TextButton = null;
-		newGame = new TextButton("new game", ( _ ) -> {
+		newGame = new TextButton( "new gme", ( _ ) -> {
 			var dialog : NewSaveDialog = null;
-			dialog = new NewSaveDialog(() -> {
-				Main.inst.startGame("100000");
-				
-				destroy();
-			}, Save, null, Main.inst.root);
+			dialog = new NewSaveDialog( ( name ) -> {
+				Client.inst.addOnConnectionCallback(() -> Client.inst.sendMessage( SaveSystemOrder( CreateNewSave( name ) ) ) );
 
-			Main.inst.root.add(dialog, Const.DP_UI + 2);
+				Main.inst.startGame( "100000" );
+				destroy();
+			}, Save, null, Main.inst.root );
+
+			Main.inst.root.add( dialog, Const.DP_UI + 2 );
 			dialog.x = parentFlow.x;
 			dialog.y = newGame.y;
-		}, vertFlow);
+		}, vertFlow );
 
 		if ( params.saveFiles.length > 0 ) {
 			var loadObj : Object = null;
-			loadObj = new TextButton("load game", ( _ ) -> {
-				var loadMan = new SaveManager(Load, () -> {
-					Main.inst.startGame("1000000");
+			loadObj = new TextButton( "load game", ( _ ) -> {
+				var loadMan = new SaveManager( Load, () -> {
+					Main.inst.startGame( "1000000" );
 
 					destroy();
-				}, parentFlow);
+				}, parentFlow );
 				loadMan.x = loadObj.x + loadObj.getSize().xMax + 20;
-				parentFlow.getProperties(loadMan).isAbsolute = true;
-			}, vertFlow);
+				parentFlow.getProperties( loadMan ).isAbsolute = true;
+			}, vertFlow );
 		}
 
-		new TextButton("options", ( _ ) -> {
-			new OptionsMenu(parentFlow);
-		}, vertFlow);
+		new TextButton( "connect to somewhere", ( _ ) -> {
+			new OptionsMenu( parentFlow );
+		}, vertFlow );
 
-		new TextButton("exit", ( _ ) -> {
+		new TextButton( "options", ( _ ) -> {
+			new OptionsMenu( parentFlow );
+		}, vertFlow );
+
+		new TextButton( "exit", ( _ ) -> {
 			System.exit();
-		}, vertFlow);
+		}, vertFlow );
 
 		// var but1 = new TextButton("Multiplayer", () -> {}, vertFlow);
-		blackOverlay = new Bitmap(Tile.fromColor(0x000000, wScaled, hScaled));
+		blackOverlay = new Bitmap( Tile.fromColor( 0x000000, wScaled, hScaled ) );
 
-		parentFlow.addChildAt(blackOverlay, 1000);
-		parentFlow.getProperties(blackOverlay).isAbsolute = true;
+		parentFlow.addChildAt( blackOverlay, 1000 );
+		parentFlow.getProperties( blackOverlay ).isAbsolute = true;
 
-		Main.inst.tw.createS(blackOverlay.alpha, 1 > 0, TBackOut, 2).end(() -> {
+		Main.inst.tw.createS( blackOverlay.alpha, 1 > 0, TBackOut, 2 ).end(() -> {
 			blackOverlay.remove();
 			blackOverlay = null;
-		});
+		} );
 
 		Boot.inst.engine.backgroundColor = 0x0c0c0c;
+
+		#if debug
+		// delayer.addF(() -> {
+		// 	var client = new DebugClient();
+		// 	isHostDebug = new ShadowedText( parentFlow );
+		// 	parentFlow.getProperties( isHostDebug ).isAbsolute = true;
+		// 	client.onConnection.add(() -> {
+		// 		client.requestServerStatus( ( msg : Message ) -> {
+		// 			switch msg {
+		// 				case ServerStatus( isHost ):
+		// 					trace( "got respond" );
+
+		// 					if ( isHost ) {
+		// 						isHostDebug.color = dn.Color.intToVector( 0x4cbb17 );
+		// 						isHostDebug.text = "Host online";
+		// 					} else {
+		// 						isHostDebug.color = dn.Color.intToVector( 0xff0038 );
+		// 						isHostDebug.text = "Host offline";
+		// 					}
+		// 				default: "";
+		// 			}
+		// 		} );
+		// 	}, true );
+		// }, 10 );
+		#end
+
 		onResize();
 	}
 
 	override function onResize() {
 		super.onResize();
 
-		planetFlow.x = Std.int(Util.wScaled * 0.74);
-		planetFlow.y = Std.int(Util.hScaled * 0.35);
-		planetFlow.scaleX = planetFlow.scaleY = Math.floor(w() / 720 + 1);
-		vertFlow.minHeight = vertFlow.maxHeight = socialFlow.minHeight = socialFlow.maxHeight = parentFlow.minHeight = parentFlow.maxHeight = Std.int(Util.hScaled);
-		vertFlow.minWidth = vertFlow.maxWidth = socialFlow.minWidth = socialFlow.maxWidth = parentFlow.minWidth = parentFlow.maxWidth = Std.int(Util.wScaled);
+		planetFlow.x = Std.int( Util.wScaled * 0.74 );
+		planetFlow.y = Std.int( Util.hScaled * 0.35 );
+		planetFlow.scaleX = planetFlow.scaleY = Math.floor( w() / 720 + 1 );
+		vertFlow.minHeight = vertFlow.maxHeight = socialFlow.minHeight = socialFlow.maxHeight = parentFlow.minHeight = parentFlow.maxHeight = Std.int( Util.hScaled );
+		vertFlow.minWidth = vertFlow.maxWidth = socialFlow.minWidth = socialFlow.maxWidth = parentFlow.minWidth = parentFlow.maxWidth = Std.int( Util.wScaled );
 	}
 
 	override function onDispose() {
@@ -206,27 +240,31 @@ class MainMenu extends Process {
 
 		if ( blackOverlay != null ) blackOverlay.remove();
 	}
+
+	override function update() {
+		super.update();
+	}
 }
 
 class TextButton extends ui.Button {
 	public function new( string : String, ?action : Event -> Void, ?colorDef : Int = 0xffffff, ?colorPressed : Int = 0x676767, ?parent ) {
-		var text = new ShadowedText(Assets.fontPixel);
-		text.color = Color.intToVector(colorDef);
+		var text = new ShadowedText( Assets.fontPixel );
+		text.color = Color.intToVector( colorDef );
 		text.text = "  " + string;
 
-		var tex0 = new Texture(Std.int(text.textWidth), Std.int(text.textHeight), [Target]);
-		text.drawTo(tex0);
+		var tex0 = new Texture( Std.int( text.textWidth ), Std.int( text.textHeight ), [Target] );
+		text.drawTo( tex0 );
 
-		var tex1 = new Texture(Std.int(text.textWidth), Std.int(text.textHeight), [Target]);
+		var tex1 = new Texture( Std.int( text.textWidth ), Std.int( text.textHeight ), [Target] );
 		text.text = "> " + string;
-		text.drawTo(tex1);
+		text.drawTo( tex1 );
 
-		text.color = Color.intToVector(colorPressed);
+		text.color = Color.intToVector( colorPressed );
 
-		var tex2 = new Texture(Std.int(text.textWidth), Std.int(text.textHeight), [Target]);
-		text.drawTo(tex2);
-		super([h2d.Tile.fromTexture(tex0), h2d.Tile.fromTexture(tex1), h2d.Tile.fromTexture(tex2)], parent);
-		onClickEvent.add(action != null ? action : ( _ ) -> {});
+		var tex2 = new Texture( Std.int( text.textWidth ), Std.int( text.textHeight ), [Target] );
+		text.drawTo( tex2 );
+		super( [h2d.Tile.fromTexture( tex0 ), h2d.Tile.fromTexture( tex1 ), h2d.Tile.fromTexture( tex2 )], parent );
+		onClickEvent.add( action != null ? action : ( _ ) -> {} );
 	}
 }
 
@@ -235,27 +273,27 @@ class OptionsMenu extends SecondaryMenu {
 	var nicknameInput : ui.TextInput;
 
 	public function new( ?parent : Object ) {
-		super(parent);
+		super( parent );
 
-		vertFlow = new Flow(this);
+		vertFlow = new Flow( this );
 
 		vertFlow.paddingLeft = 110;
 		vertFlow.verticalAlign = Middle;
 		vertFlow.layout = Vertical;
 		vertFlow.verticalSpacing = 10;
 
-		var mm = new ShadowedText(Assets.fontPixel, vertFlow);
-		mm.scale(1.5);
+		var mm = new ShadowedText( Assets.fontPixel, vertFlow );
+		mm.scale( 1.5 );
 		mm.text = "Options";
 
-		var horFlow = new Flow(vertFlow);
+		var horFlow = new Flow( vertFlow );
 		horFlow.layout = Horizontal;
 		horFlow.verticalAlign = Top;
 
-		var nickname = new ShadowedText(Assets.fontPixel, horFlow);
+		var nickname = new ShadowedText( Assets.fontPixel, horFlow );
 		nickname.text = "username: ";
 
-		nicknameInput = new ui.TextInput(Assets.fontPixel, horFlow);
+		nicknameInput = new ui.TextInput( Assets.fontPixel, horFlow );
 		nicknameInput.text = Settings.params.nickname;
 		nicknameInput.onFocusLost = function ( e : Event ) {
 			Settings.params.nickname = nicknameInput.text;
@@ -272,12 +310,12 @@ class OptionsMenu extends SecondaryMenu {
 	}
 
 	override function sync( ctx : RenderContext ) {
-		vertFlow.minHeight = Std.int(Util.hScaled);
-		vertFlow.minWidth = Std.int(Util.wScaled);
-		vertFlow.paddingTop = -Std.int(Util.hScaled / 4);
-		super.sync(ctx);
+		vertFlow.minHeight = Std.int( Util.hScaled );
+		vertFlow.minWidth = Std.int( Util.wScaled );
+		vertFlow.paddingTop = -Std.int( Util.hScaled / 4 );
+		super.sync( ctx );
 
-		if ( Main.inst.ca.isPressed(SELECT) ) {
+		if ( Main.inst.ca.isPressed( SELECT ) ) {
 			remove();
 		}
 	}

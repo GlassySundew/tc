@@ -1,9 +1,5 @@
 package en;
 
-import hxd.clipper.Clipper.ClipperOffset;
-import net.ClientToServer;
-import en.player.Player;
-import net.ClientController;
 import differ.Collision;
 import differ.shapes.Circle;
 import differ.shapes.Polygon;
@@ -11,8 +7,6 @@ import differ.shapes.Shape;
 import dn.heaps.slib.HSprite;
 import en.objs.IsoTileSpr;
 import format.tmx.Data.TmxObject;
-import format.tmx.Data.TmxTilesetTile;
-import format.tmx.Tools;
 import h2d.Tile;
 import h3d.Vector;
 import h3d.mat.Texture;
@@ -24,8 +18,8 @@ import hxGeomAlgo.PoleOfInaccessibility;
 import hxbit.NetworkSerializable;
 import hxbit.Serializable;
 import hxd.IndexBuffer;
+import net.ClientToServer.AClientToServerFloat;
 import tools.Save;
-import ui.InventoryGrid.UICellGrid;
 import ui.InventoryGrid;
 
 @:structInit
@@ -54,8 +48,10 @@ class Entity implements NetworkSerializable {
 	public var yr = 0.5;
 	public var zr = 0.;
 
-	@:s public var dx = 0.;
-	@:s public var dy = 0.;
+	public var dx = 0.;
+
+	public var dy = 0.;
+
 	public var dz = 0.;
 	public var bdx = 0.;
 	public var bdy = 0.;
@@ -80,19 +76,11 @@ class Entity implements NetworkSerializable {
 			Client.inst.tmod #end;
 	}
 
-	// @:s public var netX( default, set ) : Float;
-	// @:s public var netY( default, set ) : Float;
-	// function set_netY( v : Float ) {
-	// 	return netY = v;
-	// }
-	// function set_netX( v : Float ) {
-	// 	return netX = v;
-	// }
 	@:s
-	public var footX : AClientToServer<Float>;
+	public var footX : AClientToServerFloat;
 
 	@:s
-	public var footY : AClientToServer<Float>;
+	public var footY : AClientToServerFloat;
 
 	// public var tmxTile( get, never ) : TmxTilesetTile;
 	// inline function get_tmxTile() return Tools.getTileByGid( Level.inst.data, tmxObj.objectType.getParameters()[0] );
@@ -140,8 +128,8 @@ class Entity implements NetworkSerializable {
 	public function new( ?x : Float = 0, ?z : Float = 0, ?tmxObj : Null<TmxObject> ) {
 		ServerALL.push( this );
 
-		footX = new AClientToServer( 0., () -> false );
-		footY = new AClientToServer( 0., () -> false );
+		footX = new AClientToServerFloat( 0., () -> false );
+		footY = new AClientToServerFloat( 0., () -> false );
 
 		flippedX = false;
 		collisions = new Map<Shape, CollisionObjectData>();
@@ -160,8 +148,6 @@ class Entity implements NetworkSerializable {
 	}
 
 	public function init( ?x : Float, ?z : Float, ?tmxObj : Null<TmxObject> ) {
-		footX.clientToServerCond = footY.clientToServerCond = () -> false;
-
 		enableReplication = true;
 
 		cd = new dn.Cooldown( Const.FPS );
@@ -460,7 +446,6 @@ class Entity implements NetworkSerializable {
 		return M.dist( footX, footY, x, y );
 	}
 
-	@:rpc
 	public function destroy() {
 		if ( !destroyed ) {
 			destroyed = true;
@@ -662,7 +647,6 @@ class Entity implements NetworkSerializable {
 	}
 
 	public function update() {
-
 		// @:privateAccess if (spr.anim.getCurrentAnim() != null) {
 		// 	if ( tmpCur != 0 && (spr.anim.getCurrentAnim().curFrameCpt - (tmpDt)) == 0 ) // ANIM LINK HACK
 		// 		spr.anim.getCurrentAnim().curFrameCpt = tmpCur + spr.anim.getAnimCursor();

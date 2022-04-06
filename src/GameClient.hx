@@ -1,23 +1,16 @@
-import haxe.CallStack;
-import net.ClientController;
-import en.Entity;
 import Level.StructTile;
-import cherry.soup.EventSignal.EventSignal0;
 import differ.math.Vector;
 import differ.shapes.Circle;
 import differ.shapes.Polygon;
 import dn.Process;
+import en.Entity;
 import en.player.Player;
-import format.tmx.*;
 import format.tmx.Data;
 import h3d.scene.CameraController;
 import h3d.scene.Object;
-import haxe.Unserializer;
-import hxbit.Serializer;
-import tools.Save;
+import net.ClientController;
 import tools.Settings;
 import ui.Hud;
-import ui.Navigation;
 import ui.PauseMenu;
 
 /** 
@@ -287,8 +280,8 @@ class GameClient extends Process {
 						}
 
 						// ending serving this particular entity 'ent' here
-						var pivotX = (center.x) / ent.tmxObj.width;
-						var pivotY = (center.y) / ent.tmxObj.height;
+						var pivotX = ( center.x ) / ent.tmxObj.width;
+						var pivotY = ( center.y ) / ent.tmxObj.height;
 
 						// ent.setPivot(pivotX, pivotY);
 
@@ -303,12 +296,12 @@ class GameClient extends Process {
 						#end
 
 						try {
-							cast(ent, Interactive).rebuildInteract();
+							cast( ent, Interactive ).rebuildInteract();
 						}
-						catch( e:Dynamic ) {}
+						catch( e : Dynamic ) {}
 
 						if ( Std.isOfType( ent, SpriteEntity ) && tile.properties.exists( "interactable" ) ) {
-							cast(ent, SpriteEntity).interactable = tile.properties.getBool( "interactable" );
+							cast( ent, SpriteEntity ).interactable = tile.properties.getBool( "interactable" );
 						}
 					}
 				}
@@ -325,6 +318,7 @@ class GameClient extends Process {
 
 	override function onDispose() {
 		super.onDispose();
+
 		if ( Player.inst != null ) {
 			Player.inst.saveSettings();
 		}
@@ -341,6 +335,8 @@ class GameClient extends Process {
 		gc();
 
 		if ( PauseMenu.inst != null ) PauseMenu.inst.destroy();
+
+		Client.inst.disconnect();
 	}
 
 	public override function onResize() {
@@ -452,7 +448,7 @@ class GridHelper extends h3d.scene.Graphics {
 		var center = divisions / 2;
 		for ( i in 0...divisions + 1 ) {
 			var p = i * csize;
-			setColor( (i != 0 && i != divisions && i % center == 0) ? color2 : color1 );
+			setColor( ( i != 0 && i != divisions && i % center == 0 ) ? color2 : color1 );
 			moveTo(-hsize + p, -hsize, 0 );
 			lineTo(-hsize + p, -hsize + size, 0 );
 			moveTo(-hsize, -hsize + p, 0 );

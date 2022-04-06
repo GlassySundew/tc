@@ -1,0 +1,8 @@
+
+-hl bin/game.hl
+# -D hl-profile
+
+hxml/common/debug.hxml
+hxml/common/hl.sdl.hxml
+
+--connect 64228
