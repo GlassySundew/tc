@@ -1,12 +1,9 @@
 -cp src
 -cp .
--cp vendor/format-tiled/
--cp vendor/
--cp vendor/set/src
 
 -dce full
 
-# -lib hide
+-lib hide
 -lib domkit
 -lib heaps
 -lib Heeps

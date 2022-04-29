@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx",
+    "activeFile": "tiled/levels/ship_pascal.tmx",
     "automapping.whileDrawing": false,
     "expandedProjectPaths": [
-        "tiled",
-        "."
+        ".",
+        "tiled"
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
@@ -513,8 +513,8 @@
             "scale": 1.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 244.66666666666669,
-                "y": 125.66666666666663
+                "x": 224,
+                "y": 98.33333333333333
             }
         },
         "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx#CONGRUENT": {
@@ -744,8 +744,8 @@
             "scale": 3,
             "selectedLayer": 9,
             "viewCenter": {
-                "x": 615,
-                "y": 146.83333333333331
+                "x": 634.6666666666666,
+                "y": 261.8333333333333
             }
         },
         "tiled/levels/test.tmx": {
@@ -801,17 +801,17 @@
     "project": "res.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "tiled/levels/ship_pascal.tmx",
-        "tiled/levels/bridge.tmx",
-        "tiled/levels/alpha.tsx",
-        "tiled/levels/ui.tmx",
-        "tiled/levels/ui.tsx",
-        "tiled/levels/entities.tsx",
-        "tiled/levels/rules/rules.tmx",
-        "tiled/levels/rules/random.tmx",
-        "tiled/levels/asteroid.tmx",
-        "tiled/levels/procgen/asteroids.tmx",
         "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx",
+        "tiled/levels/procgen/asteroids.tmx",
+        "tiled/levels/asteroid.tmx",
+        "tiled/levels/rules/random.tmx",
+        "tiled/levels/rules/rules.tmx",
+        "tiled/levels/entities.tsx",
+        "tiled/levels/ui.tsx",
+        "tiled/levels/ui.tmx",
+        "tiled/levels/alpha.tsx",
+        "tiled/levels/bridge.tmx",
+        "tiled/levels/ship_pascal.tmx",
         "tiled/levels/test.tmx"
     ],
     "resizeMap.removeObjects": true,

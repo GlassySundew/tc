@@ -1,9 +1,9 @@
 package tools;
 
 import Sys.SysError;
-import hxd.File;
 import h3d.Vector;
 import haxe.io.Path;
+import hxd.File;
 
 @:publicFields
 @:expose

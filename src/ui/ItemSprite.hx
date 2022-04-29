@@ -1,5 +1,6 @@
 package ui;
 
+import dn.heaps.input.ControllerAccess;
 import haxe.CallStack;
 import ch2.ui.EventInteractive;
 import en.player.Player;
@@ -18,14 +19,14 @@ class ItemSprite extends Flow {
 	public var item : Item;
 
 	var tooltip : TextLabelComp;
-	var ca : dn.heaps.Controller.ControllerAccess;
+	var ca : ControllerAccess<ControllerAction>;
 
 	var displayText : String = "";
 
 	public function new( item : Item, ?parent : h2d.Object ) {
 		super(parent);
 		
-		ca = Main.inst.controller.createAccess("chest");
+		ca = Main.inst.controller.createAccess();
 
 		this.item = item;
 		item.itemSprite = this;
@@ -81,7 +82,7 @@ class ItemSprite extends Flow {
 		}
 
 		eventInteractive.onTextInput = ( e ) -> {
-			if ( ca.yPressed() ) {
+			if ( ca.isPressed( DropItem ) ) {
 				if ( !item.isDisposed ) {
 					if ( Key.isDown(Key.CTRL) ) {
 						// dropping whole stack

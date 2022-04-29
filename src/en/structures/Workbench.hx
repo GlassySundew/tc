@@ -8,7 +8,7 @@ import format.tmx.Data.TmxObject;
 class Workbench extends Structure {
 	var crafting : Crafting;
 
-	var ca : dn.heaps.Controller.ControllerAccess;
+	var ca : ControllerAccess<ControllerAction>;
 
 	public function new( x : Float, y : Float, ?tmxObject : TmxObject ) {
 		super(x, y, tmxObject);
@@ -17,7 +17,7 @@ class Workbench extends Structure {
 
 	override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
 		super.init(x, z, tmxObj);
-		ca = Main.inst.controller.createAccess("workbench");
+		ca = Main.inst.controller.createAccess();
 
 		GameClient.inst.delayer.addF(() -> {
 
@@ -26,7 +26,7 @@ class Workbench extends Structure {
 		}, 2);
 
 		interact.onTextInputEvent.add(( e : Event ) -> {
-			if ( ca.aPressed() ) {
+			if ( ca.isPressed(Escape) ) {
 				if ( !Player.inst.ui.inventory.win.visible ) Player.inst.ui.inventory.toggleVisible();
 				crafting.toggleVisible();
 				// Window.centrizeTwoWins(Player.inst.ui.inventory, inventory);

@@ -1,5 +1,4 @@
 import Level.StructTile;
-import MainMenu.TextButton;
 import cherry.soup.EventSignal.EventSignal0;
 import cherry.soup.EventSignal.EventSignal2;
 import dn.Process;
@@ -7,6 +6,7 @@ import h2d.Flow;
 import hxbit.NetworkHost.NetworkClient;
 import tools.Settings;
 import ui.ShadowedText;
+import ui.TextButton;
 
 class Client extends Process {
 	static var HOST = "127.0.0.1";

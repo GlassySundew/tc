@@ -1,3 +1,4 @@
+import ui.PauseMenu;
 import Level.StructTile;
 import differ.math.Vector;
 import differ.shapes.Circle;
@@ -11,7 +12,6 @@ import h3d.scene.Object;
 import net.ClientController;
 import tools.Settings;
 import ui.Hud;
-import ui.PauseMenu;
 
 /** 
 	@param manual debug parameter, if true, player will not be kept and will be load clear from tmx entity named 'player'
@@ -37,7 +37,6 @@ class LevelLoadPlayerConfig {
 class GameClient extends Process {
 	public static var inst : GameClient;
 
-	public var ca : dn.heaps.Controller.ControllerAccess;
 	public var camera : Camera;
 
 	private var cam : CameraController;
@@ -55,11 +54,12 @@ class GameClient extends Process {
 	public var structTiles : Array<StructTile> = [];
 
 	public var suspended : Bool = false;
-	public var pauseCycle : Bool = false;
 
 	public var navFieldsGenerated : Null<Int>;
 
 	public var clientController : ClientController;
+
+	var ca : ControllerAccess<ControllerAction>;
 
 	#if game_tmod
 	var stats : h2d.Text;
@@ -69,6 +69,8 @@ class GameClient extends Process {
 		super( Main.inst );
 
 		inst = this;
+
+		ca = Main.inst.controller.createAccess();
 
 		// generating initial asteroids to have where to put player on
 		// we do not yet have need to save stuff about asteroids, temporal clause
@@ -88,10 +90,6 @@ class GameClient extends Process {
 		#if game_tmod
 		stats = new Text( Assets.fontPixel, Boot.inst.s2d );
 		#end
-
-		ca = Main.inst.controller.createAccess( "game" );
-		ca.setLeftDeadZone( 0.2 );
-		ca.setRightDeadZone( 0.2 );
 
 		createRootInLayers( Main.inst.root, Const.DP_BG );
 
@@ -334,13 +332,9 @@ class GameClient extends Process {
 		for ( e in Entity.ALL ) e.destroy();
 		gc();
 
-		if ( PauseMenu.inst != null ) PauseMenu.inst.destroy();
-
 		Client.inst.disconnect();
-	}
 
-	public override function onResize() {
-		super.onResize();
+		ca.dispose();
 	}
 
 	override function update() {
@@ -350,14 +344,17 @@ class GameClient extends Process {
 		stats.text = "tmod: " + tmod;
 		#end
 
-		pauseCycle = false;
-
 		// Updates
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.preUpdate();
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.update();
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.postUpdate();
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.frameEnd();
 		gc();
+
+		if ( ca.isPressed( Escape ) ) {
+
+			new PauseMenu( this, Main.inst.root, Main.inst );
+		}
 	}
 
 	public function showStrTiles() {
@@ -370,46 +367,10 @@ class GameClient extends Process {
 
 	override function pause() {
 		super.pause();
-		// if ( Player.inst != null && Player.inst.holdItem != null ) Player.inst.holdItem.visible = false;
 	}
 
 	override function resume() {
 		super.resume();
-		// if ( Player.inst != null && Player.inst.holdItem != null ) Player.inst.holdItem.visible = true;
-	}
-
-	public function suspendGame() {
-		if ( suspended ) return;
-
-		suspended = true;
-		dn.heaps.slib.SpriteLib.DISABLE_ANIM_UPDATES = true;
-
-		// Pause other process
-		for ( p in Process.ROOTS ) if ( p != this ) p.pause();
-
-		// Create mask
-		root.visible = true;
-		root.removeChildren();
-	}
-
-	public function resumeGame() {
-		if ( !suspended ) return;
-		dn.heaps.slib.SpriteLib.DISABLE_ANIM_UPDATES = false;
-
-		delayer.addF( function () {
-			root.visible = false;
-			root.removeChildren();
-		}, 1 );
-		suspended = false;
-
-		for ( p in Process.ROOTS ) if ( p != this ) p.resume();
-	}
-
-	public function toggleGamePause() {
-		if ( suspended ) {
-			resumeGame();
-		} else
-			suspendGame();
 	}
 }
 

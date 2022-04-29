@@ -1,3 +1,5 @@
+#if !macro
+
 import dn.Color;
 import dn.Lib;
 import dn.M;
@@ -11,6 +13,7 @@ import tools.Settings.*;
 import tools.Settings;
 import tools.Util.*;
 import tools.Util;
+import dn.heaps.input.ControllerAccess;
 
 using Item.StackExtender;
 using tools.Util.FlowExtender;
@@ -19,3 +22,5 @@ using tools.Util.SeedyRandomExtender;
 using tools.Util.SocketHostExtender;
 using tools.Util.TmxLayerExtender;
 using tools.Util.TmxMapExtender;
+
+#end

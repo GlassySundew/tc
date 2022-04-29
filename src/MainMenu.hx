@@ -1,18 +1,17 @@
-import Client.DebugClient;
+import ui.dialog.NewSaveDialog;
 import dn.Process;
 import h2d.Bitmap;
 import h2d.Flow;
 import h2d.Object;
-import h2d.RenderContext;
 import h2d.Tile;
 import h3d.mat.Texture;
 import hxd.Event;
 import hxd.System;
-import tools.Settings;
 import ui.Button;
-import ui.SaveManager;
-import ui.SecondaryMenu;
 import ui.ShadowedText;
+import ui.TextButton;
+import ui.dialog.OptionsMenu;
+import ui.dialog.SaveManager;
 
 class MainMenu extends Process {
 	var parentFlow : Flow;
@@ -144,18 +143,15 @@ class MainMenu extends Process {
 		// }, vertFlow);
 
 		var newGame : TextButton = null;
-		newGame = new TextButton( "new gme", ( _ ) -> {
-			var dialog : NewSaveDialog = null;
-			dialog = new NewSaveDialog( ( name ) -> {
-				Client.inst.addOnConnectionCallback(() -> Client.inst.sendMessage( SaveSystemOrder( CreateNewSave( name ) ) ) );
-
+		newGame = new TextButton( "new game", ( _ ) -> {
+			var dialog = new NewSaveDialog( ( name ) -> {
 				Main.inst.startGame( "100000" );
+
+				Client.inst.addOnConnectionCallback(() -> Client.inst.sendMessage( SaveSystemOrder( CreateNewSave( name ) ) ) );
 				destroy();
 			}, Save, null, Main.inst.root );
 
-			Main.inst.root.add( dialog, Const.DP_UI + 2 );
-			dialog.x = parentFlow.x;
-			dialog.y = newGame.y;
+			Main.inst.root.add( dialog.h2dObject, Const.DP_UI );
 		}, vertFlow );
 
 		if ( params.saveFiles.length > 0 ) {
@@ -165,18 +161,19 @@ class MainMenu extends Process {
 					Main.inst.startGame( "1000000" );
 
 					destroy();
-				}, parentFlow );
-				loadMan.x = loadObj.x + loadObj.getSize().xMax + 20;
-				parentFlow.getProperties( loadMan ).isAbsolute = true;
+				} );
+				Main.inst.root.add( loadMan.h2dObject, Const.DP_UI );
+
+				// loadMan.h2dObject.x = loadObj.x + loadObj.getSize().xMax + 20;
 			}, vertFlow );
 		}
 
-		new TextButton( "connect to somewhere", ( _ ) -> {
+		new TextButton( "connect", ( _ ) -> {
 			new OptionsMenu( parentFlow );
 		}, vertFlow );
 
 		new TextButton( "options", ( _ ) -> {
-			new OptionsMenu( parentFlow );
+			Main.inst.root.add( new OptionsMenu().h2dObject, Const.DP_UI );
 		}, vertFlow );
 
 		new TextButton( "exit", ( _ ) -> {
@@ -243,84 +240,5 @@ class MainMenu extends Process {
 
 	override function update() {
 		super.update();
-	}
-}
-
-class TextButton extends ui.Button {
-	public function new( string : String, ?action : Event -> Void, ?colorDef : Int = 0xffffff, ?colorPressed : Int = 0x676767, ?parent ) {
-		var text = new ShadowedText( Assets.fontPixel );
-		text.color = Color.intToVector( colorDef );
-		text.text = "  " + string;
-
-		var tex0 = new Texture( Std.int( text.textWidth ), Std.int( text.textHeight ), [Target] );
-		text.drawTo( tex0 );
-
-		var tex1 = new Texture( Std.int( text.textWidth ), Std.int( text.textHeight ), [Target] );
-		text.text = "> " + string;
-		text.drawTo( tex1 );
-
-		text.color = Color.intToVector( colorPressed );
-
-		var tex2 = new Texture( Std.int( text.textWidth ), Std.int( text.textHeight ), [Target] );
-		text.drawTo( tex2 );
-		super( [h2d.Tile.fromTexture( tex0 ), h2d.Tile.fromTexture( tex1 ), h2d.Tile.fromTexture( tex2 )], parent );
-		onClickEvent.add( action != null ? action : ( _ ) -> {} );
-	}
-}
-
-class OptionsMenu extends SecondaryMenu {
-	var vertFlow : Flow;
-	var nicknameInput : ui.TextInput;
-
-	public function new( ?parent : Object ) {
-		super( parent );
-
-		vertFlow = new Flow( this );
-
-		vertFlow.paddingLeft = 110;
-		vertFlow.verticalAlign = Middle;
-		vertFlow.layout = Vertical;
-		vertFlow.verticalSpacing = 10;
-
-		var mm = new ShadowedText( Assets.fontPixel, vertFlow );
-		mm.scale( 1.5 );
-		mm.text = "Options";
-
-		var horFlow = new Flow( vertFlow );
-		horFlow.layout = Horizontal;
-		horFlow.verticalAlign = Top;
-
-		var nickname = new ShadowedText( Assets.fontPixel, horFlow );
-		nickname.text = "username: ";
-
-		nicknameInput = new ui.TextInput( Assets.fontPixel, horFlow );
-		nicknameInput.text = Settings.params.nickname;
-		nicknameInput.onFocusLost = function ( e : Event ) {
-			Settings.params.nickname = nicknameInput.text;
-			Settings.saveSettings();
-		}
-
-		// nicknameInput.onKeyDown = function(e : Event) {
-		// 	if ( e.keyCode == Key.ENTER ) {
-		// 		Util.nickname = nicknameInput.text;
-		// 		Util.saveSettings();
-		// 		if ( onRemoveEvent != null ) onRemoveEvent();
-		// 	}
-		// }
-	}
-
-	override function sync( ctx : RenderContext ) {
-		vertFlow.minHeight = Std.int( Util.hScaled );
-		vertFlow.minWidth = Std.int( Util.wScaled );
-		vertFlow.paddingTop = -Std.int( Util.hScaled / 4 );
-		super.sync( ctx );
-
-		if ( Main.inst.ca.isPressed( SELECT ) ) {
-			remove();
-		}
-	}
-
-	override function onRemove() {
-		super.onRemove();
 	}
 }

@@ -1,5 +1,6 @@
 package ui;
 
+import dn.heaps.input.ControllerAccess;
 import dn.Tweenie.Tween;
 import tools.UniformPoissonDisc.UniformPoissonDisk;
 import cherry.soup.EventSignal.EventSignal0;
@@ -81,7 +82,7 @@ class Navigation implements NetworkSerializable {
 	should only be instanced on client-side
 **/
 class NavigationWindow extends NinesliceWindow {
-	var ca : dn.heaps.Controller.ControllerAccess;
+	var ca : ControllerAccess<ControllerAction>;
 	var navMask : FixedScrollArea;
 	var bodiesContainer : Object;
 

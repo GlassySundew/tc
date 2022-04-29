@@ -33,7 +33,8 @@ class Assets {
 		// #end
 		// music.groupId = 1;
 
-		fontPixel = hxd.Res.fonts.Haversham_fnt.toSdfFont(16, MultiChannel, 0.5, 1 / 16);
+		fontPixel = hxd.Res.fonts.Haversham_new.toFont(); //toSdfFont(16, MultiChannel, 1, 1 / 16);
+
 		// fontPixel.resizeTo(fontPixel.size >>1);
 		// fontPixel
 		// fontPixel.resizeTo(8);

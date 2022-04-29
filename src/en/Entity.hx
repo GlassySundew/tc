@@ -203,9 +203,9 @@ class Entity implements NetworkSerializable {
 							isoDebugMesh.material.mainPass.depth( true, Less );
 
 							isoDebugMesh.x = 0.5;
-							isoDebugMesh.y = ( spr.pivot.centerFactorX * spr.tile.width )
+							isoDebugMesh.y = ( spr.pivot.centerFactorX * tmxObj.width )
 								- values.offset.x;
-							isoDebugMesh.z = ( spr.pivot.centerFactorY * spr.tile.height )
+							isoDebugMesh.z = ( spr.pivot.centerFactorY * tmxObj.height )
 								- values.offset.y;
 
 							isoDebugMesh.rotate( M.toRad( poly.rotation ), 0, -M.toRad( 90 ) );
@@ -225,9 +225,9 @@ class Entity implements NetworkSerializable {
 							sphere.scaleZ = circle.scaleY;
 
 							sphere.x = .25;
-							sphere.y = ( spr.pivot.centerFactorX * spr.tile.width )
+							sphere.y = ( spr.pivot.centerFactorX * tmxObj.width )
 								- values.offset.x;
-							sphere.z = ( spr.pivot.centerFactorY * spr.tile.height )
+							sphere.z = ( spr.pivot.centerFactorY * tmxObj.height )
 								- values.offset.y;
 
 							debugObjs.push( sphere );

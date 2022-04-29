@@ -1,5 +1,6 @@
 package en.player;
 
+import dn.heaps.input.ControllerAccess;
 import net.ClientToServer.AClientToServer;
 import net.ClientController;
 import haxe.CallStack;
@@ -33,8 +34,8 @@ class Player extends Entity {
 	@:s public var nickname : String;
 	public var ui : PlayerUI;
 
-	public var ca : dn.heaps.Controller.ControllerAccess;
-	public var belt : dn.heaps.Controller.ControllerAccess;
+	public var ca : ControllerAccess<ControllerAction>;
+	public var belt : ControllerAccess<ControllerAction>;
 
 	@:s public var holdItem( default, set ) : en.Item;
 
@@ -44,9 +45,6 @@ class Player extends Entity {
 	@:s public var actionState : AClientToServer<PlayerActionState>;
 
 	function set_holdItem( v : en.Item ) : Item {
-
-		// for( i in CallStack.callStack())
-		// 	trace(i);
 
 		if ( holdItem != null ) {
 			if ( holdItem.itemSprite != null )
@@ -126,9 +124,9 @@ class Player extends Entity {
 		// netY = footY;
 
 		spr = new HSprite( Assets.player, entParent );
-		ca = Main.inst.controller.createAccess( "player" );
-		belt = Main.inst.controller.createAccess( "belt" );
-		
+		ca = Main.inst.controller.createAccess();
+		belt = Main.inst.controller.createAccess();
+
 		for ( i => dir in [
 			{ dir : "right", prio : 0 },
 			{ dir : "up_right", prio : 1 },
@@ -146,7 +144,7 @@ class Player extends Entity {
 				() -> return this.dir == i && actionState.getValue() == Idle
 			);
 		}
-		
+
 		super.alive();
 
 		#if depth_debug
@@ -326,32 +324,30 @@ class Player extends Entity {
 		if ( inst == this ) {
 			// calculateIsMoving();
 
-			var leftDist = M.dist( 0, 0, ca.lxValue(), ca.lyValue() );
+			var lx = ca.getAnalogValue2(MoveLeft, MoveRight);
+			var ly = ca.getAnalogValue2(MoveDown, MoveUp);
+
+			var leftDist = M.dist( 0, 0, lx,  ly);
 			var leftPushed = leftDist >= 0.3;
-			var leftAng = Math.atan2( ca.lyValue(), ca.lxValue() );
+			var leftAng = Math.atan2( ly, lx );
 			if ( !isLocked() ) {
 				if ( leftPushed ) {
 					var s = 0.325 * leftDist;
 					dx += Math.cos( leftAng ) * s;
 					dy += Math.sin( leftAng ) * s;
 
-					if ( ca.lxValue() < -0.3 && M.fabs( ca.lyValue() ) < 0.6 ) dir = 4; else if ( ca.lyValue() < -0.3 && M.fabs( ca.lxValue() ) < 0.6 ) dir = 6;
-					else if ( ca.lxValue() > 0.3
-						&& M.fabs( ca.lyValue() ) < 0.6 ) dir = 0; else if ( ca.lyValue() > 0.3 && M.fabs( ca.lxValue() ) < 0.6 ) dir = 2;
+					if ( lx < -0.3 && M.fabs( ly ) < 0.6 ) dir = 4; else if ( ly < -0.3 && M.fabs( lx ) < 0.6 ) dir = 6;
+					else if ( lx > 0.3
+						&& M.fabs( ly ) < 0.6 ) dir = 0; else if ( ly > 0.3 && M.fabs( lx ) < 0.6 ) dir = 2;
 
-					if ( ca.lxValue() > 0.3 && ca.lyValue() > 0.3 ) dir = 1; else if ( ca.lxValue() < -0.3 && ca.lyValue() > 0.3 ) dir = 3; else
-						if ( ca.lxValue() < -0.3
-							&& ca.lyValue() < -0.3 ) dir = 5; else if ( ca.lxValue() > 0.3 && ca.lyValue() < -0.3 ) dir = 7;
+					if ( lx > 0.3 && ly > 0.3 ) dir = 1; else if ( lx < -0.3 && ly > 0.3 ) dir = 3; else
+						if ( lx < -0.3
+							&& ly < -0.3 ) dir = 5; else if ( lx > 0.3 && ly < -0.3 ) dir = 7;
 				} else {
 					dx *= Math.pow( 0.6, tmod );
 					dy *= Math.pow( 0.6, tmod );
 				}
 			}
-
-			// if ( isMoving ) {
-			// netX = footX;
-			// netY = footY;
-			// }
 
 			actionState.setValue( isMoving ? Running : Idle );
 		}
@@ -383,11 +379,11 @@ class Player extends Entity {
 	public function unlockBelt() belt.unlock();
 
 	function checkBeltInputs() {
-		if ( ca.isPressed( LT ) ) {
+		if ( ca.isPressed( ToggleInventory ) ) {
 			ui.inventory.toggleVisible();
 		}
 
-		if ( ca.isPressed( DPAD_UP ) ) {
+		if ( ca.isPressed( ToggleCraftingMenu ) ) {
 			ui.craft.toggleVisible();
 		}
 
@@ -409,13 +405,7 @@ class Player extends Entity {
 			}
 		}
 
-		if ( ca.selectPressed() ) {
-			GameClient.inst.pause();
-			GameClient.inst.pauseCycle = true;
-			new PauseMenu();
-		}
-
-		if ( ca.yPressed() ) {
+		if ( ca.isPressed(DropItem) ) {
 			// Q
 			if ( holdItem != null && !holdItem.isDisposed ) {
 				if ( Key.isDown( Key.CTRL ) ) {

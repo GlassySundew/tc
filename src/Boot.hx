@@ -1,3 +1,4 @@
+import dn.heaps.input.Controller;
 import h2d.Scene;
 import tools.Save;
 
@@ -65,7 +66,6 @@ class Boot extends hxd.App {
 	override function update( deltaTime : Float ) {
 		// Manager.get().listener.syncCamera(s3d.camera);
 		var tmod = hxd.Timer.tmod * speed;
-		dn.heaps.Controller.beforeUpdate();
 		dn.Process.updateAll(tmod);
 		super.update(deltaTime);
 	}

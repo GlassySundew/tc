@@ -1,5 +1,6 @@
 package en.structures;
 
+import dn.heaps.input.ControllerAccess;
 import en.player.Player;
 import format.tmx.Data.TmxObject;
 import hxbit.Serializer;
@@ -8,7 +9,7 @@ import ui.Navigation;
 
 class NavigationConsole extends Structure {
 	var navigation : NavigationWindow;
-	var ca : dn.heaps.Controller.ControllerAccess;
+	var ca : ControllerAccess<ControllerAction>;
 
 	public function new( x : Float, y : Float, ?tmxObject : TmxObject, ?cdbEntry : Data.StructureKind ) {
 		super(x, y, tmxObject, cdbEntry);
@@ -47,9 +48,9 @@ class NavigationConsole extends Structure {
 
 			Navigation.clientInst.navWin.updateBackgroundInteractive();
 
-			ca = Main.inst.controller.createAccess("navigation");
+			ca = Main.inst.controller.createAccess();
 			interact.onTextInput = function ( e : Event ) {
-				if ( ca.aPressed() ) {
+				if ( ca.isPressed(Escape) ) {
 					navigation.toggleVisible();
 				}
 			}

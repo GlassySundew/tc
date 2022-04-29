@@ -3,15 +3,15 @@
   "skipSwitchToOutput": false,
   "skipErrorMessage": false,
   "commands": [
-    {
-      "text": "Debug HL",
-      "color": "orange",
-      "commandType": "palette",
-      "command": "workbench.action.tasks.runTask|HL debug",
-      "alignment": "right",
-      "skipTerminateQuickPick": false,
-      "priority": -11
-    },
+    // {
+    //   "text": "Debug HL",
+    //   "color": "orange",
+    //   "commandType": "palette",
+    //   "command": "workbench.action.tasks.runTask|HL debug",
+    //   "alignment": "right",
+    //   "skipTerminateQuickPick": false,
+    //   "priority": -11
+    // },
 	{
 		"text": "build all",
 		"color": "#47a3ff",
@@ -21,15 +21,15 @@
 		"skipTerminateQuickPick": false,
 		"priority": -12
 	  },
-    {
-      "text": "Build server",
-      "color": "#4daa8f",
-      "commandType": "palette",
-      "command": "workbench.action.tasks.runTask|build server",
-      "alignment": "right",
-      "skipTerminateQuickPick": false,
-      "priority": -10
-    },
+    // {
+    //   "text": "Build server",
+    //   "color": "#4daa8f",
+    //   "commandType": "palette",
+    //   "command": "workbench.action.tasks.runTask|build server",
+    //   "alignment": "right",
+    //   "skipTerminateQuickPick": false,
+    //   "priority": -10
+    // },
     {
       "text": "Run server",
       "color": "#4daa8f",

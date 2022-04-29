@@ -8,8 +8,6 @@ import ui.domkit.InventoryComp;
 **/
 class Inventory extends NinesliceWindow {
 
-	var ca : dn.heaps.Controller.ControllerAccess;
-
 	public var cellGrid : UICellGrid;
 	public var containmentEntity : Entity;
 

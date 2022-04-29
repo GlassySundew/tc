@@ -1,11 +1,16 @@
 package;
 
+import cherry.soup.EventSignal;
+import dn.heaps.input.ControllerAccess;
+import dn.heaps.input.Controller;
 import cherry.soup.EventSignal.EventSignal0;
 import dn.Process;
 import en.player.Player;
 import hxd.Key;
 import tools.Save;
 import tools.Settings;
+
+
 
 /**
 	client-side only
@@ -15,16 +20,18 @@ class Main extends Process {
 	public static var inst : Main;
 
 	public var console : ui.Console;
-	public var controller : dn.heaps.Controller;
-	public var ca : dn.heaps.Controller.ControllerAccess;
+	public var controller : Controller<ControllerAction>;
+	public var ca : ControllerAccess<ControllerAction>;
 	public var onClose : EventSignal0;
 	public var save : Save;
+
+	public var onResizeEvent : EventSignal0 = new EventSignal0();
 
 	public function new( s : h2d.Scene ) {
 		super();
 
 		inst = this;
-		createRoot(s);
+		createRoot( s );
 
 		// root.filter = new h2d.filter.ColorMatrix();
 
@@ -36,14 +43,14 @@ class Main extends Process {
 		#end
 
 		#if debug
-		hxd.Res.data.watch(function () {
-			delayer.cancelById("cdb");
+		hxd.Res.data.watch( function () {
+			delayer.cancelById( "cdb" );
 			//
-			delayer.addS("cdb", function () {
-				Data.load(hxd.Res.data.entry.getBytes().toString());
+			delayer.addS( "cdb", function () {
+				Data.load( hxd.Res.data.entry.getBytes().toString() );
 				if ( GameClient.inst != null ) GameClient.inst.onCdbReload();
-			}, 0.2);
-		});
+			}, 0.2 );
+		} );
 		#end
 
 		Boot.inst.renderer = new CustomRenderer();
@@ -54,32 +61,35 @@ class Main extends Process {
 
 		Assets.init();
 		Cursors.init();
-		Lang.init("en");
+		Lang.init( "en" );
 
-		uiMap = MapCache.inst.get("ui.tmx");
+		uiMap = MapCache.inst.get( "ui.tmx" );
 		uiConf = uiMap.mapLayersByName();
 		for ( i in uiConf ) {
-			var window = i.getObjectByName("window");
-			if ( window != null ) i.localBy(window);
+			var window = i.getObjectByName( "window" );
+			if ( window != null ) i.localBy( window );
 		}
 
-		Data.load(hxd.Res.data.entry.getText());
+		Data.load( hxd.Res.data.entry.getText() );
 
-		console = new ui.Console(Assets.fontPixel, s);
-		controller = new dn.heaps.Controller(s);
-		ca = controller.createAccess("main");
+		console = new ui.Console( Assets.fontPixel, s );
 
-		controller.bind(AXIS_LEFT_X_NEG, Key.LEFT, Key.A);
-		controller.bind(AXIS_LEFT_X_POS, Key.RIGHT, Key.D);
-		controller.bind(AXIS_LEFT_Y_NEG, Key.UP, Key.W);
-		controller.bind(AXIS_LEFT_Y_POS, Key.DOWN, Key.S);
+		controller = new Controller( ControllerAction );
+		ca = controller.createAccess();
 
-		controller.bind(A, Key.E);
-		controller.bind(Y, Key.Q);
-		// controller.bind(B, Key.ESCAPE, Key.BACKSPACE); // ??
-		controller.bind(LT, Key.TAB); // Inventory
-		controller.bind(DPAD_UP, Key.C);
-		controller.bind(SELECT, Key.ESCAPE);
+		controller.bindPadLStick4( MoveLeft, MoveRight, MoveUp, MoveDown );
+
+		controller.bindKeyboard( MoveUp,	[Key.UP,	Key.W] );
+		controller.bindKeyboard( MoveLeft,	[Key.LEFT,	Key.A] );
+		controller.bindKeyboard( MoveDown,	[Key.DOWN,	Key.S] );
+		controller.bindKeyboard( MoveRight,	[Key.RIGHT,	Key.D] );
+
+		controller.bindKeyboard( Action, Key.E );
+		controller.bindKeyboard( DropItem, Key.Q );
+		controller.bindKeyboard( ToggleInventory, Key.TAB ); 
+		controller.bindKeyboard( ToggleCraftingMenu, Key.C );
+
+		controller.bindKeyboard( Escape, Key.ESCAPE );
 
 		onClose = new EventSignal0();
 
@@ -90,7 +100,7 @@ class Main extends Process {
 				Player.inst.saveSettings();
 			}
 			Settings.saveSettings();
-		});
+		} );
 
 		if ( Settings.params.fullscreen ) toggleFullscreen();
 
@@ -99,14 +109,14 @@ class Main extends Process {
 			return true;
 		}
 
-		delayer.addF(start, 1);
+		delayer.addF( start, 1 );
 
 		// var bmp = new Bitmap(Tile.fromColor(0xffffff, 256, 256), Boot.inst.s2d);
 		// bmp.filter = new Shader(new CornersRounder());
 	}
 
 	function start() {
-		new MainMenu(Boot.inst.s2d);
+		new MainMenu( Boot.inst.s2d );
 	}
 
 	public function toggleFullscreen() {
@@ -120,7 +130,7 @@ class Main extends Process {
 	public function startGame( ?seed : String ) {
 		if ( GameClient.inst != null ) {
 			GameClient.inst.destroy();
-			@:privateAccess Process._garbageCollector(Process.ROOTS);
+			@:privateAccess Process._garbageCollector( Process.ROOTS );
 		}
 
 		new Client();
@@ -132,7 +142,7 @@ class Main extends Process {
 	public function connect( ?seed : String ) {
 		if ( GameClient.inst != null ) {
 			GameClient.inst.destroy();
-			@:privateAccess Process._garbageCollector(Process.ROOTS);
+			@:privateAccess Process._garbageCollector( Process.ROOTS );
 		}
 		new Client();
 		new GameClient();
@@ -146,14 +156,15 @@ class Main extends Process {
 		// else if ( Const.AUTO_SCALE_TARGET_HEI > 0 )
 		// 	Const.UI_SCALE = M.floor(h() / Const.AUTO_SCALE_TARGET_HEI);
 
-		root.setScale(Const.UI_SCALE);
+		root.setScale( Const.UI_SCALE );
+
+		onResizeEvent.dispatch();
 	}
 
 	override function update() {
 		// dn.heaps.slib.SpriteLib.TMOD = tmod;
-		if ( ca.isKeyboardPressed(Key.F11) ) toggleFullscreen();
+		if ( ca.isKeyboardPressed( Key.F11 ) ) toggleFullscreen();
 		// if ( ca.isKeyboardPressed(Key.M) ) Assets.toggleMusicPause();
-		// сделано наспех, итерирует по массиву ALL, скрывает первый видимый инстанс и выходит из цикла
 		super.update();
 	}
 }

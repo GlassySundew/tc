@@ -19,6 +19,7 @@ class Const {
 	public static var INFINITE = 1. / 0.;
 
 	static var _inc = 0;
+
 	public static var DP_BG = _inc++;
 	public static var DP_FX_BG = _inc++;
 	public static var DP_MAIN = _inc++;
@@ -29,6 +30,7 @@ class Const {
 	public static var DP_UI = _inc++;
 	public static var DP_UI_FRONT = _inc++;
 	public static var DP_MASK = _inc++;
+	
 	public static var LEVELS_PATH = "tiled/levels/";
 	public static var ATLAS_PATH = "tiled/atlas/";
 	public static var SAVEFILE_EXT = ".zhopa";
