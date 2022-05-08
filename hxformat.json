@@ -1,0 +1,210 @@
+{
+  "indentation": {
+    "conditionalPolicy": "aligned"
+  },
+  "lineEnds": {
+    "rightCurly": "both",
+
+    "objectLiteralCurly": {
+      "leftCurly": "after"
+    }
+  },
+  "sameLine": {
+    "elseBody": "keep",
+    "elseIf": "keep",
+    "returnBody": "keep",
+    "anonFunctionBody": "keep",
+    "expressionIf": "keep",
+    "functionBody": "keep",
+    "expressionTry": "keep",
+    "expressionCase": "keep",
+    "expressionIfWithBlocks": false,
+    "returnBodySingleLine": "keep",
+    "ifBody": "keep",
+    "ifElse": "keep",
+    "doWhile": "keep",
+    "tryBody": "keep",
+    "tryCatch": "keep",
+    "untypedBody": "keep",
+    "forBody": "keep",
+    "whileBody": "keep"
+  },
+
+  "emptyLines": {
+    "conditionalsEmptyLines": {},
+    "lineCommentsBetweenFunctions": "keep",
+    "lineCommentsBetweenTypes": "keep",
+    "beforeBlocks": "keep",
+    "afterFileHeaderComment": 1,
+    "betweenSingleLineTypes": 1,
+    "betweenTypes": 1,
+    "afterFieldsWithDocComments": "ignore",
+    "afterBlocks": "keep",
+
+    "afterLeftCurly": "keep",
+    "beforeDocCommentEmptyLines": "one",
+    "afterPackage": 1,
+    "finalNewline": true,
+    "maxAnywhereInFile": 1,
+
+    "enumAbstractEmptyLines": {
+      "afterVars": 1,
+      "existingBetweenFields": "keep",
+      "beginType": 1,
+      "endType": 1,
+      "betweenFunctions": 1
+    },
+    "externClassEmptyLines": {
+      "existingBetweenFields": "keep",
+      "beginType": 1,
+      "betweenFunctions": 1,
+      "endType": 1,
+      "afterVars": 1
+    },
+    "classEmptyLines": {
+      "betweenFunctions": 1,
+	  "beginType": 1
+    },
+    "macroClassEmptyLines": {
+      "afterPrivateVars": 1,
+      "afterVars": 1,
+      "existingBetweenFields": "keep",
+      "endType": 1,
+      "betweenVars": 1,
+      "betweenStaticVars": 1,
+      "betweenStaticFunctions": 1,
+      "betweenFunctions": 1
+    },
+    "typedefEmptyLines": {
+      "betweenFields": 0,
+      "existingBetweenFields": "keep"
+    },
+    "abstractEmptyLines": {
+      "betweenVars": 1,
+      "afterVars": 1,
+      "afterStaticVars": 1,
+      "existingBetweenFields": "keep",
+      "afterStaticFunctions": 1,
+      "beginType": 1,
+      "afterPrivateVars": 1,
+      "betweenStaticVars": 1,
+      "afterPrivateFunctions": 1
+    }
+  },
+  "whitespace": {
+    "typeHintColonPolicy": "around",
+	"colonPolicy": "around",
+    "parenConfig": {
+      "catchParens": {
+        "openingPolicy": "onlyAfter",
+        "closingPolicy": "before"
+      },
+	  "conditionParens": {
+		  "closingPolicy": "around",
+		  "openingPolicy": "around"
+	  },
+      "metadataParens": {
+        "openingPolicy": "after",
+        "closingPolicy": "around"
+      },
+      "expressionParens": {
+        "closingPolicy": "before",
+        "openingPolicy": "after"
+      },
+      "callParens": {
+        "openingPolicy": "after",
+        "closingPolicy": "before"
+      },
+      "ifConditionParens": {
+        "openingPolicy": "around",
+        "closingPolicy": "around"
+      },
+      "sharpConditionParens": {
+        "openingPolicy": "onlyAfter",
+        "closingPolicy": "before"
+      },
+      "switchConditionParens": {
+        "openingPolicy": "onlyAfter",
+        "closingPolicy": "before"
+      },
+      "whileConditionParens": {
+        "openingPolicy": "onlyAfter",
+        "closingPolicy": "before"
+      },
+      "anonFuncParamParens": {
+        "closingPolicy": "around",
+        "openingPolicy": "around"
+      },
+      "forLoopParens": {
+        "closingPolicy": "around",
+        "openingPolicy": "around"
+      },
+      "funcParamParens": {
+        "closingPolicy": "around",
+        "openingPolicy": "after"
+      }
+    },
+
+    "arrowFunctionsPolicy": "around",
+    "binopPolicy": "around",
+    "ternaryPolicy": "around",
+    "addLineCommentSpace": true,
+    "bracesConfig": {
+      "anonTypeBraces": {
+        "closingPolicy": "around",
+        "openingPolicy": "around"
+      },
+      "unknownBraces": {
+        "openingPolicy": "around",
+        "closingPolicy": "around"
+      },
+      "typedefBraces": {
+        "closingPolicy": "around",
+        "openingPolicy": "around"
+      },
+      "objectLiteralBraces": {
+        "closingPolicy": "around",
+        "openingPolicy": "around"
+      }
+    },
+    "caseColonPolicy": "after",
+    "commaPolicy": "after",
+    "intervalPolicy": "around",
+    "objectFieldColonPolicy": "around",
+    "typeCheckColonPolicy": "around",
+    "functionTypeHaxe4Policy": "around",
+    "functionTypeHaxe3Policy": "around"
+  },
+  "wrapping": {
+    "arrayMatrixWrap": "matrixWrapWithAlign",
+    "casePattern": {
+      "defaultWrap": "keep"
+    },
+    "maxLineLength": 160,
+    "implementsExtends": {
+      "defaultWrap": "keep"
+    },
+    "callParameter": {
+      "defaultWrap": "keep",
+      "defaultAdditionalIndent": 0
+    },
+    "arrayWrap": {
+      "defaultWrap": "keep"
+    },
+    "typeParameter": {
+      "defaultWrap": "keep"
+    },
+    "functionSignature": {
+      "defaultWrap": "keep"
+    },
+    "opBoolChain": {
+      "defaultWrap": "keep"
+    },
+    "opAddSubChain": { "defaultWrap": "keep" },
+    "methodChain": { "defaultWrap": "keep" },
+    "multiVar": { "defaultWrap": "keep" },
+    "objectLiteral": { "defaultWrap": "keep" },
+    "anonType": { "defaultWrap": "keep" },
+    "anonFunctionSignature": { "defaultWrap": "keep" }
+  }
+}
