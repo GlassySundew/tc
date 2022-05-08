@@ -63,7 +63,7 @@
     },
     "classEmptyLines": {
       "betweenFunctions": 1,
-	  "beginType": 1
+      "beginType": 1
     },
     "macroClassEmptyLines": {
       "afterPrivateVars": 1,
@@ -93,16 +93,16 @@
   },
   "whitespace": {
     "typeHintColonPolicy": "around",
-	"colonPolicy": "around",
+    "colonPolicy": "around",
     "parenConfig": {
       "catchParens": {
         "openingPolicy": "onlyAfter",
         "closingPolicy": "before"
       },
-	  "conditionParens": {
-		  "closingPolicy": "around",
-		  "openingPolicy": "around"
-	  },
+      "conditionParens": {
+        "closingPolicy": "around",
+        "openingPolicy": "around"
+      },
       "metadataParens": {
         "openingPolicy": "after",
         "closingPolicy": "around"
