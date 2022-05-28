@@ -1,39 +1,53 @@
-import ui.dialog.NewSaveDialog;
 import dn.Process;
 import h2d.Bitmap;
 import h2d.Flow;
 import h2d.Object;
 import h2d.Tile;
-import h3d.mat.Texture;
-import hxd.Event;
 import hxd.System;
 import ui.Button;
 import ui.ShadowedText;
 import ui.TextButton;
+import ui.dialog.ConnectMenu;
+import ui.dialog.NewSaveDialog;
 import ui.dialog.OptionsMenu;
 import ui.dialog.SaveManager;
 
 class MainMenu extends Process {
+
+	static var inst : MainMenu;
+
 	var parentFlow : Flow;
 	var vertFlow : Flow;
 	var socialFlow : Flow;
 	var planetFlow : Object;
-	var camera : Camera;
-	var parents2d : Object;
+	var camera : s3d.Camera;
 	var blackOverlay : Bitmap;
 
 	var isHostDebug : ShadowedText;
 
-	public function new( ?parent : Object ) {
+	public static function spawn( ?parent ) {
+		if ( inst != null ) {
+			inst.root.visible = true;
+			return inst;
+		} else {
+			return new MainMenu( parent );
+		}
+	}
+
+	public static function hide() {
+		if ( inst != null )
+			inst.root.visible = false;
+	}
+
+	function new( ?parent : Object ) {
 		super( Main.inst );
 
-		this.parents2d = parent;
+		if ( inst != null ) inst.destroy();
+		inst = this;
 
-		parentFlow = new Flow();
-
-		Main.inst.root.add( parentFlow, Const.DP_BG );
-
-		camera = new Camera( this );
+		createRoot( Main.inst.root );
+		parentFlow = new Flow( root );
+		camera = new s3d.Camera( this );
 
 		vertFlow = new Flow( parentFlow );
 		socialFlow = new Flow( parentFlow );
@@ -145,42 +159,36 @@ class MainMenu extends Process {
 		var newGame : TextButton = null;
 		newGame = new TextButton( "new game", ( _ ) -> {
 			var dialog = new NewSaveDialog( ( name ) -> {
-				Main.inst.startGame( "100000" );
-
-				Client.inst.addOnConnectionCallback(() -> Client.inst.sendMessage( SaveSystemOrder( CreateNewSave( name ) ) ) );
 				destroy();
-			}, Save, null, Main.inst.root );
+			}, Save, null, root );
 
-			Main.inst.root.add( dialog.h2dObject, Const.DP_UI );
+			root.add( dialog.h2dObject, Const.DP_UI );
 		}, vertFlow );
 
 		if ( params.saveFiles.length > 0 ) {
 			var loadObj : Object = null;
 			loadObj = new TextButton( "load game", ( _ ) -> {
 				var loadMan = new SaveManager( Load, () -> {
-					Main.inst.startGame( "1000000" );
-
 					destroy();
 				} );
-				Main.inst.root.add( loadMan.h2dObject, Const.DP_UI );
+				root.add( loadMan.h2dObject, Const.DP_UI );
 
 				// loadMan.h2dObject.x = loadObj.x + loadObj.getSize().xMax + 20;
 			}, vertFlow );
 		}
 
 		new TextButton( "connect", ( _ ) -> {
-			new OptionsMenu( parentFlow );
+			new ConnectMenu( parentFlow );
 		}, vertFlow );
 
 		new TextButton( "options", ( _ ) -> {
-			Main.inst.root.add( new OptionsMenu().h2dObject, Const.DP_UI );
+			root.add( new OptionsMenu().h2dObject, Const.DP_UI );
 		}, vertFlow );
 
 		new TextButton( "exit", ( _ ) -> {
 			System.exit();
 		}, vertFlow );
 
-		// var but1 = new TextButton("Multiplayer", () -> {}, vertFlow);
 		blackOverlay = new Bitmap( Tile.fromColor( 0x000000, wScaled, hScaled ) );
 
 		parentFlow.addChildAt( blackOverlay, 1000 );
@@ -234,7 +242,7 @@ class MainMenu extends Process {
 	override function onDispose() {
 		super.onDispose();
 		parentFlow.remove();
-
+		inst = null;
 		if ( blackOverlay != null ) blackOverlay.remove();
 	}
 

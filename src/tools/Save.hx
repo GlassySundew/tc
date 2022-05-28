@@ -32,7 +32,7 @@ typedef SavedPlayer = SavedEntity & {
 	public var nickname : String;
 }
 
-/** for proper work .hdll libs of sqlite of the latest version need to be compiled(amalgamation) and also with URI enabled **/
+/** for proper work .hdll libs sqlite of the latest version has to be compiled(amalgamation) and also with URI enabled **/
 class Save {
 	public static var inst : Save;
 
@@ -57,9 +57,9 @@ class Save {
 
 		sqlite = Sqlite.open( "" );
 		#if debug
-		sqlite.request( "attach database 'file::memory:' as maindb" );
-		fillDbWithScheme( sqlite, "maindb" );
-		startTransaction();
+		// sqlite.request( "attach database 'file::memory:' as maindb" );
+		// fillDbWithScheme( sqlite, "maindb" );
+		// startTransaction();
 		#end
 	}
 
@@ -164,6 +164,8 @@ class Save {
 		}
 
 		if ( sqlite != null && isDbLocatedInMemory( "maindb" ) ) {
+			commitChanges();
+			
 			try {
 				sqlite.request( "detach maindb" );
 			} catch( e : Dynamic ) {

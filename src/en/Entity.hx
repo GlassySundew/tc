@@ -22,13 +22,8 @@ import net.ClientToServer.AClientToServerFloat;
 import tools.Save;
 import ui.InventoryGrid;
 
-@:structInit
-class CollisionObjectData implements Serializable {
-	@:s public var cent : differ.math.Vector;
-	@:s public var offset : differ.math.Vector;
-}
-
 class Entity implements NetworkSerializable {
+
 	public static var ALL : Array<Entity> = [];
 	public static var ServerALL : Array<Entity> = [];
 
@@ -37,7 +32,7 @@ class Entity implements NetworkSerializable {
 	/**
 		Map of multiple shapes, 1st vector is a center of polygon Shape, 2nd polygon is a position of a poly
 	**/
-	@:s public var collisions : Map<Shape, CollisionObjectData>;
+	@:s public var collisions : Map<Shape, differ.math.Vector>;
 
 	@:s public var level : ServerLevel;
 
@@ -128,14 +123,12 @@ class Entity implements NetworkSerializable {
 	public function new( ?x : Float = 0, ?z : Float = 0, ?tmxObj : Null<TmxObject> ) {
 		ServerALL.push( this );
 
-		footX = new AClientToServerFloat( 0., () -> false );
-		footY = new AClientToServerFloat( 0., () -> false );
+		footX = new AClientToServerFloat( x, () -> false );
+		footY = new AClientToServerFloat( z, () -> false );
 
 		flippedX = false;
-		collisions = new Map<Shape, CollisionObjectData>();
+		collisions = new Map<Shape, differ.math.Vector>();
 		if ( this.tmxObj == null && tmxObj != null ) this.tmxObj = tmxObj;
-
-		if ( x != null && z != null ) setFeetPos( x, z );
 
 		pivot = { x : 0, y : 0 };
 		serverApplyTmx();
@@ -173,7 +166,7 @@ class Entity implements NetworkSerializable {
 		#if colliders_debug
 		GameClient.inst.delayer.addF(() -> {
 			if ( collisions != null )
-				for ( shape => values in collisions ) {
+				for ( shape => vec in collisions ) {
 					switch true {
 						case Std.isOfType( shape, Polygon ) => a if ( a ):
 							var pts : Array<h3d.col.Point> = [];
@@ -204,9 +197,9 @@ class Entity implements NetworkSerializable {
 
 							isoDebugMesh.x = 0.5;
 							isoDebugMesh.y = ( spr.pivot.centerFactorX * tmxObj.width )
-								- values.offset.x;
+								- vec.x;
 							isoDebugMesh.z = ( spr.pivot.centerFactorY * tmxObj.height )
-								- values.offset.y;
+								- vec.y;
 
 							isoDebugMesh.rotate( M.toRad( poly.rotation ), 0, -M.toRad( 90 ) );
 							isoDebugMesh.scaleX = poly.scaleX;
@@ -226,9 +219,9 @@ class Entity implements NetworkSerializable {
 
 							sphere.x = .25;
 							sphere.y = ( spr.pivot.centerFactorX * tmxObj.width )
-								- values.offset.x;
+								- vec.x;
 							sphere.z = ( spr.pivot.centerFactorY * tmxObj.height )
-								- values.offset.y;
+								- vec.y;
 
 							debugObjs.push( sphere );
 					}
@@ -363,43 +356,43 @@ class Entity implements NetworkSerializable {
 		return dir = v == 0 ? 0 : v == 1 ? 1 : v == 2 ? 2 : v == 3 ? 3 : v == 4 ? 4 : v == 5 ? 5 : v == 6 ? 6 : v == 7 ? 7 : dir;
 	}
 
-	/**Flips spr.scaleX, all of collision objects, and sorting rectangle**/
+	/** Flips spr.scaleX, all of collision objects, and sorting rectangle **/
 	@:rpc
 	public function flipX() {
-		refreshTile = true;
-		flippedX = !flippedX;
 
-		// footX -= (((1 - pivot.x * 2) * tmxObj.width));
+		flippedX = !flippedX;
 
 		updateCollisions();
 
-		for ( shape => value in collisions ) {
+		for ( shape => offset in collisions ) {
 			shape.x = shape.y = 0;
-
 			shape.scaleX *= -1;
-			value.offset.x *= -1;
-			value.offset.x += tmxObj.width;
+			offset.x *= -1;
+			offset.x += tmxObj.width;
 		}
+
+		footX += ( ( ( 1 - pivot.x / tmxObj.width * 2 ) * tmxObj.width ) );
 
 		clientFlipX();
 	}
 
+	var flippedOnClient = false;
+
 	function clientFlipX() {
 		if ( spr != null ) {
 			spr.scaleX *= -1;
-
-			@:privateAccess mesh.plane.invalidate();
 
 			spr.pivot.centerFactorX = 1 - spr.pivot.centerFactorX;
 			pivotChanged = true;
 
 			if ( mesh.isLong ) mesh.flipX();
 			mesh.renewDebugPts();
+			refreshTile = true;
+			flippedOnClient = flippedX;
+			Main.inst.delayer.addF(() -> {
 
-			try {
-				cast( this, Interactive ).rebuildInteract();
-			}
-			catch( e : Dynamic ) {}
+				updateDebugDisplay();
+			}, 10 );
 		}
 	}
 
@@ -481,10 +474,7 @@ class Entity implements NetworkSerializable {
 
 		GameClient.inst.delayer.addF(() -> {
 			if ( flippedX ) {
-				GameClient.inst.delayer.addF(() -> {
-					clientFlipX();
-					footX -= ( ( ( 1 - spr.pivot.centerFactorX * 2 ) * spr.tile.width ) );
-				}, 1 );
+				if ( !flippedOnClient ) clientFlipX();
 			}
 		}, 2 );
 
@@ -509,7 +499,7 @@ class Entity implements NetworkSerializable {
 	}
 
 	public function networkAllow( op : hxbit.NetworkSerializable.Operation, propId : Int, clientSer : hxbit.NetworkSerializable ) : Bool {
-		return false;
+		return true;
 	}
 
 	public function dispose() {
@@ -561,15 +551,15 @@ class Entity implements NetworkSerializable {
 
 	public function updateCollisions() {
 		if ( collisions != null ) {
-			for ( collObj => values in collisions ) {
-				if ( values != null ) {
+			for ( collObj => offset in collisions ) {
+				if ( offset != null ) {
 					collObj.x = footX.toFloat()
 						- pivot.x
-						+ values.offset.x;
+						+ offset.x;
 
 					collObj.y = footY.toFloat()
 						+ pivot.y
-						- values.offset.y;
+						- offset.y;
 				}
 			}
 		}

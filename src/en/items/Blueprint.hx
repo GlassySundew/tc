@@ -34,7 +34,7 @@ class Blueprint extends Item {
 			if ( ghostStructure.canBePlaced ) {
 				amount--;
 				var ent = Structure.fromCdbEntry(Std.int(tile.x), Std.int(tile.z), Data.blueprint.get(blueprintScheme).structureId);
-				GameClient.inst.applyTmxObjOnEnt(ent);
+				// GameClient.inst.applyTmxObjOnEnt(ent);
 				if ( ghostStructure.flippedX ) ent.flipX();
 				ent.offsetFootByTile();
 			}

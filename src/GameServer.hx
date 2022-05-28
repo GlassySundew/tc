@@ -16,6 +16,7 @@ import ui.Navigation.NavigationFields;
 	Логика игры на сервере
 **/
 class GameServer extends Process implements Serializable {
+
 	public static var inst : GameServer;
 
 	public var network( get, never ) : Bool;
@@ -221,8 +222,15 @@ class GameServer extends Process implements Serializable {
 		return null;
 	}
 
-	// Search for name from parsed entNames Entity classes and spawns it, creates static SpriteEntity and puts name into spr group if not found
-	function searchAndSpawnEnt( e : TmxObject, entClasses : List<Class<Entity>>, sLevel : ServerLevel, ?args : Array<Dynamic>, ?exclude : Array<Class<Entity>> ) : Entity {
+	// Search for name from parsed entNames Entity classes and spawn it, creates static SpriteEntity and puts name into spr group if not found
+	function searchAndSpawnEnt(
+		e : TmxObject,
+		entClasses : List<Class<Entity>>,
+		sLevel : ServerLevel,
+		?args : Array<Dynamic>,
+		?exclude : Array<Class<Entity>>
+	) : Entity {
+
 		if ( args == null ) args = [];
 		exclude = exclude == null ? [] : exclude;
 
@@ -330,16 +338,12 @@ class GameServer extends Process implements Serializable {
 										obj.height / 2
 									);
 
-									ent.collisions.set( shape,
-										{
-											cent : new differ.math.Vector( cent.x, cent.y ),
-											offset : new differ.math.Vector( obj.x + cent.x, obj.y + cent.y )
-										} );
+									ent.collisions.set( shape, new differ.math.Vector( obj.x + cent.x, obj.y + cent.y ));
 
-									if ( center.x == 0 && center.y == 0 ) {
-										center.x = cent.x + obj.x;
-										center.y = cent.y + obj.y;
-									}
+										if ( center.x == 0 && center.y == 0 ) {
+											center.x = cent.x + obj.x;
+											center.y = cent.y + obj.y;
+										}
 								case OTPoint:
 									switch obj.name {
 										case "center":
@@ -360,10 +364,7 @@ class GameServer extends Process implements Serializable {
 									poly.scaleY = -1;
 									ent.collisions.set(
 										poly,
-										{
-											cent : new differ.math.Vector( cent.x, cent.y ),
-											offset : new differ.math.Vector( obj.x, obj.y )
-										}
+										new differ.math.Vector( obj.x, obj.y )
 									);
 									objx = obj.x;
 
@@ -393,7 +394,7 @@ class GameServer extends Process implements Serializable {
 						#end
 
 						try {
-							cast( ent, Interactive ).rebuildInteract();
+							cast( ent, en.InteractableEntity ).rebuildInteract();
 						}
 						catch( e : Dynamic ) {}
 

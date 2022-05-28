@@ -32,9 +32,6 @@ class ButtonIcon extends Object {
 		container = new ButtonIconComp(centerFlow);
 		buttonSpr.visible = false;
 		buttonSpr.setCenterRatio();
-		style = new h2d.domkit.Style();
-		style.addObject(container);
-		style.load(hxd.Res.domkit.buttonIcon);
 		container.activateTextFlow.x -= container.activateText.textWidth / 2 - 1;
 		container.activateTextFlow.y -= container.activateText.textHeight / 2 + 2;
 		buttonSpr.onFrameChange = function () {

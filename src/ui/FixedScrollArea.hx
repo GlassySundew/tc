@@ -1,26 +1,26 @@
 package ui;
 
+import ch2.ui.ScrollArea;
 import h2d.Flow;
 import h2d.RenderContext;
 import h2d.Object;
 import h2d.col.Bounds;
-import ch2.ui.ScrollArea;
 
 class FixedScrollArea extends ScrollArea {
+
 	public var fillWidth : Bool;
 	public var fillHeight : Bool;
 
-	public function new( width : Int, height : Int, scrollStep : Int = 16, ?fillWidth = false, ?fillHeight = false, ?bounds : Bounds, ?parent : Object ) {
-		super(width, height, scrollStep, bounds, parent);
+	public function new( ?width : Int = 0, ?height : Int = 0, ?fillWidth = false, ?fillHeight = false, ?scrollStep : Int = 16, ?bounds : Bounds, ?parent : Object ) {
+		super( width, height, scrollStep, bounds, parent );
 		this.fillHeight = fillHeight;
 		this.fillWidth = fillWidth;
 	}
 
-	override function sync( ctx : RenderContext ) {
-		super.sync(ctx);
+	public function recalcFilling() {
 		try {
-			if ( fillHeight ) height = Std.int(cast(parent, Flow).innerHeight);
-			if ( fillWidth ) width = Std.int(cast(parent, Flow).innerWidth);
+			if ( fillHeight ) height = Std.int( cast( parent, Flow ).innerHeight );
+			if ( fillWidth ) width = Std.int( cast( parent, Flow ).innerWidth );
 		} catch( e ) {}
 	}
 
@@ -55,8 +55,8 @@ class FixedScrollArea extends ScrollArea {
 		}
 
 		ctx.flush();
-		ctx.pushRenderZone(x1, y1, x2 - x1, y2 - y1);
-		objDrawRec(ctx);
+		ctx.pushRenderZone( x1, y1, x2 - x1, y2 - y1 );
+		objDrawRec( ctx );
 		ctx.flush();
 		ctx.popRenderZone();
 	}

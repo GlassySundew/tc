@@ -5,7 +5,8 @@ import hxd.Event;
 import hxd.Key in K;
 
 class TextInput extends h2d.TextInput {
-	public function new( font, ?parent ) {
+
+	public function new( ?font, ?parent ) {
 		super( font, parent );
 		dropShadow = { dx : -1, dy : 1, alpha : 1, color : 0x000000 };
 	}

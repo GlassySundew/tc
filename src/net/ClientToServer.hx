@@ -15,6 +15,7 @@ abstract AClientToServer<V>( CClientToServer<V> ) from CClientToServer<V> to CCl
 }
 
 class CClientToServer<V> implements NetworkSerializable {
+
 	var maskValue : V;
 
 	@:s
@@ -86,6 +87,11 @@ abstract AClientToServerFloat( CClientToServerFloat ) from CClientToServerFloat 
 		return this.getValue();
 	}
 
+	@:to
+	public function toString() {
+		return '${this.getValue()}';
+	}
+
 	// @:from static function fromFloat( v : Float ) {
 	// 	return new (v, );
 	// }
@@ -102,6 +108,7 @@ abstract AClientToServerFloat( CClientToServerFloat ) from CClientToServerFloat 
 	specific client setting var -> server and server sending to  serializable variable
 **/
 class CClientToServerFloat implements NetworkSerializable {
+
 	var maskValue : Float;
 
 	@:s

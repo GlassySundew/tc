@@ -36,15 +36,17 @@ abstract NavigationFields( Array<NavigationField> ) {
 
 	public inline function push( field : NavigationField ) {
 		if ( Navigation.clientInst != null )
-			@:privateAccess Navigation.clientInst.navWin.bodiesContainer.addChild(field.object);
-		this.push(field);
+			@:privateAccess Navigation.clientInst.navWin.bodiesContainer.addChild( field.object );
+		this.push( field );
 	}
 }
+
 /** 
 	should only be instanced server-side,
 	singleton is always synchronized over network with all players
 **/
 class Navigation implements NetworkSerializable {
+
 	public static var serverInst : Navigation;
 	public static var clientInst : Navigation;
 
@@ -55,7 +57,7 @@ class Navigation implements NetworkSerializable {
 	public function new() {
 		serverInst = this;
 		init();
-		fields = new NavigationFields([]);
+		fields = new NavigationFields( [] );
 	}
 
 	function init() {}
@@ -78,28 +80,32 @@ class Navigation implements NetworkSerializable {
 		return null;
 	}
 }
+
 /**
 	should only be instanced on client-side
 **/
 class NavigationWindow extends NinesliceWindow {
+
 	var ca : ControllerAccess<ControllerAction>;
 	var navMask : FixedScrollArea;
 	var bodiesContainer : Object;
 
 	@:s var jumpReach : Float;
 
-	public var locked(default, set) : Bool;
+	public var locked( default, set ) : Bool;
 
 	function set_locked( locked : Bool ) : Bool {
 		return this.locked = locked;
 	}
 
 	public static var playersHeads : Map<Player, Object> = [];
+
 	/** твинеры для бошек игроков **/
 	public static var headsTweeners : Map<Player, { xTw : Tween, yTw : Tween }> = [];
 
 	public static final fieldWidth : Int = 200;
 	public static final fieldHeight : Int = 200;
+
 	/**
 		@param seed seed for icons generation
 		@param parent must be existing object, otherwise there will be huge glitches
@@ -120,52 +126,51 @@ class NavigationWindow extends NinesliceWindow {
 	override function initLoad() {
 		super.initLoad();
 
-		windowComp.window.windowLabel.labelTxt.text = "Navigation console";
-		var navigationComp = cast(windowComp, NavigationComp);
+		windowComp.window.windowLabel.shadowed_text.text = "Navigation console";
+		var navigationComp = cast( windowComp, NavigationComp );
 
-		navMask = new FixedScrollArea(0, 0, true, true, navigationComp.nav_win);
-		@:privateAccess navMask.sync(Boot.inst.s2d.ctx);
+		navMask = new FixedScrollArea( 0, 0, true, true, navigationComp.nav_win );
+		@:privateAccess navMask.sync( Boot.inst.s2d.ctx );
 		navMask.fillHeight = navMask.fillWidth = false; // отключаем заполнение из-за бага, когда окно мерцает при добавлении arrowButton
 
-		var scroller = new Dragable(navMask.width, navMask.height);
+		var scroller = new Dragable( navMask.width, navMask.height );
 		scroller.cursor = Default;
-		navigationComp.nav_win.addChildAt(scroller, 0);
-		navigationComp.nav_win.getProperties(scroller).isAbsolute = true;
+		navigationComp.nav_win.addChildAt( scroller, 0 );
+		navigationComp.nav_win.getProperties( scroller ).isAbsolute = true;
 
-		bodiesContainer = new Object(navMask);
-		bodiesContainer.scale(0.5);
+		bodiesContainer = new Object( navMask );
+		bodiesContainer.scale( 0.5 );
 
-		scroller.onDrag.add(( x, y ) -> navMask.scrollPixels(-x, -y));
+		scroller.onDrag.add( ( x, y ) -> navMask.scrollPixels(-x, -y ) );
 
-		scroller.onClickEvent.add(( _ ) -> NavigationTarget.disposeArrowButton());
+		scroller.onClickEvent.add( ( _ ) -> NavigationTarget.disposeArrowButton() );
 		// belt lock
 		GameClient.inst.delayer.addF(() -> {
 			if ( backgroundInter != null ) {
-				backgroundInter.onOverEvent.add(( e ) -> {
+				backgroundInter.onOverEvent.add( ( e ) -> {
 					if ( Player.inst != null ) Player.inst.lockBelt();
-				});
-				backgroundInter.onOutEvent.add(( e ) -> {
+				} );
+				backgroundInter.onOutEvent.add( ( e ) -> {
 					if ( Player.inst != null ) Player.inst.unlockBelt();
-				});
+				} );
 			}
 			for ( field in Navigation.clientInst.fields )
-				bodiesContainer.addChild(field.object);
-		}, 2);
+				bodiesContainer.addChild( field.object );
+		}, 2 );
 
 		scroller.propagateEvents = true;
 		recenter();
 
 		toggleVisible();
-		
-			refreshLinks(Const.jumpReach);
 
+		refreshLinks( Const.jumpReach );
 
 		NavigationTarget.onClick = ( x, y ) -> {
 			var time = 500; // ms
 
 			scroller.visible = false;
-			GameClient.inst.tw.createMs(navMask.scrollX, Std.int((x) / Const.UI_SCALE - navMask.width / 2), time);
-			GameClient.inst.tw.createMs(navMask.scrollY, Std.int((y) / Const.UI_SCALE - navMask.height / 2), time).end(
+			GameClient.inst.tw.createMs( navMask.scrollX, Std.int( ( x ) / Const.UI_SCALE - navMask.width / 2 ), time );
+			GameClient.inst.tw.createMs( navMask.scrollY, Std.int( ( y ) / Const.UI_SCALE - navMask.height / 2 ), time ).end(
 				() -> {
 					scroller.visible = true;
 				}
@@ -175,26 +180,26 @@ class NavigationWindow extends NinesliceWindow {
 
 	public function scrollToField( field : NavigationField ) {
 
-		navMask.scrollTo(field.object.x
+		navMask.scrollTo( field.object.x
 			- navMask.width / 2
-			+ (fieldWidth / 2) * bodiesContainer.scaleX,
+			+ ( fieldWidth / 2 ) * bodiesContainer.scaleX,
 			field.object.y
 			- navMask.height / 2
-			+ (fieldHeight / 2) * bodiesContainer.scaleX);
+			+ ( fieldHeight / 2 ) * bodiesContainer.scaleX );
 	}
 
 	override function toggleVisible() {
 		super.toggleVisible();
 
-		if ( win.parent != null ) refreshLinks(Const.jumpReach);
+		if ( win.parent != null ) refreshLinks( Const.jumpReach );
 
 		if ( Player.inst != null )
 			// focus on player's cluster
 			for ( field in Navigation.clientInst.fields ) {
 				if ( Lambda.exists(
 					field.targets,
-					( target ) -> target.id == Player.inst.residesOnId) ) {
-					scrollToField(field);
+					( target ) -> target.id == Player.inst.residesOnId ) ) {
+					scrollToField( field );
 					return;
 				}
 			}
@@ -207,8 +212,8 @@ class NavigationWindow extends NinesliceWindow {
 			for ( field in Navigation.clientInst.fields ) {
 				for ( target in field.targets ) {
 					if ( target.id == Player.inst.residesOnId ) {
-						var head = new HSprite(Assets.ui, "player_head", target.object);
-						head.scale(2);
+						var head = new HSprite( Assets.ui, "player_head", target.object );
+						head.scale( 2 );
 						playersHeads[Player.inst] = head;
 						break;
 					}
@@ -220,7 +225,7 @@ class NavigationWindow extends NinesliceWindow {
 			for ( field in Navigation.clientInst.fields ) {
 				for ( target in field.targets ) {
 					if ( target.id == Player.inst.residesOnId ) {
-						target.object.addChild(playersHeads[Player.inst]);
+						target.object.addChild( playersHeads[Player.inst] );
 						playersHeads[Player.inst].x = 0;
 						playersHeads[Player.inst].y = 0;
 						break;
@@ -241,37 +246,37 @@ class NavigationWindow extends NinesliceWindow {
 				for ( j => targetJ in field.targets ) {
 					if ( i < j // && !(Lambda.exists(targetI.links, ( link ) -> link.target == targetJ)
 						// 	|| Lambda.exists(targetJ.links, ( link ) -> link.target == targetI))
-						&& M.dist(targetI.object.x, targetI.object.y, targetJ.object.x, targetJ.object.y) < jumpReach ) {
+						&& M.dist( targetI.object.x, targetI.object.y, targetJ.object.x, targetJ.object.y ) < jumpReach ) {
 						var line = new Graphics();
 
-						bodiesContainer.addChildAt(line, 0);
+						bodiesContainer.addChildAt( line, 0 );
 						// line.smooth = true;
 						line.x = targetI.object.x;
 						line.y = targetI.object.y;
-						var blur = new Bloom(2, 3, 1, 1, 1);
+						var blur = new Bloom( 2, 3, 1, 1, 1 );
 
 						line.filter = blur;
-						line.lineStyle(3, 0xffffff, 0.55);
-						line.beginFill(0xffffff);
+						line.lineStyle( 3, 0xffffff, 0.55 );
+						line.beginFill( 0xffffff );
 
-						line.addVertex(0, 0, 255, 255, 255, 1);
-						line.addVertex(targetJ.object.x - line.x, targetJ.object.y - line.y, 255, 255, 255, 1);
+						line.addVertex( 0, 0, 255, 255, 255, 1 );
+						line.addVertex( targetJ.object.x - line.x, targetJ.object.y - line.y, 255, 255, 255, 1 );
 						line.endFill();
 						if ( Player.inst.residesOnId != targetI.id && Player.inst.residesOnId != targetJ.id ) {
 							line.visible = false;
 							var dashes = new shader.Dashes();
 							dashes.u_dashSize = 5;
 							dashes.u_gapSize = 12;
-							line.addShader(dashes);
+							line.addShader( dashes );
 						}
-						targetI.links.push({
+						targetI.links.push( {
 							target : targetJ,
 							graphics : line
-						});
-						targetJ.links.push({
+						} );
+						targetJ.links.push( {
 							target : targetI,
 							graphics : line
-						});
+						} );
 					}
 				}
 			}
@@ -300,6 +305,7 @@ class NavigationWindow extends NinesliceWindow {
 }
 
 class NavigationField implements Serializable {
+
 	@:s public var targets : Array<NavigationTarget>;
 
 	@:s var seed : String;
@@ -319,11 +325,11 @@ class NavigationField implements Serializable {
 		this.fieldY = fieldY;
 		this.seed = seed;
 
-		initLoad(parent);
+		initLoad( parent );
 	}
 
 	function initLoad( ?parent : Object ) {
-		object = new Object(parent);
+		object = new Object( parent );
 
 		targets = [];
 		var points : Array<Point> = genAsteroidField(
@@ -333,22 +339,22 @@ class NavigationField implements Serializable {
 		);
 
 		var random = new Random();
-		random.setStringSeed(seed);
+		random.setStringSeed( seed );
 
 		for ( i => pt in points ) {
 			var target : NavigationTarget = null;
 			target = new NavigationTarget(
-				random.choice([
+				random.choice( [
 					Data.Navigation_targetKind.asteroid0,
 					Data.Navigation_targetKind.asteroid1,
 					Data.Navigation_targetKind.asteroid2,
 					Data.Navigation_targetKind.asteroid3
-				]),
+				] ),
 				seed,
-				Std.int(pt.x),
-				Std.int(pt.y),
-				object);
-			targets.push(target);
+				Std.int( pt.x ),
+				Std.int( pt.y ),
+				object );
+			targets.push( target );
 		}
 	}
 
@@ -361,23 +367,25 @@ class NavigationField implements Serializable {
 	}
 
 	public static function genAsteroidField( ?fieldWidth : Int = 200, ?fieldHeight = 200, seed : String ) : Array<Point> {
-		var poissonMap = new UniformPoissonDisk(seed);
-		var sampledPoints = poissonMap.sample(new Point(0, 0), new Point(fieldWidth, fieldWidth), ( p : Point, r : Random ) -> {
-			return r.uniform(0.75, 1) * Const.jumpReach;
-		}, Const.jumpReach);
+		var poissonMap = new UniformPoissonDisk( seed );
+		var sampledPoints = poissonMap.sample( new Point( 0, 0 ), new Point( fieldWidth, fieldWidth ), ( p : Point, r : Random ) -> {
+			return r.uniform( 0.75, 1 ) * Const.jumpReach;
+		}, Const.jumpReach );
 
 		return sampledPoints;
 	}
 }
 
 class NavigationTarget implements Serializable {
+
 	var celestialObject : Button;
 
 	@:s public var cdbEntry : Data.Navigation_targetKind;
 
 	@:s public var id : String;
+
 	/** string, под которым лежит карта в базе данных **/
-	public var bodyLevelName(get, never) : String;
+	public var bodyLevelName( get, never ) : String;
 
 	inline function get_bodyLevelName() : String {
 		return "asteroid_" + id;
@@ -394,6 +402,7 @@ class NavigationTarget implements Serializable {
 	public var generator : AsteroidGenerator;
 
 	public static var onClick : Float -> Float -> Void;
+
 	/**
 		@param seed needed for generating id
 		@param x needed for generating id
@@ -403,63 +412,63 @@ class NavigationTarget implements Serializable {
 		this.cdbEntry = cdbEntry;
 		this.seed = seed;
 
-		initLoad(seed, x, y, parent);
+		initLoad( seed, x, y, parent );
 	}
 
 	function initLoad( seed : String, x : Int, y : Int, ?parent : Object ) {
-		object = new Object(parent);
-		object.setPosition(x, y);
+		object = new Object( parent );
+		object.setPosition( x, y );
 
 		var r = new Random();
-		r.setStringSeed(seed + x + y);
-		id = r.seededString(10);
+		r.setStringSeed( seed + x + y );
+		id = r.seededString( 10 );
 
 		createGenerator();
 
-		var sprite = new HSprite(Assets.ui, Data.navigation_target.get(cdbEntry).atlas_name);
+		var sprite = new HSprite( Assets.ui, Data.navigation_target.get( cdbEntry ).atlas_name );
 
 		// selected frame
-		var selectedTex = new Texture(Std.int(sprite.tile.width), Std.int(sprite.tile.height), [Target]);
-		sprite.drawTo(selectedTex);
-		new HSprite(Assets.ui, "body_selected").drawTo(selectedTex);
+		var selectedTex = new Texture( Std.int( sprite.tile.width ), Std.int( sprite.tile.height ), [Target] );
+		sprite.drawTo( selectedTex );
+		new HSprite( Assets.ui, "body_selected" ).drawTo( selectedTex );
 
-		celestialObject = new Button([sprite.tile, Tile.fromTexture(selectedTex)], object);
+		celestialObject = new Button( [sprite.tile, Tile.fromTexture( selectedTex )], object );
 		celestialObject.x -= celestialObject.width / 2;
 		celestialObject.y -= celestialObject.height / 2;
 		celestialObject.propagateEvents = true;
 
-		celestialObject.onClickEvent.add(( e ) -> {
+		celestialObject.onClickEvent.add( ( e ) -> {
 			if ( Navigation.clientInst.navWin.locked ) return;
 
 			// when click, all other arrow buttons must be removed
 			disposeArrowButton();
 
-			if ( Lambda.exists(links, ( link ) -> Player.inst.residesOnId == link.target.id) ) {
-				arrowButton = new Button([
-					new HSprite(Assets.ui, "travel_but0").tile,
-					new HSprite(Assets.ui, "travel_but1").tile,
-					new HSprite(Assets.ui, "travel_but2").tile
-				]);
-				parent.addChild(arrowButton);
-				arrowButton.scale(2);
+			if ( Lambda.exists( links, ( link ) -> Player.inst.residesOnId == link.target.id ) ) {
+				arrowButton = new Button( [
+					new HSprite( Assets.ui, "travel_but0" ).tile,
+					new HSprite( Assets.ui, "travel_but1" ).tile,
+					new HSprite( Assets.ui, "travel_but2" ).tile
+				] );
+				parent.addChild( arrowButton );
+				arrowButton.scale( 2 );
 				arrowButton.x = -arrowButton.width + x;
 				arrowButton.y = -arrowButton.height - sprite.tile.height - 8 + y;
 
-				arrowButton.onClickEvent.add(( _ ) -> {
+				arrowButton.onClickEvent.add( ( _ ) -> {
 					travelToThis();
-				});
+				} );
 			}
 
-			onClick(x, y);
-		});
+			onClick( x, y );
+		} );
 
-		celestialObject.onOverEvent.add(( e ) -> {
+		celestialObject.onOverEvent.add( ( e ) -> {
 			for ( l in links ) l.graphics.visible = true;
-		});
+		} );
 
-		celestialObject.onOutEvent.add(( e ) -> {
+		celestialObject.onOutEvent.add( ( e ) -> {
 			if ( Player.inst.residesOnId != id ) for ( l in links ) if ( Player.inst.residesOnId != l.target.id ) l.graphics.visible = false;
-		});
+		} );
 	}
 
 	function travelToThis() {
@@ -469,31 +478,31 @@ class NavigationTarget implements Serializable {
 			Navigation.clientInst.navWin.locked = true;
 
 		// creating tweener for head
-		createTweener(Player.inst, new h3d.col.Point(object.x, object.y));
+		createTweener( Player.inst, new h3d.col.Point( object.x, object.y ) );
 	}
 
 	function createTweener( player : Player, to : h3d.col.Point ) {
 		var wherePlayerIs = NavigationWindow.playersHeads[player].parent;
-		var time = M.dist(wherePlayerIs.x, wherePlayerIs.y, to.x, to.y) * 50;
+		var time = M.dist( wherePlayerIs.x, wherePlayerIs.y, to.x, to.y ) * 50;
 
 		NavigationWindow.headsTweeners[player] = {
 			xTw : GameClient.inst.tw.createMs(
 				NavigationWindow.playersHeads[player].x,
-				Std.int(to.x - NavigationWindow.playersHeads[player].parent.x),
-				time),
+				Std.int( to.x - NavigationWindow.playersHeads[player].parent.x ),
+				time ),
 			yTw : GameClient.inst.tw.createMs(
 				NavigationWindow.playersHeads[player].y,
-				Std.int(to.y - NavigationWindow.playersHeads[player].parent.y),
-				time)
+				Std.int( to.y - NavigationWindow.playersHeads[player].parent.y ),
+				time )
 		};
 
 		GameClient.inst.delayer.addMs(() -> {
-			stopHeadTweeners(player);
+			stopHeadTweeners( player );
 			Player.inst.residesOnId = id;
 			Player.inst.checkTeleport();
-			Navigation.clientInst.navWin.refreshLinks(Const.jumpReach);
+			Navigation.clientInst.navWin.refreshLinks( Const.jumpReach );
 			Navigation.clientInst.navWin.locked = false;
-		}, time);
+		}, time );
 	}
 
 	public function stopHeadTweeners( player : Player ) {
@@ -511,13 +520,13 @@ class NavigationTarget implements Serializable {
 	}
 
 	public function createGenerator() {
-		generator = new AsteroidGenerator(bodyLevelName);
+		generator = new AsteroidGenerator( bodyLevelName );
 	}
 
 	@:keep
 	public function customSerialize( ctx : hxbit.Serializer ) {
-		ctx.addInt(Std.int(object.x));
-		ctx.addInt(Std.int(object.y));
+		ctx.addInt( Std.int( object.x ) );
+		ctx.addInt( Std.int( object.y ) );
 	}
 
 	@:keep
@@ -525,11 +534,11 @@ class NavigationTarget implements Serializable {
 		var x = ctx.getInt();
 		var y = ctx.getInt();
 
-		generator = new AsteroidGenerator(bodyLevelName);
+		generator = new AsteroidGenerator( bodyLevelName );
 
 		GameClient.inst.delayer.addF(() -> {
-			initLoad(seed, x, y);
-		}, 1);
+			initLoad( seed, x, y );
+		}, 1 );
 	}
 
 	public static function disposeArrowButton() {
@@ -538,12 +547,14 @@ class NavigationTarget implements Serializable {
 		}
 	}
 }
+
 /** если инстанс живой, но tmxMap null, то она генерируется**/
 class AsteroidGenerator {
+
 	public var onGeneration : EventSignal0;
 	public var name : String;
 	public var tmxMap : TmxMap;
-	public var mapIsGenerating(get, never) : Bool;
+	public var mapIsGenerating( get, never ) : Bool;
 
 	static var executor : Executor;
 
@@ -552,12 +563,12 @@ class AsteroidGenerator {
 	public function new( name : String, ?onGeneration : Void -> Void ) {
 		this.name = name;
 		this.onGeneration = new EventSignal0();
-		if ( onGeneration != null ) this.onGeneration.add(onGeneration);
-		if ( executor == null ) executor = Executor.create(1);
+		if ( onGeneration != null ) this.onGeneration.add( onGeneration );
+		if ( executor == null ) executor = Executor.create( 1 );
 
-		var lvl = tools.Save.inst.getLevelByName(name);
+		var lvl = tools.Save.inst.getLevelByName( name );
 		if ( lvl != null ) {
-			tmxMap = Unserializer.run(Base64.decode(lvl.tmx).toString());
+			tmxMap = Unserializer.run( Base64.decode( lvl.tmx ).toString() );
 		} else {
 			generateAsteroid();
 		}
@@ -566,18 +577,18 @@ class AsteroidGenerator {
 	public function generateAsteroid() {
 		var future : TaskFuture<TmxMap> = null;
 		future = executor.submit(() -> {
-			var autoMapper = new mapgen.AutoMap("tiled/levels/rules.txt");
-			var mapGen = new MapGen(Unserializer.run(haxe.Serializer.run(MapCache.inst.get('procgen/asteroids.tmx'))), name, autoMapper);
-			return autoMapper.applyRulesToMap(mapGen.generate(80, 80, 60, 5, 15));
-		});
+			var autoMapper = new mapgen.AutoMap( "tiled/levels/rules.txt" );
+			var mapGen = new MapGen( Unserializer.run( haxe.Serializer.run( MapCache.inst.get( 'procgen/asteroids.tmx' ) ) ), name, autoMapper );
+			return autoMapper.applyRulesToMap( mapGen.generate( 80, 80, 60, 5, 15 ) );
+		} );
 
 		future.onResult = ( result : FutureResult<TmxMap> ) -> {
 			switch result {
-				case SUCCESS(tmxMap, time, future):
+				case SUCCESS( tmxMap, time, future ):
 					this.tmxMap = tmxMap;
-					tools.Save.inst.upsertLevelMap(name, tmxMap);
+					tools.Save.inst.upsertLevelMap( name, tmxMap );
 					onGeneration.dispatch();
-				case FAILURE(ex, time, future):
+				case FAILURE( ex, time, future ):
 					throw "unexpected result";
 				default:
 			}

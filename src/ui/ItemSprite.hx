@@ -1,8 +1,7 @@
 package ui;
 
-import dn.heaps.input.ControllerAccess;
-import haxe.CallStack;
 import ch2.ui.EventInteractive;
+import dn.heaps.input.ControllerAccess;
 import en.player.Player;
 import h2d.Flow;
 import h2d.Object;
@@ -54,7 +53,7 @@ class ItemSprite extends Flow {
 		amountLabel.dom.setAttribute("padding-bottom", VInt(0));
 		amountLabel.dom.setAttribute("padding-top", VInt(0));
 		amountLabel.dom.setAttribute("padding-right", VInt(2));
-		amountLabel.labelTxt.dom.setAttribute("offset-y", VInt(-3));
+		amountLabel.shadowed_text.dom.setAttribute("offset-y", VInt(-3));
 		amountLabel.forceDecrHeight = 4;
 		amountLabel.cornersRounder.radius = 6;
 		amountLabel.cornersRounder.edgeSoftness = 1;

@@ -11,9 +11,9 @@ typedef NinesliceConf = {
 }
 
 class NinesliceWindow extends Window {
-	@:s var background : String;
+	var background : String;
 	var rest : haxe.Rest<Dynamic>;
-	@:s var childType : String;
+	var childType : String;
 
 	public function new(
 		?background : String = "window",

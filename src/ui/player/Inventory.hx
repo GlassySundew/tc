@@ -15,7 +15,7 @@ class Inventory extends NinesliceWindow {
 		this.cellGrid = cellGrid;
 		super("window", InventoryComp, parent, cellGrid, removeLastRow);
 
-		windowComp.window.windowLabel.labelTxt.text = "Inventory";
+		windowComp.window.windowLabel.shadowed_text.text = "Inventory";
 		toggleVisible();
 	}
 }

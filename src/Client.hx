@@ -1,3 +1,4 @@
+import utils.Repeater;
 import Level.StructTile;
 import cherry.soup.EventSignal.EventSignal0;
 import cherry.soup.EventSignal.EventSignal2;
@@ -9,8 +10,7 @@ import ui.ShadowedText;
 import ui.TextButton;
 
 class Client extends Process {
-	static var HOST = "127.0.0.1";
-	// static var HOST = "78.24.222.152";
+
 	static var PORT = 6676;
 
 	public static var inst : Client;
@@ -19,7 +19,6 @@ class Client extends Process {
 	public var uid : Int;
 	public var seed : String;
 
-	public var structTiles : Array<StructTile> = [];
 	public var onConnection : EventSignal0;
 
 	public var connected = false;
@@ -37,46 +36,73 @@ class Client extends Process {
 			#end
 		} );
 
+		Main.inst.onClose.add(() -> {
+			try {
+				host.dispose();
+				if ( GameClient.inst != null )
+					GameClient.inst.gc();
+			}
+			catch( e : Dynamic ) {
+				trace( "error occured while disposing: " + e );
+			}
+			host.flush();
+		} );
+	}
+
+	public function repeatConnect( interval = 0.5, repeats = 6 ) {
+		connect();
+		if ( !connected ) {
+			addOnConnectionCallback(() -> {
+				Repeater.inst.unset( "connect" );
+			} );
+
+			Repeater.inst.setS( "connect", interval, repeats, () -> {
+				connect();
+			} );
+		}
+	}
+
+	static var infoFlow : Flow;
+
+	public function connect( hostIp = "127.0.0.1", ?onFail : Void -> Void ) {
+		trace( "trying to connect" );
+
 		uid = 1 + Std.random( 1000 );
 
-		host.connect( HOST, PORT, function ( b ) {
+		host.connect( hostIp, PORT, function ( b ) {
 			if ( !b ) {
-				// server not found
-				var infoFlow = new Flow( Boot.inst.s2d );
-				infoFlow.verticalAlign = Middle;
-				var textInfo = new ShadowedText( Assets.fontPixel, infoFlow );
-				textInfo.text = "unable to connect... ";
+				if ( !Repeater.inst.has( "connect" ) ) {
+					if ( infoFlow != null )
+						infoFlow.remove();
 
-				var mainMenuBut : TextButton = null;
-				mainMenuBut = new TextButton( "return back to menu", ( e ) -> {
-					mainMenuBut.cursor = Default;
-					infoFlow.remove();
-					destroy();
-					new MainMenu( Boot.inst.s2d );
-				}, infoFlow );
+					// server not found
+					infoFlow = new Flow( Boot.inst.s2d );
+					infoFlow.verticalAlign = Middle;
+					var textInfo = new ShadowedText( Assets.fontPixel, infoFlow );
+					textInfo.text = "unable to connect... ";
 
-				trace( "Failed to connect to server" );
+					var mainMenuBut : TextButton = null;
+					mainMenuBut = new TextButton( "return back to menu", ( e ) -> {
+						mainMenuBut.cursor = Default;
+						infoFlow.remove();
+						destroy();
+						MainMenu.spawn( Boot.inst.s2d );
+					}, infoFlow );
+					infoFlow.getProperties(mainMenuBut).verticalAlign = Bottom;
+
+					trace( "Failed to connect to server" );
+				}
 				return;
 			}
+			if ( infoFlow != null )
+				infoFlow.remove();
 
 			trace( "Connected to server", uid );
 
+			sendMessage( Message.ClientInit( uid ) );
+
 			onConnection.dispatch();
 			connected = true;
-
-			sendMessage( Message.PlayerBoot( uid, Settings.params.nickname ) );
-
-			// sys.thread.Thread.create(() -> {
-			// 	while( true ) {
-			// 		Sys.sleep(100);
-			// 		try {
-			// 			host.sendMessage({type: "ping", msg: uid});
-			// 		}
-			// 		catch( e:Dynamic  ) {
-			// 			break;
-			// 		}
-			// 	}
-			// });
 		} );
 
 		host.onMessage = ( c, msg : Message ) -> {
@@ -88,39 +114,17 @@ class Client extends Process {
 				default:
 			}
 		}
-		// host.onMessage = function(c, msg:Message) {
-		// 	switch( msg.type ) {
-		// 		case mapLoad:
-		// 			var map = cast(msg, MapLoad);
-		// 			loadMap(map.map);
-		// 			trace("ZHOPA");
-
-		// 		default:
-		// 	}
-		// }
 
 		host.onUnregister = function ( o ) {
 			trace( "client disconnected " + o );
 		};
-
-		Main.inst.onClose.add(() -> {
-			connected = false;
-			try {
-				host.dispose();
-				GameClient.inst.gc();
-			}
-			catch( e : Dynamic ) {
-				trace( "error occured while disposing: " + e );
-			}
-			host.flush();
-		} );
 	}
 
 	public function addOnConnectionCallback( callback : Void -> Void ) {
 		if ( connected )
 			callback();
 		else
-			onConnection.add( callback );
+			onConnection.add( callback, true );
 	}
 
 	override function update() {
@@ -147,6 +151,7 @@ class Client extends Process {
 }
 
 class DebugClient extends Process {
+
 	static var HOST = "127.0.0.1";
 	// static var HOST = "78.24.222.152";
 	static var PORT = 6676;
@@ -157,7 +162,6 @@ class DebugClient extends Process {
 	public var uid : Int;
 	public var seed : String;
 
-	public var structTiles : Array<StructTile> = [];
 	public var onConnection : EventSignal0;
 
 	public var connected = false;

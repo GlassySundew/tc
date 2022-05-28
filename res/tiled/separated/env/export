@@ -1,7 +1,0 @@
-#!/bin/sh
-
-cd /home/glassysundew/Projects/tc/res/tiled/separated/env
-ase -b ../../ase/env.ase --save-as {slice}.png
-
-
-echo $dirname

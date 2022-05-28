@@ -57,8 +57,8 @@ class VerticalSlider extends EventInteractive {
 		return Math.abs(Math.round((value - minValue) * (height - cursorObj.height) / (maxValue - minValue)));
 	}
 
-	inline function getValue( cursorX : Float ) : Float {
-		return ((cursorX - handleDX) / (height - cursorObj.height)) * (maxValue - minValue) + minValue;
+	inline function getValue( eRelY : Float ) : Float {
+		return ((eRelY - handleDX) / (height - cursorObj.height)) * (maxValue - minValue) + minValue;
 	}
 
 	override function handleEvent( e : hxd.Event ) {
@@ -66,12 +66,11 @@ class VerticalSlider extends EventInteractive {
 		if ( e.cancel ) return;
 		switch( e.kind ) {
 			case EPush:
-				var dx = getDy();
-				handleDX = e.relY - dx;
+				var dy = getDy();
+				handleDX = e.relY - dy;
 
 				// If clicking the slider outside the handle, drag the handle
 				// by the center of it.
-
 				if ( handleDX - cursorObj.tile.dy < 0 || handleDX - cursorObj.tile.dy > cursorObj.height ) {
 					handleDX = cursorObj.height * 0.5;
 				}
@@ -80,7 +79,7 @@ class VerticalSlider extends EventInteractive {
 
 				var scene = scene;
 				value = getValue(e.relY);
-				var capture = ( e : Event ) -> {
+				function capture( e : Event ) {
 					if ( this.scene != scene || e.kind == ERelease ) {
 						scene.stopCapture();
 						return;

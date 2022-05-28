@@ -1,19 +1,30 @@
 package ui.domkit;
 
+import cherry.soup.EventSignal.EventSignal1;
 import dn.heaps.slib.HSprite;
 import en.player.Player;
-import ui.domkit.WindowComp.WindowCompI;
-import hxd.res.Resource;
+import h2d.Flow;
+import h2d.Object;
 import h2d.Tile;
 import hxd.Event;
-import cherry.soup.EventSignal.EventSignal1;
 import hxd.Res;
-import h2d.Object;
-import h2d.Flow;
+import hxd.res.Resource;
 import ui.domkit.WindowComp.WindowCompI;
 
-@:uiCoomp("recipe-comp")
+@:uiCoomp( "recipe-comp" )
 class RecipeComp extends Flow implements h2d.domkit.Object implements WindowCompI {
+
+	// @formatter:off
+	static var SRC =
+	     <recipe-comp>
+		    <window(backgroundTile, bl, bt, br, bb) public id="window" layout="horizontal">
+		        <bitmap src={iconSpr.tile} class="icon" />
+		        <flow class="craft_button" public id="craft_button" />
+		    </window>
+		</recipe-comp>
+		
+	// @formatter:on
+
 	public var onWheel : EventSignal1<Event> = new EventSignal1();
 	public var onOver : EventSignal1<Event> = new EventSignal1();
 	public var onOut : EventSignal1<Event> = new EventSignal1();
@@ -25,15 +36,6 @@ class RecipeComp extends Flow implements h2d.domkit.Object implements WindowComp
 	var iconSpr : HSprite;
 
 	public var recipe : Data.Recipe;
-
-	static var SRC =
-	     <recipe-comp>
-		    <window(backgroundTile, bl, bt, br, bb) public id="window" layout="horizontal">
-		        <bitmap src={iconSpr.tile} class="icon" />
-		        <flow class="craft_button" public id="craft_button" />
-		    </window>
-		</recipe-comp>
-		;
 
 	public function new( backgroundTile : h2d.Tile, bl : Int, bt : Int, br : Int, bb : Int, ?parent : Null<Object>, rest : haxe.Rest<Dynamic> ) {
 		super(parent);

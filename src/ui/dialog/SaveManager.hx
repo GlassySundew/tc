@@ -1,7 +1,8 @@
 package ui.dialog;
 
+import utils.Repeater;
+import net.ClientController;
 import ch2.ui.EventInteractive;
-import cherry.soup.EventSignal.EventSignal0;
 import dn.Process;
 import h2d.Bitmap;
 import h2d.Flow;
@@ -12,13 +13,18 @@ import h2d.col.Bounds;
 import h2d.col.Point;
 import hxd.Event;
 import ui.dialog.FocusMenu;
+import ui.domkit.SaveManagerComp;
 
 enum Mode {
 	Save;
 	Load;
+	NewSaveEntry;
 }
 
 class SaveManager extends FocusMenu {
+
+	public static var inst : SaveManager;
+
 	public var scrollVoid : Event -> Void;
 
 	var saveEntriesFlow : Flow;
@@ -37,23 +43,27 @@ class SaveManager extends FocusMenu {
 	var slider : VerticalSlider;
 	var areaBarFlow : Flow;
 
-	public var onLoad : () -> Void;
+	public var onGameStart : () -> Void;
 
-	public static var generalSave = ( e : String ) -> {
-		Client.inst.addOnConnectionCallback(() -> Client.inst.sendMessage( SaveSystemOrder( CreateNewSave( e ) ) ) );
-	};
+	override function get_contentTopPadding() : Int
+		return 0;
 
-	public static var generalLoad = ( e : String ) -> {}
-
-	public static var generalDelete = ( e : String ) -> {}
-
-	public function new( mode : Mode, ?onLoad : () -> Void, ?parent : Object ) {
+	public function new( mode : Mode, ?onGameStart : () -> Void, ?parent : Object ) {
 		super( parent );
 
+		inst = this;
+
 		this.mode = mode;
-		this.onLoad = onLoad;
+		this.onGameStart = onGameStart;
 
 		refreshSaves();
+		centrizeContent();
+
+		var comp = new SaveManagerComp( mode, params.saveFiles, contentFlow );
+
+		// deprecated below
+
+		return;
 
 		var generalFlow = new Flow( h2dObject );
 		generalFlow.layout = Vertical;
@@ -66,7 +76,7 @@ class SaveManager extends FocusMenu {
 			case Save: "Save file: ";
 			case Load: "Load file: ";
 			default: "";
-		}
+		};
 
 		areaBarFlow = new Flow( generalFlow );
 		areaBarFlow.layout = Horizontal;
@@ -89,6 +99,7 @@ class SaveManager extends FocusMenu {
 
 		grid = new ScaleGrid( Tile.fromColor( 0x8f8f8f, 1, 1, 1 ), 1, 1, 1, 1, h2dObject );
 		slider = new VerticalSlider( 10, scrollArea.height, grid, sliderBack );
+
 		scrollVoid = ( e : Event ) -> {
 			scrollArea.scrollBy( 0, e.wheelDelta );
 			slider.value = scrollArea.scrollY;
@@ -111,6 +122,7 @@ class SaveManager extends FocusMenu {
 			var e = new SaveEntry( i, mode, this, saveEntriesFlow );
 			entries.push( e );
 		}
+
 		if ( mode == Save ) {
 			var e = new SaveEntry( "New save...", mode, this, saveEntriesFlow );
 			entries.push( e );
@@ -146,14 +158,45 @@ class SaveManager extends FocusMenu {
 		e.selected = true;
 	}
 
+	public static function newSave( e : String, seed : String ) {
+		Main.inst.onClientControllerSetEvent.add(
+			() -> Main.inst.clientController.orderSaveSystem( CreateNewSave( e ),
+				( result ) -> {
+					Main.inst.clientController.spawnPlayer( Settings.params.nickname );
+				} ),
+			true
+		);
+		Client.inst.repeatConnect( 0.25, 10 );
+		Main.inst.startGame( false );
+
+		// Client.inst.addOnConnectionCallback(() -> Client.inst.sendMessage( SaveSystemOrder( CreateNewSave( e ) ) ) );
+	};
+
+	public static function save( e : String ) {
+		// Client.inst.addOnConnectionCallback(() -> Client.inst.sendMessage( SaveSystemOrder( CreateNewSave( e ) ) ) );
+	};
+
+	public static function load( e : String ) {
+		// Client.inst.addOnConnectionCallback(() -> Client.inst.sendMessage( SaveSystemOrder( CreateNewSave( e ) ) ) );
+	}
+
+	public static function generalDelete( e : String ) {}
+
+	override function onResize() {
+		super.onResize();
+		// sliderBack.height = scrollArea.height = Std.int( hScaled - h2dObject.y - 20 );
+		// grid.height = M.fclamp( ( 1 / ( saveEntriesFlow.innerHeight / scrollArea.height ) * scrollArea.height ), 15, scrollArea.height - 0.1 );
+	}
+
 	override function onDispose() {
 		super.onDispose();
-		for ( i in entries ) i.destroy();
+		// for ( i in entries ) i.destroy();
 		// if ( onLoad != null ) onLoad();
 	}
 }
 
 class SaveEntry extends Process {
+
 	var horflow : Flow;
 	var utilityFlow : Flow;
 	var dialog : Dialog;
@@ -194,14 +237,15 @@ class SaveEntry extends Process {
 		activateEntry = ( e : Event ) -> {
 			switch( mode ) {
 				case Save:
-					SaveManager.generalSave( name );
+					SaveManager.save( name );
 				case Load:
 					saveMan.destroy();
-					if ( saveMan.onLoad != null ) saveMan.onLoad();
+					if ( saveMan.onGameStart != null ) saveMan.onGameStart();
 					tools.Save.inst.loadGame( name );
-					// case New( name ):
-					// 	dialog = new NewSaveDialog( ( e ) -> {}, mode, saveMan, Main.inst.root );
-					// 	syncDialog( dialog );
+				// case New( name ):
+				// 	dialog = new NewSaveDialog( ( e ) -> {}, mode, saveMan, Main.inst.root );
+				// 	syncDialog( dialog );
+				default:
 			}
 		};
 
@@ -242,23 +286,24 @@ class SaveEntry extends Process {
 		var delete0 = new HSprite( Assets.ui, "trash0" );
 		var delete1 = new HSprite( Assets.ui, "trash1" );
 
-		var start0, start1, start2;
-		switch( mode ) {
-			case Save:
-				start0 = new HSprite( Assets.ui, "save0" );
-				start1 = new HSprite( Assets.ui, "save1" );
-				start2 = new HSprite( Assets.ui, "save2" );
-			case Load:
-				start0 = new HSprite( Assets.ui, "start0" );
-				start1 = new HSprite( Assets.ui, "start1" );
-				start2 = new HSprite( Assets.ui, "start2" );
-				// case New( name ):
-				// 	start0 = new HSprite( Assets.ui, "new0" );
-				// 	start1 = new HSprite( Assets.ui, "new1" );
-				// 	start2 = new HSprite( Assets.ui, "new2" );
-		}
-		var startButton = new Button( [start0.tile, start1.tile, start2.tile], utilityFlow );
-		startButton.onClickEvent.add( activateEntry, 1 );
+		// var start0, start1, start2;
+		// switch( mode ) {
+		// 	case Save:
+		// 		start0 = new HSprite( Assets.ui, "save0" );
+		// 		start1 = new HSprite( Assets.ui, "save1" );
+		// 		start2 = new HSprite( Assets.ui, "save2" );
+		// 	case Load:
+		// 		start0 = new HSprite( Assets.ui, "start0" );
+		// 		start1 = new HSprite( Assets.ui, "start1" );
+		// 		start2 = new HSprite( Assets.ui, "start2" );
+		// 		// case New( name ):
+		// 		// 	start0 = new HSprite( Assets.ui, "new0" );
+		// 		// 	start1 = new HSprite( Assets.ui, "new1" );
+		// 		// 	start2 = new HSprite( Assets.ui, "new2" );
+		// 	default:
+		// }
+		// var startButton = new Button( [start0.tile, start1.tile, start2.tile], utilityFlow );
+		// startButton.onClickEvent.add( activateEntry, 1 );
 
 		switch mode {
 			case Save | Load:
@@ -271,11 +316,12 @@ class SaveEntry extends Process {
 				 */
 				var delete = new Button( [delete0.tile, delete1.tile, delete0.tile], utilityFlow );
 				delete.onClickEvent.add( ( e ) -> {
-					dialog = new DeleteDialog( name, activateEntry, mode, saveMan, Main.inst.root );
-					syncDialog( dialog );
+					// dialog = new DeleteDialog( name, mode, saveMan, Main.inst.root );
+					// syncDialog( dialog );
 				} );
-				// case New( _ ):
-				// 	startButton.onClickEvent.add( ( e ) -> {}, 0 );
+			// case New( _ ):
+			// 	startButton.onClickEvent.add( ( e ) -> {}, 0 );
+			default:
 		}
 
 		try {

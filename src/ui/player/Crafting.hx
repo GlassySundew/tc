@@ -8,7 +8,6 @@ import h2d.Object;
 import h2d.ScaleGrid;
 import h2d.col.Bounds;
 import h2d.col.Point;
-import h3d.Vector;
 import hxd.Event;
 import ui.InventoryGrid.InventoryCell;
 import ui.domkit.CraftingComp;
@@ -18,12 +17,12 @@ import ui.domkit.RecipeComp;
 import ui.domkit.ScrollbarComp;
 
 class Crafting extends NinesliceWindow {
-	var scrollable : ScrollArea;
+	var scrollable : FixedScrollArea;
 
 	public function new( source : Data.Recipe_recipe_source, ?parent : Object ) {
 		super(CraftingComp, parent);
 
-		windowComp.window.windowLabel.labelTxt.text = "Crafting";
+		windowComp.window.windowLabel.shadowed_text.text = "Crafting";
 		var craftingComp = cast(windowComp, CraftingComp);
 
 		// scrollbar for recipes
@@ -127,7 +126,7 @@ class Recipe extends NinesliceWindow {
 		super("craft_recipe", RecipeComp, parent, recipe);
 
 		// cast(windowComp, Recip)
-		windowComp.window.windowLabel.labelTxt.text = recipe.name + (recipe.result.length > 0 ? (" x " + recipe.result[0].amount) : "");
+		windowComp.window.windowLabel.shadowed_text.text = recipe.name + (recipe.result.length > 0 ? (" x " + recipe.result[0].amount) : "");
 
 		var recipeComp = Std.downcast(windowComp, RecipeComp);
 		recipeComp.onOver.add(( e ) -> {

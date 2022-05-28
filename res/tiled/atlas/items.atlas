@@ -1,75 +1,75 @@
 items.png
-size: 51, 53
+size: 160, 16
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 door
   rotate: false
-  xy: 19, 1
-  size: 14, 16
+  xy: 0, 0
+  size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 emerald
   rotate: false
-  xy: 1, 1
+  xy: 16, 0
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 fireaxe
   rotate: false
-  xy: 19, 19
-  size: 14, 16
+  xy: 32, 0
+  size: 16, 16
   orig: 16, 16
-  offset: 1, 0
+  offset: 0, 0
   index: -1
 hydroponics
   rotate: false
-  xy: 1, 37
-  size: 16, 15
+  xy: 48, 0
+  size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 item_gravity_manipulator
   rotate: false
-  xy: 37, 45
-  size: 3, 3
+  xy: 64, 0
+  size: 16, 16
   orig: 16, 16
-  offset: 0, 13
+  offset: 0, 0
   index: -1
 item_iron_ore
   rotate: false
-  xy: 19, 37
-  size: 16, 15
+  xy: 80, 0
+  size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 seaweed
   rotate: false
-  xy: 35, 18
-  size: 15, 14
+  xy: 96, 0
+  size: 16, 16
   orig: 16, 16
-  offset: 1, 1
+  offset: 0, 0
   index: -1
 seeds_seaweed
   rotate: false
-  xy: 37, 34
-  size: 13, 9
+  xy: 112, 0
+  size: 16, 16
   orig: 16, 16
-  offset: 1, 4
+  offset: 0, 0
   index: -1
 shadow
   rotate: false
-  xy: 1, 19
+  xy: 128, 0
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 workbench
   rotate: false
-  xy: 35, 1
-  size: 15, 15
+  xy: 144, 0
+  size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1

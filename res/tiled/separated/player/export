@@ -1,5 +1,0 @@
-#!/bin/bash
-
-
-Aseprite.exe -b ../../ase/player_run.ase --save-as {tag}_{slice}_{frame0}.png
-

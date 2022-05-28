@@ -37,7 +37,7 @@ class LevelLoadPlayerConfig {
 class GameClient extends Process {
 	public static var inst : GameClient;
 
-	public var camera : Camera;
+	public var camera : s3d.Camera;
 
 	private var cam : CameraController;
 
@@ -57,7 +57,6 @@ class GameClient extends Process {
 
 	public var navFieldsGenerated : Null<Int>;
 
-	public var clientController : ClientController;
 
 	var ca : ControllerAccess<ControllerAction>;
 
@@ -93,7 +92,7 @@ class GameClient extends Process {
 
 		createRootInLayers( Main.inst.root, Const.DP_BG );
 
-		camera = new Camera();
+		camera = new s3d.Camera();
 	}
 
 	public function onCdbReload() {}
@@ -188,124 +187,124 @@ class GameClient extends Process {
 		camera.recenter();
 	}
 
-	public function applyTmxObjOnEnt( ?ent : Null<Entity> ) {
-		// если ent не определён, то на все Entity из массива ALL будут добавлены TmxObject из тайлсета с названием colls
+	// public function applyTmxObjOnEnt( ?ent : Null<Entity> ) {
+	// 	// если ent не определён, то на все Entity из массива ALL будут добавлены TmxObject из тайлсета с названием colls
 
-		// parsing collision objects from 'colls' tileset
-		var entitiesTs : TmxTileset = null;
+	// 	// parsing collision objects from 'colls' tileset
+	// 	var entitiesTs : TmxTileset = null;
 
-		for ( tileset in tmxMap.tilesets ) {
-			if ( StringTools.contains( tileset.source, "entities" ) ) {
-				entitiesTs = tileset;
-			}
-		}
+	// 	for ( tileset in tmxMap.tilesets ) {
+	// 		if ( StringTools.contains( tileset.source, "entities" ) ) {
+	// 			entitiesTs = tileset;
+	// 		}
+	// 	}
 
-		var ents = ent != null ? [ent] : Entity.ALL;
+	// 	var ents = ent != null ? [ent] : Entity.ALL;
 
-		for ( tile in entitiesTs.tiles ) {
-			if ( eregFileName.match( tile.image.source ) ) {
-				var picName = {
-					if ( tile.properties.existsType( "className", PTString ) ) {
-						var className = tile.properties.getString( "className" );
-						eregCompTimeClass.match( className );
-						eregCompTimeClass.matched( 1 ).toLowerCase();
-					} else
-						eregFileName.matched( 1 );
-				}
+	// 	for ( tile in entitiesTs.tiles ) {
+	// 		if ( eregFileName.match( tile.image.source ) ) {
+	// 			var picName = {
+	// 				if ( tile.properties.existsType( "className", PTString ) ) {
+	// 					var className = tile.properties.getString( "className" );
+	// 					eregCompTimeClass.match( className );
+	// 					eregCompTimeClass.matched( 1 ).toLowerCase();
+	// 				} else
+	// 					eregFileName.matched( 1 );
+	// 			}
 
-				for ( ent in ents ) {
-					eregClass.match( '$ent'.toLowerCase() );
-					var entityName = eregClass.matched( 1 );
+	// 			for ( ent in ents ) {
+	// 				eregClass.match( '$ent'.toLowerCase() );
+	// 				var entityName = eregClass.matched( 1 );
 
-					if ( entityName == picName
-						|| ent.spr.groupName == picName ) {
+	// 				if ( entityName == picName
+	// 					|| ent.spr.groupName == picName ) {
 
-						// соотношение, которое в конце будет применено к entity
-						var center = new Vector();
+	// 					// соотношение, которое в конце будет применено к entity
+	// 					var center = new Vector();
 
-						for ( obj in tile.objectGroup.objects ) {
-							switch obj.objectType {
-								case OTRectangle:
-								case OTEllipse:
-									var shape = new differ.shapes.Circle( 0, 0, obj.width / 2 );
-									var cent = new Vector(
-										obj.width / 2,
-										obj.height / 2
-									);
+	// 					for ( obj in tile.objectGroup.objects ) {
+	// 						switch obj.objectType {
+	// 							case OTRectangle:
+	// 							case OTEllipse:
+	// 								var shape = new differ.shapes.Circle( 0, 0, obj.width / 2 );
+	// 								var cent = new Vector(
+	// 									obj.width / 2,
+	// 									obj.height / 2
+	// 								);
 
-									ent.collisions.set( shape,
-										{
-											cent : new differ.math.Vector( cent.x, cent.y ),
-											offset : new differ.math.Vector( obj.x + cent.x, obj.y + cent.y )
-										} );
+	// 								ent.collisions.set( shape,
+	// 									{
+	// 										cent : new differ.math.Vector( cent.x, cent.y ),
+	// 										offset : new differ.math.Vector( obj.x + cent.x, obj.y + cent.y )
+	// 									} );
 
-									if ( center.x == 0 && center.y == 0 ) {
-										center.x = cent.x + obj.x;
-										center.y = cent.y + obj.y;
-									}
-								case OTPoint:
-									switch obj.name {
-										case "center":
-											center.x = obj.x;
-											center.y = obj.y;
-									}
-								case OTPolygon( points ):
-									var pts = makePolyClockwise( points );
-									rotatePoly( obj, pts );
+	// 								if ( center.x == 0 && center.y == 0 ) {
+	// 									center.x = cent.x + obj.x;
+	// 									center.y = cent.y + obj.y;
+	// 								}
+	// 							case OTPoint:
+	// 								switch obj.name {
+	// 									case "center":
+	// 										center.x = obj.x;
+	// 										center.y = obj.y;
+	// 								}
+	// 							case OTPolygon( points ):
+	// 								var pts = makePolyClockwise( points );
+	// 								rotatePoly( obj, pts );
 
-									var cent = getProjectedDifferPolygonRect( obj, points );
+	// 								var cent = getProjectedDifferPolygonRect( obj, points );
 
-									var verts : Array<Vector> = [];
-									for ( i in pts ) verts.push( new Vector( i.x, i.y ) );
+	// 								var verts : Array<Vector> = [];
+	// 								for ( i in pts ) verts.push( new Vector( i.x, i.y ) );
 
-									var poly = new Polygon( 0, 0, verts );
+	// 								var poly = new Polygon( 0, 0, verts );
 
-									poly.scaleY = -1;
-									ent.collisions.set(
-										poly,
-										{
-											cent : new differ.math.Vector( cent.x, cent.y ),
-											offset : new differ.math.Vector( obj.x, obj.y )
-										}
-									);
+	// 								poly.scaleY = -1;
+	// 								ent.collisions.set(
+	// 									poly,
+	// 									{
+	// 										cent : new differ.math.Vector( cent.x, cent.y ),
+	// 										offset : new differ.math.Vector( obj.x, obj.y )
+	// 									}
+	// 								);
 
-									if ( center.x == 0 && center.y == 0 ) {
-										center.x = cent.x + obj.x;
-										center.y = cent.y + obj.y;
-									}
-								default:
-							}
-						}
+	// 								if ( center.x == 0 && center.y == 0 ) {
+	// 									center.x = cent.x + obj.x;
+	// 									center.y = cent.y + obj.y;
+	// 								}
+	// 							default:
+	// 						}
+	// 					}
 
-						// ending serving this particular entity 'ent' here
-						var pivotX = ( center.x ) / ent.tmxObj.width;
-						var pivotY = ( center.y ) / ent.tmxObj.height;
+	// 					// ending serving this particular entity 'ent' here
+	// 					var pivotX = ( center.x ) / ent.tmxObj.width;
+	// 					var pivotY = ( center.y ) / ent.tmxObj.height;
 
-						// ent.setPivot(pivotX, pivotY);
+	// 					// ent.setPivot(pivotX, pivotY);
 
-						var actualX = ent.tmxObj.width / 2;
-						var actualY = ent.tmxObj.height;
+	// 					var actualX = ent.tmxObj.width / 2;
+	// 					var actualY = ent.tmxObj.height;
 
-						ent.footX -= actualX - pivotX * ent.tmxObj.width;
-						ent.footY += actualY - pivotY * ent.tmxObj.height;
+	// 					ent.footX -= actualX - pivotX * ent.tmxObj.width;
+	// 					ent.footY += actualY - pivotY * ent.tmxObj.height;
 
-						#if depth_debug
-						ent.mesh.renewDebugPts();
-						#end
+	// 					#if depth_debug
+	// 					ent.mesh.renewDebugPts();
+	// 					#end
 
-						try {
-							cast( ent, Interactive ).rebuildInteract();
-						}
-						catch( e : Dynamic ) {}
+	// 					try {
+	// 						cast( ent, en.InteractableEntity ).rebuildInteract();
+	// 					}
+	// 					catch( e : Dynamic ) {}
 
-						if ( Std.isOfType( ent, SpriteEntity ) && tile.properties.exists( "interactable" ) ) {
-							cast( ent, SpriteEntity ).interactable = tile.properties.getBool( "interactable" );
-						}
-					}
-				}
-			}
-		}
-	}
+	// 					if ( Std.isOfType( ent, SpriteEntity ) && tile.properties.exists( "interactable" ) ) {
+	// 						cast( ent, SpriteEntity ).interactable = tile.properties.getBool( "interactable" );
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	public function gc() {
 		if ( Entity.GC == null || Entity.GC.length == 0 ) return;

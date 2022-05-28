@@ -5,12 +5,12 @@ import hxd.Event;
 import h2d.Object;
 import h2d.Flow;
 
-
 class OptionsMenu extends FocusMenu {
+
 	var nicknameInput : ui.TextInput;
 
 	public function new( ?parent : Object ) {
-		super( parent ); 
+		super( parent );
 
 		centrizeContent();
 
@@ -51,7 +51,5 @@ class OptionsMenu extends FocusMenu {
 
 	override function onResize() {
 		super.onResize();
-		
 	}
-
 }

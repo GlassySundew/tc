@@ -1,4 +1,0 @@
-#!/bin/bash
-
-ase -b ../../ase/ui.ase  --save-as {slice}.png # --list-slices  --data ui.json
-

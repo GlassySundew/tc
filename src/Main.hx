@@ -1,5 +1,7 @@
 package;
 
+import utils.Repeater;
+import net.ClientController;
 import cherry.soup.EventSignal;
 import dn.heaps.input.ControllerAccess;
 import dn.heaps.input.Controller;
@@ -10,13 +12,12 @@ import hxd.Key;
 import tools.Save;
 import tools.Settings;
 
-
-
 /**
 	client-side only
 **/
 @:publicFields
 class Main extends Process {
+
 	public static var inst : Main;
 
 	public var console : ui.Console;
@@ -24,8 +25,17 @@ class Main extends Process {
 	public var ca : ControllerAccess<ControllerAction>;
 	public var onClose : EventSignal0;
 	public var save : Save;
-
 	public var onResizeEvent : EventSignal0 = new EventSignal0();
+
+	public var onClientControllerSetEvent = new EventSignal0();
+
+	public var clientController( default, set ) : ClientController;
+
+	function set_clientController( cc : ClientController ) {
+		
+		delayer.addF( onClientControllerSetEvent.dispatch, 1 );
+		return clientController = cc;
+	}
 
 	public function new( s : h2d.Scene ) {
 		super();
@@ -45,7 +55,7 @@ class Main extends Process {
 		#if debug
 		hxd.Res.data.watch( function () {
 			delayer.cancelById( "cdb" );
-			//
+
 			delayer.addS( "cdb", function () {
 				Data.load( hxd.Res.data.entry.getBytes().toString() );
 				if ( GameClient.inst != null ) GameClient.inst.onCdbReload();
@@ -79,14 +89,14 @@ class Main extends Process {
 
 		controller.bindPadLStick4( MoveLeft, MoveRight, MoveUp, MoveDown );
 
-		controller.bindKeyboard( MoveUp,	[Key.UP,	Key.W] );
-		controller.bindKeyboard( MoveLeft,	[Key.LEFT,	Key.A] );
-		controller.bindKeyboard( MoveDown,	[Key.DOWN,	Key.S] );
-		controller.bindKeyboard( MoveRight,	[Key.RIGHT,	Key.D] );
+		controller.bindKeyboard( MoveUp, [Key.UP, Key.W] );
+		controller.bindKeyboard( MoveLeft, [Key.LEFT, Key.A] );
+		controller.bindKeyboard( MoveDown, [Key.DOWN, Key.S] );
+		controller.bindKeyboard( MoveRight, [Key.RIGHT, Key.D] );
 
 		controller.bindKeyboard( Action, Key.E );
 		controller.bindKeyboard( DropItem, Key.Q );
-		controller.bindKeyboard( ToggleInventory, Key.TAB ); 
+		controller.bindKeyboard( ToggleInventory, Key.TAB );
 		controller.bindKeyboard( ToggleCraftingMenu, Key.C );
 
 		controller.bindKeyboard( Escape, Key.ESCAPE );
@@ -110,13 +120,11 @@ class Main extends Process {
 		}
 
 		delayer.addF( start, 1 );
-
-		// var bmp = new Bitmap(Tile.fromColor(0xffffff, 256, 256), Boot.inst.s2d);
-		// bmp.filter = new Shader(new CornersRounder());
+		new Client();
 	}
 
 	function start() {
-		new MainMenu( Boot.inst.s2d );
+		MainMenu.spawn( Boot.inst.s2d );
 	}
 
 	public function toggleFullscreen() {
@@ -127,24 +135,16 @@ class Main extends Process {
 		#end
 	}
 
-	public function startGame( ?seed : String ) {
+	/**
+		start local server
+	**/
+	public function startGame( ?clientOnly = true ) {
 		if ( GameClient.inst != null ) {
 			GameClient.inst.destroy();
 			@:privateAccess Process._garbageCollector( Process.ROOTS );
 		}
-
-		new Client();
-		// Client.inst.sendMessage(SaveSystemOrder(CreateNewSave()));
-
-		new GameClient();
-	}
-
-	public function connect( ?seed : String ) {
-		if ( GameClient.inst != null ) {
-			GameClient.inst.destroy();
-			@:privateAccess Process._garbageCollector( Process.ROOTS );
-		}
-		new Client();
+		if ( !clientOnly )
+			Boot.inst.createServer();
 		new GameClient();
 	}
 
@@ -165,6 +165,8 @@ class Main extends Process {
 		// dn.heaps.slib.SpriteLib.TMOD = tmod;
 		if ( ca.isKeyboardPressed( Key.F11 ) ) toggleFullscreen();
 		// if ( ca.isKeyboardPressed(Key.M) ) Assets.toggleMusicPause();
+		Repeater.inst.update( tmod );
+
 		super.update();
 	}
 }

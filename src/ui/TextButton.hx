@@ -3,25 +3,53 @@ package ui;
 import h3d.mat.Texture;
 import hxd.Event;
 
-
 class TextButton extends ui.Button {
-	public function new( string : String, ?action : Event -> Void, ?colorDef : Int = 0xffffff, ?colorPressed : Int = 0x676767, ?parent ) {
+
+	public var prefix( default, set ) : String;
+
+	function set_prefix( v : String ) {
+		prefix = v;
+		refresh();
+		return v;
+	}
+
+	var texDefault : Texture;
+	var texPrefix : Texture;
+	var texPrefixPressed : Texture;
+	var colorDefault : Int;
+	var colorPressed : Int;
+	var title : String;
+
+	public function new( title : String, prefix = "> ", ?action : Event -> Void, ?colorDefault : Int = 0xffffff, ?colorPressed : Int = 0x676767, ?parent ) {
+		this.colorDefault = colorDefault;
+		this.colorPressed = colorPressed;
+		this.title = title;
+		this.prefix = prefix;
+
+		super( [h2d.Tile.fromTexture( texDefault ), h2d.Tile.fromTexture( texPrefix ), h2d.Tile.fromTexture( texPrefixPressed )], parent );
+		onClickEvent.add( action != null ? action : ( _ ) -> {} );
+	}
+
+	function refresh() {
 		var text = new ShadowedText( Assets.fontPixel );
-		text.color = Color.intToVector( colorDef );
-		text.text = "  " + string;
+		text.color = Color.intToVector( colorDefault );
 
-		var tex0 = new Texture( Std.int( text.textWidth ), Std.int( text.textHeight ), [Target] );
-		text.drawTo( tex0 );
+		text.text = prefix + title;
+		texPrefix = new Texture( Std.int( text.textWidth ), Std.int( text.textHeight ), [Target] );
+		text.drawTo( texPrefix );
 
-		var tex1 = new Texture( Std.int( text.textWidth ), Std.int( text.textHeight ), [Target] );
-		text.text = "> " + string;
-		text.drawTo( tex1 );
+		text.text = [for ( i in 0...prefix.length ) " "].join( "" ) + title;
+		texDefault = new Texture( Std.int( texPrefix.width ), Std.int( texPrefix.height ), [Target] );
+		text.drawTo( texDefault );
 
 		text.color = Color.intToVector( colorPressed );
+		texPrefixPressed = new Texture( Std.int( texPrefix.width ), Std.int( texPrefix.height ), [Target] );
+		text.drawTo( texPrefixPressed );
+		
+		states = [h2d.Tile.fromTexture( texDefault ), h2d.Tile.fromTexture( texPrefix ), h2d.Tile.fromTexture( texPrefixPressed )];
+		processStates( states );
 
-		var tex2 = new Texture( Std.int( text.textWidth ), Std.int( text.textHeight ), [Target] );
-		text.drawTo( tex2 );
-		super( [h2d.Tile.fromTexture( tex0 ), h2d.Tile.fromTexture( tex1 ), h2d.Tile.fromTexture( tex2 )], parent );
-		onClickEvent.add( action != null ? action : ( _ ) -> {} );
+		width = states[0].width;
+		height = states[0].height;
 	}
 }

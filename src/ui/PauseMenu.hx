@@ -71,7 +71,7 @@ class PauseMenu extends FocusMenu {
 			// TODO make
 			// Save.inst.disconnect();
 
-			new MainMenu( Boot.inst.s2d );
+			MainMenu.spawn( Boot.inst.s2d );
 			destroy();
 		}, contentFlow );
 

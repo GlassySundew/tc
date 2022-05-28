@@ -1,18 +1,14 @@
 package en;
 
-import ui.InventoryGrid.UICellGrid;
 import en.player.Player;
-import hxd.Key;
-import Level.StructTile;
 import format.tmx.Data.TmxObject;
-import h2d.Bitmap;
-import h3d.mat.Texture;
 import hxbit.Serializer;
-import hxd.Res;
 
-class Structure extends Interactive {
+class Structure extends en.InteractableEntity {
+
 	@:s public var cdbEntry : Data.StructureKind;
 	public var toBeCollidedAgainst = true;
+	public var health : Float;
 
 	public function new( x : Float, y : Float, ?tmxObject : TmxObject, ?cdbEntry : Data.StructureKind ) {
 		this.cdbEntry = cdbEntry;
@@ -90,7 +86,37 @@ class Structure extends Interactive {
 		interact.onOutEvent.add( ( e : hxd.Event ) -> {
 			turnOffHighlight();
 		} );
+
+		Main.inst.delayer.addF(() -> {
+
+			interactCheck();
+		}, 10 );
 	}
+
+	function activateInteractive() {
+		if ( interactable && isInPlayerRange() ) {
+			if ( doHighlight )
+				turnOnHighlight();
+			return true;
+		} else
+			return false;
+	}
+
+	function updateInteract() {
+		if ( interactable ) updateKeyIcon();
+		if ( interact != null && Player.inst != null && Player.inst.isMoving )
+			interactCheck();
+	}
+
+	function interactCheck() {
+		interact.visible =
+			interactable
+			&& Player.inst != null
+			&& !Player.inst.destroyed
+			&& isInPlayerRange();
+	}
+
+	function isInPlayerRange() return distPolyToPt( Player.inst ) <= useRange;
 
 	public function offsetFootByTile() {
 		footY += 1.;
@@ -129,6 +155,9 @@ class Structure extends Interactive {
 		}
 	}
 
+	@:rpc( server )
+	public function useByEntity( ent : Entity ) {}
+
 	public function emitDestroyItem( item : Item ) {
 		// var hitPart = Res.hit_ico.toGpuParticlesClamped(mesh);
 		// hitPart.z = 15;
@@ -149,6 +178,11 @@ class Structure extends Interactive {
 		// 	hitPart.remove();
 		// 	hitPart = null;
 		// };
+	}
+
+	override function postUpdate() {
+		super.postUpdate();
+		updateInteract();
 	}
 
 	public static function fromCdbEntry( x : Int, y : Int, cdbEntry : Data.StructureKind, ?amount : Int = 1 ) : Structure {

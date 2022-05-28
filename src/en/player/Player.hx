@@ -25,6 +25,7 @@ enum abstract PlayerActionState( String ) from String to String {
 }
 
 class Player extends Entity {
+
 	public static var inst : Player;
 
 	public var state : PlayerState;
@@ -94,9 +95,10 @@ class Player extends Entity {
 
 		actionState = new AClientToServer<PlayerActionState>( Idle );
 
+		inventory = new InventoryGrid( 5, 6, this );
+
 		super( x, z, tmxObj );
 
-		inventory = new InventoryGrid( 5, 6, this );
 		lock( 30 );
 
 		// new game here, thus setting player to a random asteroid in 0, 0 asteroid chunk, idk what to make it in multiplayer
@@ -162,7 +164,9 @@ class Player extends Entity {
 
 			sprFrame = { group : spr.groupName, frame : spr.frame };
 
-			actionState.clientToServerCond = footX.clientToServerCond = footY.clientToServerCond = () -> true;
+			Main.inst.delayer.addF(() -> {
+				actionState.clientToServerCond = footX.clientToServerCond = footY.clientToServerCond = () -> true;
+			}, 1 );
 		}
 
 		initNickname();
@@ -174,7 +178,7 @@ class Player extends Entity {
 		propId : Int,
 		clientSer : hxbit.NetworkSerializable
 	) : Bool {
-		return GameClient.inst != null ? GameClient.inst.clientController == clientSer : cast( clientSer, ClientController ).player == this;
+		return GameClient.inst != null ? Main.inst.clientController == clientSer : cast( clientSer, ClientController ).player == this;
 	}
 
 	/**generate nickname text mesh**/
@@ -324,10 +328,10 @@ class Player extends Entity {
 		if ( inst == this ) {
 			// calculateIsMoving();
 
-			var lx = ca.getAnalogValue2(MoveLeft, MoveRight);
-			var ly = ca.getAnalogValue2(MoveDown, MoveUp);
+			var lx = ca.getAnalogValue2( MoveLeft, MoveRight );
+			var ly = ca.getAnalogValue2( MoveDown, MoveUp );
 
-			var leftDist = M.dist( 0, 0, lx,  ly);
+			var leftDist = M.dist( 0, 0, lx, ly );
 			var leftPushed = leftDist >= 0.3;
 			var leftAng = Math.atan2( ly, lx );
 			if ( !isLocked() ) {
@@ -405,7 +409,7 @@ class Player extends Entity {
 			}
 		}
 
-		if ( ca.isPressed(DropItem) ) {
+		if ( ca.isPressed( DropItem ) ) {
 			// Q
 			if ( holdItem != null && !holdItem.isDisposed ) {
 				if ( Key.isDown( Key.CTRL ) ) {

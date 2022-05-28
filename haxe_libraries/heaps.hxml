@@ -1,4 +1,4 @@
-# @install: lix --silent download "gh://github.com/heapsio/heaps#860be7d8c6fa59e537c4a02c0d19023d278fc345" into heaps/1.9.1/github/860be7d8c6fa59e537c4a02c0d19023d278fc345
+# @install: lix --silent download "gh://github.com/GlassySundew/heaps#d1d0008ccbad2f7f3ec802d8f4469bf82bce7f5f" into heaps/1.9.1/github/d1d0008ccbad2f7f3ec802d8f4469bf82bce7f5f
 -lib format
--cp ${HAXE_LIBCACHE}/heaps/1.9.1/github/860be7d8c6fa59e537c4a02c0d19023d278fc345/
+-cp src/heaps
 -D heaps=1.9.1

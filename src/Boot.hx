@@ -1,11 +1,12 @@
-import dn.heaps.input.Controller;
+import utils.Repeater;
 import h2d.Scene;
+import dn.heaps.input.Controller;
 import tools.Save;
 
 class Boot extends hxd.App {
+
 	public static var inst : Boot;
 
-	public var customScenes : Array<Scene> = [];
 	public var renderer : CustomRenderer;
 
 	static function main() {
@@ -18,14 +19,16 @@ class Boot extends hxd.App {
 		Settings.init();
 		Save.initFields();
 
+		new Repeater( hxd.Timer.wantedFPS );
+
 		haxe.Log.trace = function ( v : Dynamic, ?infos : haxe.PosInfos ) {
 			#if hx_concurrent
-			var str = formatOutput(v, infos);
-			Sys.println(str);
+			var str = formatOutput( v, infos );
+			Sys.println( str );
 			#else
-			if ( !StringTools.startsWith(infos.fileName, "hx/concurrent") ) {
-				var str = haxe.Log.formatOutput(v, infos);
-				Sys.println(str);
+			if ( !StringTools.startsWith( infos.fileName, "hx/concurrent" ) ) {
+				var str = haxe.Log.formatOutput( v, infos );
+				Sys.println( str );
 			}
 			#end
 		}
@@ -34,25 +37,11 @@ class Boot extends hxd.App {
 		hl.UI.closeConsole();
 		#end
 
-		sys.thread.Thread.create(() -> {
-			switch Env.system {
-				case Windows:
-					Sys.command(".\tc.exe server.hl");
-				default:
-					#if debug
-					Sys.command("hl bin/server.hl");
-					#else
-					Sys.command("./tc server.hl");
-					#end
-			};
-		});
-
 		inst = this;
 		entParent = new Scene();
 
-		new Main(s2d);
+		new Main( s2d );
 
-		// s3d.lightSystem.ambientLight.set(1, 1, 1);
 		onResize();
 	}
 
@@ -66,8 +55,22 @@ class Boot extends hxd.App {
 	override function update( deltaTime : Float ) {
 		// Manager.get().listener.syncCamera(s3d.camera);
 		var tmod = hxd.Timer.tmod * speed;
-		dn.Process.updateAll(tmod);
-		super.update(deltaTime);
+		dn.Process.updateAll( tmod );
+		super.update( deltaTime );
+	}
+
+	public function createServer() {
+		sys.thread.Thread.create(() -> {
+			switch Env.system {
+				case Windows:
+					Sys.command( ".\tc.exe server.hl" );
+				default:
+					#if debug
+					Sys.command( "hl bin/server.hl" );
+					#else
+					Sys.command( "./tc server.hl" );
+					#end
+			};
+		} );
 	}
 }
-	// @formatter:off

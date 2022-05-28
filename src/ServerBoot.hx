@@ -8,6 +8,7 @@ import h2d.Scene;
 
 /** server-side **/
 class ServerBoot {
+
 	public static var inst : ServerBoot;
 
 	public var engine( default, null ) : h3d.Engine;
@@ -39,6 +40,11 @@ class ServerBoot {
 	function update( dt : Float ) {}
 
 	public function new() {
+
+		haxe.Log.trace = function ( v : Dynamic, ?infos : haxe.PosInfos ) {
+			var str = haxe.Log.formatOutput(v, infos);
+			Sys.println( "[SERVER] " + str );
+		}
 
 		hxd.System.start( function () {
 			loadAssets( function () {

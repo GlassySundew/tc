@@ -14,6 +14,7 @@ import Message;
 	network host setup
 **/
 class Server extends Process {
+
 	public static var inst : Server;
 
 	static var parsedPort = Std.parseInt( Sys.getEnv( "PORT" ) );
@@ -97,50 +98,12 @@ class Server extends Process {
 
 			onTypedMessage.add( ( c, msg : Message ) -> {
 				switch( msg ) {
-					case PlayerBoot( uid, nickname ):
-
-						log( "Client identified ( uid:" + uid + " nickname: " + nickname + ")" );
-
+					case ClientInit( uid ):
 						var clientController = new ClientController();
-						c.ownerObject = clientController;
-
-						host.sendMessage( WorldInfo( game.seed ), c );
-
-						var savedPlayerByNickname = null;
-						//  Save.inst.getPlayerByNickname(nickname);
-
-						var player : Player = null;
-						if ( savedPlayerByNickname != null ) {
-							// loading level
-
-							// Save.inst.load
-							// loading this bastard
-							player = Save.inst.loadEntity( savedPlayerByNickname ).as( Player );
-						} else {
-							// slapping new player in entrypoint
-							player = game.initializePlayer( nickname, uid );
-						}
-
-						// host.sendTypedMessage(MapLoad(player.level));
-
-						// game.applyTmxObjOnEnt(cursorClient);
-						// host.sendMessage(MapLoad(GameServer.inst.lvlName, GameServer.inst.tmxMap), c);
-
-						clientController.player = player;
-						clientController.level = player.level;
 						clientController.uid = uid;
+						c.ownerObject = clientController;
+						clientController.networkClient = c;
 						c.sync();
-
-					case SaveSystemOrder( type ):
-						switch type {
-							case CreateNewSave( name ):
-								tools.Save.inst.makeFreshSave( name );
-							case SaveGame( name ):
-								tools.Save.inst.saveGame( name );
-							case DeleteSave( name ):
-								File.delete( Settings.SAVEPATH + name + Const.SAVEFILE_EXT );
-						}
-
 					default:
 				}
 			} );
@@ -168,8 +131,38 @@ class Server extends Process {
 			host.flush();
 		}
 		catch( e : Dynamic ) {
-			trace( "port is already taken, server will not be booted..." );
+			log( "The 6676 port is already taken, server will not be booted..." );
 		}
+	}
+
+	public function spawnPlayer( uid : Int, nickname : String, clientController : ClientController ) {
+
+		log( "Client identified ( uid:" + uid + " nickname: " + nickname + ")" );
+
+		var savedPlayerByNickname = null;
+		//  Save.inst.getPlayerByNickname(nickname);
+
+		var player : Player = null;
+		if ( savedPlayerByNickname != null ) {
+			// loading level
+
+			// Save.inst.load
+			// loading this bastard
+			player = Save.inst.loadEntity( savedPlayerByNickname ).as( Player );
+		} else {
+			// slapping new player in entrypoint
+			player = game.initializePlayer( nickname, uid );
+		}
+
+		// host.sendTypedMessage(MapLoad(player.level));
+
+		// game.applyTmxObjOnEnt(cursorClient);
+		// host.sendMessage(MapLoad(GameServer.inst.lvlName, GameServer.inst.tmxMap), c);
+
+		clientController.player = player;
+		clientController.level = player.level;
+		clientController.uid = uid;
+		clientController.networkClient.sync();
 	}
 
 	override function update() {

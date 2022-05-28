@@ -87,7 +87,7 @@ class ChestWin extends Inventory {
 	public function new( ?cellGrid : UICellGrid, ?parent : Object ) {
 		super( false, cellGrid, parent );
 
-		windowComp.window.windowLabel.labelTxt.text = "Chest";
+		windowComp.window.windowLabel.shadowed_text.text = "Chest";
 	}
 
 	override function initLoad() {

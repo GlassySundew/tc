@@ -1,34 +1,35 @@
 package ui.dialog;
 
-import ui.domkit.TextLabelComp;
-import h2d.Flow;
 import dn.Process;
+import h2d.Flow;
 import h2d.Object;
-import ui.dialog.SaveManager.Mode;
-import hxd.Event;
+import ui.domkit.TextLabelComp;
 
 class DeleteDialog extends Dialog {
-	public function new( name : String, activateEvent : Event -> Void, mode : Mode, saveMan : SaveManager, ?parent : Object, ?parentProcess : Process ) {
-		super( mode, saveMan, parent, parentProcess );
 
-		var dialogFlow = new Flow( h2dObject );
-		dialogFlow.verticalAlign = Middle;
-		dialogFlow.horizontalSpacing = 6;
+	public function new( name : String, ?parent : Object, ?parentProcess : Process ) {
+		super( parent, parentProcess );
 
-		var deleteText = new TextLabelComp( 'Are you sure?', Assets.fontPixel, dialogFlow );
+		new TextLabelComp( 'Are you sure?', Assets.fontPixel, contentFlow );
 
-		var yesBut = new TextButton( "yes", ( e ) -> {
+		var horizontalFlow = new Flow(contentFlow);
+		horizontalFlow.layout = Horizontal;
+		horizontalFlow.horizontalSpacing = 10;
+
+		new TextButton( "yes", ( e ) -> {
 			destroy();
 
 			SaveManager.generalDelete( name );
 
 			Client.inst.delayer.addF(() -> {
 				refreshSaves();
-				saveMan.refreshEntries();
 			}, 10 );
-		}, 0xbe3434, 0x6d2a45, dialogFlow );
-		var noBut = new TextButton( "no", ( e ) -> {
+		}, 0xd36363, 0x855a5a, horizontalFlow );
+
+		new TextButton( "no", ( e ) -> {
 			destroy();
-		}, dialogFlow );
+		}, horizontalFlow );
+
+		centrizeContent();
 	}
 }

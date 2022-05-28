@@ -1,5 +1,4 @@
 #if !macro
-
 import dn.Color;
 import dn.Lib;
 import dn.M;
@@ -22,5 +21,7 @@ using tools.Util.SeedyRandomExtender;
 using tools.Util.SocketHostExtender;
 using tools.Util.TmxLayerExtender;
 using tools.Util.TmxMapExtender;
-
 #end
+
+// компоненты которые используются в других компонентах
+import ui.domkit.element.*;

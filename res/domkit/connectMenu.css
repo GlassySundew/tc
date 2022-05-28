@@ -1,0 +1,17 @@
+button-flow {
+	overflow: hidden;
+	padding: 3 3 6 2;
+	background: #333;
+	transition: background 0.5;
+}
+
+button-flow shadowed-text {
+}
+
+button-flow:hover {
+	background: #444;
+}
+
+button-flow:active {
+	background: #666;
+}

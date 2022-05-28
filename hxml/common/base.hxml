@@ -1,11 +1,11 @@
 -cp src
 -cp .
+-cp src/heaps
+-cp src/domkit
 
 -dce full
 
 -lib hide
--lib domkit
--lib heaps
 -lib Heeps
 -lib castle
 -lib hxbit
@@ -16,6 +16,7 @@
 -lib seedyrng
 -lib haxe-concurrent
 
+-D domkit
 -D heaps_enable_hl_mp3
 
 -cp src/helper

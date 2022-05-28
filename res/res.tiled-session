@@ -744,8 +744,8 @@
             "scale": 3,
             "selectedLayer": 9,
             "viewCenter": {
-                "x": 634.6666666666666,
-                "y": 261.8333333333333
+                "x": 615,
+                "y": 146.83333333333331
             }
         },
         "tiled/levels/test.tmx": {

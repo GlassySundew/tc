@@ -1,6 +1,0 @@
-#!/bin/sh
-
-
-ase -b ../../ase/structures.ase --save-as {slice}.png
-ase -b ../../ase/door.ase --save-as {slice}0.png
-echo $dirname

@@ -2,13 +2,14 @@ package en;
 
 // Just an helping indicator that should show if structure can be placed on
 class StructureGhost extends Structure {
+
 	public var canBePlaced : Bool = false;
 
 	public function new( cdbEntry : Data.StructureKind ) {
-		spr = new HSprite(Assets.structures, entParent);
-		spr.set('${Data.structure.get(cdbEntry).id}');
+		spr = new HSprite( Assets.structures, entParent );
+		spr.set( '${Data.structure.get( cdbEntry ).id}' );
 
-		super(0, 0, cdbEntry);
+		super( 0, 0, cdbEntry );
 
 		toBeCollidedAgainst = false;
 
@@ -19,13 +20,13 @@ class StructureGhost extends Structure {
 
 		spr.alpha = .75;
 
-		cd.setS("colorMaintain", 1 / 0);
+		cd.setS( "colorMaintain", 1 / 0 );
 
-		GameClient.inst.applyTmxObjOnEnt(this);
+		// GameClient.inst.applyTmxObjOnEnt(this);
 	}
 
 	public function checkIfValidToPlace() {
-		if ( checkCollsAgainstAll(false) ) {
+		if ( checkCollsAgainstAll( false ) ) {
 			turnRed();
 			canBePlaced = false;
 		} else {
@@ -35,11 +36,11 @@ class StructureGhost extends Structure {
 	}
 
 	public function turnGreen() {
-		colorAdd.setColor(0x29621e);
+		colorAdd.setColor( 0x29621e );
 	}
 
 	public function turnRed() {
-		colorAdd.setColor(0xbe3434);
+		colorAdd.setColor( 0xbe3434 );
 	}
 
 	override function applyItem( item : Item ) {}

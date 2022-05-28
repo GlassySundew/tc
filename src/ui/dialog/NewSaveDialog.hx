@@ -1,21 +1,28 @@
 package ui.dialog;
 
+import cherry.soup.EventSignal.EventSignal0;
+import dn.Process;
+import h2d.Flow;
+import h2d.Object;
 import hxd.File;
 import hxd.Key;
-import dn.Process;
-import h2d.Object;
-import ui.dialog.SaveManager.Mode;
-import h2d.Flow;
+import ui.dialog.Dialog;
+import ui.dialog.SaveManager;
 
 class NewSaveDialog extends Dialog {
+
 	var buttonsFlow : Flow;
 
 	public var textInput : TextInput;
 
-	public function new( onSave : String -> Void, mode : Mode, saveMan : SaveManager, ?parent : Object, ?parentProcess : Process ) {
-		super( mode, saveMan, parent, parentProcess );
+	var onSave : String -> Void;
 
+	public function new( onSave : String -> Void, mode : Mode, saveMan : SaveManager, ?parent : Object, ?parentProcess : Process ) {
+		super( parent, parentProcess );
+		this.onSave = onSave;
 		centrizeContent();
+
+		var onActivate = new EventSignal0();
 
 		var dialogFlow = new Flow( contentFlow );
 		dialogFlow.verticalAlign = Middle;
@@ -28,14 +35,12 @@ class NewSaveDialog extends Dialog {
 		textInput = new TextInput( Assets.fontPixel, dialogFlow );
 		textInput.backgroundColor = 0x80808080;
 
-		addOnSceneAddedCb(() -> {
-			dialogFlow.getProperties( dialogText ).verticalAlign = Top;
-			dialogFlow.getProperties( textInput ).verticalAlign = Top;
-		} );
+		dialogFlow.getProperties( dialogText ).verticalAlign = Top;
+		dialogFlow.getProperties( textInput ).verticalAlign = Top;
 
 		textInput.onKeyDown = function ( e ) {
 			if ( e.keyCode == Key.ENTER ) {
-				this.activateEvent.dispatch( e );
+				onActivate.dispatch();
 			}
 		}
 
@@ -53,28 +58,27 @@ class NewSaveDialog extends Dialog {
 
 		textInput.text = fileName + i;
 
-		this.activateEvent.add( ( e ) -> {
+		onActivate.add( this.onActivate );
 
-			// mode = New( textInput.text );
-
-			onSave( textInput.text );
-
-			destroy();
-		}, 1 );
-
-		var yesBut = new TextButton( "ok", ( e ) -> {
+		new TextButton( "ok", ( e ) -> {
 			if ( saveMan != null ) {
 				saveMan.destroy();
 				saveMan = null;
 			}
-			this.activateEvent.dispatch( e );
+			onActivate.dispatch();
 		}, buttonsFlow );
-		var noBut = new TextButton( "cancel", ( e ) -> {
 
+		new TextButton( "cancel", ( e ) -> {
 			destroy();
-		}, buttonsFlow );
+		}, 0x666666, 0x303030, buttonsFlow );
 
 		contentFlow.minWidth = contentFlow.innerWidth;
 		contentFlow.minHeight = contentFlow.innerHeight;
+	}
+
+	function onActivate() {
+		onSave( textInput.text );
+		SaveManager.newSave( textInput.text, "100000" );
+		destroy();
 	}
 }

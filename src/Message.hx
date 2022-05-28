@@ -4,9 +4,8 @@ enum Message {
 
 	/** seed on client side can only be used to generate icons in navigation window **/
 	WorldInfo( seed : String );
-	PlayerBoot( uid : Int, nickname : String );
+	ClientInit( uid : Int );
 	MapLoad( name : String, map : TmxMap );
-	SaveSystemOrder( type : SaveSystemOrderType );
 
 	#if debug
 	GetServerStatus;
@@ -14,8 +13,3 @@ enum Message {
 	#end
 }
 
-enum SaveSystemOrderType {
-	CreateNewSave( name : String );
-	SaveGame( name : String );
-	DeleteSave( name : String );
-}
