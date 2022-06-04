@@ -46,9 +46,7 @@ class ClientController implements hxbit.NetworkSerializable {
 	}
 
 	public function networkAllow( op : hxbit.NetworkSerializable.Operation, propId : Int, clientSer : hxbit.NetworkSerializable ) : Bool {
-		trace( clientSer );
-
-		return true;
+		return clientSer == this;
 	}
 
 	function set_player( player : Player ) {

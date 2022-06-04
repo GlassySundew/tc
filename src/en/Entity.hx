@@ -173,7 +173,7 @@ class Entity implements NetworkSerializable {
 
 							var poly = cast( shape, Polygon );
 
-							if ( poly.vertices == null ) break;
+							if ( poly.vertices == null ) continue;
 							for ( pt in poly.vertices ) {
 								pts.push( new h3d.col.Point( pt.x, 0, pt.y ) );
 							}
@@ -327,7 +327,8 @@ class Entity implements NetworkSerializable {
 	public function setPivot() {
 		pivotChanged = true;
 
-		spr.pivot.setCenterRatio( pivot.x / tmxObj.width, pivot.y / tmxObj.height );
+		if ( spr != null )
+			spr.pivot.setCenterRatio( pivot.x / tmxObj.width, pivot.y / tmxObj.height );
 	}
 
 	public function serverApplyTmx() {
@@ -362,16 +363,16 @@ class Entity implements NetworkSerializable {
 
 		flippedX = !flippedX;
 
-		updateCollisions();
-
 		for ( shape => offset in collisions ) {
-			shape.x = shape.y = 0;
 			shape.scaleX *= -1;
 			offset.x *= -1;
 			offset.x += tmxObj.width;
 		}
 
-		footX += ( ( ( 1 - pivot.x / tmxObj.width * 2 ) * tmxObj.width ) );
+		pivot.x = tmxObj.width - pivot.x;
+		setPivot();
+
+		footX -= ( ( ( 1 - pivot.x / tmxObj.width * 2 ) * tmxObj.width ) );
 
 		clientFlipX();
 	}
@@ -382,15 +383,11 @@ class Entity implements NetworkSerializable {
 		if ( spr != null ) {
 			spr.scaleX *= -1;
 
-			spr.pivot.centerFactorX = 1 - spr.pivot.centerFactorX;
-			pivotChanged = true;
-
 			if ( mesh.isLong ) mesh.flipX();
 			mesh.renewDebugPts();
 			refreshTile = true;
 			flippedOnClient = flippedX;
 			Main.inst.delayer.addF(() -> {
-
 				updateDebugDisplay();
 			}, 10 );
 		}

@@ -178,6 +178,12 @@ class Player extends Entity {
 		propId : Int,
 		clientSer : hxbit.NetworkSerializable
 	) : Bool {
+
+		// server
+		// if ( clientController.player == this && op == SetField ) {
+		// 	return false;
+		// }
+
 		return GameClient.inst != null ? Main.inst.clientController == clientSer : cast( clientSer, ClientController ).player == this;
 	}
 

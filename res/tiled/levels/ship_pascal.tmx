@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.1" orientation="isometric" renderorder="right-down" compressionlevel="0" width="14" height="29" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#0f0f0f" nextlayerid="807" nextobjectid="15699">
+<map version="1.8" tiledversion="1.8.1" orientation="isometric" renderorder="right-down" compressionlevel="0" width="14" height="29" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#0f0f0f" nextlayerid="807" nextobjectid="15700">
  <tileset firstgid="1" source="alpha.tsx"/>
  <tileset firstgid="152" source="entities.tsx"/>
  <layer id="54" name="proto" width="14" height="29" opacity="0.58">
@@ -72,6 +72,6 @@
  </objectgroup>
  <objectgroup id="3" name="entities">
   <object id="8850" gid="154" x="168" y="288" width="48" height="48"/>
-  <object id="15698" gid="2147483812" x="192" y="288" width="48" height="72"/>
+  <object id="15698" gid="2147483812" x="192" y="240" width="48" height="72"/>
  </objectgroup>
 </map>

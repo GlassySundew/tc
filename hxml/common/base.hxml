@@ -1,10 +1,10 @@
 -cp src
 -cp .
--cp src/heaps
 -cp src/domkit
 
 -dce full
 
+-lib heaps
 -lib hide
 -lib Heeps
 -lib castle

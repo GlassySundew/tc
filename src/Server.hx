@@ -1,13 +1,11 @@
-import net.ClientController;
-import hxd.File;
-import tools.Save;
-import hxbit.NetworkHost.NetworkClient;
+import Message;
 import cherry.soup.EventSignal.EventSignal2;
-import ui.Navigation;
 import dn.Process;
 import en.player.Player;
+import hxbit.NetworkHost.NetworkClient;
 import hxd.net.SocketHost;
-import Message;
+import net.ClientController;
+import tools.Save;
 
 /**
 	server-side
@@ -131,7 +129,7 @@ class Server extends Process {
 			host.flush();
 		}
 		catch( e : Dynamic ) {
-			log( "The 6676 port is already taken, server will not be booted..." );
+			log( "port 6676 is already taken, server will not be booted..." );
 		}
 	}
 

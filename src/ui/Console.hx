@@ -7,6 +7,7 @@ import h2d.Console.ConsoleArg;
 import dn.Lib;
 
 class Console extends h2d.Console {
+
 	public static var inst : Console;
 
 	#if debug
@@ -82,7 +83,8 @@ class Console extends h2d.Console {
 		this.addCommand( "untarget", [], function ( ?k : String ) {
 			GameClient.inst.camera.stopTracking();
 			new h3d.scene.CameraController( Boot.inst.s3d ).loadFromCamera();
-			Level.inst.cursorInteract.visible = false;
+			if ( Level.inst != null )
+				Level.inst.cursorInteract.visible = false;
 		} );
 
 		this.addCommand( "loadlvl", [{ name : "k", t : AString }], function ( name : String, ?manual : Bool = true ) {
@@ -130,7 +132,7 @@ class Console extends h2d.Console {
 	}
 
 	override function sync( ctx : h2d.RenderContext ) {
-		super.sync(ctx);
+		super.sync( ctx );
 
 		var scene = ctx.scene;
 		if ( scene != null ) {
@@ -150,7 +152,6 @@ class Console extends h2d.Console {
 				if ( log.alpha <= 0 ) log.visible = false;
 			}
 		}
-
 	}
 
 	override function getCommandSuggestion( cmd : String ) : String {

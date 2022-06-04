@@ -88,7 +88,7 @@ class Client extends Process {
 						destroy();
 						MainMenu.spawn( Boot.inst.s2d );
 					}, infoFlow );
-					infoFlow.getProperties(mainMenuBut).verticalAlign = Bottom;
+					infoFlow.getProperties( mainMenuBut ).verticalAlign = Bottom;
 
 					trace( "Failed to connect to server" );
 				}

@@ -1,6 +1,3 @@
-[submodule "src/heaps"]
-	path = src/heaps
-	url = https://github.com/GlassySundew/heaps
 [submodule "src/domkit"]
 	path = src/domkit
 	url = https://github.com/GlassySundew/domkit
