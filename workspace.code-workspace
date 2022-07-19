@@ -1,0 +1,32 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../lix/haxe_libraries"
+		}
+	],
+	"settings": {
+		"haxe.displayPort": 64228,
+		"workbench.colorCustomizations": {
+			"titleBar.inactiveBackground": "#134e41",
+			"titleBar.activeBackground": "#1a6b59",
+			"titleBar.activeForeground": "#ffffff"
+		},
+		"haxe.configurations": [
+			{
+				"label": "hl.debug.hxml",
+				"args": [
+					"hxml/debug/hl.debug.hxml"
+				]
+			},
+			{
+				"label": "hl.server.debug.hxml",
+				"args": [
+					"hxml/debug/hl.server.debug.hxml"
+				]
+			}
+		]
+	}
+}

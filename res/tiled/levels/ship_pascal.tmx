@@ -1,77 +1,173 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.1" orientation="isometric" renderorder="right-down" compressionlevel="0" width="14" height="29" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#0f0f0f" nextlayerid="807" nextobjectid="15700">
+<map version="1.8" tiledversion="1.8.1" orientation="isometric" renderorder="right-down" compressionlevel="0" width="10" height="13" tilewidth="48" tileheight="24" infinite="0" backgroundcolor="#0f0f0f" nextlayerid="807" nextobjectid="20200">
  <tileset firstgid="1" source="alpha.tsx"/>
  <tileset firstgid="152" source="entities.tsx"/>
- <layer id="54" name="proto" width="14" height="29" opacity="0.58">
+ <tileset firstgid="173" name="CONGRUENT" tilewidth="8" tileheight="8" tilecount="2304" columns="48">
+  <grid orientation="isometric" width="8" height="4"/>
+  <image source="../../../../../../../mnt/part2/SteamLibrary/congruent/CONGRUENT.png" trans="000000" width="384" height="384"/>
+ </tileset>
+ <layer id="54" name="proto" width="10" height="13" opacity="0.58">
   <data encoding="base64" compression="zlib">
-   eAErYGBgKBjFwy4MgFFKsp9AemAgGMggNl2A1CLj4aaPWP+MqiM+zYyG1fAOKwAecq30
+   eAErYGBgKBjhOBjof2SMKzyQ1YDYg00dLvcQIw4AsFg2nQ==
   </data>
  </layer>
- <layer id="42" name="walls" width="14" height="29">
+ <layer id="42" name="walls" width="10" height="13">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyGACIFwIBOGMxDCeFkReGWxSwLtaMAug190IPSl43fSqOxoCIyGAFoIAACuVAWJ
+   eAFjYBgFoBAIR8IZOIIkAoc4sjDQnAZkPi42LdSl47KMCHEAZJUFiQ==
   </data>
  </layer>
- <layer id="804" name="ground_bot" width="14" height="29">
+ <layer id="804" name="ground_bot" width="10" height="13">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyFA3RAII9O4wawvFOgnGA4h03+j2kZDYKSEAAAsAwKs
+   eAFjYBgF5IZAGJEa6akuFOgmGA4h0n0gZQAF0wKs
   </data>
  </layer>
- <layer id="33" name="ground" width="14" height="29">
+ <layer id="33" name="ground" width="10" height="13">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEACYE8IBWMhIkNF2Q9IDaxYCD1BRHryFF1oyEwGgIkhwAAWBsGlw==
+   eAFjYBgFecAgCEbCuEIEWQ2IjQvQUl0QLkspFAcAhaAGlw==
   </data>
  </layer>
- <layer id="36" name="wallsAgri" width="14" height="29">
+ <layer id="36" name="wallsAgri" width="10" height="13">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEwGgKjITAaAqMhQL0QAAAGWAAB
+   eAFjYBgFoyHAwAAAAggAAQ==
   </data>
  </layer>
- <layer id="190" name="shadows" width="14" height="29" visible="0">
+ <layer id="190" name="shadows" width="10" height="13" visible="0">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFoyEACYEYIBXNwNAAwvFATGy4ANXDAZB9AM4hwKC3PqCfQP5zAGGgXx0IOG9UejQERkOAzBAAAL1MCYU=
+   eAFjYBgFMcAgiGZgaADheCDGFSJAeTgAsg/AOWgMaqsDugnkPgcQBrrVAc06qnABlpoJhQ==
   </data>
  </layer>
- <layer id="805" name="light" width="14" height="29">
+ <layer id="805" name="light" width="10" height="13">
   <data encoding="base64" compression="zlib">
-   eAFjYBgFtAqBbKDBOVCcS6QlQD0NRCpFUQa0Z0joA4YDWe5E8SwdOfl0tGvUqtEQGC4hAADJpwa8
+   eAFjYBh4kA10Qg4U5+JwDlBNAw4pFGGgOQOiDuhuouxFcSwVOfkUmgUAgGUGvA==
   </data>
  </layer>
  <objectgroup id="47" name="image">
-  <object id="15680" x="165" y="225"/>
+  <object id="15680" x="165" y="153"/>
  </objectgroup>
  <objectgroup id="34" name="obstacles">
-  <object id="15655" x="192" y="336" width="24" height="24"/>
-  <object id="15656" x="216" y="312" width="24" height="24"/>
-  <object id="15657" x="216" y="336" width="24" height="24"/>
-  <object id="15658" x="123" y="219">
+  <object id="20087" x="0" y="0" width="24" height="24"/>
+  <object id="20088" x="24" y="0" width="24" height="24"/>
+  <object id="20089" x="48" y="0" width="24" height="24"/>
+  <object id="20090" x="72" y="0" width="24" height="24"/>
+  <object id="20091" x="96" y="0" width="24" height="24"/>
+  <object id="20092" x="120" y="0" width="24" height="24"/>
+  <object id="20093" x="144" y="0" width="24" height="24"/>
+  <object id="20094" x="168" y="0" width="24" height="24"/>
+  <object id="20095" x="192" y="0" width="24" height="24"/>
+  <object id="20096" x="216" y="0" width="24" height="24"/>
+  <object id="20097" x="0" y="24" width="24" height="24"/>
+  <object id="20098" x="24" y="24" width="24" height="24"/>
+  <object id="20099" x="48" y="24" width="24" height="24"/>
+  <object id="20100" x="72" y="24" width="24" height="24"/>
+  <object id="20101" x="96" y="24" width="24" height="24"/>
+  <object id="20102" x="120" y="24" width="24" height="24"/>
+  <object id="20103" x="144" y="24" width="24" height="24"/>
+  <object id="20104" x="168" y="24" width="24" height="24"/>
+  <object id="20105" x="192" y="24" width="24" height="24"/>
+  <object id="20106" x="216" y="24" width="24" height="24"/>
+  <object id="20107" x="0" y="48" width="24" height="24"/>
+  <object id="20108" x="24" y="48" width="24" height="24"/>
+  <object id="20109" x="48" y="48" width="24" height="24"/>
+  <object id="20110" x="72" y="48" width="24" height="24"/>
+  <object id="20111" x="96" y="48" width="24" height="24"/>
+  <object id="20112" x="120" y="48" width="24" height="24"/>
+  <object id="20113" x="144" y="48" width="24" height="24"/>
+  <object id="20114" x="168" y="48" width="24" height="24"/>
+  <object id="20115" x="192" y="48" width="24" height="24"/>
+  <object id="20116" x="216" y="48" width="24" height="24"/>
+  <object id="20117" x="0" y="72" width="24" height="24"/>
+  <object id="20118" x="24" y="72" width="24" height="24"/>
+  <object id="20119" x="48" y="72" width="24" height="24"/>
+  <object id="20120" x="72" y="72" width="24" height="24"/>
+  <object id="20121" x="96" y="72" width="24" height="24"/>
+  <object id="20122" x="120" y="72" width="24" height="24"/>
+  <object id="20123" x="144" y="72" width="24" height="24"/>
+  <object id="20124" x="168" y="72" width="24" height="24"/>
+  <object id="20125" x="192" y="72" width="24" height="24"/>
+  <object id="20126" x="216" y="72" width="24" height="24"/>
+  <object id="20127" x="0" y="96" width="24" height="24"/>
+  <object id="20128" x="24" y="96" width="24" height="24"/>
+  <object id="20129" x="48" y="96" width="24" height="24"/>
+  <object id="20130" x="72" y="96" width="24" height="24"/>
+  <object id="20131" x="96" y="96" width="24" height="24"/>
+  <object id="20132" x="120" y="96" width="24" height="24"/>
+  <object id="20133" x="144" y="96" width="24" height="24"/>
+  <object id="20134" x="168" y="96" width="24" height="24"/>
+  <object id="20135" x="192" y="96" width="24" height="24"/>
+  <object id="20136" x="216" y="96" width="24" height="24"/>
+  <object id="20137" x="0" y="120" width="24" height="24"/>
+  <object id="20138" x="24" y="120" width="24" height="24"/>
+  <object id="20139" x="48" y="120" width="24" height="24"/>
+  <object id="20140" x="72" y="120" width="24" height="24"/>
+  <object id="20141" x="96" y="120" width="24" height="24"/>
+  <object id="20142" x="120" y="120" width="24" height="24"/>
+  <object id="20143" x="144" y="120" width="24" height="24"/>
+  <object id="20144" x="168" y="120" width="24" height="24"/>
+  <object id="20145" x="192" y="120" width="24" height="24"/>
+  <object id="20146" x="216" y="120" width="24" height="24"/>
+  <object id="20147" x="0" y="144" width="24" height="24"/>
+  <object id="20148" x="24" y="144" width="24" height="24"/>
+  <object id="20149" x="48" y="144" width="24" height="24"/>
+  <object id="20150" x="72" y="144" width="24" height="24"/>
+  <object id="20151" x="96" y="144" width="24" height="24"/>
+  <object id="20152" x="216" y="144" width="24" height="24"/>
+  <object id="20153" x="0" y="168" width="24" height="24"/>
+  <object id="20154" x="24" y="168" width="24" height="24"/>
+  <object id="20155" x="48" y="168" width="24" height="24"/>
+  <object id="20156" x="72" y="168" width="24" height="24"/>
+  <object id="20157" x="96" y="168" width="24" height="24"/>
+  <object id="20158" x="216" y="168" width="24" height="24"/>
+  <object id="20159" x="0" y="192" width="24" height="24"/>
+  <object id="20160" x="24" y="192" width="24" height="24"/>
+  <object id="20161" x="48" y="192" width="24" height="24"/>
+  <object id="20162" x="72" y="192" width="24" height="24"/>
+  <object id="20163" x="96" y="192" width="24" height="24"/>
+  <object id="20164" x="216" y="192" width="24" height="24"/>
+  <object id="20165" x="0" y="216" width="24" height="24"/>
+  <object id="20166" x="24" y="216" width="24" height="24"/>
+  <object id="20167" x="48" y="216" width="24" height="24"/>
+  <object id="20168" x="72" y="216" width="24" height="24"/>
+  <object id="20169" x="96" y="216" width="24" height="24"/>
+  <object id="20170" x="216" y="216" width="24" height="24"/>
+  <object id="20171" x="0" y="240" width="24" height="24"/>
+  <object id="20172" x="24" y="240" width="24" height="24"/>
+  <object id="20173" x="48" y="240" width="24" height="24"/>
+  <object id="20174" x="72" y="240" width="24" height="24"/>
+  <object id="20175" x="96" y="240" width="24" height="24"/>
+  <object id="20176" x="216" y="240" width="24" height="24"/>
+  <object id="20177" x="0" y="264" width="24" height="24"/>
+  <object id="20178" x="24" y="264" width="24" height="24"/>
+  <object id="20179" x="48" y="264" width="24" height="24"/>
+  <object id="20180" x="72" y="264" width="24" height="24"/>
+  <object id="20181" x="96" y="264" width="24" height="24"/>
+  <object id="20182" x="120" y="264" width="24" height="24"/>
+  <object id="20183" x="144" y="264" width="24" height="24"/>
+  <object id="20184" x="168" y="264" width="24" height="24"/>
+  <object id="20185" x="192" y="264" width="24" height="24"/>
+  <object id="20186" x="216" y="264" width="24" height="24"/>
+  <object id="20187" x="0" y="288" width="24" height="24"/>
+  <object id="20188" x="24" y="288" width="24" height="24"/>
+  <object id="20189" x="48" y="288" width="24" height="24"/>
+  <object id="20190" x="72" y="288" width="24" height="24"/>
+  <object id="20191" x="96" y="288" width="24" height="24"/>
+  <object id="20192" x="120" y="288" width="24" height="24"/>
+  <object id="20193" x="144" y="288" width="24" height="24"/>
+  <object id="20194" x="168" y="288" width="24" height="24"/>
+  <object id="20195" x="192" y="288" width="24" height="24"/>
+  <object id="20196" x="216" y="288" width="24" height="24"/>
+  <object id="20197" x="123" y="147">
    <polygon points="-3,-3 -3,5 5,-3"/>
   </object>
-  <object id="15659" x="216" y="216" width="24" height="24"/>
-  <object id="15660" x="216" y="240" width="24" height="24"/>
-  <object id="15661" x="216" y="264" width="24" height="24"/>
-  <object id="15662" x="216" y="288" width="24" height="24"/>
-  <object id="15663" x="210" y="336">
+  <object id="20198" x="210" y="264">
    <polygon points="0,0 6,0 6,-6"/>
   </object>
-  <object id="15664" x="120" y="336" width="24" height="24"/>
-  <object id="15665" x="144" y="336" width="24" height="24"/>
-  <object id="15666" x="168" y="336" width="24" height="24"/>
-  <object id="15667" x="216" y="192" width="24" height="24"/>
-  <object id="15668" x="144" y="192" width="24" height="24"/>
-  <object id="15669" x="168" y="192" width="24" height="24"/>
-  <object id="15670" x="192" y="192" width="24" height="24"/>
-  <object id="15671" x="96" y="240" width="24" height="24"/>
-  <object id="15672" x="96" y="264" width="24" height="24"/>
-  <object id="15673" x="96" y="288" width="24" height="24"/>
-  <object id="15674" x="96" y="312" width="24" height="24"/>
-  <object id="15675" x="96" y="216" width="24" height="24"/>
-  <object id="15676" x="120" y="192" width="24" height="24"/>
-  <object id="15677" x="96" y="192" width="24" height="24"/>
-  <object id="15678" x="96" y="336" width="24" height="24"/>
  </objectgroup>
  <objectgroup id="3" name="entities">
-  <object id="8850" gid="154" x="168" y="288" width="48" height="48"/>
-  <object id="15698" gid="2147483812" x="192" y="240" width="48" height="72"/>
+  <object id="19722" gid="2147483812" x="192" y="168" width="48" height="72">
+   <properties>
+    <property name="to" type="file" value="bridge.tmx"/>
+   </properties>
+  </object>
+  <object id="20199" gid="154" x="192" y="168" width="48" height="48"/>
  </objectgroup>
 </map>

@@ -10,6 +10,7 @@ import ui.InventoryGrid.UICellGrid;
 import ui.player.Inventory;
 
 class Chest extends Structure {
+
 	public var chestWin : ChestWin;
 
 	var ca : ControllerAccess<ControllerAction>;
@@ -42,9 +43,9 @@ class Chest extends Structure {
 
 		ca = Main.inst.controller.createAccess();
 
-		cellGrid = new UICellGrid( inventory, 20, 20 );
-
 		GameClient.inst.delayer.addF(() -> {
+			cellGrid = new UICellGrid( inventory, 20, 20 );
+
 			if ( Player.inst != null && Player.inst.ui != null ) {
 				chestWin = new ChestWin( cellGrid, Player.inst.ui.root );
 				chestWin.containmentEntity = this;
@@ -83,6 +84,7 @@ class Chest extends Structure {
 }
 
 class ChestWin extends Inventory {
+
 	// public var chestEntity :
 	public function new( ?cellGrid : UICellGrid, ?parent : Object ) {
 		super( false, cellGrid, parent );

@@ -1,3 +1,4 @@
+import net.ClientController;
 import differ.shapes.Polygon;
 import differ.math.Vector;
 import en.player.Player;
@@ -79,22 +80,26 @@ class GameServer extends Process implements Serializable {
 		inst = this;
 	}
 
+	// var testSLevel : ServerLevel = null;
+
 	/** 
 		starts entrypoint level and slaps player onto it
 	**/
-	public function initializePlayer( nickname : String, uid : Int ) : Player {
+	public function initializePlayer( nickname : String, uid : Int, clientController : ClientController ) : Player {
 		// our temporary entrypoint
 		var entryPointLevel = "ship_pascal.tmx";
-		var sLevel = startLevel( entryPointLevel, {} );
+
+		var sLevel = getLevel( entryPointLevel, {} );
+		clientController.level = sLevel;
 		// раз игрок новый, то спавним его из tmxObject
-		var player = sasByName( "en.player.$Player", entClasses, sLevel, [nickname, uid] ).as( Player );
+		var player = sasByName( "en.player.$Player", entClasses, sLevel, [nickname, uid, clientController] ).as( Player );
 
 		return player;
 	}
 
-	public function startLevel( name : String, playerLoadConf : LevelLoadPlayerConfig ) : ServerLevel {
-		if ( levels[name] != null )
-			return levels[name];
+	public function getLevel( name : String, playerLoadConf : LevelLoadPlayerConfig ) : ServerLevel {
+		if ( levels[name] != null ) return levels[name];
+
 		// Save.inst.saveLevel(levels[name]);
 
 		var savedLevel = Save.inst.getLevelByName( name.split( "." )[0] );
@@ -130,7 +135,7 @@ class GameServer extends Process implements Serializable {
 		var loadedLevel = Save.inst.saveLevel( sLevel );
 
 		// Загрузка игрока при переходе в другую локацию
-		Save.inst.bringPlayerToLevel( loadedLevel );
+		// Save.inst.bringPlayerToLevel( loadedLevel );
 		var cachedPlayer = Save.inst.playerSavedOn( sLevel );
 
 		if ( cachedPlayer != null ) {
@@ -147,7 +152,11 @@ class GameServer extends Process implements Serializable {
 			Save.inst.loadEntity( cachedPlayer );
 		} else {
 			for ( e in sLevel.entitiesTmxObj ) {
+				// if ( testSLevel == null )
+				// 	testSLevel = startLevel( "bridge.tmx", {} );
+
 				var ent = searchAndSpawnEnt( e, entClasses, sLevel, [], [Player] );
+
 				// if ( ent != null )
 
 				// 	ent.level = sLevel;
@@ -252,7 +261,6 @@ class GameServer extends Process implements Serializable {
 			default:
 				"";
 		}
-
 		// Парсим все классы - наследники en.Entity и спавним их
 		for ( eClass in entClasses ) {
 			if ( exclude.contains( eClass ) ) continue;
@@ -262,11 +270,10 @@ class GameServer extends Process implements Serializable {
 			if ( (
 				eregCompTimeClass.match( '$eClass'.toLowerCase() )
 				&& eregCompTimeClass.matched( 1 ) == e.name
+			) || (
+				tsTile.properties.existsType( "className", PTString )
+				&& tsTile.properties.getString( "className" ) == '$eClass'
 			)
-				|| (
-					tsTile.properties.existsType( "className", PTString )
-					&& tsTile.properties.getString( "className" ) == '$eClass'
-				)
 			) {
 				var totalArgs : Array<Dynamic> = [isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, e];
 				totalArgs = totalArgs.concat( args );
@@ -278,28 +285,30 @@ class GameServer extends Process implements Serializable {
 		if ( resultEntity == null
 			&& eregFileName.match( tsTile.image.source )
 			&& !tsTile.properties.existsType( "className", PTString ) ) {
-			return {
-				resultEntity = new SpriteEntity( isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, eregFileName.matched( 1 ), e );
-			}
+
+			resultEntity = new SpriteEntity( isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, eregFileName.matched( 1 ), e );
 		}
 
-		if ( resultEntity != null ) {
+		if ( resultEntity != null ) @:privateAccess {
 			resultEntity.level = sLevel;
-			sLevel.entities.push( resultEntity );
+			trace( "pushing entity " + resultEntity );
+			sLevel.addEntity( resultEntity );
 		}
 
 		return resultEntity;
 	}
 
-	public function applyTmxObjOnEnt( ?ent : Null<Entity> ) {
+	public function calculateCoordinateOffset( ?ent : Null<Entity> ) {
 		// если ent не определён, то на все Entity из массива ALL будут добавлены TmxObject из тайлсета с названием colls
 
 		// parsing collision objects from 'colls' tileset
 		var entitiesTs : TmxTileset = null;
 
 		for ( tileset in tmxMap.tilesets ) {
-			if ( StringTools.contains( tileset.source, "entities" ) ) {
+			if ( tileset.source != null
+				&& StringTools.contains( tileset.source, "entities" ) ) {
 				entitiesTs = tileset;
+				break;
 			}
 		}
 
@@ -338,12 +347,12 @@ class GameServer extends Process implements Serializable {
 										obj.height / 2
 									);
 
-									ent.collisions.set( shape, new differ.math.Vector( obj.x + cent.x, obj.y + cent.y ));
+									ent.collisions.set( shape, new differ.math.Vector( obj.x + cent.x, obj.y + cent.y ) );
 
-										if ( center.x == 0 && center.y == 0 ) {
-											center.x = cent.x + obj.x;
-											center.y = cent.y + obj.y;
-										}
+									if ( center.x == 0 && center.y == 0 ) {
+										center.x = cent.x + obj.x;
+										center.y = cent.y + obj.y;
+									}
 								case OTPoint:
 									switch obj.name {
 										case "center":
@@ -351,22 +360,7 @@ class GameServer extends Process implements Serializable {
 											center.y = obj.y;
 									}
 								case OTPolygon( points ):
-									var pts = makePolyClockwise( points );
-									rotatePoly( obj, pts );
-
 									var cent = getProjectedDifferPolygonRect( obj, points );
-
-									var verts : Array<Vector> = [];
-									for ( i in pts ) verts.push( new Vector( i.x, i.y ) );
-
-									var poly = new Polygon( 0, 0, verts );
-
-									poly.scaleY = -1;
-									ent.collisions.set(
-										poly,
-										new differ.math.Vector( obj.x, obj.y )
-									);
-									objx = obj.x;
 
 									if ( center.x == 0 && center.y == 0 ) {
 										center.x = cent.x + obj.x;
@@ -387,20 +381,6 @@ class GameServer extends Process implements Serializable {
 
 						ent.footX -= actualX - pivotX;
 						ent.footY += actualY - pivotY;
-
-						#if depth_debug
-						if ( ent.mesh != null )
-							ent.mesh.renewDebugPts();
-						#end
-
-						try {
-							cast( ent, en.InteractableEntity ).rebuildInteract();
-						}
-						catch( e : Dynamic ) {}
-
-						if ( Std.isOfType( ent, SpriteEntity ) && tile.properties.exists( "interactable" ) ) {
-							cast( ent, SpriteEntity ).interactable = tile.properties.getBool( "interactable" );
-						}
 					}
 				}
 			}

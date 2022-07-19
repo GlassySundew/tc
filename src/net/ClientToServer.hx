@@ -55,7 +55,7 @@ class CClientToServer<V> implements NetworkSerializable {
 		clientToServerCond = condition == null ? () -> false : condition;
 
 		setValue( value );
-		enableReplication = true;
+		enableAutoReplication = true;
 	}
 }
 
@@ -150,6 +150,6 @@ class CClientToServerFloat implements NetworkSerializable {
 		clientToServerCond = condition == null ? () -> false : condition;
 
 		setValue( value );
-		enableReplication = true;
+		enableAutoReplication = true;
 	}
 }

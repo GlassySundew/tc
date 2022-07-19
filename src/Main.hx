@@ -32,7 +32,6 @@ class Main extends Process {
 	public var clientController( default, set ) : ClientController;
 
 	function set_clientController( cc : ClientController ) {
-		
 		delayer.addF( onClientControllerSetEvent.dispatch, 1 );
 		return clientController = cc;
 	}

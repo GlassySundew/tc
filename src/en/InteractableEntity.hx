@@ -19,7 +19,6 @@ import ui.s3d.EventInteractive;
 /**
 	An interactive entity
 **/
-@:keep
 class InteractableEntity extends Entity {
 
 	public var interact : EventInteractive;
@@ -168,8 +167,6 @@ class InteractableEntity extends Entity {
 	}
 
 	override function dispose() {
-		interact.visible = false;
-		interact.cursor = Default;
 		super.dispose();
 
 		interact.remove();

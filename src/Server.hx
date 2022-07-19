@@ -101,6 +101,8 @@ class Server extends Process {
 						clientController.uid = uid;
 						c.ownerObject = clientController;
 						clientController.networkClient = c;
+
+						@:privateAccess host.register( clientController, c.ctx );
 						c.sync();
 					default:
 				}
@@ -149,7 +151,7 @@ class Server extends Process {
 			player = Save.inst.loadEntity( savedPlayerByNickname ).as( Player );
 		} else {
 			// slapping new player in entrypoint
-			player = game.initializePlayer( nickname, uid );
+			player = game.initializePlayer( nickname, uid, clientController );
 		}
 
 		// host.sendTypedMessage(MapLoad(player.level));
@@ -157,10 +159,9 @@ class Server extends Process {
 		// game.applyTmxObjOnEnt(cursorClient);
 		// host.sendMessage(MapLoad(GameServer.inst.lvlName, GameServer.inst.tmxMap), c);
 
-		clientController.player = player;
-		clientController.level = player.level;
 		clientController.uid = uid;
-		clientController.networkClient.sync();
+		clientController.level = player.level;
+		clientController.player = player;
 	}
 
 	override function update() {

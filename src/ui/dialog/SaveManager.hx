@@ -160,13 +160,15 @@ class SaveManager extends FocusMenu {
 
 	public static function newSave( e : String, seed : String ) {
 		Main.inst.onClientControllerSetEvent.add(
-			() -> Main.inst.clientController.orderSaveSystem( CreateNewSave( e ),
-				( result ) -> {
-					Main.inst.clientController.spawnPlayer( Settings.params.nickname );
-				} ),
+			() -> {
+				Main.inst.clientController.orderSaveSystem( CreateNewSave( e ),
+					( result ) -> {
+						Main.inst.clientController.spawnPlayer( Settings.params.nickname );
+					} );
+			},
 			true
 		);
-		Client.inst.repeatConnect( 0.25, 10 );
+		Client.inst.repeatConnect( 0.05, 10 );
 		Main.inst.startGame( false );
 
 		// Client.inst.addOnConnectionCallback(() -> Client.inst.sendMessage( SaveSystemOrder( CreateNewSave( e ) ) ) );

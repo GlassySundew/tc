@@ -6,14 +6,19 @@
     "activeFile": "tiled/levels/ship_pascal.tmx",
     "automapping.whileDrawing": false,
     "expandedProjectPaths": [
-        ".",
-        "tiled"
+        "tiled",
+        "."
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "": {
-            "scaleInDock": 1,
+            "scaleInDock": 5.5,
             "scaleInEditor": 3
+        },
+        "/home/glassysundew/Documents/CONGRUENT.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1.5,
+            "scaleInEditor": 1
         },
         "/home/glassysundew/Projects/heaps examples/examples/desert.tmx": {
             "scale": 2,
@@ -510,11 +515,11 @@
             "scaleInDock": 1
         },
         "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx": {
-            "scale": 1.5,
-            "selectedLayer": 4,
+            "scale": 3,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 224,
-                "y": 98.33333333333333
+                "x": 204.83333333333334,
+                "y": 197.16666666666669
             }
         },
         "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx#CONGRUENT": {
@@ -526,6 +531,11 @@
         },
         "tiled/entities.tsx": {
             "scaleInDock": 1
+        },
+        "tiled/levels/CONGRUENT.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 5.5,
+            "scaleInEditor": 3
         },
         "tiled/levels/alpha.tsx": {
             "dynamicWrapping": true,
@@ -544,17 +554,20 @@
             "scale": 0.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 2400,
-                "y": 1185
+                "x": 2401,
+                "y": 1181
             }
         },
         "tiled/levels/bridge.tmx": {
             "scale": 1.5,
-            "selectedLayer": 5,
+            "selectedLayer": 23,
             "viewCenter": {
-                "x": 418,
-                "y": 52.99999999999997
+                "x": 339.6666666666667,
+                "y": 220.33333333333337
             }
+        },
+        "tiled/levels/bridge.tmx#entities": {
+            "scaleInDock": 0.33
         },
         "tiled/levels/colls.tsx": {
             "dynamicWrapping": true,
@@ -585,11 +598,11 @@
             }
         },
         "tiled/levels/procgen/asteroids.tmx": {
-            "scale": 0.33,
+            "scale": 1,
             "selectedLayer": 16,
             "viewCenter": {
-                "x": 2400,
-                "y": 1086.3636363636363
+                "x": 2462.5,
+                "y": 377.5
             }
         },
         "tiled/levels/rules.tmx": {
@@ -605,19 +618,19 @@
             "scaleInDock": 1
         },
         "tiled/levels/rules/random.tmx": {
-            "scale": 5.5,
+            "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 218.90909090909093,
-                "y": -51
+                "x": 219.75,
+                "y": -50.75
             }
         },
         "tiled/levels/rules/rules.tmx": {
-            "scale": 3,
+            "scale": 1.5,
             "selectedLayer": 9,
             "viewCenter": {
-                "x": 2400,
-                "y": 1088.8333333333333
+                "x": 2399.6666666666665,
+                "y": 1088.6666666666665
             }
         },
         "tiled/levels/rules/rules1.tmx": {
@@ -741,12 +754,17 @@
             }
         },
         "tiled/levels/ship_pascal.tmx": {
-            "scale": 3,
+            "scale": 4,
             "selectedLayer": 9,
             "viewCenter": {
-                "x": 662.3333333333333,
-                "y": 196.83333333333331
+                "x": 350.875,
+                "y": 132.875
             }
+        },
+        "tiled/levels/ship_pascal.tmx#CONGRUENT": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "tiled/levels/test.tmx": {
             "scale": 0.25,
@@ -757,11 +775,11 @@
             }
         },
         "tiled/levels/ui.tmx": {
-            "scale": 5.5,
-            "selectedLayer": 4,
+            "scale": 16,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 124.9090909090909,
-                "y": 50.090909090909086
+                "x": 138.53125,
+                "y": 57.84375
             }
         },
         "tiled/levels/ui.tsx": {
@@ -770,7 +788,8 @@
             "scaleInEditor": 0.33
         }
     },
-    "last.imagePath": "/home/glassysundew/Projects/tc/res/tiled/separated/env",
+    "last.externalTilesetPath": "/home/glassysundew/Documents",
+    "last.imagePath": "/home/glassysundew/Projects/tc/res/tiled/atlas",
     "last.objectTemplatePath": "/home/glassysundew/Projects/tc/res/tiled/levels",
     "last.worldFilePath": "/home/glassysundew/Projects/tc/res/tiled/levels",
     "loadedWorlds": [
@@ -799,8 +818,10 @@
         "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx"
     ],
     "project": "res.tiled-project",
-    "property.type": "string",
+    "property.type": "file",
     "recentFiles": [
+        "tiled/levels/CONGRUENT.tsx",
+        "/home/glassysundew/Documents/CONGRUENT.tsx",
         "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx",
         "tiled/levels/procgen/asteroids.tmx",
         "tiled/levels/asteroid.tmx",
@@ -810,9 +831,7 @@
         "tiled/levels/ui.tsx",
         "tiled/levels/ui.tmx",
         "tiled/levels/alpha.tsx",
-        "tiled/levels/bridge.tmx",
-        "tiled/levels/ship_pascal.tmx",
-        "tiled/levels/test.tmx"
+        "tiled/levels/bridge.tmx"
     ],
     "resizeMap.removeObjects": true,
     "textEdit.monospace": true,
@@ -821,8 +840,8 @@
     "tileset.margin": 0,
     "tileset.spacing": 0,
     "tileset.tileSize": {
-        "height": 24,
-        "width": 48
+        "height": 4,
+        "width": 8
     },
     "tileset.transparentColor": "#ff00ff",
     "tileset.type": 0,

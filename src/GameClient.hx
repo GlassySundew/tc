@@ -1,3 +1,4 @@
+import cherry.soup.EventSignal.EventSignal0;
 import ui.PauseMenu;
 import Level.StructTile;
 import differ.math.Vector;
@@ -20,6 +21,7 @@ import ui.Hud;
 **/
 @:structInit
 class LevelLoadPlayerConfig {
+
 	public var manual : Bool;
 	public var acceptTmxPlayerCoord : Bool;
 	public var acceptSqlPlayerCoord : Bool;
@@ -35,6 +37,7 @@ class LevelLoadPlayerConfig {
 	Логика игры на клиете
 **/
 class GameClient extends Process {
+
 	public static var inst : GameClient;
 
 	public var camera : s3d.Camera;
@@ -57,8 +60,9 @@ class GameClient extends Process {
 
 	public var navFieldsGenerated : Null<Int>;
 
-
 	var ca : ControllerAccess<ControllerAction>;
+
+	public var onLevelChanged = new EventSignal0();
 
 	#if game_tmod
 	var stats : h2d.Text;
@@ -120,57 +124,6 @@ class GameClient extends Process {
 		CompileTime.importPackage( "en" );
 		var entClasses = CompileTime.getAllClasses( Entity );
 
-		// Загрузка игрока при переходе в другую локацию
-		// Save.inst.bringPlayerToLevel(loadedLevel);
-		// var cachedPlayer = Save.inst.playerSavedOn(level);
-
-		// if ( cachedPlayer != null ) {
-		// 	// это значит, что инстанс игрока был ранее создан и делать нового не надо
-		// 	for ( e in level.entities ) if ( playerLoadConf.manual
-		// 		|| (
-		// 			!e.properties.existsType("className", PTString)
-		// 			|| e.properties.getString("className") != "en.player.$Player"
-		// 		) ) {
-		// 			searchAndSpawnEnt(e, entClasses);
-		// 	}
-		// 	Save.inst.loadEntity(cachedPlayer);
-		// } else {
-		// 	for ( e in level.entities )
-		// 		searchAndSpawnEnt(e, entClasses);
-		// }
-
-		// player = Player.inst;
-
-		// if ( playerLoadConf.acceptTmxPlayerCoord ) {
-		// 	delayer.addF(() -> {
-		// 		var playerEnt : TmxObject = null;
-		// 		for ( e in level.entitiesTmxObj )
-		// 			if (
-		// 				!e.properties.existsType("className", PTString)
-		// 				|| e.properties.getString("className") == "en.player.$Player"
-		// 			)
-		// 				playerEnt = e;
-		// 		if ( playerEnt != null )
-		// 			player.setFeetPos(
-		// 				level.cartToIsoLocal(playerEnt.x, playerEnt.y).x,
-		// 				level.cartToIsoLocal(playerEnt.x, playerEnt.y).y
-		// 			);
-
-		// 		targetCameraOnPlayer();
-		// 	}, 1);
-		// }
-
-		// if ( playerLoadConf.acceptSqlPlayerCoord ) {
-		// 	delayer.addF(() -> {
-		// 		var playerEnt = Save.inst.getPlayerShallowFeet(player);
-		// 		if ( playerEnt != null ) {
-		// 			var blob = '${playerEnt.blob}'.split("_");
-		// 			player.setFeetPos(Std.parseInt(blob[0]), Std.parseInt(blob[1]));
-		// 		}
-		// 		targetCameraOnPlayer();
-		// 	}, 1);
-		// }
-
 		delayer.addF(() -> {
 			hideStrTiles();
 			Process.resizeAll();
@@ -179,6 +132,9 @@ class GameClient extends Process {
 		// applyTmxObjOnEnt();
 
 		targetCameraOnPlayer();
+
+		onLevelChanged.dispatch();
+
 		return level;
 	}
 
@@ -186,125 +142,6 @@ class GameClient extends Process {
 		camera.target = player;
 		camera.recenter();
 	}
-
-	// public function applyTmxObjOnEnt( ?ent : Null<Entity> ) {
-	// 	// если ent не определён, то на все Entity из массива ALL будут добавлены TmxObject из тайлсета с названием colls
-
-	// 	// parsing collision objects from 'colls' tileset
-	// 	var entitiesTs : TmxTileset = null;
-
-	// 	for ( tileset in tmxMap.tilesets ) {
-	// 		if ( StringTools.contains( tileset.source, "entities" ) ) {
-	// 			entitiesTs = tileset;
-	// 		}
-	// 	}
-
-	// 	var ents = ent != null ? [ent] : Entity.ALL;
-
-	// 	for ( tile in entitiesTs.tiles ) {
-	// 		if ( eregFileName.match( tile.image.source ) ) {
-	// 			var picName = {
-	// 				if ( tile.properties.existsType( "className", PTString ) ) {
-	// 					var className = tile.properties.getString( "className" );
-	// 					eregCompTimeClass.match( className );
-	// 					eregCompTimeClass.matched( 1 ).toLowerCase();
-	// 				} else
-	// 					eregFileName.matched( 1 );
-	// 			}
-
-	// 			for ( ent in ents ) {
-	// 				eregClass.match( '$ent'.toLowerCase() );
-	// 				var entityName = eregClass.matched( 1 );
-
-	// 				if ( entityName == picName
-	// 					|| ent.spr.groupName == picName ) {
-
-	// 					// соотношение, которое в конце будет применено к entity
-	// 					var center = new Vector();
-
-	// 					for ( obj in tile.objectGroup.objects ) {
-	// 						switch obj.objectType {
-	// 							case OTRectangle:
-	// 							case OTEllipse:
-	// 								var shape = new differ.shapes.Circle( 0, 0, obj.width / 2 );
-	// 								var cent = new Vector(
-	// 									obj.width / 2,
-	// 									obj.height / 2
-	// 								);
-
-	// 								ent.collisions.set( shape,
-	// 									{
-	// 										cent : new differ.math.Vector( cent.x, cent.y ),
-	// 										offset : new differ.math.Vector( obj.x + cent.x, obj.y + cent.y )
-	// 									} );
-
-	// 								if ( center.x == 0 && center.y == 0 ) {
-	// 									center.x = cent.x + obj.x;
-	// 									center.y = cent.y + obj.y;
-	// 								}
-	// 							case OTPoint:
-	// 								switch obj.name {
-	// 									case "center":
-	// 										center.x = obj.x;
-	// 										center.y = obj.y;
-	// 								}
-	// 							case OTPolygon( points ):
-	// 								var pts = makePolyClockwise( points );
-	// 								rotatePoly( obj, pts );
-
-	// 								var cent = getProjectedDifferPolygonRect( obj, points );
-
-	// 								var verts : Array<Vector> = [];
-	// 								for ( i in pts ) verts.push( new Vector( i.x, i.y ) );
-
-	// 								var poly = new Polygon( 0, 0, verts );
-
-	// 								poly.scaleY = -1;
-	// 								ent.collisions.set(
-	// 									poly,
-	// 									{
-	// 										cent : new differ.math.Vector( cent.x, cent.y ),
-	// 										offset : new differ.math.Vector( obj.x, obj.y )
-	// 									}
-	// 								);
-
-	// 								if ( center.x == 0 && center.y == 0 ) {
-	// 									center.x = cent.x + obj.x;
-	// 									center.y = cent.y + obj.y;
-	// 								}
-	// 							default:
-	// 						}
-	// 					}
-
-	// 					// ending serving this particular entity 'ent' here
-	// 					var pivotX = ( center.x ) / ent.tmxObj.width;
-	// 					var pivotY = ( center.y ) / ent.tmxObj.height;
-
-	// 					// ent.setPivot(pivotX, pivotY);
-
-	// 					var actualX = ent.tmxObj.width / 2;
-	// 					var actualY = ent.tmxObj.height;
-
-	// 					ent.footX -= actualX - pivotX * ent.tmxObj.width;
-	// 					ent.footY += actualY - pivotY * ent.tmxObj.height;
-
-	// 					#if depth_debug
-	// 					ent.mesh.renewDebugPts();
-	// 					#end
-
-	// 					try {
-	// 						cast( ent, en.InteractableEntity ).rebuildInteract();
-	// 					}
-	// 					catch( e : Dynamic ) {}
-
-	// 					if ( Std.isOfType( ent, SpriteEntity ) && tile.properties.exists( "interactable" ) ) {
-	// 						cast( ent, SpriteEntity ).interactable = tile.properties.getBool( "interactable" );
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
 
 	public function gc() {
 		if ( Entity.GC == null || Entity.GC.length == 0 ) return;
@@ -356,6 +193,119 @@ class GameClient extends Process {
 		}
 	}
 
+	public function applyTmxObjOnEnt( ?ent : Null<Entity> ) {
+		// если ent не определён, то на все Entity из массива ALL будут добавлены TmxObject из тайлсета с названием colls
+		if ( tmxMap == null ) return;
+
+		// parsing collision objects from 'colls' tileset
+		var entitiesTs : TmxTileset = null;
+
+		for ( tileset in tmxMap.tilesets ) {
+			if ( tileset.source != null
+				&& StringTools.contains( tileset.source, "entities" ) ) {
+				entitiesTs = tileset;
+				break;
+			}
+		}
+
+		var ents = ent != null ? [ent] : Entity.ServerALL;
+
+		for ( tile in entitiesTs.tiles ) {
+			if ( eregFileName.match( tile.image.source ) ) {
+				var picName = {
+					if ( tile.properties.existsType( "className", PTString ) ) {
+						var className = tile.properties.getString( "className" );
+						eregCompTimeClass.match( className );
+						eregCompTimeClass.matched( 1 ).toLowerCase();
+					} else
+						eregFileName.matched( 1 );
+				}
+
+				for ( ent in ents ) {
+					eregClass.match( '$ent'.toLowerCase() );
+					var entityName = eregClass.matched( 1 );
+
+					var objx = 0.;
+
+					if ( entityName == picName
+						|| ( ent.sprFrame != null && ent.sprFrame.group == picName ) ) {
+
+						// соотношение, которое в конце будет применено к entity
+						var center = new Vector();
+
+						for ( obj in tile.objectGroup.objects ) {
+							switch obj.objectType {
+								case OTRectangle:
+								case OTEllipse:
+									var shape = new differ.shapes.Circle( 0, 0, obj.width / 2 );
+									var cent = new Vector(
+										obj.width / 2,
+										obj.height / 2
+									);
+
+									ent.collisions.set( shape, new differ.math.Vector( obj.x + cent.x, obj.y + cent.y ) );
+
+									if ( center.x == 0 && center.y == 0 ) {
+										center.x = cent.x + obj.x;
+										center.y = cent.y + obj.y;
+									}
+								case OTPoint:
+									switch obj.name {
+										case "center":
+											center.x = obj.x;
+											center.y = obj.y;
+									}
+								case OTPolygon( points ):
+									var pts = makePolyClockwise( points );
+									rotatePoly( obj, pts );
+
+									var cent = getProjectedDifferPolygonRect( obj, points );
+
+									var verts : Array<Vector> = [];
+									for ( i in pts ) verts.push( new Vector( i.x, i.y ) );
+
+									var poly = new Polygon( 0, 0, verts );
+
+									poly.scaleY = -1;
+									ent.collisions.set(
+										poly,
+										new differ.math.Vector( obj.x, obj.y )
+									);
+									objx = obj.x;
+
+									if ( center.x == 0 && center.y == 0 ) {
+										center.x = cent.x + obj.x;
+										center.y = cent.y + obj.y;
+									}
+								default:
+							}
+						}
+
+						// ending serving this particular entity 'ent' here
+						var pivotX = center.x;
+						var pivotY = center.y;
+
+						ent.pivot = { x : pivotX, y : pivotY };
+
+						#if depth_debug
+						if ( ent.mesh != null )
+							ent.mesh.renewDebugPts();
+						#end
+
+						try {
+							cast( ent, en.InteractableEntity ).rebuildInteract();
+						}
+						catch( e : Dynamic ) {}
+
+						if ( Std.isOfType( ent, SpriteEntity ) && tile.properties.exists( "interactable" ) ) {
+							cast( ent, SpriteEntity ).interactable = tile.properties.getBool( "interactable" );
+						}
+					}
+				}
+			}
+		}
+	}
+
 	public function showStrTiles() {
 		for ( i in structTiles ) i.visible = true;
 	}
@@ -375,6 +325,7 @@ class GameClient extends Process {
 
 // debug stuff
 class AxesHelper extends h3d.scene.Graphics {
+
 	public function new( ?parent : h3d.scene.Object, size = 2.0, colorX = 0xEB304D, colorY = 0x7FC309, colorZ = 0x288DF9, lineWidth = 2.0 ) {
 		super( parent );
 
@@ -396,6 +347,7 @@ class AxesHelper extends h3d.scene.Graphics {
 }
 
 class GridHelper extends h3d.scene.Graphics {
+
 	public function new( ?parent : Object, size = 10.0, divisions = 10, color1 = 0x444444, color2 = 0x888888, lineWidth = 1.0 ) {
 		super( parent );
 

@@ -1,5 +1,7 @@
 package en;
 
+import hxbit.NetworkHost;
+import net.ClientController;
 import differ.Collision;
 import differ.shapes.Circle;
 import differ.shapes.Polygon;
@@ -16,7 +18,6 @@ import h3d.scene.Sphere;
 import hxGeomAlgo.HxPoint;
 import hxGeomAlgo.PoleOfInaccessibility;
 import hxbit.NetworkSerializable;
-import hxbit.Serializable;
 import hxd.IndexBuffer;
 import net.ClientToServer.AClientToServerFloat;
 import tools.Save;
@@ -32,9 +33,13 @@ class Entity implements NetworkSerializable {
 	/**
 		Map of multiple shapes, 1st vector is a center of polygon Shape, 2nd polygon is a position of a poly
 	**/
-	@:s public var collisions : Map<Shape, differ.math.Vector>;
+	public var collisions : Map<Shape, differ.math.Vector>;
 
-	@:s public var level : ServerLevel;
+	@:s public var level( default, set ) : ServerLevel;
+
+	function set_level( v : ServerLevel ) {
+		return level = v;
+	}
 
 	public var destroyed( default, null ) = false;
 	public var tmod( get, never ) : Float;
@@ -64,7 +69,7 @@ class Entity implements NetworkSerializable {
 	public var bumpFrict = 0.93;
 	public var bumpReduction = 0.;
 
-	@:s public var dir( default, set ) = 6;
+	@:s public var dir( default, set ) : AClientToServerFloat;
 
 	inline function get_tmod() {
 		return #if headless GameServer.inst.tmod #else if ( GameClient.inst != null ) GameClient.inst.tmod else
@@ -81,7 +86,8 @@ class Entity implements NetworkSerializable {
 	// inline function get_tmxTile() return Tools.getTileByGid( Level.inst.data, tmxObj.objectType.getParameters()[0] );
 	public var sqlId : Null<Int>;
 
-	@:s public var tmxObj : TmxObject;
+	@:s
+	public var tmxObj : TmxObject;
 	public var colorAdd : h3d.Vector;
 	public var spr : HSprite;
 	public var mesh : IsoTileSpr;
@@ -98,19 +104,20 @@ class Entity implements NetworkSerializable {
 
 	public var cd : dn.Cooldown;
 	public var tw : Tweenie;
-	@:s public var flippedX : Bool;
+	@:s
+	public var flippedX : Bool;
 	public var pivotChanged = true;
 
 	/** 
 		реальный x и y центра у спрайта, не процент
 	**/
-	@:s
 	public var pivot : { x : Float, y : Float };
 
 	public static var isoCoefficient = 1.2;
 
 	public var cellGrid : UICellGrid;
-	@:s public var inventory : InventoryGrid;
+	@:s
+	public var inventory : InventoryGrid;
 
 	/** 
 		из-за того, что метод отрисовки, который я добавил в том виде, какой он есть 
@@ -120,17 +127,22 @@ class Entity implements NetworkSerializable {
 	public var forceDrawTo : Bool = false;
 	public var refreshTile : Bool = false;
 
-	public function new( ?x : Float = 0, ?z : Float = 0, ?tmxObj : Null<TmxObject> ) {
+	var flippedOnClient = false;
+	private var tmxAppliedInvalidate = false;
+
+	public function new( ?x : Float = 0, ?z : Float = 0, ?tmxObj : Null<TmxObject>, ?tmxGId : Null<Int> ) {
 		ServerALL.push( this );
 
+		pivot = { x : 0, y : 0 };
 		footX = new AClientToServerFloat( x, () -> false );
 		footY = new AClientToServerFloat( z, () -> false );
+		dir = new AClientToServerFloat( 6, () -> false );
 
 		flippedX = false;
-		collisions = new Map<Shape, differ.math.Vector>();
-		if ( this.tmxObj == null && tmxObj != null ) this.tmxObj = tmxObj;
+		if ( this.tmxObj == null && tmxObj != null ) {
+			this.tmxObj = tmxObj;
+		}
 
-		pivot = { x : 0, y : 0 };
 		serverApplyTmx();
 
 		init( x, z, tmxObj );
@@ -140,9 +152,12 @@ class Entity implements NetworkSerializable {
 		}
 	}
 
-	public function init( ?x : Float, ?z : Float, ?tmxObj : Null<TmxObject> ) {
-		enableReplication = true;
+	function replicate() {
+		enableAutoReplication = true;
+	}
 
+	public function init( ?x : Float, ?z : Float, ?tmxObj : Null<TmxObject> ) {
+		replicate();
 		cd = new dn.Cooldown( Const.FPS );
 	}
 
@@ -235,6 +250,10 @@ class Entity implements NetworkSerializable {
 	**/
 	public function alive() {
 		init();
+		trace( "aliving entity " + this );
+
+		pivot = { x : 0, y : 0 };
+		collisions = new Map<Shape, differ.math.Vector>();
 
 		ALL.push( this );
 		tw = new Tweenie( Const.FPS );
@@ -281,11 +300,23 @@ class Entity implements NetworkSerializable {
 
 		if ( tmxObj != null && tmxObj.flippedVertically ) spr.scaleY = -1;
 
-		#if debug
 		GameClient.inst.delayer.addF(() -> {
+			#if debug
 			updateDebugDisplay();
+			#end
+
+			function applyTmx() {
+				// ждём пока придёт уровень с сервера
+				clientApplyTmx();
+				if ( flippedX ) {
+					if ( !flippedOnClient ) clientFlipX();
+				}
+			}
+
+			if ( Main.inst.clientController.level == null ) {
+				GameClient.inst.onLevelChanged.add( applyTmx, true );
+			} else applyTmx();
 		}, 1 );
-		#end
 	}
 
 	public function isOfType<T : Entity>( c : Class<T> ) return Std.isOfType( this, c );
@@ -333,7 +364,15 @@ class Entity implements NetworkSerializable {
 
 	public function serverApplyTmx() {
 		if ( GameServer.inst != null )
-			GameServer.inst.applyTmxObjOnEnt( this );
+			GameServer.inst.calculateCoordinateOffset( this );
+	}
+
+	public function clientApplyTmx() {
+		if ( GameClient.inst != null ) {
+			GameClient.inst.applyTmxObjOnEnt( this );
+			tmxAppliedInvalidate = true;
+			setPivot();
+		}
 	}
 
 	public function dropItem( item : en.Item, ?angle : Float, ?power : Float ) : en.Item {
@@ -354,43 +393,40 @@ class Entity implements NetworkSerializable {
 			// spr.anim.getCurrentAnim().curFrameCpt = curFrame;
 		}
 
-		return dir = v == 0 ? 0 : v == 1 ? 1 : v == 2 ? 2 : v == 3 ? 3 : v == 4 ? 4 : v == 5 ? 5 : v == 6 ? 6 : v == 7 ? 7 : dir;
+		return dir = v;
 	}
 
 	/** Flips spr.scaleX, all of collision objects, and sorting rectangle **/
-	@:rpc
 	public function flipX() {
-
 		flippedX = !flippedX;
+
+		footX += ( ( ( 1 - pivot.x / tmxObj.width * 2 ) * tmxObj.width ) );
+
+		clientFlipX();
+	}
+
+	@:rpc( clients )
+	function clientFlipX() {
+
+		if ( !tmxAppliedInvalidate ) return;
+
+		pivot.x = tmxObj.width - pivot.x;
+		setPivot();
 
 		for ( shape => offset in collisions ) {
 			shape.scaleX *= -1;
 			offset.x *= -1;
 			offset.x += tmxObj.width;
 		}
+		spr.scaleX *= -1;
 
-		pivot.x = tmxObj.width - pivot.x;
-		setPivot();
-
-		footX -= ( ( ( 1 - pivot.x / tmxObj.width * 2 ) * tmxObj.width ) );
-
-		clientFlipX();
-	}
-
-	var flippedOnClient = false;
-
-	function clientFlipX() {
-		if ( spr != null ) {
-			spr.scaleX *= -1;
-
-			if ( mesh.isLong ) mesh.flipX();
-			mesh.renewDebugPts();
-			refreshTile = true;
-			flippedOnClient = flippedX;
-			Main.inst.delayer.addF(() -> {
-				updateDebugDisplay();
-			}, 10 );
-		}
+		if ( mesh.isLong ) mesh.flipX();
+		mesh.renewDebugPts();
+		refreshTile = true;
+		flippedOnClient = flippedX;
+		Main.inst.delayer.addF(() -> {
+			updateDebugDisplay();
+		}, 10 );
 	}
 
 	public inline function bumpAwayFrom( e : Entity, spd : Float, ?spdZ = 0., ?ignoreReduction = false ) {
@@ -469,12 +505,6 @@ class Entity implements NetworkSerializable {
 	@:keep
 	public function customUnserialize( ctx : hxbit.Serializer ) {
 
-		GameClient.inst.delayer.addF(() -> {
-			if ( flippedX ) {
-				if ( !flippedOnClient ) clientFlipX();
-			}
-		}, 2 );
-
 		// var invHeight = ctx.getInt();
 		// var invWidth = ctx.getInt();
 		// if ( cellGrid == null && invHeight > 0 && invWidth > 0 ) {
@@ -493,10 +523,6 @@ class Entity implements NetworkSerializable {
 		// 		}, 1);
 		// 	}
 		// }
-	}
-
-	public function networkAllow( op : hxbit.NetworkSerializable.Operation, propId : Int, clientSer : hxbit.NetworkSerializable ) : Bool {
-		return true;
 	}
 
 	public function dispose() {
@@ -518,7 +544,6 @@ class Entity implements NetworkSerializable {
 		if ( collisions != null ) for ( i in collisions.keys() ) if ( i != null ) i.destroy();
 	}
 
-	@:rpc
 	public function setFeetPos( x : Float, y : Float ) {
 		footX.setValue( x );
 		footY.setValue( y );
@@ -544,6 +569,13 @@ class Entity implements NetworkSerializable {
 	public function kill( by : Null<Entity> ) {
 		Save.inst.removeEntityById( sqlId );
 		destroy();
+	}
+
+	public function unreg( host : NetworkHost, ctx : NetworkSerializer ) @:privateAccess {
+		host.unregister( this, ctx );
+		host.unregister( footX, ctx );
+		host.unregister( footY, ctx );
+		host.unregister( dir, ctx );
 	}
 
 	public function updateCollisions() {

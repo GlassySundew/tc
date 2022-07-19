@@ -1,7 +1,8 @@
 package net;
 
-import hxbit.NetworkHost.NetworkClient;
 import en.player.Player;
+import hxbit.NetworkHost.NetworkClient;
+import hxbit.NetworkSerializable;
 
 enum SaveSystemOrderType {
 	CreateNewSave( name : String );
@@ -10,21 +11,46 @@ enum SaveSystemOrderType {
 	DeleteSave( name : String );
 }
 
-class ClientController implements hxbit.NetworkSerializable {
+class ClientController implements NetworkSerializable {
 
-	@:s public var uid : Int; // всегда должен быть наверху
+	@:s public var uid( default, set ) : Int;
 
-	@:s public var player : Player;
+	@:s public var player( default, set ) : Player;
 	@:s public var level( default, set ) : ServerLevel;
 
 	public var networkClient : NetworkClient;
 
 	/**
-		check if we are the owner on this client ( should only be called on client ofc )
+		check if we are the owner on this client ( should only be called on client )
 	**/
 	public var isOwner( get, never ) : Bool;
 
-	inline function get_isOwner() : Bool return uid == Client.inst.uid;
+	function get_isOwner() : Bool return uid == Client.inst.uid;
+
+	function set_player( player : Player ) {
+		if ( player != null && GameClient.inst != null && isOwner ) {
+			trace( "setting player" );
+			emptyPing();
+		}
+
+		return this.player = player;
+	}
+
+	function set_level( level : ServerLevel ) {
+		if ( Client.inst != null )
+			trace( "got level " + level + ", isOwner " + isOwner + ", uid " + uid + " client uid " + Client.inst.uid );
+		if ( GameClient.inst != null && level != null && isOwner ) {
+			trace( "setting level" );
+			GameClient.inst.sLevel = level;
+			GameClient.inst.startLevelFromParsedTmx( level.tmxMap, level.lvlName );
+		}
+
+		return this.level = level;
+	}
+
+	function set_uid( v : Int ) {
+		return uid = v;
+	}
 
 	public function new() {
 		init();
@@ -33,7 +59,7 @@ class ClientController implements hxbit.NetworkSerializable {
 	public function alive() {
 		init();
 
-		trace( "aliving controller" );
+		trace( "aliving controller, uid " + uid + " isOwner - " + isOwner );
 
 		if ( isOwner ) {
 			Client.inst.host.self.ownerObject = this;
@@ -41,33 +67,21 @@ class ClientController implements hxbit.NetworkSerializable {
 		}
 	}
 
+	// function customSerialize( ctx : hxbit.Serializer ) {}
+	// function customUnserialize( ctx : hxbit.Serializer ) {}
+
 	public function init() {
-		enableReplication = true;
+		if ( GameClient.inst != null ) {
+			enableReplication = true;
+		}
 	}
 
 	public function networkAllow( op : hxbit.NetworkSerializable.Operation, propId : Int, clientSer : hxbit.NetworkSerializable ) : Bool {
 		return clientSer == this;
 	}
 
-	function set_player( player : Player ) {
-		if ( player != null && player.level != null ) {
-			player.clientController = this;
-		}
-
-		return this.player = player;
-	}
-
-	function set_level( level : ServerLevel ) {
-		if ( GameClient.inst != null && level != null && isOwner ) {
-
-			GameClient.inst.delayer.addF(() -> {
-				GameClient.inst.sLevel = level;
-				GameClient.inst.startLevelFromParsedTmx( level.tmxMap, level.lvlName );
-			}, 1 );
-		}
-
-		return this.level = level;
-	}
+	@:rpc
+	public function emptyPing() {}
 
 	@:rpc( server )
 	public function spawnPlayer( nickname : String ) {

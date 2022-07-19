@@ -415,7 +415,7 @@ class Save {
 		rollbackChanges();
 		startTransaction();
 
-		GameServer.inst.startLevel( loadLevelWithPlayerSingle().name, {} );
+		GameServer.inst.getLevel( loadLevelWithPlayerSingle().name, {} );
 
 		currentFile = fileName;
 	}

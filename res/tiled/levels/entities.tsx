@@ -143,11 +143,11 @@
   </properties>
   <image width="48" height="60" source="separated/structures/backdoor0.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="4" x="25" y="58">
-    <polygon points="0,0 -22,-11 -14,-15 8,-4"/>
-   </object>
-   <object id="5" name="center" x="20" y="49">
+   <object id="5" name="center" x="18" y="50">
     <point/>
+   </object>
+   <object id="8" x="2" y="47">
+    <polygon points="0,0 7.5,-3.75 30,7.5 22.5,11.25"/>
    </object>
   </objectgroup>
  </tile>

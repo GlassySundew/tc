@@ -1,13 +1,11 @@
-import utils.Repeater;
-import Level.StructTile;
 import cherry.soup.EventSignal.EventSignal0;
 import cherry.soup.EventSignal.EventSignal2;
 import dn.Process;
 import h2d.Flow;
 import hxbit.NetworkHost.NetworkClient;
-import tools.Settings;
 import ui.ShadowedText;
 import ui.TextButton;
+import utils.Repeater;
 
 class Client extends Process {
 
@@ -41,8 +39,7 @@ class Client extends Process {
 				host.dispose();
 				if ( GameClient.inst != null )
 					GameClient.inst.gc();
-			}
-			catch( e : Dynamic ) {
+			} catch( e : Dynamic ) {
 				trace( "error occured while disposing: " + e );
 			}
 			host.flush();
@@ -116,7 +113,7 @@ class Client extends Process {
 		}
 
 		host.onUnregister = function ( o ) {
-			trace( "client disconnected " + o );
+			if ( Std.isOfType( o, Entity ) ) cast( o, Entity ).destroy();
 		};
 	}
 

@@ -7,6 +7,6 @@
 # -D sqlite_debug_verbose
 # -D display_proto
 # -D hx_concurrent
-# -D network_debu
+# -D network_debug
 
 -debug

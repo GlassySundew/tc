@@ -5,64 +5,80 @@ import format.tmx.Data.TmxObject;
 import hxbit.Serializer;
 import hxd.Event;
 import hxd.Key;
+import net.ServerRPC;
 
 class Door extends Structure {
-	@:s public var leadsTo : String;
+
+	@:s public var leadsTo : String = "";
 
 	public override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
-		super.init(x, z, tmxObj);
-		if ( tmxObj != null && tmxObj.properties.exists("to") )
-			leadsTo = tmxObj.properties.getString("to");
+		super.init( x, z, tmxObj );
+		if ( tmxObj != null && tmxObj.properties.exists( "to" ) )
+			leadsTo = tmxObj.properties.getString( "to" );
 	}
 
-	override function alive() {
+	override function alive() @:privateAccess {
 		super.alive();
-		GameClient.inst.delayer.addF(() -> {
-			interactable = true;
-		}, 10);
+		interactable = true;
 
-		interact.onTextInputEvent.add(( e : Event ) -> {
-			if ( Key.isPressed(Key.E) ) {
-				turnOffHighlight();
+		interact.onTextInputEvent.add( onTextInput );
+	}
 
-				if ( leadsTo != null ) {
-					var curLvl = GameClient.inst.sLevel.lvlName;
+	function onTextInput( e : Event ) {
+		if ( Key.isPressed( Key.E ) ) {
+			turnOffHighlight();
 
-					// GameClient.inst.startLevel(leadsTo, {});
-					GameClient.inst.delayer.addF(() -> {
-						var door = findDoor(curLvl);
+			if ( leadsTo != null ) {
+				var curLvl = GameClient.inst.sLevel.lvlName;
+
+				// GameClient.inst.startLevel(leadsTo, {});
+				loadLevel( Player.inst, leadsTo, ( e ) -> {} );
+
+				GameClient.inst.onLevelChanged.add(
+					() -> {
+						var door = findDoor( curLvl );
 						if ( door != null ) {
 							interactable = true;
-							Player.inst.setFeetPos(door.footX, door.footY);
+							trace( "moving player " );
+
+							Player.inst.setFeetPos( door.footX, door.footY );
 							GameClient.inst.targetCameraOnPlayer();
 						}
-					}, 1);
-				}
+					},
+					true
+				);
 			}
-		});
+		}
 	}
 
-	// @:keep
-	// override function customSerialize(ctx : Serializer) {
-	// 	super.customSerialize(ctx);
-	// }
-	// @:keep
-	// override function customUnserialize(ctx : Serializer) {
-	// 	super.customUnserialize(ctx);
-	// }
+	override function networkAllow(
+		op : hxbit.NetworkSerializable.Operation,
+		propId : Int,
+		clientSer : hxbit.NetworkSerializable
+	) : Bool {
+		// return
+		// 	switch( propId ) {
+		// 		case _ => loadLevelId: true;
+		// 		default: false;
+		// 	}
+		return true;
+	}
+
+	@:rpc( server )
+	function loadLevel( player : Player, level : String ) : ServerLevel {
+		return ServerRPC.bringPlayerToLevel( player, level );
+	}
 
 	function findDoor( to : String ) : Entity {
 		for ( e in Entity.ALL ) {
-			if ( e.isOfType(en.structures.Door) ) {
-				if ( e.tmxObj != null && e.tmxObj.properties.exists("to") && e.tmxObj.properties.getFile("to").split(".")[0] == to ) {
+			if ( e.isOfType( en.structures.Door ) ) {
+				if ( e.tmxObj != null && e.tmxObj.properties.exists( "to" ) && e.tmxObj.properties.getFile( "to" ).split( "." )[0] == to ) {
 					return e;
 				}
 			}
 		}
 		#if debug
-		trace("wrong door logic???");
-		
-		// throw "wrong door markup";
+		trace( "wrong door logic???" );
 		#end
 		return null;
 	}

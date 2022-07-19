@@ -1,4 +1,3 @@
-import h3d.scene.Mesh;
 import differ.shapes.Polygon;
 import dn.Process;
 import en.items.Blueprint;
@@ -13,17 +12,18 @@ import h3d.col.Bounds;
 import h3d.col.Point;
 import h3d.mat.Texture;
 import h3d.scene.Interactive;
+import h3d.scene.Mesh;
 import h3d.scene.Object;
 import hxd.IndexBuffer;
 import hxd.Res;
 import tiled.TileLayerRenderer;
-import tools.Save;
 import ui.s3d.EventInteractive;
 
 /**
 	Level parses tmx entities maps, renders tie layers into mesh
 **/
 class Level extends dn.Process {
+
 	public static var inst : Level;
 
 	public inline function getLayerByName( id : String ) return layersByName.get( id );
@@ -32,9 +32,9 @@ class Level extends dn.Process {
 
 	public var hei( get, never ) : Int;
 
-	inline function get_wid() return Std.int( (Math.min( data.height, data.width ) + Math.abs(-data.width + data.height ) / 2) * data.tileWidth );
+	inline function get_wid() return Std.int( ( Math.min( data.height, data.width ) + Math.abs(-data.width + data.height ) / 2 ) * data.tileWidth );
 
-	inline function get_hei() return Std.int( (Math.min( data.height, data.width ) + Math.abs(-data.width + data.height ) / 2) * data.tileHeight );
+	inline function get_hei() return Std.int( ( Math.min( data.height, data.width ) + Math.abs(-data.width + data.height ) / 2 ) * data.tileHeight );
 
 	//	public var lid(get, never):Int;
 	var invalidated = true;
@@ -138,13 +138,29 @@ class Level extends dn.Process {
 		obj.material.mainPass.depth( false, LessEqual );
 		obj.material.mainPass.setBlendMode( Alpha );
 
+		inline function drawLayer( layer ) {
+			if ( layer.visible #if !display_proto && layer.name != "proto" #end ) {
+				layerRenderer = new LayerRender( data, wid, hei, layer );
+				layerRenderer.render.g.drawTo( ground );
+			}
+		}
+		function drawTilesThroughGroup( group : TmxGroup ) {
+			for ( grLayer in group.layers )
+				switch grLayer {
+					case LTileLayer( layer ):
+						drawLayer( layer );
+					case LGroup( group ):
+						drawTilesThroughGroup( group );
+					default:
+				}
+		}
+
 		for ( e in data.layers ) {
 			switch( e ) {
 				case LTileLayer( layer ):
-					if ( layer.visible #if !display_proto && layer.name != "proto" #end ) {
-						layerRenderer = new LayerRender( data, wid, hei, layer );
-						layerRenderer.render.g.drawTo( ground );
-					}
+					drawLayer( layer );
+				case LGroup( group ):
+					drawTilesThroughGroup( group );
 				default:
 			}
 		}
@@ -167,7 +183,7 @@ class Level extends dn.Process {
 								var bmp = new Bitmap( getTileFromSeparatedTsx( getTileSource( gid, Tools.getTilesetByGid( data, gid ) ) ) );
 								bmp.scaleX = obj.flippedVertically ? -1 : 1;
 								bmp.x = isoX - obj.width / 2 * bmp.scaleX;
-								bmp.y = hei - isoY - obj.height * (bmp.scaleX < 0 ? 0 : 1);
+								bmp.y = hei - isoY - obj.height * ( bmp.scaleX < 0 ? 0 : 1 );
 								bmp.drawTo( this.obj.material.texture );
 							default:
 						}
@@ -251,13 +267,14 @@ class Level extends dn.Process {
 
 	public inline function cartToIsoLocal( x : Float, y : Float ) : Vector {
 		return new Vector(
-			-(data.width - data.height) / 2 * data.tileHeight + wid * .5 + cartToIso( x, y ).x,
+			-( data.width - data.height ) / 2 * data.tileHeight + wid * .5 + cartToIso( x, y ).x,
 			hei - cartToIso( x, y ).y
 		);
 	}
 }
 
 class LayerRender extends h2d.Object {
+
 	public var render : InternalRender;
 
 	public function new( map : TmxMap, wid : Int, hei : Int, layer : TmxTileLayer ) {
@@ -272,6 +289,7 @@ class LayerRender extends h2d.Object {
 }
 
 private class InternalRender extends TileLayerRenderer {
+
 	public var g : h2d.Graphics;
 
 	public var tex : Texture;
@@ -281,7 +299,7 @@ private class InternalRender extends TileLayerRenderer {
 	override function renderOrthoTile( x : Float, y : Float, tile : TmxTile, tileset : TmxTileset ) : Void {
 		if ( tileset == null ) return;
 
-		x -= (Std.int( ((map.width - map.height) / 2) * map.tileWidth ));
+		x -= ( Std.int( ( ( map.width - map.height ) / 2 ) * map.tileWidth ) );
 
 		if ( tileset.image == null ) {
 			renderOrthoTileFromImageColl( x, y, tile, tileset );
@@ -300,12 +318,12 @@ private class InternalRender extends TileLayerRenderer {
 
 		g.beginTileFill( x
 			- uv.x
-			+ (scaleX == 1 ? 0 : map.tileWidth)
+			+ ( scaleX == 1 ? 0 : map.tileWidth )
 			+ layer.offsetX,
 			y
 			- uv.y * scaleY
 			+ map.tileHeight
-			- tileset.tileHeight / (scaleY == 1 ? 1 : 1)
+			- tileset.tileHeight / ( scaleY == 1 ? 1 : 1 )
 			+ layer.offsetY, scaleX, scaleY, h2dTile );
 		g.drawRect( x, y + map.tileHeight - tileset.tileHeight, tileset.tileWidth, tileset.tileHeight );
 		g.endFill();
@@ -321,20 +339,20 @@ private class InternalRender extends TileLayerRenderer {
 		var bmp = new Bitmap( h2dTile );
 		if ( tile.flippedDiagonally ) bmp.rotate( M.toRad( tile.flippedVertically ? -90 : 90 ) );
 
-		var scaleX = (tile.flippedHorizontally && !tile.flippedDiagonally) ? -1 : 1;
-		var scaleY = (tile.flippedVertically && !tile.flippedDiagonally) ? -1 : 1;
+		var scaleX = ( tile.flippedHorizontally && !tile.flippedDiagonally ) ? -1 : 1;
+		var scaleY = ( tile.flippedVertically && !tile.flippedDiagonally ) ? -1 : 1;
 
 		bmp.scaleX = scaleX;
 		bmp.scaleY = scaleY;
 
-		bmp.x = x + (scaleX > 0 ? 0 : h2dTile.width) + (tile.flippedDiagonally ? (tile.flippedHorizontally ? h2dTile.height : 0) : 0);
+		bmp.x = x + ( scaleX > 0 ? 0 : h2dTile.width ) + ( tile.flippedDiagonally ? ( tile.flippedHorizontally ? h2dTile.height : 0 ) : 0 );
 		bmp.y = y
 			- h2dTile.height
 			+ map.tileHeight
-			+ (scaleY > 0 ? 0 : h2dTile.height)
+			+ ( scaleY > 0 ? 0 : h2dTile.height )
 			- layer.offsetX
 			+ layer.offsetY
-			+ (tile.flippedDiagonally ? (tile.flippedVertically ? h2dTile.height : -h2dTile.width + h2dTile.height) : 0);
+			+ ( tile.flippedDiagonally ? ( tile.flippedVertically ? h2dTile.height : -h2dTile.width + h2dTile.height ) : 0 );
 
 		// Creating isometric(rombic) h3d.scene.Interactive on top of separated
 		// tiles that contain * at the end of their file name as a slots for
@@ -368,7 +386,7 @@ private class InternalRender extends TileLayerRenderer {
 
 		while( i < tiles.length ) {
 			tile = tiles[i];
-			renderIsoTile( x + ((ix - iy) * hw) + Std.int( map.tileWidth * map.width / 2 - hw ), y + (ix + iy) * hh, tile, Tools.getTilesetByGid( map, tile.gid ) );
+			renderIsoTile( x + ( ( ix - iy ) * hw ) + Std.int( map.tileWidth * map.width / 2 - hw ), y + ( ix + iy ) * hh, tile, Tools.getTilesetByGid( map, tile.gid ) );
 			i++;
 			if ( ++ix == width ) {
 				ix = 0;
@@ -382,8 +400,9 @@ private class InternalRender extends TileLayerRenderer {
 	}
 }
 
-@:allow(GameClient, InternalRender)
+@:allow( GameClient, InternalRender )
 class StructTile extends Object {
+
 	public var taken : Bool = false;
 	public var tile : EventInteractive;
 
@@ -408,13 +427,13 @@ class StructTile extends Object {
 
 		tile.onMoveEvent.add( ( event ) -> {
 			if ( Player.inst != null && Player.inst.holdItem != null && Std.isOfType( Player.inst.holdItem, Blueprint ) ) {
-				cast(Player.inst.holdItem, Blueprint).onStructTileMove.dispatch( this );
+				cast( Player.inst.holdItem, Blueprint ).onStructTileMove.dispatch( this );
 			}
 		} );
 
 		tile.onClickEvent.add( event -> {
 			if ( Player.inst != null && Player.inst.holdItem != null && Std.isOfType( Player.inst.holdItem, Blueprint ) ) {
-				cast(Player.inst.holdItem, Blueprint).onStructurePlace.dispatch( this );
+				cast( Player.inst.holdItem, Blueprint ).onStructurePlace.dispatch( this );
 			}
 		} );
 		#if debug

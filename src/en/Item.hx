@@ -52,7 +52,7 @@ class Item implements NetworkSerializable {
 		isDisposed = true;
 	}
 
-	public static function fromCdbEntry( cdbEntry : Data.ItemKind, containerEntity : Entity, ?amount : Int = 1 ) {
+	public static function fromCdbEntry( cdbEntry : Data.ItemKind, containerEntity : Entity, amount = 1 ) {
 		var item : Item = null;
 
 		var entClasses = CompileTime.getAllClasses( Item );

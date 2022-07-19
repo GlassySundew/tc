@@ -1,5 +1,9 @@
 package en.player;
 
+import hxbit.NetworkHost;
+import en.items.Axe;
+import en.items.Scepter;
+import hxbit.NetworkSerializable;
 import dn.heaps.input.ControllerAccess;
 import net.ClientToServer.AClientToServer;
 import net.ClientController;
@@ -32,18 +36,24 @@ class Player extends Entity {
 
 	var nicknameMesh : TileSprite;
 
-	@:s public var nickname : String;
 	public var ui : PlayerUI;
 
 	public var ca : ControllerAccess<ControllerAction>;
 	public var belt : ControllerAccess<ControllerAction>;
 
-	@:s public var holdItem( default, set ) : en.Item;
+	public var clientController : ClientController;
+	@:s public var nickname : String;
 
-	@:s public var item : Item;
-	@:s public var clientController : ClientController;
+	@:s public var holdItem( default, set ) : en.Item = null;
 
 	@:s public var actionState : AClientToServer<PlayerActionState>;
+
+	/** generated name of the asteroid **/
+	@:s public var residesOnId( default, set ) : String;
+	@:s public var travelling : Bool;
+	@:s public var onBoard : Bool;
+	@:s public var uid : Int;
+	@:s public var sprGroup : String;
 
 	function set_holdItem( v : en.Item ) : Item {
 
@@ -76,20 +86,14 @@ class Player extends Entity {
 		v.item.onPlayerHold.dispatch();
 	}
 
-	/** generated name of the asteroid **/
-	@:s public var residesOnId( default, set ) : String;
-	@:s public var travelling : Bool;
-	@:s public var onBoard : Bool;
-	@:s public var uid : Int;
-	@:s public var sprGroup : String;
-
 	function set_residesOnId( v : String ) {
 		return residesOnId = v;
 	}
 
-	public function new( x : Float, z : Float, ?tmxObj : TmxObject, ?nickname : String, ?uid : Int ) {
+	public function new( x : Float, z : Float, tmxObj : TmxObject, nickname : String, uid : Int, clientController : ClientController ) {
 		this.nickname = nickname;
 		this.uid = uid;
+		this.clientController = clientController;
 		travelling = false;
 		onBoard = true;
 
@@ -117,7 +121,13 @@ class Player extends Entity {
 		super.init( x, z, tmxObj );
 	}
 
+	override function replicate() {
+		enableAutoReplication = true;
+	}
+
 	public override function alive() {
+		trace( "aliving player" );
+
 		// GameClient.inst.delayer.addF(() -> {
 		// 	checkTeleport();
 		// }, 1);
@@ -173,17 +183,16 @@ class Player extends Entity {
 		syncFrames();
 	}
 
+	override function unreg( host : NetworkHost, ctx : NetworkSerializer ) @:privateAccess {
+		super.unreg( host, ctx );
+		host.unregister( actionState, ctx );
+	}
+
 	override public function networkAllow(
 		op : hxbit.NetworkSerializable.Operation,
 		propId : Int,
 		clientSer : hxbit.NetworkSerializable
 	) : Bool {
-
-		// server
-		// if ( clientController.player == this && op == SetField ) {
-		// 	return false;
-		// }
-
 		return GameClient.inst != null ? Main.inst.clientController == clientSer : cast( clientSer, ClientController ).player == this;
 	}
 
@@ -346,13 +355,13 @@ class Player extends Entity {
 					dx += Math.cos( leftAng ) * s;
 					dy += Math.sin( leftAng ) * s;
 
-					if ( lx < -0.3 && M.fabs( ly ) < 0.6 ) dir = 4; else if ( ly < -0.3 && M.fabs( lx ) < 0.6 ) dir = 6;
+					if ( lx < -0.3 && M.fabs( ly ) < 0.6 ) dir.setValue( 4 ); else if ( ly < -0.3 && M.fabs( lx ) < 0.6 ) dir.setValue( 6 );
 					else if ( lx > 0.3
-						&& M.fabs( ly ) < 0.6 ) dir = 0; else if ( ly > 0.3 && M.fabs( lx ) < 0.6 ) dir = 2;
+						&& M.fabs( ly ) < 0.6 ) dir.setValue( 0 ); else if ( ly > 0.3 && M.fabs( lx ) < 0.6 ) dir.setValue( 2 );
 
-					if ( lx > 0.3 && ly > 0.3 ) dir = 1; else if ( lx < -0.3 && ly > 0.3 ) dir = 3; else
+					if ( lx > 0.3 && ly > 0.3 ) dir.setValue( 1 ); else if ( lx < -0.3 && ly > 0.3 ) dir.setValue( 3 ); else
 						if ( lx < -0.3
-							&& ly < -0.3 ) dir = 5; else if ( lx > 0.3 && ly < -0.3 ) dir = 7;
+							&& ly < -0.3 ) dir.setValue( 5 ); else if ( lx > 0.3 && ly < -0.3 ) dir.setValue( 7 );
 				} else {
 					dx *= Math.pow( 0.6, tmod );
 					dy *= Math.pow( 0.6, tmod );
