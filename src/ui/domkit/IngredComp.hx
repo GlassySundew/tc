@@ -1,15 +1,17 @@
 package ui.domkit;
 
+import utils.Assets;
 import dn.heaps.slib.HSprite;
+import h2d.Flow;
 import h2d.Tile;
+import h2d.domkit.Object;
 import hxd.Res;
 import hxd.res.Resource;
-import h2d.Flow;
 import ui.domkit.WindowComp.WindowCompI;
-import h2d.domkit.Object;
 
-@:uiComp("ingred-comp")
+@:uiComp( "ingred-comp" )
 class IngredComp extends Flow implements Object implements WindowCompI {
+
 	var iconSpr : HSprite;
 	var amount : String;
 
@@ -25,19 +27,28 @@ class IngredComp extends Flow implements Object implements WindowCompI {
 	static var sheet : Resource;
 
 	var ingred : Data.Recipe_ingred;
+
 	/**
 		@param rest : Data.Recipe_ingred type, displayed icon
 	**/
-	public function new( backgroundTile : h2d.Tile, bl : Int, bt : Int, br : Int, bb : Int, ?parent : Null<h2d.Object>, rest : haxe.Rest<Dynamic> ) {
+	public function new( 
+		backgroundTile : h2d.Tile, 
+		bl : Int, 
+		bt : Int, 
+		br : Int, 
+		bb : Int, 
+		?parent : Null<h2d.Object>, 
+		rest : haxe.Rest<Dynamic>
+	) {
 		ingred = rest[0];
-		iconSpr = new HSprite(Assets.items, ingred.item.atlas_name);
+		iconSpr = new HSprite( Assets.items, ingred.item.atlas_name );
 
-		amount = Std.string(ingred.amount);
+		amount = Std.string( ingred.amount );
 
-		super(parent);
+		super( parent );
 		if ( sheet == null ) sheet = Res.domkit.ingred;
 		initComponent();
 
-		window.style.load(sheet);
+		window.style.load( sheet );
 	}
 }

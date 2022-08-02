@@ -1,12 +1,16 @@
 package en.structures;
 
+import en.Item.ItemPresense;
+import ui.core.InventoryGrid;
+import ui.core.InventoryGrid.InventoryCellFlowGrid;
 import dn.heaps.input.ControllerAccess;
-import ui.InventoryGrid;
 import en.player.Player;
+import en.util.ItemUtil;
 import format.tmx.Data.TmxObject;
+import game.client.ControllerAction;
+import game.client.GameClient;
 import h2d.Object;
 import hxd.Event;
-import ui.InventoryGrid.UICellGrid;
 import ui.player.Inventory;
 
 class Chest extends Structure {
@@ -19,19 +23,9 @@ class Chest extends Structure {
 		super( x, z, tmxObj, cdbEntry );
 		interactable = true;
 
-		// inventory = new
+		inventory = new InventoryGrid( 5, 5, Chest, this );
 
-		inventory = new InventoryGrid( 5, 5, null, this );
-
-		// addingData.Item from props only when first loaded (with no serialization)
-		for ( prop in tmxObj.properties.keys() ) {
-			var split = prop.split( ":" );
-			if ( split.length > 1 && split[0] == "item" ) {
-				var item = Item.fromCdbEntry( Data.item.resolve( split[1] ).id, this );
-				item.amount = tmxObj.properties.getInt( prop );
-				inventory.giveItem( item );
-			}
-		}
+		ItemUtil.resolveJsonItemStorage( tmxObj.properties.getString( "items" ), inventory );
 	}
 
 	public override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
@@ -44,20 +38,24 @@ class Chest extends Structure {
 		ca = Main.inst.controller.createAccess();
 
 		GameClient.inst.delayer.addF(() -> {
-			cellGrid = new UICellGrid( inventory, 20, 20 );
+			try {
+				cellFlowGrid = new InventoryCellFlowGrid( inventory, 20, 20 );
 
-			if ( Player.inst != null && Player.inst.ui != null ) {
-				chestWin = new ChestWin( cellGrid, Player.inst.ui.root );
-				chestWin.containmentEntity = this;
+				if ( Player.inst != null && Player.inst.pui != null ) {
+					chestWin = new ChestWin( cellFlowGrid, Player.inst.pui.root );
+					chestWin.containmentEntity = this;
+				}
+			} catch( e ) {
+				trace( e );
 			}
 		}, 1 );
 
 		interact.onTextInputEvent.add(
 			( e : Event ) -> {
-				if ( ca.isPressed( DropItem ) ) {
-					if ( !Player.inst.ui.inventory.win.visible ) Player.inst.ui.inventory.toggleVisible();
+				if ( ca.isPressed( Action ) ) {
+					if ( !Player.inst.pui.inventory.win.visible ) Player.inst.pui.inventory.toggleVisible();
 					chestWin.toggleVisible();
-					// Window.centrizeTwoWins(Player.inst.ui.inventory, inventory);
+					// Window.centrizeTwoWins(Player.inst.pui.inventory, inventory);
 				}
 			}
 		);
@@ -85,8 +83,10 @@ class Chest extends Structure {
 
 class ChestWin extends Inventory {
 
+	override function get_type() return ItemPresense.Chest;
+
 	// public var chestEntity :
-	public function new( ?cellGrid : UICellGrid, ?parent : Object ) {
+	public function new( ?cellGrid : InventoryCellFlowGrid, ?parent : Object ) {
 		super( false, cellGrid, parent );
 
 		windowComp.window.windowLabel.shadowed_text.text = "Chest";
@@ -98,8 +98,11 @@ class ChestWin extends Inventory {
 
 	override function toggleVisible() {
 		if ( !win.visible ) {
-			win.x = Player.inst.ui.inventory.windowComp.window.getSize().width + Player.inst.ui.inventory.win.x + 4;
-			win.y = Player.inst.ui.inventory.win.y + ( Player.inst.ui.inventory.windowComp.window.getSize().height - windowComp.window.getSize().height ) / 2;
+			win.x = Player.inst.pui.inventory.windowComp.window.getSize().width + Player.inst.pui.inventory.win.x + 4;
+			win.y =
+				Player.inst.pui.inventory.win.y +
+				( Player.inst.pui.inventory.windowComp.window.getSize().height -
+					windowComp.window.getSize().height ) / 2;
 		}
 		super.toggleVisible();
 	}

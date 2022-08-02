@@ -2,9 +2,11 @@ package en.structures;
 
 import en.player.Player;
 import format.tmx.Data.TmxObject;
+import game.server.ServerLevel;
 import hxbit.Serializer;
 import hxd.Event;
 import hxd.Key;
+import net.Server;
 import net.ServerRPC;
 
 class Door extends Structure {
@@ -14,7 +16,7 @@ class Door extends Structure {
 	public override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
 		super.init( x, z, tmxObj );
 		if ( tmxObj != null && tmxObj.properties.exists( "to" ) )
-			leadsTo = tmxObj.properties.getString( "to" );
+			leadsTo = Util.unifyLevelName( tmxObj.properties.getString( "to" ) );
 	}
 
 	override function alive() @:privateAccess {
@@ -29,24 +31,7 @@ class Door extends Structure {
 			turnOffHighlight();
 
 			if ( leadsTo != null ) {
-				var curLvl = GameClient.inst.sLevel.lvlName;
-
-				// GameClient.inst.startLevel(leadsTo, {});
-				loadLevel( Player.inst, leadsTo, ( e ) -> {} );
-
-				GameClient.inst.onLevelChanged.add(
-					() -> {
-						var door = findDoor( curLvl );
-						if ( door != null ) {
-							interactable = true;
-							trace( "moving player " );
-
-							Player.inst.setFeetPos( door.footX, door.footY );
-							GameClient.inst.targetCameraOnPlayer();
-						}
-					},
-					true
-				);
+				bringPlayerToLevel( Player.inst, leadsTo, ( e ) -> {} );
 			}
 		}
 	}
@@ -56,31 +41,20 @@ class Door extends Structure {
 		propId : Int,
 		clientSer : hxbit.NetworkSerializable
 	) : Bool {
-		// return
-		// 	switch( propId ) {
-		// 		case _ => loadLevelId: true;
-		// 		default: false;
-		// 	}
 		return true;
 	}
 
 	@:rpc( server )
-	function loadLevel( player : Player, level : String ) : ServerLevel {
-		return ServerRPC.bringPlayerToLevel( player, level );
-	}
-
-	function findDoor( to : String ) : Entity {
-		for ( e in Entity.ALL ) {
-			if ( e.isOfType( en.structures.Door ) ) {
-				if ( e.tmxObj != null && e.tmxObj.properties.exists( "to" ) && e.tmxObj.properties.getFile( "to" ).split( "." )[0] == to ) {
-					return e;
-				}
-			}
-		}
-		#if debug
-		trace( "wrong door logic???" );
-		#end
-		return null;
+	function bringPlayerToLevel( player : Player, level : String ) : ServerLevel {
+		player.footX.syncBack = player.footY.syncBack = true;
+		var level = ServerRPC.bringPlayerToLevel(
+			player,
+			level,
+			ServerRPC.putPlayerByDoorLeadingTo.bind( player, player.level.lvlName )
+		);
+		Server.inst.host.flush();
+		player.footX.syncBack = player.footY.syncBack = false;
+		return level;
 	}
 
 	override function postUpdate() {

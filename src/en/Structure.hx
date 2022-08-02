@@ -1,5 +1,8 @@
 package en;
 
+import game.client.GameClient;
+import game.client.GameClient;
+import utils.Assets;
 import en.player.Player;
 import format.tmx.Data.TmxObject;
 import hxbit.Serializer;
@@ -43,7 +46,7 @@ class Structure extends en.InteractableEntity {
 
 	override function alive() {
 		if ( spr == null ) {
-			spr = new HSprite( Assets.structures, entParent );
+			spr = new HSprite( Assets.structures, hollowScene );
 			eregClass.match( '$this'.toLowerCase() );
 			try {
 				spr.set( eregClass.matched( 1 ) );
@@ -78,7 +81,7 @@ class Structure extends en.InteractableEntity {
 
 		// Нажатие для того, чтобы сломать структуру
 		interact.onPushEvent.add( event -> {
-			if ( GameClient.inst.player.holdItem != null ) applyItem( GameClient.inst.player.holdItem );
+			if ( GameClient.inst.player.holdItem != null ) applyItem( GameClient.inst.player.holdItem.item );
 		} );
 		interact.onOverEvent.add( ( _ ) -> {
 			activateInteractive();
@@ -88,7 +91,6 @@ class Structure extends en.InteractableEntity {
 		} );
 
 		Main.inst.delayer.addF(() -> {
-
 			interactCheck();
 		}, 10 );
 	}
@@ -119,7 +121,7 @@ class Structure extends en.InteractableEntity {
 	function isInPlayerRange() return distPolyToPt( Player.inst ) <= useRange;
 
 	public function offsetFootByTile() {
-		footY += 1.;
+		footY.val += 1.;
 		// footY += ( StructTile.polyPrim != null ? ( StructTile.polyPrim.getBounds().zSize / 2 - Level.inst.data.tileHeight ) : 0 );
 	}
 

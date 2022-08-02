@@ -4,23 +4,24 @@ import dn.Lib;
 import dn.M;
 import dn.Tweenie;
 import dn.data.GetText;
+import dn.heaps.input.ControllerAccess;
 import dn.heaps.slib.*;
 import en.*;
 import en.Entity;
 import format.tmx.Data.TmxData;
-import tools.Settings.*;
-import tools.Settings;
-import tools.Util.*;
-import tools.Util;
-import dn.heaps.input.ControllerAccess;
+import utils.Const;
+import utils.Util.*;
+import utils.Util;
+import utils.tools.Settings.*;
+import utils.tools.Settings;
 
 using Item.StackExtender;
-using tools.Util.FlowExtender;
-using tools.Util.ReverseArrayKeyValueIterator;
-using tools.Util.SeedyRandomExtender;
-using tools.Util.SocketHostExtender;
-using tools.Util.TmxLayerExtender;
-using tools.Util.TmxMapExtender;
+using utils.Extensions.FlowExtender;
+using utils.Extensions.ReverseArrayKeyValueIterator;
+using utils.Extensions.SeedyRandomExtender;
+using utils.Extensions.SocketHostExtender;
+using utils.Extensions.TmxLayerExtender;
+using utils.Extensions.TmxMapExtender;
 #end
 
 // компоненты которые используются в других компонентах

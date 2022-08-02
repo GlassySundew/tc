@@ -1,5 +1,7 @@
 package ui.domkit;
 
+import ui.core.Button;
+import utils.Assets;
 import cherry.soup.EventSignal.EventSignal1;
 import dn.heaps.slib.HSprite;
 import en.player.Player;
@@ -68,7 +70,7 @@ class RecipeComp extends Flow implements h2d.domkit.Object implements WindowComp
 		var craft_but1 = new HSprite(Assets.ui, "craft_but1");
 		var craft_but2 = new HSprite(Assets.ui, "craft_but2");
 
-		var craftButton = new ui.Button([craft_but0.tile, craft_but1.tile, craft_but2.tile], craft_button);
+		var craftButton = new Button([craft_but0.tile, craft_but1.tile, craft_but2.tile], craft_button);
 
 		craftButton.onClickEvent.add(( e ) -> craft());
 

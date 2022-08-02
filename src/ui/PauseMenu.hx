@@ -1,5 +1,10 @@
 package ui;
 
+import ui.core.TextButton;
+import ui.core.ShadowedText;
+import net.Client;
+import game.client.GameClient;
+import utils.Assets;
 import dn.Process;
 import h2d.Flow;
 import h2d.Graphics;
@@ -9,6 +14,7 @@ import ui.dialog.OptionsMenu;
 import ui.dialog.SaveManager;
 
 class PauseMenu extends FocusMenu {
+
 	public static var inst : PauseMenu;
 
 	var backgroundGraphics : Graphics;
@@ -19,7 +25,7 @@ class PauseMenu extends FocusMenu {
 		pausableProcess.pause();
 		this.pausableProcess = pausableProcess;
 
-		centrizeContent(0);
+		centrizeContent( 0 );
 		contentFlow.padding = 10;
 
 		if ( inst != null ) inst.destroy();
@@ -66,6 +72,7 @@ class PauseMenu extends FocusMenu {
 		}, contentFlow );
 
 		new TextButton( "exit to main menu", ( e ) -> {
+			Client.inst.sendMessage( Disconnect );
 			GameClient.inst.destroy();
 
 			// TODO make

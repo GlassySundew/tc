@@ -1,7 +1,8 @@
 package en;
 
-import tools.Save;
-import hxbit.Serializer;
+import game.client.GameClient;
+import utils.Assets;
+import utils.Assets;
 import en.objs.IsoTileSpr;
 import en.player.Player;
 import format.tmx.Data.TmxObject;
@@ -14,6 +15,7 @@ import h3d.prim.UV;
 import h3d.scene.Mesh;
 import h3d.scene.Object;
 import hxGeomAlgo.HxPoint;
+import hxbit.Serializer;
 import shader.PolyDedepther;
 
 class FloatingItem extends en.InteractableEntity {
@@ -37,7 +39,7 @@ class FloatingItem extends en.InteractableEntity {
 		if ( spr == null ) spr = new HSprite(
 			Assets.items,
 			Data.item.get( item.cdbEntry ).atlas_name,
-			entParent
+			hollowScene
 		);
 
 		super.init( x, z, tmxObj );
@@ -161,23 +163,23 @@ class FloatingItem extends en.InteractableEntity {
 		// bmp.tile = spr.tile;
 		// bmp.drawTo(polyMesh.material.texture);
 
-		shadowMesh.x = footX;
-		shadowMesh.z = footY;
+		shadowMesh.x = footX.val;
+		shadowMesh.z = footY.val;
 
-		polyMesh.x = footX;
-		polyMesh.z = footY.toFloat() + 4 * Math.sin( ( GameClient.inst.ftime + startWave ) / 34 ) + 10;
+		polyMesh.x = footX.val;
+		polyMesh.z = footY.val + 4 * Math.sin( ( GameClient.inst.ftime + startWave ) / 34 ) + 10;
 
 		// polyMesh.y = 0.01;
 
 		polyMesh.rotate( 0, 0, 0.016 * tmod );
-		deDepth.objZ = ( polyMesh.z - footY.toFloat() ) * Math.sin(-rotAngle );
+		deDepth.objZ = ( polyMesh.z - footY.val ) * Math.sin(-rotAngle );
 
 		if ( !isLocked() ) bumpAwayFrom( Player.inst, distPx( Player.inst ) < 20 ? -.065 * tmod : 0 );
 
 		if ( Player.inst != null && distPx( Player.inst ) < 10 && !isLocked() ) {
-			Player.inst.inventory.giveItem( item );
+			//! Player.inst.inventory.giveItem( item );
 			destroy();
-			if ( sqlId != null ) Save.inst.removeEntityById( sqlId );
+			if ( sqlId != null ) utils.tools.Save.inst.removeEntityById( sqlId );
 		}
 	}
 

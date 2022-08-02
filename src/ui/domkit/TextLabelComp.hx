@@ -1,5 +1,6 @@
 package ui.domkit;
 
+import utils.Assets;
 import h2d.Font;
 import h2d.Object;
 import h2d.RenderContext;
@@ -39,7 +40,6 @@ class TextLabelComp extends h2d.Flow implements h2d.domkit.Object {
 		return shadowed_text.font;
 
 	public var cornersRounder : CornersRounder;
-	public var forceDecrHeight : Null<Int>;
 
 	public function new( text : String, ?font : Font, ?style : Style, ?parent : Object ) {
 		super( parent );

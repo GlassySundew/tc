@@ -518,8 +518,8 @@
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 204.83333333333334,
-                "y": 197.16666666666669
+                "x": 223.83333333333334,
+                "y": 98
             }
         },
         "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx#CONGRUENT": {
@@ -554,16 +554,16 @@
             "scale": 0.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 2401,
-                "y": 1181
+                "x": 2399,
+                "y": 1184
             }
         },
         "tiled/levels/bridge.tmx": {
-            "scale": 1.5,
-            "selectedLayer": 23,
+            "scale": 4,
+            "selectedLayer": 11,
             "viewCenter": {
-                "x": 339.6666666666667,
-                "y": 220.33333333333337
+                "x": 451.875,
+                "y": 226
             }
         },
         "tiled/levels/bridge.tmx#entities": {
@@ -601,8 +601,8 @@
             "scale": 1,
             "selectedLayer": 16,
             "viewCenter": {
-                "x": 2462.5,
-                "y": 377.5
+                "x": 2399.5,
+                "y": 1089
             }
         },
         "tiled/levels/rules.tmx": {
@@ -621,8 +621,8 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 219.75,
-                "y": -50.75
+                "x": 218.75,
+                "y": -51
             }
         },
         "tiled/levels/rules/rules.tmx": {
@@ -754,11 +754,11 @@
             }
         },
         "tiled/levels/ship_pascal.tmx": {
-            "scale": 4,
-            "selectedLayer": 9,
+            "scale": 2,
+            "selectedLayer": 14,
             "viewCenter": {
-                "x": 350.875,
-                "y": 132.875
+                "x": 399.75,
+                "y": 199.75
             }
         },
         "tiled/levels/ship_pascal.tmx#CONGRUENT": {
@@ -775,11 +775,11 @@
             }
         },
         "tiled/levels/ui.tmx": {
-            "scale": 16,
+            "scale": 23,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 138.53125,
-                "y": 57.84375
+                "x": 188.76086956521738,
+                "y": 48.54347826086956
             }
         },
         "tiled/levels/ui.tsx": {
@@ -818,7 +818,7 @@
         "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx"
     ],
     "project": "res.tiled-project",
-    "property.type": "file",
+    "property.type": "string",
     "recentFiles": [
         "tiled/levels/CONGRUENT.tsx",
         "/home/glassysundew/Documents/CONGRUENT.tsx",

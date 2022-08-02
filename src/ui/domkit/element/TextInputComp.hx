@@ -1,10 +1,12 @@
 package ui.domkit.element;
 
+import ui.core.TextInput;
+import utils.Assets;
 import h2d.Font;
 import h2d.domkit.Object;
 
 @:uiComp( "text-input" )
-class TextInputComp extends ui.TextInput implements h2d.domkit.Object {
+class TextInputComp extends TextInput implements h2d.domkit.Object {
 
 	@:p public var backgroundColorProp( default, set ) : Int;
 

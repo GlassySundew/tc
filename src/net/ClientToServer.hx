@@ -105,7 +105,7 @@ abstract AClientToServerFloat( CClientToServerFloat ) from CClientToServerFloat 
 }
 
 /**
-	specific client setting var -> server and server sending to  serializable variable
+	specific client setting var -> server and server sending to  serizzable variable
 **/
 class CClientToServerFloat implements NetworkSerializable {
 

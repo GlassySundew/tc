@@ -1,5 +1,6 @@
 package ui;
 
+import game.client.GameClient;
 import hxbit.Serializable;
 import ch2.ui.EventInteractive;
 import h2d.Flow;
@@ -8,29 +9,34 @@ import h2d.Object;
 import ui.domkit.WindowComp.WindowCompI;
 
 class Window extends dn.Process {
+
 	public static var ALL : Array<Window> = [];
 
 	var windowComp : WindowCompI;
 
 	public var win : Object;
 
+	public var isVisible( get, never ) : Bool;
+
+	inline function get_isVisible() : Bool return win.visible;
+
 	/**backdround sprite**/
 	var backgroundInter : EventInteractive;
 
 	/**
-		@param parent is usually supposed to be Player.inst.ui
+		@param parent is usually supposed to be Player.inst.pui
 	**/
 	public function new( ?parent : Object ) {
-		super(GameClient.inst);
+		super( GameClient.inst );
 
-		beforeLoad(parent);
+		beforeLoad( parent );
 		initLoad();
 		afterLoad();
 	}
 
 	public function beforeLoad( ?parent : Object ) {
-		ALL.push(this);
-		win = new h2d.Object(parent);
+		ALL.push( this );
+		win = new h2d.Object( parent );
 	}
 
 	public function initLoad() {}
@@ -43,8 +49,8 @@ class Window extends dn.Process {
 		if ( win != null && windowComp != null && windowComp.window != null && win.parent != null ) {
 			if ( backgroundInter != null ) backgroundInter.remove();
 
-			backgroundInter = new EventInteractive(windowComp.window.getSize().width, windowComp.window.getSize().height);
-			win.addChildAt(backgroundInter, 0);
+			backgroundInter = new EventInteractive( windowComp.window.getSize().width, windowComp.window.getSize().height );
+			win.addChildAt( backgroundInter, 0 );
 			backgroundInter.cursor = Default;
 			backgroundInter.onPush = function ( e ) {
 				bringOnTopOfALL();
@@ -55,26 +61,26 @@ class Window extends dn.Process {
 	public function recenter() {
 		if ( win != null ) {
 			var size = win.getSize();
-			win.x = Std.int((wScaled - size.width) / 2);
-			win.y = Std.int((hScaled - size.height) / 2);
+			win.x = Std.int( ( wScaled - size.width ) / 2 );
+			win.y = Std.int( ( hScaled - size.height ) / 2 );
 		}
 	}
 
 	function clampInScreen() {
 		if ( win != null && windowComp != null ) {
-			win.x = hxd.Math.clamp(win.x, 0, wScaled - windowComp.window.innerWidth);
-			win.y = hxd.Math.clamp(win.y, 0, hScaled - windowComp.window.innerHeight);
+			win.x = hxd.Math.clamp( win.x, 0, wScaled - windowComp.window.innerWidth );
+			win.y = hxd.Math.clamp( win.y, 0, hScaled - windowComp.window.innerHeight );
 		}
 	}
 
 	public function bringOnTopOfALL() {
 		if ( win.parent != null ) try {
-			Std.downcast(win.parent, Layers).add(win, Const.DP_UI);
+			Std.downcast( win.parent, Layers ).add( win, Const.DP_UI );
 		} catch( e ) {
-			win.parent.addChild(win);
+			win.parent.addChild( win );
 		}
-		ALL.remove(this);
-		ALL.unshift(this);
+		ALL.remove( this );
+		ALL.unshift( this );
 	}
 
 	public function clearWindow() {
@@ -86,7 +92,7 @@ class Window extends dn.Process {
 	}
 
 	public inline function add( e : h2d.Flow ) {
-		win.addChild(e);
+		win.addChild( e );
 		onResize();
 	}
 
@@ -100,7 +106,7 @@ class Window extends dn.Process {
 	override function onDispose() {
 		super.onDispose();
 		win.remove();
-		ALL.remove(this);
+		ALL.remove( this );
 	}
 
 	public function toggleVisible() {

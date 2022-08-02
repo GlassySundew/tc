@@ -1,5 +1,7 @@
 package en.structures;
 
+import game.client.GameClient;
+import game.client.ControllerAction;
 import dn.heaps.input.ControllerAccess;
 import en.player.Player;
 import format.tmx.Data.TmxObject;
@@ -30,21 +32,21 @@ class NavigationConsole extends Structure {
 				// 	Navigation.clientInst.navWin = new NavigationWindow(
 				// 		Const.jumpReach,
 				// 		Client.inst.seed,
-				// 		Player.inst.ui.root
+				// 		Player.inst.pui.root
 				// 	);
 				// } else {
-				// 	Player.inst.ui.root.addChild(Navigation.clientInst.navWin.win);
+				// 	Player.inst.pui.root.addChild(Navigation.clientInst.navWin.win);
 				// 	Navigation.clientInst.navWin;
 				// }
 
 				// if ( Navigation.clientInst != null ) {
-				// 	Player.inst.ui.root.addChild(Navigation.clientInst.navWin.win);
+				// 	Player.inst.pui.root.addChild(Navigation.clientInst.navWin.win);
 				// 	Navigation.clientInst;
 				// } else {
 				// 	new NavigationWindow(
 				// 		Const.jumpReach,
 				// 		Client.inst.seed,
-				// 		Player.inst.ui.root
+				// 		Player.inst.pui.root
 				// 	);
 				// }
 

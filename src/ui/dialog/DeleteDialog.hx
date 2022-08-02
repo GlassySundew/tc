@@ -1,5 +1,8 @@
 package ui.dialog;
 
+import ui.core.TextButton;
+import utils.Assets;
+import net.Client;
 import dn.Process;
 import h2d.Flow;
 import h2d.Object;
@@ -12,7 +15,7 @@ class DeleteDialog extends Dialog {
 
 		new TextLabelComp( 'Are you sure?', Assets.fontPixel, contentFlow );
 
-		var horizontalFlow = new Flow(contentFlow);
+		var horizontalFlow = new Flow( contentFlow );
 		horizontalFlow.layout = Horizontal;
 		horizontalFlow.horizontalSpacing = 10;
 

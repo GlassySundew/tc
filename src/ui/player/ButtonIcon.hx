@@ -1,15 +1,14 @@
 package ui.player;
 
-import dn.heaps.slib.HSprite;
-import ui.domkit.ButtonIconComp;
-import dn.Process;
-import h2d.Tile;
+import game.client.GameClient;
 import h2d.Flow;
 import h2d.Object;
-import h2d.Font;
 import h2d.domkit.Style;
+import ui.domkit.ButtonIconComp;
+import utils.Assets;
 
 class ButtonIcon extends Object {
+
 	public var container : ButtonIconComp;
 	public var buttonSpr : HSprite;
 
@@ -18,18 +17,18 @@ class ButtonIcon extends Object {
 	var style : Style;
 
 	public function new( x = 0., y = 0., ?p : Object ) {
-		super(p);
+		super( p );
 		this.x = x;
 		this.y = y;
-		centerFlow = new h2d.Flow(this);
-		centerFlow.setScale(1 / Const.UI_SCALE);
-		GameClient.inst.root.add(centerFlow, Const.DP_UI);
+		centerFlow = new h2d.Flow( this );
+		centerFlow.setScale( 1 / Const.UI_SCALE );
+		GameClient.inst.root.add( centerFlow, Const.DP_UI );
 
-		buttonSpr = Assets.ui.h_getAndPlay("keyboard_icon", 99999, false, this);
-		buttonSpr.anim.setSpeed(0.025 * GameClient.inst.tmod);
+		buttonSpr = Assets.ui.h_getAndPlay( "keyboard_icon", 99999, false, this );
+		buttonSpr.anim.setSpeed( 0.025 * GameClient.inst.tmod );
 
-		GameClient.inst.root.add(this, Const.DP_UI);
-		container = new ButtonIconComp(centerFlow);
+		GameClient.inst.root.add( this, Const.DP_UI );
+		container = new ButtonIconComp( centerFlow );
 		buttonSpr.visible = false;
 		buttonSpr.setCenterRatio();
 		container.activateTextFlow.x -= container.activateText.textWidth / 2 - 1;

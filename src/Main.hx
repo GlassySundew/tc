@@ -1,16 +1,22 @@
-package;
-
-import utils.Repeater;
-import net.ClientController;
-import cherry.soup.EventSignal;
-import dn.heaps.input.ControllerAccess;
-import dn.heaps.input.Controller;
+import ui.MainMenu;
+import utils.MapCache;
+import utils.Lang;
+import utils.Cursors;
+import pass.CustomRenderer;
+import game.client.GameClient;
+import utils.Assets;
+import game.client.ControllerAction;
+import net.Client;
 import cherry.soup.EventSignal.EventSignal0;
+import cherry.soup.EventSignal;
 import dn.Process;
+import dn.heaps.input.Controller;
+import dn.heaps.input.ControllerAccess;
 import en.player.Player;
 import hxd.Key;
-import tools.Save;
-import tools.Settings;
+import net.ClientController;
+import utils.Repeater;
+import utils.tools.Save;
 
 /**
 	client-side only
@@ -72,7 +78,7 @@ class Main extends Process {
 		Cursors.init();
 		Lang.init( "en" );
 
-		uiMap = MapCache.inst.get( "ui.tmx" );
+		uiMap = MapCache.inst.get( "ui" );
 		uiConf = uiMap.mapLayersByName();
 		for ( i in uiConf ) {
 			var window = i.getObjectByName( "window" );

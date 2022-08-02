@@ -3,8 +3,7 @@
 **/
 
 import hxd.Timer;
-import hxd.System;
-import h2d.Scene;
+import net.Server;
 
 /** server-side **/
 class ServerBoot {
@@ -42,7 +41,7 @@ class ServerBoot {
 	public function new() {
 
 		haxe.Log.trace = function ( v : Dynamic, ?infos : haxe.PosInfos ) {
-			var str = haxe.Log.formatOutput(v, infos);
+			var str = haxe.Log.formatOutput( v, infos );
 			Sys.println( "[SERVER] " + str );
 		}
 
@@ -58,7 +57,7 @@ class ServerBoot {
 				// @:privateAccess new h3d.Engine();
 				// engine.init();
 
-				// entParent = new Scene();
+				// hollowScene = new Scene();
 			} );
 		} );
 	}

@@ -1,5 +1,7 @@
 package ui.dialog;
 
+import ui.core.TextInput;
+import net.Client;
 import h2d.RenderContext;
 import hxd.Res;
 import h2d.domkit.Style;
@@ -21,7 +23,7 @@ class ConnectComp extends Flow implements h2d.domkit.Object {
 			
 			<flow layout="horizontal" hspacing="5">
 				<text-button( "connect" ) public id="connect" />
-				<text-button( "cancel", "> ", (e)->{}, ${0x666666}, ${0x303030} ) public id="cancel" />
+				<text-button( "cancel", ( e ) -> {}, ${0x666666}, ${0x303030} ) public id="cancel" />
 			</flow>
 		</connect-comp>
 	
@@ -51,12 +53,13 @@ class ConnectMenu extends FocusMenu {
 
 	public var textInput : TextInput;
 
-	public function new( ?parent : Object, ?onGameStart : Void -> Void ) {
+	public function new( ?onGameStart : Void -> Void, ?parent : Object ) {
 		super( parent );
 		centrizeContent();
 
 		function onConnect() {
 			Main.inst.startGame( true );
+			onGameStart();
 			destroy();
 		}
 

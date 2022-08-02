@@ -1,5 +1,6 @@
 package mapgen;
 
+import format.tmx.TmxMap;
 import seedyrng.Random;
 import haxe.Serializer;
 import haxe.Unserializer;

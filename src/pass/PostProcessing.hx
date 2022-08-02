@@ -1,5 +1,7 @@
 package pass;
 
+import game.client.GameClient;
+
 // inspired by https://www.shadertoy.com/view/Ms23DR
 // and https://www.shadertoy.com/view/ldjGzV
 

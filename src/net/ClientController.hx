@@ -1,8 +1,13 @@
 package net;
 
+import hxbit.NetworkHost;
+import net.transaction.Transaction;
+import game.client.GameClient;
+import game.server.ServerLevel;
 import en.player.Player;
 import hxbit.NetworkHost.NetworkClient;
 import hxbit.NetworkSerializable;
+import utils.tools.Save;
 
 enum SaveSystemOrderType {
 	CreateNewSave( name : String );
@@ -29,7 +34,6 @@ class ClientController implements NetworkSerializable {
 
 	function set_player( player : Player ) {
 		if ( player != null && GameClient.inst != null && isOwner ) {
-			trace( "setting player" );
 			emptyPing();
 		}
 
@@ -37,8 +41,6 @@ class ClientController implements NetworkSerializable {
 	}
 
 	function set_level( level : ServerLevel ) {
-		if ( Client.inst != null )
-			trace( "got level " + level + ", isOwner " + isOwner + ", uid " + uid + " client uid " + Client.inst.uid );
 		if ( GameClient.inst != null && level != null && isOwner ) {
 			trace( "setting level" );
 			GameClient.inst.sLevel = level;
@@ -53,33 +55,35 @@ class ClientController implements NetworkSerializable {
 	}
 
 	public function new() {
-		init();
+		if ( !Server.inst.host.isAutoOwner ) enableReplication = true;
 	}
 
 	public function alive() {
-		init();
-
-		trace( "aliving controller, uid " + uid + " isOwner - " + isOwner );
+		enableReplication = true;
 
 		if ( isOwner ) {
 			Client.inst.host.self.ownerObject = this;
 			Main.inst.clientController = this;
-		}
+		} else
+			if ( Client.inst.host.isAutoOwner ) throw "clientController instance is replicated on a client where it is not supposed to be";
 	}
 
 	// function customSerialize( ctx : hxbit.Serializer ) {}
 	// function customUnserialize( ctx : hxbit.Serializer ) {}
 
-	public function init() {
-		if ( GameClient.inst != null ) {
-			enableReplication = true;
-		}
-	}
-
 	public function networkAllow( op : hxbit.NetworkSerializable.Operation, propId : Int, clientSer : hxbit.NetworkSerializable ) : Bool {
 		return clientSer == this;
 	}
 
+	public function unreg( host : NetworkHost, ctx : NetworkSerializer, ?finalize ) @:privateAccess {
+		if ( ctx.refs.exists( player.__uid ) )
+			host.unregister( player, ctx, finalize );
+	}
+
+	/**
+		коостыль для бага, нужен любой rpc вызов чтобы 
+		подгрузить ServerLevel после подключения
+	**/
 	@:rpc
 	public function emptyPing() {}
 
@@ -92,13 +96,18 @@ class ClientController implements NetworkSerializable {
 	public function orderSaveSystem( type : SaveSystemOrderType ) : Bool {
 		switch type {
 			case CreateNewSave( name ):
-				tools.Save.inst.makeFreshSave( name );
+				Save.inst.makeFreshSave( name );
 			case SaveGame( name ):
-				tools.Save.inst.saveGame( name );
+				Save.inst.saveGame( name );
 			case DeleteSave( name ):
 				hxd.File.delete( Settings.SAVEPATH + name + Const.SAVEFILE_EXT );
 		}
 
 		return true;
+	}
+
+	@:rpc( server )
+	public function sendTransaction( t : Transaction ) : TransactionResult {
+		return t.validate();
 	}
 }

@@ -1,5 +1,6 @@
 package ui.domkit.element;
 
+import ui.core.ShadowedText;
 import h2d.Font;
 import h2d.Object;
 
