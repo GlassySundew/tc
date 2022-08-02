@@ -1,12 +1,14 @@
 package en;
 
+import utils.Assets;
+
 // Just an helping indicator that should show if structure can be placed on
 class StructureGhost extends Structure {
 
 	public var canBePlaced : Bool = false;
 
 	public function new( cdbEntry : Data.StructureKind ) {
-		spr = new HSprite( Assets.structures, entParent );
+		spr = new HSprite( Assets.structures, hollowScene );
 		spr.set( '${Data.structure.get( cdbEntry ).id}' );
 
 		super( 0, 0, cdbEntry );

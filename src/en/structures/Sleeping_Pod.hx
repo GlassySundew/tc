@@ -1,14 +1,16 @@
 package en.structures;
 
+import utils.Assets;
 import format.tmx.Data.TmxObject;
 
 class Sleeping_Pod extends Structure {
+
 	public function new( ?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : Data.StructureKind ) {
 		if ( spr == null ) {
-			spr = new HSprite(Assets.structures, entParent);
-			spr.set("sleeping_pod");
+			spr = new HSprite( Assets.structures, hollowScene );
+			spr.set( "sleeping_pod" );
 		}
-		super(x, z, tmxObj, cdbEntry);
+		super( x, z, tmxObj, cdbEntry );
 		interactable = true;
 
 		mesh.isLong = true;

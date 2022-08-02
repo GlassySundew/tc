@@ -1,17 +1,19 @@
 package ui.player;
 
-import shader.CornersRounder;
-import h2d.Tile;
-import h2d.Object;
-import h2d.RenderContext;
-import h2d.filter.Shader;
-import h2d.filter.Outline;
-import h3d.Vector;
-import cherry.plugins.generic.shaders.OutlineShader;
+import en.util.item.InventoryCell;
+import net.transaction.TransactionFactory;
+import ui.core.InventoryGrid.InventoryCellFlow;
+import en.player.Player;
+import en.util.item.ItemManipulations;
 import h2d.Font;
+import h2d.Object;
+import h2d.filter.Shader;
+import shader.CornersRounder;
+import ui.core.ShadowedText;
 
 @:uiComp("beltCont")
 class BeltCont extends h2d.Flow implements h2d.domkit.Object {
+
 	static var SRC =
 		<beltCont>
 			<flow class="backgroundFlow" public id="backgroundFlow" />
@@ -20,13 +22,30 @@ class BeltCont extends h2d.Flow implements h2d.domkit.Object {
 				<text class="beltSlotNumber" public id="beltSlotNumber" text={Std.string(slotNumber)} font={font} />
 			</flow>
 		</beltCont>;
+
+	public function onSelect() {
+		ItemManipulations.cursorSwappingConditions.set("beltSelectLock", 
+			function ( cellFlow : InventoryCellFlow ) {
+				if( (
+					Player.inst.pui.inventory.isVisible 
+					|| cellFlow.cell.type != PlayerBelt 
+				) && cellFlow.cell.item != null ) {
+					ItemManipulations.cursorSwappingConditions.remove( "beltSelectLock" );
+					Player.inst.holdItem.item = null;
+					TransactionFactory.itemsSwap( Player.inst.holdItem, cellFlow.cell, r -> utils.sfx.Sfx.playItemPickupSnd() );
+				}
+				return false;
+			}
+		);
+	}
+
 	public function new(?font : Font, ?slotNumber : Int, ?parent) {
 		super(parent);
 		initComponent();
 
 		ShadowedText.addTextOutlineTo(beltSlotNumber);
 		
-		var shader = new CornersRounder(6);
+		var shader = new CornersRounder(4);
 		backgroundFlow.filter = new Shader(shader);
 	}
 }

@@ -1,11 +1,10 @@
 package ui.domkit;
 
-import haxe.CallStack;
-import ui.domkit.WindowComp.WindowCompI;
-import h2d.Bitmap;
-import ui.InventoryGrid.UICellGrid;
-import ui.domkit.TextLabelComp;
 import h2d.Flow;
+import haxe.CallStack;
+import ui.core.InventoryGrid.InventoryCellFlowGrid;
+import ui.domkit.WindowComp.WindowCompI;
+import utils.Assets;
 
 @:uiComp("inventoryComp")
 class InventoryComp extends Flow implements h2d.domkit.Object implements WindowCompI {
@@ -34,13 +33,13 @@ class InventoryComp extends Flow implements h2d.domkit.Object implements WindowC
 			</window>
 		</inventoryComp>
 
-	public var cellGrid : UICellGrid;
+	public var cellGrid : InventoryCellFlowGrid;
 	public var removeLastRow:Bool = false;
 	
 		// ?removeLastRow:Bool = false,
 		// ?cellGrid : CellGrid, 
 		/**
-			@param rest cellGrid : UICellGrid, removeLastRow : Bool
+			@param rest cellGrid : InventoryCellFlowGrid, removeLastRow : Bool
 		**/
 	public function new( backgroundTile : h2d.Tile, bl : Int, bt : Int, br : Int, bb : Int, ?parent : h2d.Object, ...rest : Dynamic ) {
 		super(parent);

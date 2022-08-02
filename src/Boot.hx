@@ -1,7 +1,9 @@
+import pass.CustomRenderer;
+import utils.tools.Save;
+import utils.Env;
 import utils.Repeater;
 import h2d.Scene;
 import dn.heaps.input.Controller;
-import tools.Save;
 
 class Boot extends hxd.App {
 
@@ -38,7 +40,7 @@ class Boot extends hxd.App {
 		#end
 
 		inst = this;
-		entParent = new Scene();
+		hollowScene = new Scene();
 
 		new Main( s2d );
 

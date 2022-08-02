@@ -1,5 +1,6 @@
 package ui.domkit;
 
+import utils.Assets;
 import ui.NinesliceWindow.NinesliceConf;
 import ui.domkit.WindowComp.WindowCompI;
 import h2d.Flow;

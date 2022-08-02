@@ -1,11 +1,14 @@
 package ui;
 
-import dn.heaps.input.ControllerAccess;
-import dn.Tweenie.Tween;
-import tools.UniformPoissonDisc.UniformPoissonDisk;
+import ui.core.Dragable;
+import h3d.pass.Default;
 import cherry.soup.EventSignal.EventSignal0;
+import dn.Tweenie.Tween;
+import dn.heaps.input.ControllerAccess;
 import en.player.Player;
-import format.tmx.Data.TmxMap;
+import format.tmx.TmxMap;
+import game.client.ControllerAction;
+import game.client.GameClient;
 import h2d.Graphics;
 import h2d.Object;
 import h2d.Tile;
@@ -21,8 +24,15 @@ import hxbit.NetworkSerializable;
 import hxbit.Serializable;
 import hxbit.Serializer;
 import mapgen.MapGen;
+import net.Client;
 import seedyrng.Random;
+import ui.core.Button;
+import ui.core.FixedScrollArea;
 import ui.domkit.NavigationComp;
+import utils.Assets;
+import utils.MapCache;
+import utils.tools.Save;
+import utils.tools.UniformPoissonDisc.UniformPoissonDisk;
 
 @:forward
 abstract NavigationFields( Array<NavigationField> ) {
@@ -473,7 +483,7 @@ class NavigationTarget implements Serializable {
 
 	function travelToThis() {
 		disposeArrowButton();
-		Player.inst.ui.unprepareTeleport();
+		Player.inst.pui.unprepareTeleport();
 		if ( Navigation.clientInst != null )
 			Navigation.clientInst.navWin.locked = true;
 
@@ -566,7 +576,7 @@ class AsteroidGenerator {
 		if ( onGeneration != null ) this.onGeneration.add( onGeneration );
 		if ( executor == null ) executor = Executor.create( 1 );
 
-		var lvl = tools.Save.inst.getLevelByName( name );
+		var lvl = Save.inst.getLevelByName( name );
 		if ( lvl != null ) {
 			tmxMap = Unserializer.run( Base64.decode( lvl.tmx ).toString() );
 		} else {
@@ -586,7 +596,7 @@ class AsteroidGenerator {
 			switch result {
 				case SUCCESS( tmxMap, time, future ):
 					this.tmxMap = tmxMap;
-					tools.Save.inst.upsertLevelMap( name, tmxMap );
+					Save.inst.upsertLevelMap( name, tmxMap );
 					onGeneration.dispatch();
 				case FAILURE( ex, time, future ):
 					throw "unexpected result";

@@ -1,9 +1,11 @@
 package ui.dialog;
 
 import dn.Process;
+import game.client.ControllerAction;
 import h2d.Flow;
 import h2d.Object;
 import h2d.Tile;
+import ui.core.OnSceneAddedObject;
 
 class FocusMenu extends Process {
 

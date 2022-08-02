@@ -1,7 +1,11 @@
 package ui.dialog;
 
-import utils.Repeater;
-import net.ClientController;
+import ui.core.Button;
+import ui.core.ShadowedText;
+import ui.core.VerticalSlider;
+import ui.core.FixedScrollArea;
+import utils.Assets;
+import net.Client;
 import ch2.ui.EventInteractive;
 import dn.Process;
 import h2d.Bitmap;
@@ -12,6 +16,7 @@ import h2d.Tile;
 import h2d.col.Bounds;
 import h2d.col.Point;
 import hxd.Event;
+import net.ClientController;
 import ui.dialog.FocusMenu;
 import ui.domkit.SaveManagerComp;
 
@@ -243,7 +248,7 @@ class SaveEntry extends Process {
 				case Load:
 					saveMan.destroy();
 					if ( saveMan.onGameStart != null ) saveMan.onGameStart();
-					tools.Save.inst.loadGame( name );
+					utils.tools.Save.inst.loadGame( name );
 				// case New( name ):
 				// 	dialog = new NewSaveDialog( ( e ) -> {}, mode, saveMan, Main.inst.root );
 				// 	syncDialog( dialog );

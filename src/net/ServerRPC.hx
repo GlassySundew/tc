@@ -1,5 +1,7 @@
 package net;
 
+import en.structures.Door;
+import game.server.GameServer;
 import en.player.Player;
 
 /**
@@ -7,7 +9,7 @@ import en.player.Player;
 **/
 class ServerRPC {
 
-	public static function bringPlayerToLevel( player : Player, level : String ) @:privateAccess {
+	public static function bringPlayerToLevel( player : Player, level : String, ?cb : Void -> Void ) @:privateAccess {
 		var fromLevel = player.level;
 
 		var host = Server.inst.host;
@@ -31,6 +33,20 @@ class ServerRPC {
 
 		toLevel.addEntity( player );
 
+		if ( cb != null ) cb();
+
 		return toLevel;
+	}
+
+	public static function putPlayerByDoorLeadingTo( player : Player, leadingTo : String ) {
+		var testDoor : Door = null;
+		for ( i in player.level.entities )
+			if ( i.isOfType( Door ) ) {
+				testDoor = cast( i, Door );
+				break;
+			}
+
+		var door = player.level.entities.filter( ( e ) -> return ( e.isOfType( Door ) && cast( e, Door ).leadsTo == leadingTo ) )[0];
+		player.setFeetPos( door.footX.val, door.footY.val );
 	}
 }

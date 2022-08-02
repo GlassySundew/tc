@@ -1,5 +1,9 @@
 package ui.dialog;
 
+import ui.core.TextButton;
+import ui.core.ShadowedText;
+import ui.core.TextInput;
+import utils.Assets;
 import cherry.soup.EventSignal.EventSignal0;
 import dn.Process;
 import h2d.Flow;
@@ -45,15 +49,13 @@ class NewSaveDialog extends Dialog {
 		}
 
 		buttonsFlow = new Flow( contentFlow );
-		buttonsFlow.horizontalAlign = Middle;
-		// buttonsFlow.verticalAlign = Middle;
 		buttonsFlow.horizontalSpacing = 5;
 		buttonsFlow.minWidth = contentFlow.outerWidth;
 
 		var fileName = "new_save_";
 		var i = 0;
 
-		while( File.exists( tools.Save.saveDirectory + fileName + i + Const.SAVEFILE_EXT ) )
+		while( File.exists( utils.tools.Save.saveDirectory + fileName + i + Const.SAVEFILE_EXT ) )
 			i++;
 
 		textInput.text = fileName + i;

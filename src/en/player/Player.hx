@@ -1,26 +1,27 @@
 package en.player;
 
-import hxbit.NetworkHost;
-import en.items.Axe;
-import en.items.Scepter;
-import hxbit.NetworkSerializable;
-import dn.heaps.input.ControllerAccess;
-import net.ClientToServer.AClientToServer;
-import net.ClientController;
-import haxe.CallStack;
+import ui.core.InventoryGrid;
 import ch3.scene.TileSprite;
+import dn.heaps.input.ControllerAccess;
 import en.items.Blueprint;
 import format.tmx.Data.TmxObject;
+import game.client.ControllerAction;
+import game.client.GameClient;
+import game.client.Level;
 import h2d.Tile;
 import h3d.mat.Texture;
+import hxbit.NetworkHost;
+import hxbit.NetworkSerializable;
 import hxbit.Serializer;
 import hxd.Key;
-import ui.InventoryGrid;
-import ui.ItemSprite;
+import net.ClientController;
+import net.ClientToServer.AClientToServer;
 import ui.Navigation;
-import ui.PauseMenu;
 import ui.domkit.TextLabelComp;
+import ui.player.ItemCursorHolder;
 import ui.player.PlayerUI;
+import utils.Assets;
+import utils.Cursors;
 
 enum abstract PlayerActionState( String ) from String to String {
 
@@ -36,55 +37,23 @@ class Player extends Entity {
 
 	var nicknameMesh : TileSprite;
 
-	public var ui : PlayerUI;
+	public var pui : PlayerUI;
 
 	public var ca : ControllerAccess<ControllerAction>;
 	public var belt : ControllerAccess<ControllerAction>;
 
 	public var clientController : ClientController;
-	@:s public var nickname : String;
-
-	@:s public var holdItem( default, set ) : en.Item = null;
-
-	@:s public var actionState : AClientToServer<PlayerActionState>;
 
 	/** generated name of the asteroid **/
 	@:s public var residesOnId( default, set ) : String;
 	@:s public var travelling : Bool;
 	@:s public var onBoard : Bool;
+	@:s public var nickname : String;
 	@:s public var uid : Int;
 	@:s public var sprGroup : String;
 
-	function set_holdItem( v : en.Item ) : Item {
-
-		if ( holdItem != null ) {
-			if ( holdItem.itemSprite != null )
-				Cursors.removeObjectFromCursor( holdItem.itemSprite );
-			holdItem.onPlayerRemove.dispatch();
-		}
-
-		if ( v == null ) {
-			for ( e in Entity.ALL ) if ( e.cellGrid != null ) e.cellGrid.disableGrid();
-		}
-
-		if ( v != null /* && !itemInBelt(v) */ && v.itemSprite != null ) {
-			trace( "putting item " + v.itemSprite, Server.inst, v == holdItem );
-			// for( i in CallStack.callStack())
-			// 	trace(i);
-
-			putItemInCursor( v.itemSprite );
-			Player.inst.ui.belt.deselectCells();
-		}
-
-		return holdItem = v;
-	}
-
-	public function putItemInCursor( v : ItemSprite ) {
-		for ( e in Entity.ALL ) if ( e.cellGrid != null ) e.cellGrid.enableGrid();
-		v.x = v.y = 5;
-		Cursors.passObjectForCursor( v );
-		v.item.onPlayerHold.dispatch();
-	}
+	@:s public var holdItem : ItemCursorHolder;
+	@:s public var actionState : AClientToServer<PlayerActionState>;
 
 	function set_residesOnId( v : String ) {
 		return residesOnId = v;
@@ -98,10 +67,13 @@ class Player extends Entity {
 		onBoard = true;
 
 		actionState = new AClientToServer<PlayerActionState>( Idle );
-
-		inventory = new InventoryGrid( 5, 6, this );
+		inventory = new InventoryGrid( 5, 6, PlayerInventory, this );
+		holdItem = new ItemCursorHolder( this );
 
 		super( x, z, tmxObj );
+
+		actionState.syncBack = footX.syncBack = footY.syncBack = false;
+		actionState.syncBackOwner = footX.syncBackOwner = footY.syncBackOwner = clientController;
 
 		lock( 30 );
 
@@ -121,13 +93,7 @@ class Player extends Entity {
 		super.init( x, z, tmxObj );
 	}
 
-	override function replicate() {
-		enableAutoReplication = true;
-	}
-
 	public override function alive() {
-		trace( "aliving player" );
-
 		// GameClient.inst.delayer.addF(() -> {
 		// 	checkTeleport();
 		// }, 1);
@@ -135,7 +101,7 @@ class Player extends Entity {
 		// netX = footX;
 		// netY = footY;
 
-		spr = new HSprite( Assets.player, entParent );
+		spr = new HSprite( Assets.player, hollowScene );
 		ca = Main.inst.controller.createAccess();
 		belt = Main.inst.controller.createAccess();
 
@@ -150,10 +116,10 @@ class Player extends Entity {
 			{ dir : "down_right", prio : 1 }
 		] ) {
 			spr.anim.registerStateAnim( "walk_" + dir.dir, dir.prio, ( 1 / 60 / 0.16 ),
-				() -> return this.dir == i && actionState.getValue() == Running
+				() -> return this.dir.getValue() == i && actionState.getValue() == Running
 			);
 			spr.anim.registerStateAnim( "idle_" + dir.dir, dir.prio, ( 1 / 60 / 0.16 ),
-				() -> return this.dir == i && actionState.getValue() == Idle
+				() -> return this.dir.getValue() == i && actionState.getValue() == Idle
 			);
 		}
 
@@ -163,29 +129,23 @@ class Player extends Entity {
 		mesh.renewDebugPts();
 		#end
 
-		if ( uid == Client.inst.uid ) {
+		if ( uid == net.Client.inst.uid ) {
 			inst = this;
 
-			ui = new PlayerUI( GameClient.inst.root, this );
+			pui = new PlayerUI( GameClient.inst.root, this );
 			GameClient.inst.camera.target = this;
 			GameClient.inst.camera.recenter();
 
 			GameClient.inst.player = this;
-
-			sprFrame = { group : spr.groupName, frame : spr.frame };
-
-			Main.inst.delayer.addF(() -> {
-				actionState.clientToServerCond = footX.clientToServerCond = footY.clientToServerCond = () -> true;
-			}, 1 );
 		}
 
 		initNickname();
-		syncFrames();
 	}
 
-	override function unreg( host : NetworkHost, ctx : NetworkSerializer ) @:privateAccess {
+	override function unreg( host : NetworkHost, ctx : NetworkSerializer, ?finalize ) @:privateAccess {
 		super.unreg( host, ctx );
-		host.unregister( actionState, ctx );
+		host.unregister( actionState, ctx, finalize );
+		host.unregister( holdItem, ctx, finalize );
 	}
 
 	override public function networkAllow(
@@ -227,12 +187,12 @@ class Player extends Entity {
 
 		onGenerationCallback = () -> {
 			if ( onBoard )
-				ui.prepareTeleportDown( target.bodyLevelName, true );
+				pui.prepareTeleportDown( target.bodyLevelName, true );
 			else
-				ui.prepareTeleportUp( "ship_pascal", false );
+				pui.prepareTeleportUp( "ship_pascal", false );
 		}
 
-		if ( ui != null ) if ( target != null &&
+		if ( pui != null ) if ( target != null &&
 			target.generator != null &&
 			target.generator.mapIsGenerating ) {
 			target.generator.onGeneration.add( onGenerationCallback );
@@ -245,44 +205,18 @@ class Player extends Entity {
 	/* записывает настройки  */
 	public function saveSettings() {
 		if ( inst == this ) {
-			if ( Player.inst.ui.inventory != null ) {
-				Settings.params.inventoryCoordRatio.x = Player.inst.ui.inventory.win.x / Main.inst.w();
-				Settings.params.inventoryCoordRatio.y = Player.inst.ui.inventory.win.y / Main.inst.h();
-				Settings.params.inventoryVisible = ui.inventory.win.visible;
+			if ( Player.inst.pui.inventory != null ) {
+				Settings.params.inventoryCoordRatio.x = Player.inst.pui.inventory.win.x / Main.inst.w();
+				Settings.params.inventoryCoordRatio.y = Player.inst.pui.inventory.win.y / Main.inst.h();
+				Settings.params.inventoryVisible = pui.inventory.win.visible;
 			}
 
-			if ( Player.inst.ui.craft != null ) {
-				Settings.params.playerCrafting.x = Player.inst.ui.craft.win.x / Main.inst.w();
-				Settings.params.playerCrafting.y = Player.inst.ui.craft.win.y / Main.inst.h();
-				Settings.params.playerCraftingVisible = ui.craft.win.visible;
+			if ( Player.inst.pui.craft != null ) {
+				Settings.params.playerCrafting.x = Player.inst.pui.craft.win.x / Main.inst.w();
+				Settings.params.playerCrafting.y = Player.inst.pui.craft.win.y / Main.inst.h();
+				Settings.params.playerCraftingVisible = pui.craft.win.visible;
 			}
 		}
-	}
-
-	@:rpc( server )
-	public function testItem() : Item {
-		holdItem = Item.fromCdbEntry( iron, this, 1 );
-		return holdItem;
-	}
-
-	public function itemInBelt( item : Item ) {
-		return holdItem == item && holdItem.itemPresense == Belt;
-	}
-
-	public function itemInCursor( item : Item ) {
-		return holdItem == item && holdItem.itemPresense == Cursor;
-	}
-
-	public function itemInInventory( item : Item ) {
-		return holdItem == item && holdItem.itemPresense == Inventory;
-	}
-
-	public function disableGrids() {
-		ui.inventory.cellGrid.disableGrid();
-	}
-
-	public function enableGrids() {
-		ui.inventory.cellGrid.enableGrid();
 	}
 
 	override function dispose() {
@@ -292,9 +226,9 @@ class Player extends Entity {
 			inst = null;
 		}
 
-		if ( ui != null ) {
-			ui.destroy();
-			ui = null;
+		if ( pui != null ) {
+			pui.destroy();
+			pui = null;
 		}
 
 		if ( nicknameMesh != null ) {
@@ -305,30 +239,7 @@ class Player extends Entity {
 			ca.dispose();
 			belt.dispose();
 
-			if ( holdItem != null && holdItem.itemSprite != null )
-				holdItem.itemSprite.remove();
-
 			holdItem = null;
-		}
-	}
-
-	// multiplayer
-	function syncFrames() {
-		if ( sprFrame != null ) {
-			if ( spr.frame != sprFrame.frame || spr.groupName != sprFrame.group ) {
-				if ( this == inst )
-					sprFrame = {
-						group : spr.groupName,
-						frame : spr.frame
-					};
-				else if ( sprFrame == null )
-					sprFrame = {
-						group : "null",
-						frame : 0
-					}
-				else
-					spr.set( sprFrame.group, sprFrame.frame );
-			}
 		}
 	}
 
@@ -370,14 +281,12 @@ class Player extends Entity {
 
 			actionState.setValue( isMoving ? Running : Idle );
 		}
-
-		syncFrames();
 	}
 
 	override function postUpdate() {
 		super.postUpdate();
 
-		if ( this == inst && !isLocked() && ui != null ) checkBeltInputs();
+		// if ( this == inst && !isLocked() && ui != null ) checkBeltInputs();
 
 		if ( ca.isKeyboardPressed( Key.R ) ) {
 			if ( holdItem != null && Std.isOfType( holdItem, Blueprint ) && cast( holdItem, Blueprint ).ghostStructure != null ) {
@@ -399,54 +308,50 @@ class Player extends Entity {
 
 	function checkBeltInputs() {
 		if ( ca.isPressed( ToggleInventory ) ) {
-			ui.inventory.toggleVisible();
+			pui.inventory.toggleVisible();
 		}
 
 		if ( ca.isPressed( ToggleCraftingMenu ) ) {
-			ui.craft.toggleVisible();
+			pui.craft.toggleVisible();
 		}
 
-		if ( Key.isPressed( Key.NUMBER_1 ) ) ui.belt.selectCell( 1 );
-		if ( Key.isPressed( Key.NUMBER_2 ) ) ui.belt.selectCell( 2 );
-		if ( Key.isPressed( Key.NUMBER_3 ) ) ui.belt.selectCell( 3 );
-		if ( Key.isPressed( Key.NUMBER_4 ) ) ui.belt.selectCell( 4 );
-		if ( Key.isPressed( Key.NUMBER_5 ) ) ui.belt.selectCell( 5 );
+		if ( Key.isPressed( Key.NUMBER_1 ) ) pui.belt.selectCell( 1 );
+		if ( Key.isPressed( Key.NUMBER_2 ) ) pui.belt.selectCell( 2 );
+		if ( Key.isPressed( Key.NUMBER_3 ) ) pui.belt.selectCell( 3 );
+		if ( Key.isPressed( Key.NUMBER_4 ) ) pui.belt.selectCell( 4 );
+		if ( Key.isPressed( Key.NUMBER_5 ) ) pui.belt.selectCell( 5 );
 
 		// Wheel scroll item selection
-		if ( ui != null ) {
-			var cellToSelect = ui.belt.selectedCellNumber;
+		if ( pui != null ) {
+			var cellToSelect = pui.belt.selectedCellNumber;
 			if ( belt.isKeyboardPressed( Key.MOUSE_WHEEL_DOWN ) ) cellToSelect++;
 			if ( belt.isKeyboardPressed( Key.MOUSE_WHEEL_UP ) ) cellToSelect--;
-			if ( cellToSelect != ui.belt.selectedCellNumber ) {
-				if ( cellToSelect < 1 ) cellToSelect = ui.belt.beltSlots.length;
-				if ( cellToSelect > ui.belt.beltSlots.length ) cellToSelect = 1;
-				ui.belt.selectCell( cellToSelect );
+			if ( cellToSelect != pui.belt.selectedCellNumber ) {
+				if ( cellToSelect < 1 ) cellToSelect = pui.belt.beltSlots.length;
+				if ( cellToSelect > pui.belt.beltSlots.length ) cellToSelect = 1;
+				pui.belt.selectCell( cellToSelect );
 			}
 		}
 
 		if ( ca.isPressed( DropItem ) ) {
 			// Q
-			if ( holdItem != null && !holdItem.isDisposed ) {
+			if ( holdItem != null ) {
 				if ( Key.isDown( Key.CTRL ) ) {
 
 					// dropping whole stack
-					dropItem( Item.fromCdbEntry( holdItem.cdbEntry, this, holdItem.amount ), angToPxFree( Level.inst.cursX, Level.inst.cursY ), 2.3 );
-					holdItem.amount = 0;
+					dropItem( Item.fromCdbEntry( holdItem.item.cdbEntry, this, holdItem.item.amount ), angToPxFree( Level.inst.cursX, Level.inst.cursY ), 2.3 );
+					holdItem.item.amount = 0;
 					holdItem = null;
 				} else {
 					// dropping 1 item
-					dropItem( Item.fromCdbEntry( holdItem.cdbEntry, this, 1 ), angToPxFree( Level.inst.cursX, Level.inst.cursY ), 2.3 );
-					holdItem.amount--;
+					dropItem( Item.fromCdbEntry( holdItem.item.cdbEntry, this, 1 ), angToPxFree( Level.inst.cursX, Level.inst.cursY ), 2.3 );
+					holdItem.item.amount--;
 				}
-				if ( holdItem == null || holdItem.isDisposed ) {
+				if ( holdItem == null ) {
 
-					Player.inst.ui.belt.deselectCells();
+					Player.inst.pui.belt.deselectCells();
 				}
 			}
-
-			if ( holdItem != null
-				&& holdItem.itemPresense == Cursor )
-				holdItem = holdItem;
 		}
 	}
 }

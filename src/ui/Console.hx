@@ -1,5 +1,9 @@
 package ui;
 
+import en.util.item.InventoryCell;
+import pass.CustomRenderer;
+import game.client.Level;
+import game.client.GameClient;
 import h2d.Console.ConsoleArgDesc;
 import en.player.Player;
 import h3d.scene.Renderer;
@@ -56,17 +60,10 @@ class Console extends h2d.Console {
 			{ name : "amount", t : AInt, opt : true }
 		], function ( ?k : Data.ItemKind, ?amount : Int = 1 ) {
 			if ( Data.item.get( k ) != null ) {
-				var newItem = Item.fromCdbEntry( k, Player.inst, amount );
-				Player.inst.inventory.giveItem( newItem, false );
+				var cell = new InventoryCell( Cursor, null );
+				cell.item = Item.fromCdbEntry( k, Player.inst, amount );
+				Player.inst.inventory.giveItem( cell, false );
 			}
-		} );
-
-		this.addCommand( "testCom", [
-			{ name : "item", t : AString, opt : false },
-			{ name : "amount", t : AInt, opt : true }
-		], function ( ?k : Data.ItemKind, ?amount : Int = 1 ) {
-			Player.inst.testItem( ( e ) -> {
-				trace( e );} );
 		} );
 
 		this.addCommand( "connect", [], function ( ?k : String ) {
@@ -74,7 +71,7 @@ class Console extends h2d.Console {
 		} );
 
 		this.addCommand( "hud", [], function ( ?k : String ) {
-			Player.inst.ui.root.visible = !Player.inst.ui.root.visible;
+			Player.inst.pui.root.visible = !Player.inst.pui.root.visible;
 		} );
 
 		this.addAlias( "+", "set" );

@@ -1,5 +1,7 @@
 package en.structures;
 
+import game.client.GameClient;
+import game.client.ControllerAction;
 import hxd.Event;
 import en.player.Player;
 import ui.player.Crafting;
@@ -21,15 +23,15 @@ class Workbench extends Structure {
 
 		GameClient.inst.delayer.addF(() -> {
 
-			crafting = new Crafting(Workbench, Player.inst.ui.root);
+			crafting = new Crafting(Workbench, Player.inst.pui.root);
 			crafting.recenter();
 		}, 2);
 
 		interact.onTextInputEvent.add(( e : Event ) -> {
 			if ( ca.isPressed(Escape) ) {
-				if ( !Player.inst.ui.inventory.win.visible ) Player.inst.ui.inventory.toggleVisible();
+				if ( !Player.inst.pui.inventory.win.visible ) Player.inst.pui.inventory.toggleVisible();
 				crafting.toggleVisible();
-				// Window.centrizeTwoWins(Player.inst.ui.inventory, inventory);
+				// Window.centrizeTwoWins(Player.inst.pui.inventory, inventory);
 			}
 		});
 	}

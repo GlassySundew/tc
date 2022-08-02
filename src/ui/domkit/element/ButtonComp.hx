@@ -1,7 +1,10 @@
 package ui.domkit.element;
 
+import ui.core.Button;
+import utils.Assets;
+
 @:uiComp( "button" )
-class ButtonComp extends ui.Button implements h2d.domkit.Object {
+class ButtonComp extends Button implements h2d.domkit.Object {
 
 	public function new( key : String, keyAmount : Int, ?callback : Void -> Void, ?parent : h2d.Object ) {
 		var tiles = [for ( i in 0...keyAmount ) {

@@ -1,5 +1,6 @@
 package ui.domkit.element;
 
+import ui.core.FixedScrollArea;
 import h2d.col.Bounds;
 import h2d.col.Point;
 import h2d.Flow;

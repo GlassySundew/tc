@@ -1,21 +1,34 @@
 package ui.player;
 
+import en.Item.ItemPresense;
+import en.util.ItemUtil;
+import en.util.item.IInventory;
 import h2d.Object;
-import ui.InventoryGrid.UICellGrid;
+import ui.core.InventoryGrid.InventoryCellFlowGrid;
 import ui.domkit.InventoryComp;
+
 /**
 	Формочки для Player, визуализация InventoryGrid
 **/
-class Inventory extends NinesliceWindow {
+class Inventory extends NinesliceWindow implements IInventory {
 
-	public var cellGrid : UICellGrid;
+	public var cellFlowGrid : InventoryCellFlowGrid;
 	public var containmentEntity : Entity;
+	public var type( get, never ) : ItemPresense;
 
-	public function new( ?removeLastRow : Bool = true, cellGrid : UICellGrid, ?parent : Null<Object> ) {
-		this.cellGrid = cellGrid;
-		super("window", InventoryComp, parent, cellGrid, removeLastRow);
+	function get_type() return PlayerInventory;
+
+	public function new( ?removeLastRow : Bool = true, cellGrid : InventoryCellFlowGrid, ?parent : Null<Object> ) {
+		this.cellFlowGrid = cellGrid;
+		super( "window", InventoryComp, parent, cellGrid, removeLastRow );
 
 		windowComp.window.windowLabel.shadowed_text.text = "Inventory";
 		toggleVisible();
+		ItemUtil.inventories.push( this );
+	}
+
+	override function onDispose() {
+		super.onDispose();
+		ItemUtil.inventories.remove( this );
 	}
 }

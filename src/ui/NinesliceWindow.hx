@@ -1,5 +1,6 @@
 package ui;
 
+import utils.Assets;
 import h2d.Object;
 
 typedef NinesliceConf = {

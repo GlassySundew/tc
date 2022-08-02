@@ -1,6 +1,6 @@
 package tiled;
 
-import format.tmx.Data.TmxMap;
+import format.tmx.TmxMap;
 import format.tmx.Data.TmxOrientation;
 import format.tmx.Data.TmxRenderOrder;
 import format.tmx.Data.TmxStaggerAxis;
