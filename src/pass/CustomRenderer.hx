@@ -83,16 +83,7 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 	}
 
 	override function render() {
-		if ( has( "shadow" ) ) {
-			shadow.draw( get( "shadow" ) );
-			renderPass( shadow, get( "shadow" ) );
-		}
-
-		if ( has( "depth" ) ) renderPass( depth, get( "depth" ), backToFront );
-
-		// ctx.setGlobalID(depthColorMapId, depthColorMap);
-
-		all.setContext( ctx );
+		if ( has( "shadow" ) ) renderPass( shadow, get( "shadow" ) );
 
 		var colorTex = allocTarget( "color" );
 		var depthTex = allocTarget( "depth" );
@@ -101,51 +92,18 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 
 		setTargets( [colorTex, depthTex, normalTex, additiveTex] );
 		clear( h3d.Engine.getCurrent().backgroundColor, 1 );
-
-		all.draw( get( "default" ) );
-
+		renderPass( defaultPass, get( "default" ) );
 		renderPass( defaultPass, get( "alpha" ), backToFront );
-		// setTarget(colorTex);
-		// draw("alpha");
 		resetTarget();
 
 		setTarget( additiveTex );
 		clear( 0 );
-		// draw("additive");
+		draw( "additive" );
 		resetTarget();
 
 		emissive.setContext( ctx );
 		emissive.draw( get( "emissive" ) );
 
-		if ( enableSao ) {
-			// apply sao
-			var saoTarget = allocTarget( "sao", false );
-			setTarget( saoTarget );
-			sao.apply( depthTex, normalTex, ctx.camera );
-			resetTarget();
-			saoBlur.apply( ctx, saoTarget, allocTarget( "saoBlurTmp", false ) );
-			h3d.pass.Copy.run( saoTarget, colorTex, Multiply );
-		}
-		{ // apply fog
-			// post.apply(colorTex, ctx.time);
-			// var fogTarget = allocTarget("fog", false, 1);
-			// fog.setGlobals(ctx);
-			// setTarget(fogTarget);
-			// fog.apply(colorTex, depthTex, normalTex, ctx.camera);
-			// resetTarget();
-			// colorTex = fogTarget;
-		}
-
-		h3d.pass.Copy.run( ctx.textures.allocTarget( "emissive", colorTex.width, colorTex.height ), colorTex, Add );
-		h3d.pass.Copy.run( additiveTex, colorTex, Add );
-
-		if ( enableFXAA ) {
-			var t = allocTarget( "fxaaOut", false, 0 );
-			setTarget( t );
-			fxaa.apply( colorTex );
-			resetTarget();
-			colorTex = t;
-		}
 		post.setGlobals( ctx );
 		post.apply( colorTex, ctx.time );
 	}
@@ -166,8 +124,7 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 		passes.sort( function ( p1, p2 ) {
 			return try {
 				getFrontPassIso( p1, p2 );
-			}
-			catch( e : Dynamic ) {
+			} catch( e : Dynamic ) {
 				( p1.depth > p2.depth ? -1 : 1 );
 			};
 		} );

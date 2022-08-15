@@ -105,6 +105,7 @@ class Client extends Process {
 
 			onConnection.dispatch();
 		} );
+		
 		@:privateAccess
 		host.socket.onError = onError;
 

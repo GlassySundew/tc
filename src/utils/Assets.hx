@@ -1,12 +1,10 @@
 package utils;
 
-import utils.Const;
 import dn.heaps.assets.Atlas;
-import haxe.macro.ExprTools;
-import haxe.macro.Expr.ExprDef;
 import dn.heaps.slib.*;
-import haxe.macro.Expr;
-import haxe.macro.Context;
+import hxd.Res;
+import utils.Const;
+import utils.tilesets.Tileset;
 
 class Assets {
 
@@ -22,6 +20,10 @@ class Assets {
 	public static var structures : SpriteLib;
 	public static var ui : SpriteLib;
 	public static var env : SpriteLib;
+
+	public static var modelCache = new utils.s3d.ModelCache();
+
+	public static var CONGRUENT : Tileset;
 
 	static var music : dn.heaps.Sfx;
 
@@ -53,6 +55,25 @@ class Assets {
 		structures = Atlas.load( Const.ATLAS_PATH + "structures.atlas" );
 		ui = Atlas.load( Const.ATLAS_PATH + "ui.atlas" );
 		env = Atlas.load( Const.ATLAS_PATH + "env.atlas" );
+		CONGRUENT = new Tileset( Res.tiled.atlas.CONGRUENT_png.toTexture(), 8, 8,
+			[
+				for ( i in 0...43 ) {
+					figStartX : i,
+					figStartY : 0,
+					palettes : 31,
+				}
+			]
+			.concat(
+				[
+					for ( i in 0...8 ) {
+						figStartX : i,
+						figStartY : 31,
+						palettes : 11,
+					}
+				]
+			), 4
+		);
+		CONGRUENT.texture.filter = Nearest;
 
 		var action = ["idle_", "walk_"];
 		var direc = ["left", "up", "down", "right", "down_left", "down_right", "up_left", "up_right"];

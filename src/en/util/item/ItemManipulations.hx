@@ -28,7 +28,9 @@ class ItemManipulations {
 		// будет неприкольно, если мы добавим предмет самого в себя
 		var freeSlot = ( sameItemCell != null ) ? sameItemCell : Player.inst.inventory.getFreeSlot();
 		if ( freeSlot != null ) {
-			TransactionFactory.transferToOtherInv( cell, Player.inst.inventory, ( r ) -> Player.inst.pui.belt.deselectCells() );
+			TransactionFactory.transferToOtherInv( cell, Player.inst.inventory, ( r ) -> {
+				utils.sfx.Sfx.playItemPickupSnd();
+			} );
 		}
 	}
 
@@ -42,14 +44,14 @@ class ItemManipulations {
 			if ( w.isVisible && ( !isAnyChestOpened || w.type != PlayerBelt ) && w.type != cell.type ) {
 				var sameItemCell = w.cellFlowGrid.inventoryGrid.findSameItem( cell.item, true, true );
 				if ( sameItemCell != null ) {
-					TransactionFactory.transferToOtherInv( cell, w.cellFlowGrid.inventoryGrid );
+					TransactionFactory.transferToOtherInv( cell, w.cellFlowGrid.inventoryGrid, r -> utils.sfx.Sfx.playItemPickupSnd() );
 					return;
 				}
 			}
 		}
 		// если мы здесь, значит, что не нашлось пустых ячеек в открытых сундуках и мы кидаем предмет в пояс
 		if ( Player.inst.pui.belt.inventory.findSameItem( cell.item, false, true ) != null ) {
-			TransactionFactory.transferToOtherInv( cell, Player.inst.pui.belt.inventory );
+			TransactionFactory.transferToOtherInv( cell, Player.inst.pui.belt.inventory, r -> utils.sfx.Sfx.playItemPickupSnd() );
 			return;
 		}
 	}

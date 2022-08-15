@@ -1,5 +1,6 @@
-package game.client;
+package game.client.level;
 
+import utils.TmxUtils;
 import utils.Util;
 import differ.shapes.Polygon;
 import dn.Process;
@@ -35,20 +36,22 @@ class Level extends dn.Process {
 
 	public var hei( get, never ) : Int;
 
-	inline function get_wid() return Std.int( ( Math.min( data.height, data.width ) + Math.abs(-data.width + data.height ) / 2 ) * data.tileWidth );
+	inline function get_wid() return Std.int( ( Math.min( tmxMap.height, tmxMap.width ) + Math.abs(-tmxMap.width + tmxMap.height ) / 2 ) * tmxMap.tileWidth );
 
-	inline function get_hei() return Std.int( ( Math.min( data.height, data.width ) + Math.abs(-data.width + data.height ) / 2 ) * data.tileHeight );
+	inline function get_hei() return Std.int( ( Math.min( tmxMap.height, tmxMap.width ) + Math.abs(-tmxMap.width + tmxMap.height ) / 2 ) * tmxMap.tileHeight );
 
 	//	public var lid(get, never):Int;
 	var invalidated = true;
 
 	public var sqlId : Null<Int>;
 	public var lvlName : String;
-	public var data : TmxMap;
+
 	public var entities : Array<TmxObject> = [];
 	public var walkable : Array<Polygon> = [];
 	public var ground : Texture;
 	public var obj : IsoTileSpr;
+
+	public var tmxMap : TmxMap;
 
 	var layersByName : Map<String, TmxLayer> = new Map();
 
@@ -67,10 +70,9 @@ class Level extends dn.Process {
 	public function new( map : TmxMap ) {
 		super( GameClient.inst );
 		inst = this;
-		// data = map;
-		data = map;
+		tmxMap = map;
 
-		Boot.inst.engine.backgroundColor = data.backgroundColor;
+		Boot.inst.engine.backgroundColor = tmxMap.backgroundColor;
 		Boot.inst.s3d.camera.setFovX( 70, Boot.inst.s3d.camera.screenRatio );
 
 		for ( layer in map.layers ) {
@@ -111,7 +113,7 @@ class Level extends dn.Process {
 
 		for ( i in walkable ) i.destroy();
 		walkable = null;
-		data = null;
+		tmxMap = null;
 		obj = null;
 		entities = null;
 		layersByName = null;
@@ -123,10 +125,29 @@ class Level extends dn.Process {
 		return a;
 	}
 
-	public function render() {
-		var layerRenderer : LayerRender;
-
+	function render() {
 		invalidated = false;
+
+		if ( tmxMap.tilesets.filter( ( ts ) -> ts.name == "CONGRUENT" ).length > 0 ) {
+			render3d();
+		} else
+			renderPlane();
+	}
+
+	/**
+		CONGRUENT tileset
+	**/
+	function render3d() {
+		trace( "rendering 3d" );
+		new VoxelLevel( this ).render( tmxMap );
+	}
+
+	/**
+		render level to a square 2d plane
+	**/
+	function renderPlane() {
+
+		var layerRenderer : LayerRender;
 
 		ground = new h3d.mat.Texture( wid, hei, [Target] );
 		ground.filter = Nearest;
@@ -141,32 +162,18 @@ class Level extends dn.Process {
 		obj.material.mainPass.depth( false, LessEqual );
 		obj.material.mainPass.setBlendMode( Alpha );
 
-		inline function drawLayer( layer ) {
-			if ( layer.visible #if !display_proto && layer.name != "proto" #end ) {
-				layerRenderer = new LayerRender( data, wid, hei, layer );
-				layerRenderer.render.g.drawTo( ground );
-			}
-		}
-		function drawTilesThroughGroup( group : TmxGroup ) {
-			for ( grLayer in group.layers )
-				switch grLayer {
-					case LTileLayer( layer ):
-						drawLayer( layer );
-					case LGroup( group ):
-						drawTilesThroughGroup( group );
-					default:
+		TmxUtils.mapTmxMap(
+			tmxMap,
+			{
+				tmxTileLayerCb : ( layer ) -> {
+					if ( layer.visible #if !display_proto && layer.name != "proto" #end ) {
+						layerRenderer = new LayerRender( tmxMap, wid, hei, layer );
+						layerRenderer.render.g.drawTo( ground );
+					}
+					return true;
 				}
-		}
-
-		for ( e in data.layers ) {
-			switch( e ) {
-				case LTileLayer( layer ):
-					drawLayer( layer );
-				case LGroup( group ):
-					drawTilesThroughGroup( group );
-				default:
 			}
-		}
+		);
 
 		// чтобы получать 3d координаты курсора
 		{
@@ -243,7 +250,7 @@ class Level extends dn.Process {
 
 	public inline function cartToIsoLocal( x : Float, y : Float ) : Vector {
 		return new Vector(
-			-( data.width - data.height ) / 2 * data.tileHeight + wid * .5 + cartToIso( x, y ).x,
+			-( tmxMap.width - tmxMap.height ) / 2 * tmxMap.tileHeight + wid * .5 + cartToIso( x, y ).x,
 			hei - cartToIso( x, y ).y
 		);
 	}
@@ -338,8 +345,8 @@ private class InternalRender extends TileLayerRenderer {
 		if (
 			eregFileName.match( sourceTile.image.source )
 			&& StringTools.endsWith( eregFileName.matched( 1 ), "floor" ) )
-			GameClient.inst.structTiles.push( new StructTile( bmp.x + Level.inst.data.tileWidth / 2,
-				Level.inst.hei - bmp.y - Level.inst.data.tileHeight / 2 + 2, Boot.inst.s3d ) );
+			GameClient.inst.structTiles.push( new StructTile( bmp.x + Level.inst.tmxMap.tileWidth / 2,
+				Level.inst.hei - bmp.y - Level.inst.tmxMap.tileHeight / 2 + 2, Boot.inst.s3d ) );
 
 		bmp.drawTo( tex );
 		bmp.tile.dispose();

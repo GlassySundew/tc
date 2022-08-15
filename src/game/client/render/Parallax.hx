@@ -1,5 +1,6 @@
 package game.client.render;
 
+import game.client.level.Level;
 import ch3.scene.TileSprite;
 import dn.heaps.slib.HSprite;
 import h2d.Tile;

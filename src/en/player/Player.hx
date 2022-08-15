@@ -1,13 +1,12 @@
 package en.player;
 
-import ui.core.InventoryGrid;
 import ch3.scene.TileSprite;
 import dn.heaps.input.ControllerAccess;
 import en.items.Blueprint;
 import format.tmx.Data.TmxObject;
 import game.client.ControllerAction;
 import game.client.GameClient;
-import game.client.Level;
+import game.client.level.Level;
 import h2d.Tile;
 import h3d.mat.Texture;
 import hxbit.NetworkHost;
@@ -17,11 +16,11 @@ import hxd.Key;
 import net.ClientController;
 import net.ClientToServer.AClientToServer;
 import ui.Navigation;
+import ui.core.InventoryGrid;
 import ui.domkit.TextLabelComp;
 import ui.player.ItemCursorHolder;
 import ui.player.PlayerUI;
 import utils.Assets;
-import utils.Cursors;
 
 enum abstract PlayerActionState( String ) from String to String {
 
@@ -54,6 +53,10 @@ class Player extends Entity {
 
 	@:s public var holdItem : ItemCursorHolder;
 	@:s public var actionState : AClientToServer<PlayerActionState>;
+
+	public static final speed = 0.325;
+
+	var holdItemSpr : HSprite;
 
 	function set_residesOnId( v : String ) {
 		return residesOnId = v;
@@ -94,13 +97,6 @@ class Player extends Entity {
 	}
 
 	public override function alive() {
-		// GameClient.inst.delayer.addF(() -> {
-		// 	checkTeleport();
-		// }, 1);
-
-		// netX = footX;
-		// netY = footY;
-
 		spr = new HSprite( Assets.player, hollowScene );
 		ca = Main.inst.controller.createAccess();
 		belt = Main.inst.controller.createAccess();
@@ -116,10 +112,10 @@ class Player extends Entity {
 			{ dir : "down_right", prio : 1 }
 		] ) {
 			spr.anim.registerStateAnim( "walk_" + dir.dir, dir.prio, ( 1 / 60 / 0.16 ),
-				() -> return this.dir.getValue() == i && actionState.getValue() == Running
+				() -> return this.dir == i && actionState.getValue() == Running
 			);
 			spr.anim.registerStateAnim( "idle_" + dir.dir, dir.prio, ( 1 / 60 / 0.16 ),
-				() -> return this.dir.getValue() == i && actionState.getValue() == Idle
+				() -> return this.dir == i && actionState.getValue() == Idle
 			);
 		}
 
@@ -131,7 +127,6 @@ class Player extends Entity {
 
 		if ( uid == net.Client.inst.uid ) {
 			inst = this;
-
 			pui = new PlayerUI( GameClient.inst.root, this );
 			GameClient.inst.camera.target = this;
 			GameClient.inst.camera.recenter();
@@ -140,6 +135,17 @@ class Player extends Entity {
 		}
 
 		initNickname();
+
+		// holdItem.onSetItem.add( attachHoldItemToSpr );
+	}
+
+	function attachHoldItemToSpr( item : Item ) {
+		if ( holdItemSpr != null ) forceDrawTo = holdItemSpr.visible = item != null;
+
+		if ( item != null ) {
+			if ( holdItemSpr == null ) holdItemSpr = new HSprite( Assets.items, spr );
+			holdItemSpr.set( Data.item.get( item.cdbEntry ).atlas_name );
+		}
 	}
 
 	override function unreg( host : NetworkHost, ctx : NetworkSerializer, ?finalize ) @:privateAccess {
@@ -239,6 +245,7 @@ class Player extends Entity {
 			ca.dispose();
 			belt.dispose();
 
+			holdItem.onSetItem.remove( attachHoldItemToSpr );
 			holdItem = null;
 		}
 	}
@@ -252,8 +259,6 @@ class Player extends Entity {
 		super.update();
 
 		if ( inst == this ) {
-			// calculateIsMoving();
-
 			var lx = ca.getAnalogValue2( MoveLeft, MoveRight );
 			var ly = ca.getAnalogValue2( MoveDown, MoveUp );
 
@@ -262,17 +267,17 @@ class Player extends Entity {
 			var leftAng = Math.atan2( ly, lx );
 			if ( !isLocked() ) {
 				if ( leftPushed ) {
-					var s = 0.325 * leftDist;
+					var s = leftDist * speed;
 					dx += Math.cos( leftAng ) * s;
 					dy += Math.sin( leftAng ) * s;
 
-					if ( lx < -0.3 && M.fabs( ly ) < 0.6 ) dir.setValue( 4 ); else if ( ly < -0.3 && M.fabs( lx ) < 0.6 ) dir.setValue( 6 );
+					if ( lx < -0.3 && M.fabs( ly ) < 0.6 ) dir = 4; else if ( ly < -0.3 && M.fabs( lx ) < 0.6 ) dir = 6;
 					else if ( lx > 0.3
-						&& M.fabs( ly ) < 0.6 ) dir.setValue( 0 ); else if ( ly > 0.3 && M.fabs( lx ) < 0.6 ) dir.setValue( 2 );
+						&& M.fabs( ly ) < 0.6 ) dir = 0; else if ( ly > 0.3 && M.fabs( lx ) < 0.6 ) dir = 2;
 
-					if ( lx > 0.3 && ly > 0.3 ) dir.setValue( 1 ); else if ( lx < -0.3 && ly > 0.3 ) dir.setValue( 3 ); else
+					if ( lx > 0.3 && ly > 0.3 ) dir = 1; else if ( lx < -0.3 && ly > 0.3 ) dir = 3; else
 						if ( lx < -0.3
-							&& ly < -0.3 ) dir.setValue( 5 ); else if ( lx > 0.3 && ly < -0.3 ) dir.setValue( 7 );
+							&& ly < -0.3 ) dir = 5; else if ( lx > 0.3 && ly < -0.3 ) dir = 7;
 				} else {
 					dx *= Math.pow( 0.6, tmod );
 					dy *= Math.pow( 0.6, tmod );

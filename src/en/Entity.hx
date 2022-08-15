@@ -1,18 +1,17 @@
 package en;
 
-import ui.core.InventoryGrid;
-import net.PrimNS;
-import en.util.Direction;
-import net.ClientToServer.AClientToServer;
+import cherry.soup.EventSignal.EventSignal0;
+import cherry.soup.EventSignal.EventSignal1;
 import differ.Collision;
 import differ.shapes.Circle;
 import differ.shapes.Polygon;
 import differ.shapes.Shape;
 import dn.heaps.slib.HSprite;
 import en.objs.IsoTileSpr;
+import en.util.Direction;
 import format.tmx.Data.TmxObject;
 import game.client.GameClient;
-import game.client.Level;
+import game.client.level.Level;
 import game.server.GameServer;
 import game.server.ServerLevel;
 import h2d.Tile;
@@ -27,11 +26,12 @@ import hxbit.NetworkHost;
 import hxbit.NetworkSerializable;
 import hxd.IndexBuffer;
 import net.Client;
-import net.ClientController;
-import net.ClientToServer.AClientToServerFloat;
+import net.PrimNS;
+import ui.core.InventoryGrid;
 import utils.TmxUtils;
 import utils.tools.Save;
 
+@:keep
 class Entity implements NetworkSerializable {
 
 	public static var ALL : Array<Entity> = [];
@@ -78,7 +78,13 @@ class Entity implements NetworkSerializable {
 	public var bumpFrict = 0.93;
 	public var bumpReduction = 0.;
 
-	@:s public var dir( default, set ) : AClientToServer<Direction>;
+	@:s public var dir( default, set ) : Direction;
+
+	inline function set_dir( v : Direction ) {
+		if ( v != dir ) onDirChangedSignal.dispatch( v );
+
+		return dir = v;
+	}
 
 	inline function get_tmod() {
 		return #if headless GameServer.inst.tmod #else if ( GameClient.inst != null ) GameClient.inst.tmod else
@@ -138,15 +144,20 @@ class Entity implements NetworkSerializable {
 	var flippedOnClient = false;
 	private var tmxAppliedInvalidate = false;
 
+	public var onDirChangedSignal : EventSignal1<Direction> = new EventSignal1();
+	public var onMoveSignal : EventSignal0 = new EventSignal0();
+
+	var onMoveTriggered = false;
+
 	public function new( ?x : Float = 0, ?z : Float = 0, ?tmxObj : Null<TmxObject>, ?tmxGId : Null<Int> ) {
 		ServerALL.push( this );
 
 		pivot = { x : 0, y : 0 };
 		footX = new PrimNS( x );
 		footY = new PrimNS( z );
-		dir = new AClientToServer( 6, () -> false );
-
+		dir = Bottom;
 		flippedX = false;
+
 		if ( this.tmxObj == null && tmxObj != null ) {
 			this.tmxObj = tmxObj;
 		}
@@ -157,6 +168,7 @@ class Entity implements NetworkSerializable {
 	public function init( ?x : Float, ?z : Float, ?tmxObj : Null<TmxObject> ) {
 		enableAutoReplication = true;
 		cd = new dn.Cooldown( Const.FPS );
+		onMoveSignal.add(() -> onMoveTriggered = true );
 	}
 
 	var debugObjs : Array<Object> = [];
@@ -326,7 +338,6 @@ class Entity implements NetworkSerializable {
 		cd.setS( "colorMaintain", 0.03 );
 	}
 
-	// @:s
 	public var isMoving( get, never ) : Bool;
 
 	function get_isMoving() return M.fabs( dxTotal ) >= 0.01 || M.fabs( dyTotal ) >= 0.01;
@@ -334,7 +345,7 @@ class Entity implements NetworkSerializable {
 	public inline function at( x, y ) return footX == x && footY == y;
 
 	public inline function isAlive() {
-		return !destroyed; // && life > 0;
+		return !destroyed;
 	}
 
 	public function isLocked() return cd == null ? true : cd.has( "lock" );
@@ -378,14 +389,6 @@ class Entity implements NetworkSerializable {
 			item.itemSprite.remove();
 
 		return item;
-	}
-
-	inline function set_dir( v ) {
-		if ( dir != v ) {
-			// spr.anim.getCurrentAnim().curFrameCpt = curFrame;
-		}
-
-		return dir = v;
 	}
 
 	/** Flips spr.scaleX, all of collision objects, and sorting rectangle **/
@@ -473,52 +476,6 @@ class Entity implements NetworkSerializable {
 		}
 	}
 
-	@:keep
-	public function customSerialize( ctx : hxbit.Serializer ) {
-		// // Data.Item inventory
-		// if ( cellGrid != null ) {
-		// 	ctx.addInt(cellGrid.grid.length);
-		// 	ctx.addInt(cellGrid.grid[0].length);
-		// 	ctx.addInt(cellGrid.cellWidth);
-		// 	ctx.addInt(cellGrid.cellHeight);
-		// 	for ( i in cellGrid.grid ) for ( j in i ) {
-		// 		if ( j.item != null ) {
-		// 			ctx.addString(Std.string(j.item.cdbEntry));
-		// 			ctx.addInt(j.item.amount);
-		// 		} else {
-		// 			ctx.addString("null");
-		// 			ctx.addInt(0);
-		// 		}
-		// 	}
-		// } else {
-		// 	ctx.addInt(0);
-		// 	ctx.addInt(0);
-		// }
-	}
-
-	@:keep
-	public function customUnserialize( ctx : hxbit.Serializer ) {
-
-		// var invHeight = ctx.getInt();
-		// var invWidth = ctx.getInt();
-		// if ( cellGrid == null && invHeight > 0 && invWidth > 0 ) {
-		// 	var cellWidth = ctx.getInt();
-		// 	var cellHeight = ctx.getInt();
-		// 	cellGrid = new CellGrid(invWidth, invHeight, cellWidth, cellHeight, this);
-		// }
-		// for ( i in 0...invHeight ) for ( j in 0...invWidth ) {
-		// 	var itemString = ctx.getString();
-		// 	var itemAmount = ctx.getInt();
-		// 	if ( itemString != "null" && itemString != "null" && itemString != null ) {
-		// 		GameClient.inst.delayer.addF(() -> {
-		// 			var item = Item.fromCdbEntry(Data.item.resolve(itemString).id, itemAmount);
-		// 			item.containerEntity = this;
-		// 			cellGrid.grid[i][j].item = item;
-		// 		}, 1);
-		// 	}
-		// }
-	}
-
 	public function dispose() {
 		ALL.remove( this );
 		spr.remove();
@@ -569,7 +526,6 @@ class Entity implements NetworkSerializable {
 		host.unregister( this, ctx, finalize );
 		host.unregister( footX, ctx, finalize );
 		host.unregister( footY, ctx, finalize );
-		host.unregister( dir, ctx, finalize );
 		if ( inventory != null )
 			inventory.unreg( host, ctx, finalize );
 	}
@@ -593,7 +549,6 @@ class Entity implements NetworkSerializable {
 	public function checkCollsAgainstAll( ?doMove : Bool = true ) : Bool {
 		var collided = false;
 		if ( collisions != null ) {
-
 			for ( ent in Entity.ALL ) {
 				if (
 					ent.collisions != null
@@ -607,11 +562,8 @@ class Entity implements NetworkSerializable {
 							var collideInfo = Collision.shapeWithShape( collObj, entCollObj );
 							if ( collideInfo != null ) {
 								collided = true;
-
-								collObj.x += ( collideInfo.separationX );
-								collObj.y += ( collideInfo.separationY );
-
 								if ( doMove ) {
+									if ( !onMoveTriggered ) onMoveSignal.dispatch();
 									footX.val += ( collideInfo.separationX );
 									footY.val += ( collideInfo.separationY );
 								}
@@ -627,11 +579,8 @@ class Entity implements NetworkSerializable {
 						var collideInfo = Collision.shapeWithShape( collObj, poly );
 						if ( collideInfo != null ) {
 							collided = true;
-
-							collObj.x += ( collideInfo.separationX );
-							collObj.y += ( collideInfo.separationY );
-
 							if ( doMove ) {
+								if ( !onMoveTriggered ) onMoveSignal.dispatch();
 								footX.val += ( collideInfo.separationX );
 								footY.val += ( collideInfo.separationY );
 							}
@@ -640,10 +589,6 @@ class Entity implements NetworkSerializable {
 				}
 		}
 		return collided;
-	}
-
-	private function calculateIsMoving() {
-		// isMoving = M.fabs( dxTotal ) >= 0.01 || M.fabs( dyTotal ) >= 0.01;
 	}
 
 	public function headlessPreUpdate() {}
@@ -655,27 +600,18 @@ class Entity implements NetworkSerializable {
 	public function headlessFrameEnd() {}
 
 	public function preUpdate() {
-		calculateIsMoving();
 		spr.anim.update( tmod );
 		cd.update( tmod );
 		tw.update( tmod );
 	}
 
 	public function update() {
-		// @:privateAccess if (spr.anim.getCurrentAnim() != null) {
-		// 	if ( tmpCur != 0 && (spr.anim.getCurrentAnim().curFrameCpt - (tmpDt)) == 0 ) // ANIM LINK HACK
-		// 		spr.anim.getCurrentAnim().curFrameCpt = tmpCur + spr.anim.getAnimCursor();
-		// 	tmpDt = tmod * spr.anim.getCurrentAnim().speed;
-		// 	tmpCur = spr.anim.getCurrentAnim().curFrameCpt;
-		// }
-
 		var steps = M.ceil( M.fabs( dxTotal * tmod ) );
 		var step = dxTotal * tmod / steps;
 
-		// if ( networkAllow( SetField, networkPropFootX.toInt(), Player.inst.clientController ) ) {
-		// x
-
 		step = ( M.fabs( dy ) > 0.0001 ) ? step * isoCoefficient : step; // ISO FIX
+
+		if ( !onMoveTriggered && steps > 0 ) onMoveSignal.dispatch();
 
 		while( steps > 0 ) {
 			xr += step;
@@ -694,12 +630,11 @@ class Entity implements NetworkSerializable {
 		bdx *= Math.pow( bumpFrict, tmod );
 		if ( M.fabs( dx ) <= 0.0005 * tmod ) dx = 0;
 		if ( M.fabs( bdx ) <= 0.0005 * tmod ) bdx = 0;
-		// }
 
-		// if ( networkAllow( SetField, networkPropFootY.toInt(), Player.inst.clientController ) ) {
-		// y
 		var steps = M.ceil( M.fabs( dyTotal * tmod ) );
 		step = ( M.fabs( step ) > 0.001 ) ? ( dyTotal * tmod / steps * isoCoefficient * 0.5 ) : ( dyTotal * tmod / steps ); // ISO FIX
+
+		if ( !onMoveTriggered && steps > 0 ) onMoveSignal.dispatch();
 
 		while( steps > 0 ) {
 			yr += step;
@@ -718,35 +653,13 @@ class Entity implements NetworkSerializable {
 		bdy *= Math.pow( bumpFrict, tmod );
 		if ( M.fabs( dy ) <= 0.0005 * tmod ) dy = 0;
 		if ( M.fabs( bdy ) <= 0.0005 * tmod ) bdy = 0;
-		// }
 	}
 
-	public function postUpdate() {
-		if ( mesh != null ) {
-			updateCollisions();
-			// spr.scaleX = dir * sprScaleX;
-			// spr.scaleY = sprScaleY;
-
-			// if ( !cd.has("colorMaintain") ) {
-			// 	colorAdd.r *= Math.pow(0.6, tmod);
-			// 	colorAdd.g *= Math.pow(0.6, tmod);
-			// 	colorAdd.b *= Math.pow(0.6, tmod);
-			// }
-
-			// if (debugLabel != null) {
-			// 	debugLabel.x = Std.int(footX - debugLabel.textWidth * 0.5);
-			// 	debugLabel.y = Std.int(footY + 1);
-			// }
-			// curFrame = spr.anim.getCurrentAnim().curFrameCpt;
-		}
-
-		// if ( !isMoving ) {
-		// 	footX = M.round( M.fabs( footX ) );
-		// 	footY = M.round( M.fabs( footY ) );
-		// }
-	}
+	public function postUpdate() {}
 
 	public function frameEnd() {
+		updateCollisions();
+
 		if ( mesh != null && spr != null && spr.tile != null ) {
 			@:privateAccess
 			var bounds = mesh.plane.getBounds();
@@ -806,5 +719,6 @@ class Entity implements NetworkSerializable {
 				mesh.z = footY.val;
 			}
 		}
+		onMoveTriggered = false;
 	}
 }

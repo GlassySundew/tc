@@ -304,7 +304,6 @@ class Tools
         if (tile.id == lid) return tile;
       }
     }
-    trace("returning null");
     return null;
   }
   

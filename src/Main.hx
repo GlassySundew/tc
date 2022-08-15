@@ -1,3 +1,5 @@
+import h2d.Text;
+import game.test.VoxelSceneTest;
 import ui.MainMenu;
 import utils.MapCache;
 import utils.Lang;
@@ -37,6 +39,8 @@ class Main extends Process {
 
 	public var clientController( default, set ) : ClientController;
 
+	var fps : Text;
+
 	function set_clientController( cc : ClientController ) {
 		delayer.addF( onClientControllerSetEvent.dispatch, 1 );
 		return clientController = cc;
@@ -70,7 +74,7 @@ class Main extends Process {
 
 		Boot.inst.renderer = new CustomRenderer();
 		Boot.inst.s3d.renderer = Boot.inst.renderer;
-		Boot.inst.renderer.depthColorMap = hxd.Res.gradients.test.toTexture();
+		// Boot.inst.renderer.depthColorMap = hxd.Res.gradients.test.toTexture();
 		Boot.inst.renderer.enableFXAA = false;
 		Boot.inst.renderer.enableSao = false;
 
@@ -126,10 +130,17 @@ class Main extends Process {
 
 		delayer.addF( start, 1 );
 		new Client();
+
+		fpsCounter();
+	}
+
+	function fpsCounter() {
+		fps = new Text( Assets.fontPixel, Boot.inst.s2d );
 	}
 
 	function start() {
-		MainMenu.spawn( Boot.inst.s2d );
+		VoxelSceneTest.start();
+		// MainMenu.spawn( Boot.inst.s2d );
 	}
 
 	public function toggleFullscreen() {
@@ -172,6 +183,7 @@ class Main extends Process {
 		// if ( ca.isKeyboardPressed(Key.M) ) Assets.toggleMusicPause();
 		Repeater.inst.update( tmod );
 
+		if ( fps != null ) fps.text = '${Boot.inst.engine.fps}';
 		super.update();
 	}
 }

@@ -2,7 +2,7 @@ package ui;
 
 import en.util.item.InventoryCell;
 import pass.CustomRenderer;
-import game.client.Level;
+import game.client.level.Level;
 import game.client.GameClient;
 import h2d.Console.ConsoleArgDesc;
 import en.player.Player;
@@ -78,10 +78,11 @@ class Console extends h2d.Console {
 		this.addAlias( "-", "unset" );
 
 		this.addCommand( "untarget", [], function ( ?k : String ) {
-			GameClient.inst.camera.stopTracking();
-			new h3d.scene.CameraController( Boot.inst.s3d ).loadFromCamera();
-			if ( Level.inst != null )
-				Level.inst.cursorInteract.visible = false;
+			if ( GameClient.inst != null )
+				GameClient.inst.camera.stopTracking();
+			var cam = new h3d.scene.CameraController( Boot.inst.s3d );
+			cam.lockZPlanes = true;
+			cam.loadFromCamera();
 		} );
 
 		this.addCommand( "loadlvl", [{ name : "k", t : AString }], function ( name : String, ?manual : Bool = true ) {

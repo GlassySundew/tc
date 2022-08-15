@@ -1,7 +1,7 @@
 package en.items;
 
 import game.client.GameClient;
-import game.client.Level.StructTile;
+import game.client.level.Level.StructTile;
 import cherry.soup.EventSignal.EventSignal1;
 import h2d.Object;
 

@@ -114,8 +114,7 @@ class InventoryGrid implements Serializable {
 					from.item = null;
 					return slot;
 				}
-				slot = findSameItem( item );
-				if ( slot == null ) slot = getFreeSlot();
+				slot = findSameItem( item, true, true );
 				if ( slot == null ) break;
 			} while( from.item != null );
 			return slot;
@@ -211,6 +210,7 @@ class InventoryCellFlow extends h2d.Flow {
 
 		this.minWidth = this.maxWidth = width;
 		this.minHeight = this.maxHeight = height;
+		overflow = Limit;
 
 		inter = new ch2.ui.EventInteractive( width, height, this );
 		inter.cursor = Default;

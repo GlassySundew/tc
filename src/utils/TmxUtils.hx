@@ -1,5 +1,10 @@
 package utils;
 
+import format.tmx.Data.TmxGroup;
+import format.tmx.Data.TmxImageLayer;
+import format.tmx.Data.TmxObjectGroup;
+import format.tmx.Data.TmxTileLayer;
+import format.tmx.Data.TmxLayer;
 import format.tmx.TmxMap;
 import differ.math.Vector;
 import differ.shapes.Polygon;
@@ -7,7 +12,47 @@ import format.tmx.Data.TmxTilesetTile;
 import format.tmx.Tools;
 import game.client.GameClient;
 
+typedef TmxLayerCb = {
+	var ?tmxTileLayerCb : TmxTileLayer -> Bool;
+	var ?tmxObjLayerCb : TmxObjectGroup -> Bool;
+	var ?tmxImgLayerCb : TmxImageLayer -> Bool;
+	var ?tmxGroupLayerCb : TmxGroup -> Bool;
+}
+
 class TmxUtils {
+
+	public static function layerRec(
+		layer : TmxLayer,
+		tmxLayerCb : TmxLayerCb
+	) {
+		switch( layer ) {
+			case LTileLayer( layer ):
+				if ( tmxLayerCb.tmxTileLayerCb != null && !tmxLayerCb.tmxTileLayerCb( layer ) ) return;
+			case LObjectGroup( group ):
+				if ( tmxLayerCb.tmxObjLayerCb != null && !tmxLayerCb.tmxObjLayerCb( group ) ) return;
+			case LImageLayer( layer ):
+				if ( tmxLayerCb.tmxImgLayerCb != null && !tmxLayerCb.tmxImgLayerCb( layer ) ) return;
+			case LGroup( group ):
+				if ( tmxLayerCb.tmxGroupLayerCb != null && !tmxLayerCb.tmxGroupLayerCb( group ) ) return;
+
+				for ( grLayer in group.layers ) {
+					var tmxLayerArg : TmxLayer = switch grLayer {
+						case LTileLayer( layer ): LTileLayer( layer );
+						case LObjectGroup( group ): LObjectGroup( group );
+						case LImageLayer( layer ): LImageLayer( layer );
+						case LGroup( group ): LGroup( group );
+					}
+					layerRec( tmxLayerArg, tmxLayerCb );
+				}
+		}
+	}
+
+	public static function mapTmxMap(
+		tmxMap : TmxMap,
+		tmxLayerCb : TmxLayerCb
+	) {
+		for ( l in tmxMap.layers ) layerRec( l, tmxLayerCb );
+	}
 
 	/**
 		server-side
@@ -163,7 +208,6 @@ class TmxUtils {
 				return Tools.getTileByGid( tmxMap, gid );
 			default:
 		}
-
 		return null;
 	}
 }
