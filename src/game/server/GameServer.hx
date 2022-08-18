@@ -1,5 +1,6 @@
 package game.server;
 
+import utils.TmxUtils;
 import net.Server;
 import utils.MapCache;
 import cherry.soup.EventSignal.EventSignal0;
@@ -77,7 +78,7 @@ class GameServer extends Process implements Serializable {
 	/** 
 		starts entrypoint level and slaps player onto it
 	**/
-	public function initializePlayer( nickname : String, uid : Int, clientController : ClientController ) : Player {
+	public function newPlayer( nickname : String, uid : Int, clientController : ClientController ) : Player {
 		// our temporary entrypoint
 		var entryPointLevel = "ship_pascal.tmx";
 
@@ -213,7 +214,6 @@ class GameServer extends Process implements Serializable {
 	**/
 	function sasByName( name : String, entClasses : List<Class<Entity>>, sLevel : ServerLevel, ?args : Array<Dynamic> ) : Entity {
 		for ( obj in sLevel.entitiesTmxObj ) {
-
 			if ( obj.name == name
 				|| ( obj.properties.existsType( "className", PTString )
 					&& obj.properties.getString( "className" ) == name ) ) {
@@ -238,8 +238,8 @@ class GameServer extends Process implements Serializable {
 
 		var resultEntity = null;
 
-		var isoX = 0., isoY = 0.;
-		if ( sLevel.tmxMap.orientation == Isometric ) {
+		var isoX = e.x, isoY = e.y;
+		if ( sLevel.tmxMap.orientation == Isometric && !TmxUtils.isMap3d( sLevel.tmxMap ) ) {
 			// все объекты в распаршенных слоях уже с конвертированными координатами
 			// entities export lies ahead
 			isoX = sLevel.cartToIsoLocal( e.x, e.y ).x;
@@ -268,7 +268,7 @@ class GameServer extends Process implements Serializable {
 				&& tsTile.properties.getString( "className" ) == '$eClass'
 			)
 			) {
-				var totalArgs : Array<Dynamic> = [isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, e];
+				var totalArgs : Array<Dynamic> = [isoX, isoY, e];
 				totalArgs = totalArgs.concat( args );
 				resultEntity = Type.createInstance( eClass, totalArgs );
 			}
@@ -278,8 +278,7 @@ class GameServer extends Process implements Serializable {
 		if ( resultEntity == null
 			&& eregFileName.match( tsTile.image.source )
 			&& !tsTile.properties.existsType( "className", PTString ) ) {
-
-			resultEntity = new SpriteEntity( isoX != 0 ? isoX : e.x, isoY != 0 ? isoY : e.y, eregFileName.matched( 1 ), e );
+			resultEntity = new SpriteEntity( isoX, isoY, eregFileName.matched( 1 ), e );
 		}
 
 		if ( resultEntity != null ) @:privateAccess {

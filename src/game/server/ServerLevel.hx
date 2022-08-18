@@ -3,6 +3,8 @@ package game.server;
 /**
 	server-side level
 **/
+import dn.Process;
+import oimo.dynamics.World;
 import net.Server;
 import differ.math.Vector;
 import differ.shapes.Polygon;
@@ -45,8 +47,8 @@ class ServerLevel extends dn.Process implements NetworkSerializable {
 		enableAutoReplication = true;
 	}
 
-	public function new( map : TmxMap ) {
-		super( Server.inst );
+	public function new( map : TmxMap, ?parentProc : Process ) {
+		super( parentProc == null ? GameServer.inst : parentProc );
 		initSer();
 
 		tmxMap = map;

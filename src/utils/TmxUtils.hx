@@ -54,6 +54,10 @@ class TmxUtils {
 		for ( l in tmxMap.layers ) layerRec( l, tmxLayerCb );
 	}
 
+	public static function isMap3d( tmxMap : TmxMap ) {
+		return tmxMap.properties.getBool( "3d" );
+	}
+
 	/**
 		server-side
 	**/

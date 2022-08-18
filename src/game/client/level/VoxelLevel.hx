@@ -96,7 +96,7 @@ class VoxelLevel extends Process {
 					)
 				);
 
-				p.addShader( new VoxelDepther( zheight + depthOff ) );
+				p.addShader( new VoxelDepther( ( zheight + depthOff * 5 ) * 0.0005 ) );
 
 				model.x = ( tileidx % tmxMap.width ) * tmxMap.tileHeight + zheight * tmxMap.tileHeight;
 				model.y = Math.floor( tileidx / tmxMap.width ) * tmxMap.tileHeight + zheight * tmxMap.tileHeight;

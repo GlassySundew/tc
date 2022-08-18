@@ -1,5 +1,6 @@
 package en;
 
+import shader.VoxelDepther;
 import cherry.soup.EventSignal.EventSignal0;
 import cherry.soup.EventSignal.EventSignal1;
 import differ.Collision;
@@ -296,6 +297,7 @@ class Entity implements NetworkSerializable {
 		s.color = colorAdd;
 		mesh.material.mainPass.enableLights = false;
 		mesh.material.mainPass.depth( false, Less );
+		// mesh.material.mainPass.addShader( new VoxelDepther( 10 ) );
 
 		// TODO semi-transparent shadow overlapping
 		// var s = new h3d.mat.Stencil();
@@ -716,7 +718,7 @@ class Entity implements NetworkSerializable {
 				}
 
 				mesh.x = footX.val;
-				mesh.z = footY.val;
+				mesh.y = footY.val;
 			}
 		}
 		onMoveTriggered = false;

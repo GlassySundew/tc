@@ -49,6 +49,7 @@ class Camera extends dn.Process {
 		parallax = new Parallax( Boot.inst.s3d );
 		parallax.y = -1;
 		onResize();
+
 		s3dCam.zNear = 0.1;
 		s3dCam.zFar = 2000;
 	}
@@ -59,8 +60,9 @@ class Camera extends dn.Process {
 			parallax.z = y;
 		}
 		s3dCam.target.x = ( x );
-		s3dCam.target.z = ( y );
-		s3dCam.pos = s3dCam.target.add( new Vector( 0, -( w() * 1 ) / ( 2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * ( Math.PI / 180 ) ) ), -0.01 ) );
+		s3dCam.target.y = ( y );
+		s3dCam.pos = s3dCam.target.add( new Vector( 150, 150, 150 ) ); // 282.842666667
+		// s3dCam.pos = s3dCam.target.add( new Vector( 0, -( w() * 1 ) / ( 2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * ( Math.PI / 180 ) ) ), -0.01 ) );
 	}
 
 	public inline function stopTracking() {

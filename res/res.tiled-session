@@ -828,7 +828,7 @@
         "tiled/levels/ship_pascal.tmx"
     ],
     "project": "res.tiled-project",
-    "property.type": "int",
+    "property.type": "bool",
     "recentFiles": [
         "tiled/levels/bridge.tmx",
         "tiled/levels/ship_pascal.tmx",

@@ -139,8 +139,8 @@ class Main extends Process {
 	}
 
 	function start() {
-		VoxelSceneTest.start();
-		// MainMenu.spawn( Boot.inst.s2d );
+		// VoxelSceneTest.start();
+		MainMenu.spawn( Boot.inst.s2d );
 	}
 
 	public function toggleFullscreen() {

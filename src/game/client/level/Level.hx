@@ -1,5 +1,6 @@
 package game.client.level;
 
+import oimo.dynamics.World;
 import utils.TmxUtils;
 import utils.Util;
 import differ.shapes.Polygon;
@@ -23,7 +24,10 @@ import hxd.Res;
 import tiled.TileLayerRenderer;
 import ui.s3d.EventInteractive;
 
+using utils.TmxUtils;
+
 /**
+	client-side level rendering
 	Level parses tmx entities maps, renders tie layers into mesh
 **/
 class Level extends dn.Process {
@@ -67,8 +71,11 @@ class Level extends dn.Process {
 
 	public var cursorInteract : Interactive;
 
+	var world : World;
+
 	public function new( map : TmxMap ) {
 		super( GameClient.inst );
+		world = new World();
 		inst = this;
 		tmxMap = map;
 
@@ -128,7 +135,7 @@ class Level extends dn.Process {
 	function render() {
 		invalidated = false;
 
-		if ( tmxMap.tilesets.filter( ( ts ) -> ts.name == "CONGRUENT" ).length > 0 ) {
+		if ( tmxMap.isMap3d() ) {
 			render3d();
 		} else
 			renderPlane();
@@ -138,15 +145,13 @@ class Level extends dn.Process {
 		CONGRUENT tileset
 	**/
 	function render3d() {
-		trace( "rendering 3d" );
 		new VoxelLevel( this ).render( tmxMap );
 	}
 
 	/**
-		render level to a square 2d plane
+		render level to a square 2d plane, deprecated
 	**/
 	function renderPlane() {
-
 		var layerRenderer : LayerRender;
 
 		ground = new h3d.mat.Texture( wid, hei, [Target] );

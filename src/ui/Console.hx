@@ -85,6 +85,11 @@ class Console extends h2d.Console {
 			cam.loadFromCamera();
 		} );
 
+		this.addCommand( "fov", [{ name : "k", t : AString }], function ( ?k : String ) {
+			if ( GameClient.inst != null )
+				GameClient.inst.camera.s3dCam.fovY = Std.parseFloat( k );
+		} );
+
 		this.addCommand( "loadlvl", [{ name : "k", t : AString }], function ( name : String, ?manual : Bool = true ) {
 			// GameClient.inst.startLevel(name + ".tmx", { manual : true });
 		} );

@@ -1,0 +1,3 @@
+# @install: lix --silent download "gh://github.com/saharan/OimoPhysics#297090ff00847f7a6cefbacd114388477b338b7a" into oimophysics/1.2.2/github/297090ff00847f7a6cefbacd114388477b338b7a
+-cp ${HAXE_LIBCACHE}/oimophysics/1.2.2/github/297090ff00847f7a6cefbacd114388477b338b7a/src
+-D oimophysics=1.2.2

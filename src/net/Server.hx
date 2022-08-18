@@ -145,7 +145,7 @@ class Server extends Process {
 			player = Save.inst.loadEntity( savedPlayerByNickname ).as( Player );
 		} else {
 			// slapping new player in entrypoint
-			player = game.initializePlayer( nickname, uid, clientController );
+			player = game.newPlayer( nickname, uid, clientController );
 		}
 
 		// host.sendTypedMessage(MapLoad(player.level));

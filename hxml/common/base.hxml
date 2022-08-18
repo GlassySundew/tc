@@ -15,6 +15,7 @@
 -lib random
 -lib seedyrng
 -lib haxe-concurrent
+-lib oimophysics
 
 -D domkit
 -D heaps_enable_hl_mp3
