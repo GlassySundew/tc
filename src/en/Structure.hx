@@ -13,16 +13,9 @@ class Structure extends en.InteractableEntity {
 	public var toBeCollidedAgainst = true;
 	public var health : Float;
 
-	public function new( x : Float, y : Float, ?tmxObject : TmxObject, ?cdbEntry : Data.StructureKind ) {
+	public function new( x = 0., y = 0., z = 0., ?tmxObject : TmxObject, ?cdbEntry : Data.StructureKind ) {
 		this.cdbEntry = cdbEntry;
-		super( x, y, tmxObject );
-	}
-
-	/**
-		all serializable variables access in init(), unfortunately, have to be wrapped 
-		around a delayer because all serializble vars are synced later on 
-	**/
-	public override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
+		super( x, y, z, tmxObject );
 
 		// CDB parsed entry corresponding to this structure instance class name
 		if ( cdbEntry == null ) try {
@@ -32,24 +25,26 @@ class Structure extends en.InteractableEntity {
 		catch( e ) {
 			// trace(e);
 		}
+	}
 
+	public override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
 		// Initializing spr and making it static sprite from structures atlas as a
 		// class name if not initialized in custom structure class file
 
-		if ( cdbEntry == null && spr != null ) try {
-			cdbEntry = Data.structure.resolve( spr.groupName ).id;
+		if ( cdbEntry == null && eSpr != null ) try {
+			cdbEntry = Data.structure.resolve( eSpr.spr.groupName ).id;
 		}
 		catch( Dynamic ) {}
 
-		super.init( x, z, tmxObj );
+		super.init( x, y, z, tmxObj );
 	}
 
 	override function alive() {
-		if ( spr == null ) {
-			spr = new HSprite( Assets.structures, hollowScene );
+		if ( eSpr.spr == null ) {
+			eSpr.spr = new HSprite( Assets.structures, hollowScene );
 			eregClass.match( '$this'.toLowerCase() );
 			try {
-				spr.set( eregClass.matched( 1 ) );
+				eSpr.spr.set( eregClass.matched( 1 ) );
 			}
 			catch( e : Dynamic ) {
 				trace( e );
@@ -69,12 +64,12 @@ class Structure extends en.InteractableEntity {
 			}
 
 			if ( Data.structure.get( cdbEntry ).isoHeight != 0 && Data.structure.get( cdbEntry ).isoWidth != 0 ) {
-				mesh.isLong = true;
-				mesh.isoWidth = Data.structure.get( cdbEntry ).isoWidth;
-				mesh.isoHeight = Data.structure.get( cdbEntry ).isoHeight;
+				eSpr.mesh.isLong = true;
+				eSpr.mesh.isoWidth = Data.structure.get( cdbEntry ).isoWidth;
+				eSpr.mesh.isoHeight = Data.structure.get( cdbEntry ).isoHeight;
 
 				#if depth_debug
-				mesh.renewDebugPts();
+				eSpr.mesh.renewDebugPts();
 				#end
 			}
 		}
@@ -118,7 +113,7 @@ class Structure extends en.InteractableEntity {
 			&& isInPlayerRange();
 	}
 
-	function isInPlayerRange() return distPolyToPt( Player.inst ) <= useRange;
+	function isInPlayerRange() return this.distPolyToPt( Player.inst ) <= useRange;
 
 	public function offsetFootByTile() {
 		footY.val += 1.;

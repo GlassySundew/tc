@@ -4,7 +4,6 @@ import utils.TmxUtils;
 import net.Server;
 import utils.MapCache;
 import cherry.soup.EventSignal.EventSignal0;
-import differ.math.Vector;
 import dn.Process;
 import en.player.Player;
 import format.tmx.*;
@@ -85,7 +84,7 @@ class GameServer extends Process implements Serializable {
 		var sLevel = getLevel( entryPointLevel, {} );
 		clientController.level = sLevel;
 		// раз игрок новый, то спавним его из tmxObject
-		var player = sasByName( "en.player.$Player", entClasses, sLevel, [nickname, uid, clientController] ).as( Player );
+		var player = spawnByName( "en.player.$Player", entClasses, sLevel, [nickname, uid, clientController] ).as( Player );
 
 		return player;
 	}
@@ -146,9 +145,6 @@ class GameServer extends Process implements Serializable {
 			Save.inst.loadEntity( cachedPlayer );
 		} else {
 			for ( e in sLevel.entitiesTmxObj ) {
-				// if ( testSLevel == null )
-				// 	testSLevel = startLevel( "bridge.tmx", {} );
-
 				var ent = searchAndSpawnEnt( e, entClasses, sLevel, [], [Player] );
 
 				// if ( ent != null )
@@ -212,7 +208,7 @@ class GameServer extends Process implements Serializable {
 		search and spawn entity	
 		in fact only needed for player searching  
 	**/
-	function sasByName( name : String, entClasses : List<Class<Entity>>, sLevel : ServerLevel, ?args : Array<Dynamic> ) : Entity {
+	function spawnByName( name : String, entClasses : List<Class<Entity>>, sLevel : ServerLevel, ?args : Array<Dynamic> ) : Entity {
 		for ( obj in sLevel.entitiesTmxObj ) {
 			if ( obj.name == name
 				|| ( obj.properties.existsType( "className", PTString )
@@ -237,14 +233,12 @@ class GameServer extends Process implements Serializable {
 		exclude = exclude == null ? [] : exclude;
 
 		var resultEntity = null;
-
-		var isoX = e.x, isoY = e.y;
-		if ( sLevel.tmxMap.orientation == Isometric && !TmxUtils.isMap3d( sLevel.tmxMap ) ) {
-			// все объекты в распаршенных слоях уже с конвертированными координатами
-			// entities export lies ahead
-			isoX = sLevel.cartToIsoLocal( e.x, e.y ).x;
-			isoY = sLevel.cartToIsoLocal( e.x, e.y ).y;
-		}
+		var footZ = //
+			( sLevel.tmxMap.properties.exists( "defaultEntitySpawnLevel" ) ? //
+				sLevel.tmxMap.properties.getInt( "defaultEntitySpawnLevel" ) : //
+				e.properties.exists( "z" ) ? //
+					e.properties.getInt( "z" ) : //
+					0 ) * sLevel.tmxMap.tileHeight;
 
 		var tsTile : TmxTilesetTile = null;
 
@@ -268,7 +262,7 @@ class GameServer extends Process implements Serializable {
 				&& tsTile.properties.getString( "className" ) == '$eClass'
 			)
 			) {
-				var totalArgs : Array<Dynamic> = [isoX, isoY, e];
+				var totalArgs : Array<Dynamic> = [e.x, e.y, footZ, e];
 				totalArgs = totalArgs.concat( args );
 				resultEntity = Type.createInstance( eClass, totalArgs );
 			}
@@ -278,7 +272,7 @@ class GameServer extends Process implements Serializable {
 		if ( resultEntity == null
 			&& eregFileName.match( tsTile.image.source )
 			&& !tsTile.properties.existsType( "className", PTString ) ) {
-			resultEntity = new SpriteEntity( isoX, isoY, eregFileName.matched( 1 ), e );
+			resultEntity = new SpriteEntity( e.x, e.y, eregFileName.matched( 1 ), e );
 		}
 
 		if ( resultEntity != null ) @:privateAccess {

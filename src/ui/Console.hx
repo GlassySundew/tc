@@ -1,5 +1,7 @@
 package ui;
 
+import h3d.col.Bounds;
+import utils.s3d.Camera;
 import en.util.item.InventoryCell;
 import pass.CustomRenderer;
 import game.client.level.Level;
@@ -81,13 +83,21 @@ class Console extends h2d.Console {
 			if ( GameClient.inst != null )
 				GameClient.inst.camera.stopTracking();
 			var cam = new h3d.scene.CameraController( Boot.inst.s3d );
-			cam.lockZPlanes = true;
+			// cam.lockZPlanes = true;
 			cam.loadFromCamera();
 		} );
 
-		this.addCommand( "fov", [{ name : "k", t : AString }], function ( ?k : String ) {
-			if ( GameClient.inst != null )
-				GameClient.inst.camera.s3dCam.fovY = Std.parseFloat( k );
+		this.addCommand( "toggleOrtho", [], function ( ?k : String ) {
+			if ( GameClient.inst.camera.s3dCam.orthoBounds != null ) {
+				GameClient.inst.camera.s3dCam.orthoBounds = null;
+			} else {
+				GameClient.inst.camera.s3dCam.orthoBounds = new Bounds();
+				GameClient.inst.camera.refreshOrtho();
+			}
+		} );
+
+		this.addCommand( "toggleVoxelLevel", [], function ( ?k : String ) {
+			Level.inst.voxelLevel.toggleVisible();
 		} );
 
 		this.addCommand( "loadlvl", [{ name : "k", t : AString }], function ( name : String, ?manual : Bool = true ) {

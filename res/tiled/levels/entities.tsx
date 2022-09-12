@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.8" tiledversion="1.8.1" name="entities" tilewidth="144" tileheight="134" tilecount="15" columns="10" backgroundcolor="#171717">
+<tileset version="1.9" tiledversion="1.9.0" name="entities" tilewidth="144" tileheight="134" tilecount="15" columns="10" backgroundcolor="#171717">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="2">
   <properties>
@@ -7,7 +7,10 @@
   </properties>
   <image width="48" height="48" source="separated/player/idle_down_0.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="11" x="22" y="39">
+   <object id="11" x="22.2793" y="39.1241">
+    <properties>
+     <property name="h" type="int" value="21"/>
+    </properties>
     <polygon points="0,0 3,0 6,-1 7,-3 6,-5 3,-6 0,-6 -3,-5 -4,-3 -3,-1"/>
    </object>
   </objectgroup>

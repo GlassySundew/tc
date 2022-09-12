@@ -1,9 +1,11 @@
 package game.client.level;
 
+import oimo.common.Vec3;
+import cherry.soup.EventSignal.EventSignal0;
+import utils.oimo.OimoDebugRenderer;
 import oimo.dynamics.World;
 import utils.TmxUtils;
 import utils.Util;
-import differ.shapes.Polygon;
 import dn.Process;
 import en.items.Blueprint;
 import en.objs.IsoTileSpr;
@@ -44,14 +46,10 @@ class Level extends dn.Process {
 
 	inline function get_hei() return Std.int( ( Math.min( tmxMap.height, tmxMap.width ) + Math.abs(-tmxMap.width + tmxMap.height ) / 2 ) * tmxMap.tileHeight );
 
-	//	public var lid(get, never):Int;
-	var invalidated = true;
-
 	public var sqlId : Null<Int>;
 	public var lvlName : String;
 
 	public var entities : Array<TmxObject> = [];
-	public var walkable : Array<Polygon> = [];
 	public var ground : Texture;
 	public var obj : IsoTileSpr;
 
@@ -70,12 +68,14 @@ class Level extends dn.Process {
 	public var cursY : Float;
 
 	public var cursorInteract : Interactive;
-
-	var world : World;
+	public var voxelLevel : VoxelLevel;
+	public var world : World;
+	public var oimoDebug : OimoDebugRenderer;
+	public var onRenderedSignal = new EventSignal0();
 
 	public function new( map : TmxMap ) {
 		super( GameClient.inst );
-		world = new World();
+		world = new World( new Vec3( 0, 0, -9.80665 ) ); //
 		inst = this;
 		tmxMap = map;
 
@@ -92,9 +92,7 @@ class Level extends dn.Process {
 							switch( obj.objectType ) {
 								case OTPolygon( points ):
 									var pts = Util.makePolyClockwise( points );
-									setWalkable( obj, pts );
 								case OTRectangle:
-									setWalkable( obj );
 								default:
 							}
 						}
@@ -102,6 +100,8 @@ class Level extends dn.Process {
 				default:
 			}
 		}
+
+		render();
 	}
 
 	// function get_lid() {
@@ -118,8 +118,6 @@ class Level extends dn.Process {
 		cursorInteract.remove();
 		if ( ground != null ) ground.dispose();
 
-		for ( i in walkable ) i.destroy();
-		walkable = null;
 		tmxMap = null;
 		obj = null;
 		entities = null;
@@ -133,19 +131,21 @@ class Level extends dn.Process {
 	}
 
 	function render() {
-		invalidated = false;
-
 		if ( tmxMap.isMap3d() ) {
 			render3d();
 		} else
 			renderPlane();
+		onRenderedSignal.dispatch();
 	}
 
 	/**
 		CONGRUENT tileset
 	**/
 	function render3d() {
-		new VoxelLevel( this ).render( tmxMap );
+		voxelLevel = new VoxelLevel( this ).render( tmxMap );
+		#if colliders_debug
+		oimoDebug = new OimoDebugRenderer( this ).initWorld( world );
+		#end
 	}
 
 	/**
@@ -195,62 +195,18 @@ class Level extends dn.Process {
 			}
 			cursorInteract.priority = -10;
 		}
-
-		#if colliders_debug
-		for ( i in walkable ) {
-			var pts : Array<Point> = [];
-			for ( pt in i.vertices ) {
-				pts.push( new Point( pt.x, 0, pt.y ) );
-			}
-			var idx = new IndexBuffer();
-			for ( i in 1...pts.length - 1 ) {
-				idx.push( 0 );
-				idx.push( i );
-				idx.push( i + 1 );
-			}
-
-			var polyPrim = new h3d.prim.Polygon( pts, idx );
-			polyPrim.addUVs();
-			polyPrim.addNormals();
-
-			var isoDebugMesh = new Mesh( polyPrim, obj );
-			isoDebugMesh.rotate( 0, M.toRad( 180 ), M.toRad( 90 ) );
-			isoDebugMesh.material.color.setColor( 0x361bcc );
-			isoDebugMesh.material.shadows = false;
-			isoDebugMesh.material.mainPass.wireframe = true;
-			isoDebugMesh.material.mainPass.depth( true, Less );
-
-			isoDebugMesh.y = -i.x;
-			isoDebugMesh.x = .25;
-			isoDebugMesh.z = i.y - ground.height;
-		}
-		#end
 	}
 
-	public function setWalkable( poly : TmxObject, ?points : Array<TmxPoint> ) { // setting obstacles as a differ polygon
-		var vertices : Array<differ.math.Vector> = [];
+	override function preUpdate() {
+		super.preUpdate();
+	}
 
-		if ( points != null ) {
-			makePolyClockwise( points );
-			for ( i in points ) vertices.push( new differ.math.Vector( cartToIso( i.x, i.y ).x, cartToIso( i.x, i.y ).y ) );
-			walkable.push( new Polygon( cartToIsoLocal( poly.x, poly.y ).x, cartToIsoLocal( poly.x, poly.y ).y, vertices ) );
-		} else if ( poly.objectType == OTRectangle ) {
-			vertices.push( new differ.math.Vector( cartToIso( poly.width, 0 ).x, cartToIso( poly.width, 0 ).y ) );
-			vertices.push( new differ.math.Vector( cartToIso( poly.width, poly.height ).x, cartToIso( poly.width, poly.height ).y ) );
-			vertices.push( new differ.math.Vector( cartToIso( 0, poly.height ).x, cartToIso( 0, poly.height ).y ) );
-			vertices.push( new differ.math.Vector( 0, 0 ) );
-
-			walkable.push( new Polygon( cartToIsoLocal( poly.x, poly.y ).x, cartToIsoLocal( poly.x, poly.y ).y, vertices ) );
-		}
-		walkable[walkable.length - 1].scaleY = -1;
+	override function update() {
+		super.update();
 	}
 
 	override function postUpdate() {
 		super.postUpdate();
-
-		if ( invalidated ) {
-			render();
-		}
 	}
 
 	public inline function cartToIsoLocal( x : Float, y : Float ) : Vector {

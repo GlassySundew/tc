@@ -79,14 +79,18 @@ class VoxelSceneTest {
 
 		for ( ifig => fig in Assets.CONGRUENT.figures ) {
 			for ( ipal in 0...fig.palettes ) {
-				spawnBlock(
-					'${ifig}',
-					ifig * 10,
-					ipal * 10,
-					true,
-					( fig.figStartX ) * cngrnt.tileW,
-					( fig.figStartY + ipal ) * cngrnt.tileH
-				);
+				try {
+					spawnBlock(
+						'${ifig}',
+						ifig * 10,
+						ipal * 10,
+						true,
+						( fig.figStartX ) * cngrnt.tileW,
+						( fig.figStartY + ipal ) * cngrnt.tileH
+					);
+				} catch( e ) {
+					trace( e );
+				}
 			}
 		}
 	}

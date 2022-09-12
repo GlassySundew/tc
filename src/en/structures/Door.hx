@@ -13,8 +13,8 @@ class Door extends Structure {
 
 	@:s public var leadsTo : String = "";
 
-	public override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
-		super.init( x, z, tmxObj );
+	public override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
+		super.init( x, y, z, tmxObj );
 		if ( tmxObj != null && tmxObj.properties.exists( "to" ) )
 			leadsTo = Util.unifyLevelName( tmxObj.properties.getString( "to" ) );
 	}

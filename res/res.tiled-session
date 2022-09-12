@@ -562,11 +562,11 @@
             "expandedGroupLayers": [
                 63
             ],
-            "scale": 3,
+            "scale": 2,
             "selectedLayer": 11,
             "viewCenter": {
-                "x": 489.16666666666663,
-                "y": 215.83333333333334
+                "x": 575.75,
+                "y": 196.25
             }
         },
         "tiled/levels/bridge.tmx#entities": {
@@ -635,8 +635,8 @@
             "scale": 1.5,
             "selectedLayer": 9,
             "viewCenter": {
-                "x": 2399.6666666666665,
-                "y": 1199.6666666666665
+                "x": 2400,
+                "y": 1200
             }
         },
         "tiled/levels/rules/rules1.tmx": {
@@ -764,11 +764,14 @@
                 830,
                 829
             ],
-            "scale": 3,
+            "expandedObjectLayers": [
+                3
+            ],
+            "scale": 5.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 348.5,
-                "y": 198.16666666666666
+                "x": 421.3636363636364,
+                "y": 44.45454545454546
             }
         },
         "tiled/levels/ship_pascal.tmx#CONGRUENT": {
@@ -788,8 +791,8 @@
             "scale": 23,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 124.97826086956522,
-                "y": 49.97826086956522
+                "x": 125,
+                "y": 50
             }
         },
         "tiled/levels/ui.tsx": {
@@ -828,15 +831,15 @@
         "tiled/levels/ship_pascal.tmx"
     ],
     "project": "res.tiled-project",
-    "property.type": "bool",
+    "property.type": "int",
     "recentFiles": [
+        "tiled/levels/rules/random.tmx",
+        "tiled/levels/rules/rules.tmx",
+        "tiled/levels/procgen/asteroids.tmx",
+        "tiled/levels/asteroid.tmx",
         "tiled/levels/bridge.tmx",
         "tiled/levels/ship_pascal.tmx",
         "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx",
-        "tiled/levels/procgen/asteroids.tmx",
-        "tiled/levels/asteroid.tmx",
-        "tiled/levels/rules/random.tmx",
-        "tiled/levels/rules/rules.tmx",
         "tiled/levels/entities.tsx",
         "tiled/levels/ui.tsx",
         "tiled/levels/ui.tmx",

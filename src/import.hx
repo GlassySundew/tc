@@ -16,6 +16,7 @@ import utils.tools.Settings.*;
 import utils.tools.Settings;
 
 using Item.StackExtender;
+using en.util.EntityUtil;
 using utils.Extensions.FlowExtender;
 using utils.Extensions.ReverseArrayKeyValueIterator;
 using utils.Extensions.SeedyRandomExtender;

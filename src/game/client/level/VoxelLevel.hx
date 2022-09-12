@@ -1,5 +1,8 @@
 package game.client.level;
 
+import game.client.level.batch.LUTBatcher;
+import oimo.common.Vec3;
+import utils.oimo.OimoUtil;
 import ch2.Tilemap;
 import shader.VoxelDepther;
 import shader.LUT;
@@ -29,10 +32,16 @@ class VoxelLevel extends Process {
 
 	var threeDRoot : Object;
 	var tmxMap : TmxMap;
+	var batcher : LUTBatcher;
 
 	public function new( parent : Process ) {
 		super( parent );
 		threeDRoot = new Object( Boot.inst.s3d );
+		batcher = new LUTBatcher();
+	}
+
+	public function toggleVisible() {
+		threeDRoot.visible = !threeDRoot.visible;
 	}
 
 	public function render( tmxMap : TmxMap ) {
@@ -57,6 +66,8 @@ class VoxelLevel extends Process {
 						} else true;
 				} }
 		);
+
+		return this;
 	}
 
 	function createModel( nameAppend : String, tileset : TmxTileset ) : Mesh {
@@ -73,6 +84,7 @@ class VoxelLevel extends Process {
 
 		for ( tileidx => tile in tileLayer.data.tiles ) {
 			if ( tile.gid != 0 ) {
+
 				var tileset = Tools.getTilesetByGid( tmxMap, tile.gid );
 				var tilesetLine = tileset.getTilesCountInLineOnTileset();
 				var tsFigures : Tileset = Reflect.field( Assets, tileset.name );
@@ -83,7 +95,8 @@ class VoxelLevel extends Process {
 					blockCache[tile.gid] = tsFigures.bSearchModel( tsetTileX, tsetTileY, tsetTileX );
 
 				var model = createModel( '${blockCache[tile.gid]}', tileset );
-				Boot.inst.s3d.addChild( model );
+
+				threeDRoot.addChild( model );
 				model.material.shadows = false;
 				model.material.texture.filter = Nearest;
 				var p = model.material.mainPass;
@@ -96,11 +109,18 @@ class VoxelLevel extends Process {
 					)
 				);
 
-				p.addShader( new VoxelDepther( ( zheight + depthOff * 5 ) * 0.0005 ) );
+				p.addShader( new VoxelDepther( ( zheight + depthOff * 2 ) * 0.0005 ) );
 
 				model.x = ( tileidx % tmxMap.width ) * tmxMap.tileHeight + zheight * tmxMap.tileHeight;
 				model.y = Math.floor( tileidx / tmxMap.width ) * tmxMap.tileHeight + zheight * tmxMap.tileHeight;
 				model.z = zheight * tmxMap.tileHeight;
+
+				OimoUtil.addBox(
+					Level.inst.world,
+					new Vec3( model.x + ( tmxMap.tileHeight >> 1 ), model.y + ( tmxMap.tileHeight >> 1 ), model.z + ( tmxMap.tileHeight + 1 ) / 2 ),
+					new Vec3( tmxMap.tileHeight >> 1, tmxMap.tileHeight >> 1, ( tmxMap.tileHeight + 1 ) / 2 ),
+					true
+				);
 			}
 		}
 	}

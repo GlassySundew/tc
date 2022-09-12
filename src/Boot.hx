@@ -10,6 +10,7 @@ class Boot extends hxd.App {
 	public static var inst : Boot;
 
 	public var renderer : CustomRenderer;
+	public var deltaTime( default, null ) : Float;
 
 	static function main() {
 		new Boot();
@@ -56,6 +57,7 @@ class Boot extends hxd.App {
 
 	override function update( deltaTime : Float ) {
 		// Manager.get().listener.syncCamera(s3d.camera);
+		this.deltaTime = deltaTime;
 		var tmod = hxd.Timer.tmod * speed;
 		dn.Process.updateAll( tmod );
 		super.update( deltaTime );

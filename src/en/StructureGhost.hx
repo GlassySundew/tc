@@ -1,5 +1,6 @@
 package en;
 
+import en.spr.EntitySprite;
 import utils.Assets;
 
 // Just an helping indicator that should show if structure can be placed on
@@ -8,8 +9,12 @@ class StructureGhost extends Structure {
 	public var canBePlaced : Bool = false;
 
 	public function new( cdbEntry : Data.StructureKind ) {
-		spr = new HSprite( Assets.structures, hollowScene );
-		spr.set( '${Data.structure.get( cdbEntry ).id}' );
+		eSpr = new EntitySprite(
+			this,
+			Assets.structures,
+			'${Data.structure.get( cdbEntry ).id}',
+			hollowScene
+		);
 
 		super( 0, 0, cdbEntry );
 
@@ -20,29 +25,29 @@ class StructureGhost extends Structure {
 		interact.onOutEvent.removeAll();
 		interact.visible = false;
 
-		spr.alpha = .75;
+		eSpr.spr.alpha = .75;
 
 		cd.setS( "colorMaintain", 1 / 0 );
 
 		// GameClient.inst.applyTmxObjOnEnt(this);
 	}
 
-	public function checkIfValidToPlace() {
-		if ( checkCollsAgainstAll( false ) ) {
-			turnRed();
-			canBePlaced = false;
-		} else {
-			turnGreen();
-			canBePlaced = true;
-		}
+	public function isValidToPlace() {
+		// if ( checkCollsAgainstAll( false ) ) {
+		// 	turnRed();
+		// 	canBePlaced = false;
+		// } else {
+		// 	turnGreen();
+		// 	canBePlaced = true;
+		// }
 	}
 
 	public function turnGreen() {
-		colorAdd.setColor( 0x29621e );
+		eSpr.colorAdd.setColor( 0x29621e );
 	}
 
 	public function turnRed() {
-		colorAdd.setColor( 0xbe3434 );
+		eSpr.colorAdd.setColor( 0xbe3434 );
 	}
 
 	override function applyItem( item : Item ) {}
@@ -53,6 +58,6 @@ class StructureGhost extends Structure {
 
 	override function postUpdate() {
 		super.postUpdate();
-		checkIfValidToPlace();
+		isValidToPlace();
 	}
 }

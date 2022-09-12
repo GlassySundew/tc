@@ -16,11 +16,11 @@ class LUT extends Shader {
 		//
 		@param var lookup : Sampler2D;
 		//
-		@param var lutRows : Int; // 8
+		@perInstance @param var lutRows : Int; // 8
 		@param var lutSize : Int; // 64
 		//
-		@param var offsetX : Int;
-		@param var offsetY : Int;
+		@perInstance @param var offsetX : Int;
+		@perInstance @param var offsetY : Int;
 		//
 		function lutUV( color : Vec4 ) : Vec2 {
 			var z = color.z * 256; // 17

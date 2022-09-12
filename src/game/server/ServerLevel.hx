@@ -4,15 +4,10 @@ package game.server;
 	server-side level
 **/
 import dn.Process;
-import oimo.dynamics.World;
-import net.Server;
-import differ.math.Vector;
-import differ.shapes.Polygon;
 import en.Entity;
 import format.tmx.Data.TmxLayer;
-import format.tmx.TmxMap;
 import format.tmx.Data.TmxObject;
-import format.tmx.Data.TmxPoint;
+import format.tmx.TmxMap;
 import format.tmx.Tools;
 import hxbit.NetworkSerializable;
 
@@ -21,7 +16,6 @@ class ServerLevel extends dn.Process implements NetworkSerializable {
 	public var sqlId : Null<Int>;
 	@:s public var tmxMap : TmxMap;
 
-	@:s public var walkable : Array<Polygon> = [];
 	@:s public var entitiesTmxObj : Array<TmxObject> = [];
 	@:s public var entities : Array<Entity> = [];
 
@@ -63,9 +57,7 @@ class ServerLevel extends dn.Process implements NetworkSerializable {
 							switch( obj.objectType ) {
 								case OTPolygon( points ):
 									var pts = makePolyClockwise( points );
-									setWalkable( obj, pts );
 								case OTRectangle:
-									setWalkable( obj );
 								default:
 							}
 						}
@@ -121,31 +113,12 @@ class ServerLevel extends dn.Process implements NetworkSerializable {
 		entities.remove( ent );
 	}
 
-	public inline function cartToIsoLocal( x : Float, y : Float ) : Vector {
-		return new Vector(
-			-( tmxMap.width - tmxMap.height ) / 2 * tmxMap.tileHeight + wid * .5 + cartToIso( x, y ).x,
-			hei - cartToIso( x, y ).y
-		);
-	}
-
-	public function setWalkable( poly : TmxObject, ?points : Array<TmxPoint> ) { // setting obstacles as a differ polygon
-		var vertices : Array<differ.math.Vector> = [];
-
-		if ( points != null ) {
-			makePolyClockwise( points );
-			for ( i in points ) vertices.push( new differ.math.Vector( cartToIso( i.x, i.y ).x, cartToIso( i.x, i.y ).y ) );
-			walkable.push( new Polygon( cartToIsoLocal( poly.x, poly.y ).x, cartToIsoLocal( poly.x, poly.y ).y, vertices ) );
-		} else if ( poly.objectType == OTRectangle ) {
-			vertices.push( new differ.math.Vector( cartToIso( poly.width, 0 ).x, cartToIso( poly.width, 0 ).y ) );
-			vertices.push( new differ.math.Vector( cartToIso( poly.width, poly.height ).x, cartToIso( poly.width, poly.height ).y ) );
-			vertices.push( new differ.math.Vector( cartToIso( 0, poly.height ).x, cartToIso( 0, poly.height ).y ) );
-			vertices.push( new differ.math.Vector( 0, 0 ) );
-
-			walkable.push( new Polygon( cartToIsoLocal( poly.x, poly.y ).x, cartToIsoLocal( poly.x, poly.y ).y, vertices ) );
-		}
-		walkable[walkable.length - 1].scaleY = -1;
-	}
-
+	// public inline function cartToIsoLocal( x : Float, y : Float ) : Vector {
+	// 	return new Vector(
+	// 		-( tmxMap.width - tmxMap.height ) / 2 * tmxMap.tileHeight + wid * .5 + cartToIso( x, y ).x,
+	// 		hei - cartToIso( x, y ).y
+	// 	);
+	// }
 	// destroys itself if has no player instances for 5 seconds
 	function gc() {
 		for ( e in entities ) {}

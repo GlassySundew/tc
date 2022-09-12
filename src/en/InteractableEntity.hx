@@ -45,18 +45,18 @@ class InteractableEntity extends Entity {
 	var points : Array<HxPoint>;
 	var doHighlight : Bool = true;
 
-	function new( ?x : Float = 0, ?z : Float = 0, ?tmxObj : TmxObject ) {
-		super( x, z, tmxObj );
+	function new( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
+		super( x, y, z, tmxObj );
 	}
 
-	public override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
-		super.init( x, z, tmxObj );
+	public override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
+		super.init( x, y, z, tmxObj );
 	}
 
 	override function alive() {
 		super.alive();
 
-		var pixels = Pixels.fromBytes( tex.capturePixels().bytes, Std.int( spr.tile.width ), Std.int( spr.tile.height ) );
+		var pixels = Pixels.fromBytes( eSpr.tex.capturePixels().bytes, Std.int( eSpr.spr.tile.width ), Std.int( eSpr.spr.tile.height ) );
 		points = new MarchingSquares( pixels ).march();
 		polygonized = ( EarCut.triangulate( points ) );
 
@@ -70,7 +70,7 @@ class InteractableEntity extends Entity {
 		}
 
 		polyPrim = new Polygon( translatedPoints, idx );
-		interact = new EventInteractive( polyPrim.getCollider(), mesh );
+		interact = new EventInteractive( polyPrim.getCollider(), eSpr.mesh );
 
 		interact.rotate( -0.01, hxd.Math.degToRad( 180 ), hxd.Math.degToRad( 90 ) );
 
@@ -108,16 +108,16 @@ class InteractableEntity extends Entity {
 	/**only x flipping is supported yet**/
 	public function rebuildInteract() {
 		@:privateAccess polyPrim.translate(-polyPrim.translatedX, 0, -polyPrim.translatedZ );
-		interact.scaleX = spr.scaleX;
-		var facX = ( flippedX ) ? 1 - spr.pivot.centerFactorX : spr.pivot.centerFactorX;
-		polyPrim.translate(-spr.tile.width * facX, 0, -spr.tile.height * spr.pivot.centerFactorY );
+		interact.scaleX = eSpr.spr.scaleX;
+		var facX = ( flippedX ) ? 1 - eSpr.spr.pivot.centerFactorX : eSpr.spr.pivot.centerFactorX;
+		polyPrim.translate(-eSpr.spr.tile.width * facX, 0, -eSpr.spr.tile.height * eSpr.spr.pivot.centerFactorY );
 		interact.shape = polyPrim.getCollider();
 	}
 
 	public function turnOnHighlight() {
 		if ( cd != null ) {
-			spr.filter = filter;
-			forceDrawTo = true;
+			eSpr.spr.filter = filter;
+			eSpr.forceDrawTo = true;
 			filter.enable = true;
 			cd.setS( "keyboardIconInit", .4 );
 			cd.setS( "interacted", Const.INFINITE );
@@ -127,8 +127,8 @@ class InteractableEntity extends Entity {
 	public function turnOffHighlight() {
 		if ( cd != null ) {
 			cd.unset( "interacted" );
-			forceDrawTo = false;
-			spr.filter = null;
+			eSpr.forceDrawTo = false;
+			eSpr.spr.filter = null;
 			filter.enable = false;
 			if ( buttonIcon != null ) buttonIcon.dispose();
 		}
@@ -136,13 +136,13 @@ class InteractableEntity extends Entity {
 
 	function updateKeyIcon() {
 		if ( !cd.has( "keyboardIconInit" ) && cd.has( "interacted" ) ) {
-			var pos = Boot.inst.s3d.camera.project( mesh.x, 0, mesh.z, wScaled, hScaled );
+			var pos = Boot.inst.s3d.camera.project( eSpr.mesh.x, 0, eSpr.mesh.z, wScaled, hScaled );
 			cd.unset( "interacted" );
 			buttonIcon = new ButtonIcon( pos.x, pos.y );
 			tw.createS( buttonIcon.container.icon.alpha, 0 > 1, TEaseIn, .4 );
 		}
 		if ( buttonIcon != null ) {
-			var pos = Boot.inst.s3d.camera.project( mesh.x, 0, mesh.z, wScaled, hScaled );
+			var pos = Boot.inst.s3d.camera.project( eSpr.mesh.x, 0, eSpr.mesh.z, wScaled, hScaled );
 
 			buttonIcon.centerFlow.x = pos.x - 1;
 			buttonIcon.centerFlow.y = pos.y - 100 / Const.UI_SCALE;
@@ -161,7 +161,7 @@ class InteractableEntity extends Entity {
 	override function clientFlipX() {
 		super.clientFlipX();
 
-		if ( spr != null ) {
+		if ( eSpr.spr != null ) {
 			rebuildInteract();
 		}
 	}

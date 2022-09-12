@@ -1,5 +1,6 @@
 package en;
 
+import en.spr.EntitySprite;
 import utils.Assets;
 import format.tmx.Data.TmxObject;
 
@@ -7,29 +8,31 @@ class SpriteEntity extends Structure {
 
 	@:s var spriteGroup : String;
 
-	public function new( ?x : Float = 0, ?z : Float = 0, sprite : String, ?tmxObj : TmxObject, ?cdbEntry : Data.StructureKind ) {
+	public function new( x = 0., y = 0., z = 0., sprite : String, ?tmxObj : TmxObject, ?cdbEntry : Data.StructureKind ) {
 		spriteGroup = sprite;
-		super( x, z, tmxObj, cdbEntry );
+		super( x, y, z, tmxObj, cdbEntry );
 	}
 
-	override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
+	override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
 
-		super.init( x, z, tmxObj );
+		super.init( x, y, z, tmxObj );
 		// mesh.isLong=true;
 		// mesh.isoHeight=mesh.isoWidth=1;
 	}
 
 	public override function alive() {
-		if ( spr == null ) {
-			spr = new HSprite( Assets.structures, spriteGroup, hollowScene );
-		}
+		eSpr = new EntitySprite(
+			this,
+			Assets.structures,
+			spriteGroup,
+			hollowScene
+		);
 		super.alive();
-		if ( tmxObj != null && tmxObj.properties.exists( "interactable" ) ) {
-			interactable = tmxObj.properties.getBool( "interactable" );
-		}
 	}
 
 	override function postUpdate() {
 		super.postUpdate();
 	}
+
+	
 }

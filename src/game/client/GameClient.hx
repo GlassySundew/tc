@@ -72,21 +72,6 @@ class GameClient extends Process {
 
 		ca = Main.inst.controller.createAccess();
 
-		// generating initial asteroids to have where to put player on
-		// we do not yet have need to save stuff about asteroids, temporal clause
-
-		// @:privateAccess
-		// Navigation.fields.push(new NavigationField(
-		// 	seed,
-		// 	0,
-		// 	0
-		// ));
-
-		// new Navigation(
-		// 	Const.jumpReach,
-		// 	'${GameClient.inst.seed}'
-		// );
-
 		#if game_tmod
 		stats = new Text( Assets.fontPixel, Boot.inst.s2d );
 		#end
@@ -178,12 +163,15 @@ class GameClient extends Process {
 		// Updates
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.preUpdate();
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.update();
+
+		if ( level != null ) level.world.step( Boot.inst.deltaTime );
+
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.postUpdate();
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.frameEnd();
+
 		gc();
 
 		if ( ca.isPressed( Escape ) ) {
-
 			new PauseMenu( this, Main.inst.root, Main.inst );
 		}
 	}

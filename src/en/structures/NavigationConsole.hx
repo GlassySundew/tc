@@ -14,13 +14,13 @@ class NavigationConsole extends Structure {
 	var navigation : NavigationWindow;
 	var ca : ControllerAccess<ControllerAction>;
 
-	public function new( x : Float, y : Float, ?tmxObject : TmxObject, ?cdbEntry : Data.StructureKind ) {
-		super( x, y, tmxObject, cdbEntry );
+	public function new( x = 0., y = 0., z = 0., ?tmxObject : TmxObject, ?cdbEntry : Data.StructureKind ) {
+		super( x, y, z, tmxObject, cdbEntry );
 		interactable = true;
 	}
 
-	public override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
-		super.init( x, z, tmxObj );
+	public override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
+		super.init( x, y, z, tmxObj );
 	}
 
 	override function alive() {

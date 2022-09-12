@@ -11,13 +11,6 @@ typedef Figure = {
 	var palettes : Int;
 }
 
-enum abstract SearchResult( Int ) from Int to Int {
-
-	var Found;
-	var Lower;
-	var Higher;
-}
-
 /**
 	a packed tileset with a set of figures in different palettes, 
 	used to turn them 3d through LUT

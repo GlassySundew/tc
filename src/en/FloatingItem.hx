@@ -1,5 +1,6 @@
 package en;
 
+import en.spr.EntitySprite;
 import game.client.GameClient;
 import utils.Assets;
 import utils.Assets;
@@ -29,26 +30,22 @@ class FloatingItem extends en.InteractableEntity {
 	var startWave = Math.random() * 9999;
 	var rotCont : Object;
 
-	public function new( ?x : Float = 0, ?z : Float = 0, item : en.Item, ?tmxObj : TmxObject ) {
+	public function new( x = 0., y = 0., z = 0., item : en.Item, ?tmxObj : TmxObject ) {
 		this.item = item;
-
-		super( x, z, tmxObj );
+		super( x, y, z, tmxObj );
 	}
 
-	override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
-		if ( spr == null ) spr = new HSprite(
+	override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
+		eSpr = new EntitySprite(
+			this,
 			Assets.items,
 			Data.item.get( item.cdbEntry ).atlas_name,
 			hollowScene
 		);
 
-		super.init( x, z, tmxObj );
+		super.init( x, y, z, tmxObj );
 
-		setPivot();
-		spr.tile.getTexture().filter = Nearest;
-
-		mesh.remove();
-		mesh = null;
+		this.refreshPivot();
 
 		var revPts = translatedPoints.copy();
 		for ( i in revPts ) translatedPoints.push( new Point( i.x, i.y + 1.5, i.z ) );
@@ -105,20 +102,18 @@ class FloatingItem extends en.InteractableEntity {
 		}
 		for ( i in translatedPoints.length ... idx.length ) polyPrim.uvs.push( new UV( 0, 0 ) );
 
-		spr.drawTo( tex );
-		tex.filter = Nearest;
+		// spr.drawTo( tex );
+		// tex.filter = Nearest;
 
 		polyPrim.addNormals();
 		polyPrim.addTangents();
 
-		polyMesh = new Mesh( polyPrim, Material.create( tex ), Boot.inst.s3d );
-		polyMesh.material.mainPass.depth( true, LessEqual );
-		polyMesh.material.mainPass.culling = Front;
-		polyMesh.material.shadows = false;
-		polyMesh.material.mainPass.enableLights = false;
+		// polyMesh = new Mesh( polyPrim, Material.create( tex ), Boot.inst.s3d );
+		// polyMesh.material.mainPass.depth( true, LessEqual );
+		// polyMesh.material.mainPass.culling = Front;
+		// polyMesh.material.shadows = false;
+		// polyMesh.material.mainPass.enableLights = false;
 
-		deDepth = polyMesh.material.mainPass.addShader( new shader.PolyDedepther( z ) );
-		deDepth.xRotAngle = -rotAngle;
 		var meshSize = polyMesh.getBounds().getSize();
 
 		polyPrim.translate( -.5 * meshSize.x - 1, -.5 * meshSize.y, -.5 * meshSize.z );
@@ -143,9 +138,6 @@ class FloatingItem extends en.InteractableEntity {
 		shadowTex = new Texture( Std.int( shadowSpr.tile.width ), Std.int( shadowSpr.tile.height ), [Target] );
 		var shadowBmp = new Bitmap( shadowSpr.tile );
 		shadowBmp.drawTo( shadowTex );
-
-		var shape = new differ.shapes.Circle( 0, 0, 4 );
-		collisions.set( shape, new differ.math.Vector( 0, 0 ) );
 	}
 
 	// public static function
@@ -158,7 +150,6 @@ class FloatingItem extends en.InteractableEntity {
 
 	override function postUpdate() {
 		super.postUpdate();
-		updateCollisions();
 		// polyMesh.material.texture.clear(0, 0);
 		// bmp.tile = spr.tile;
 		// bmp.drawTo(polyMesh.material.texture);
@@ -172,48 +163,19 @@ class FloatingItem extends en.InteractableEntity {
 		// polyMesh.y = 0.01;
 
 		polyMesh.rotate( 0, 0, 0.016 * tmod );
-		deDepth.objZ = ( polyMesh.z - footY.val ) * Math.sin(-rotAngle );
 
-		if ( !isLocked() ) bumpAwayFrom( Player.inst, distPx( Player.inst ) < 20 ? -.065 * tmod : 0 );
+		if ( !isLocked() ) bumpAwayFrom( Player.inst, this.distPx( Player.inst ) < 20 ? -.065 * tmod : 0 );
 
-		if ( Player.inst != null && distPx( Player.inst ) < 10 && !isLocked() ) {
-			//! Player.inst.inventory.giveItem( item );
+		if ( Player.inst != null && this.distPx( Player.inst ) < 10 && !isLocked() ) {
+			// ! Player.inst.inventory.giveItem( item );
 			destroy();
 			if ( sqlId != null ) utils.tools.Save.inst.removeEntityById( sqlId );
 		}
 	}
 
-	override function updateCollisions() {
-		super.updateCollisions();
-		checkCollsAgainstAll();
-	}
-
 	public override function frameEnd() {
 		super.frameEnd();
 	}
-
-	// @:keep
-	// override function customSerialize( ctx : Serializer ) {
-	// 	if ( item != null ) {
-	// 		ctx.addString(Std.string(item.cdbEntry));
-	// 		ctx.addInt(item.amount);
-	// 	} else {
-	// 		ctx.addString("null");
-	// 		ctx.addInt(0);
-	// 	}
-	// 	super.customSerialize(ctx);
-	// }
-	// @:keep
-	// override function customUnserialize( ctx : Serializer ) {
-	// 	var itemCdb = ctx.getString();
-	// 	var itemAmt = ctx.getInt();
-	// 	if ( itemCdb != "null" ) {
-	// 		var item = Item.fromCdbEntry(Data.item.resolve(itemCdb).id, itemAmt);
-	// 		item.containerEntity = this;
-	// 		this.item = item;
-	// 	}
-	// 	super.customUnserialize(ctx);
-	// }
 
 	function filterArray( array : Array<HxPoint> ) {
 		var i = 0;

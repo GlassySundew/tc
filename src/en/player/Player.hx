@@ -3,21 +3,20 @@ package en.player;
 import ch3.scene.TileSprite;
 import dn.heaps.input.ControllerAccess;
 import en.items.Blueprint;
+import en.spr.EntitySprite;
 import format.tmx.Data.TmxObject;
 import game.client.ControllerAction;
 import game.client.GameClient;
 import game.client.level.Level;
-import h2d.Tile;
-import h3d.mat.Texture;
 import hxbit.NetworkHost;
 import hxbit.NetworkSerializable;
 import hxbit.Serializer;
 import hxd.Key;
 import net.ClientController;
 import net.ClientToServer.AClientToServer;
+import oimo.common.Vec3;
 import ui.Navigation;
 import ui.core.InventoryGrid;
-import ui.domkit.TextLabelComp;
 import ui.player.ItemCursorHolder;
 import ui.player.PlayerUI;
 import utils.Assets;
@@ -62,7 +61,7 @@ class Player extends Entity {
 		return residesOnId = v;
 	}
 
-	public function new( x : Float, z : Float, tmxObj : TmxObject, nickname : String, uid : Int, clientController : ClientController ) {
+	public function new( x = 0., y = 0., z = 0., tmxObj : TmxObject, nickname : String, uid : Int, clientController : ClientController ) {
 		this.nickname = nickname;
 		this.uid = uid;
 		this.clientController = clientController;
@@ -73,31 +72,25 @@ class Player extends Entity {
 		inventory = new InventoryGrid( 5, 6, PlayerInventory, this );
 		holdItem = new ItemCursorHolder( this );
 
-		super( x, z, tmxObj );
+		super( x, y, z, tmxObj );
 
 		actionState.syncBack = footX.syncBack = footY.syncBack = false;
 		actionState.syncBackOwner = footX.syncBackOwner = footY.syncBackOwner = clientController;
 
 		lock( 30 );
-
-		// new game here, thus setting player to a random asteroid in 0, 0 asteroid chunk, idk what to make it in multiplayer
-
-		// if ( Navigation.serverInst.fields.length > 0 ) {
-		// var r = new Random();
-		// 	r.setStringSeed(Server.inst.game.seed);
-		// 	residesOnId = r.choice(Navigation.serverInst.fields[0].targets).id;
-		// }
-
-		// footX.clientToServerCond = footY.clientToServerCond = () -> return true;
 	}
 
-	override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
+	override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
 
-		super.init( x, z, tmxObj );
+		super.init( x, y, z, tmxObj );
 	}
 
 	public override function alive() {
-		spr = new HSprite( Assets.player, hollowScene );
+		eSpr = new EntitySprite(
+			this,
+			Assets.player,
+			hollowScene
+		);
 		ca = Main.inst.controller.createAccess();
 		belt = Main.inst.controller.createAccess();
 
@@ -111,19 +104,15 @@ class Player extends Entity {
 			{ dir : "down", prio : 0 },
 			{ dir : "down_right", prio : 1 }
 		] ) {
-			spr.anim.registerStateAnim( "walk_" + dir.dir, dir.prio, ( 1 / 60 / 0.16 ),
+			eSpr.spr.anim.registerStateAnim( "walk_" + dir.dir, dir.prio, ( 1 / 60 / 0.16 ),
 				() -> return this.dir == i && actionState.getValue() == Running
 			);
-			spr.anim.registerStateAnim( "idle_" + dir.dir, dir.prio, ( 1 / 60 / 0.16 ),
+			eSpr.spr.anim.registerStateAnim( "idle_" + dir.dir, dir.prio, ( 1 / 60 / 0.16 ),
 				() -> return this.dir == i && actionState.getValue() == Idle
 			);
 		}
 
 		super.alive();
-
-		#if depth_debug
-		mesh.renewDebugPts();
-		#end
 
 		if ( uid == net.Client.inst.uid ) {
 			inst = this;
@@ -134,16 +123,28 @@ class Player extends Entity {
 			GameClient.inst.player = this;
 		}
 
-		initNickname();
+		GameClient.inst.delayer.addF(
+			() -> {
+				eSpr.initTextLabel( nickname );
+				eSpr.pivotChanged = true;
+			}, 1 );
+	}
 
-		// holdItem.onSetItem.add( attachHoldItemToSpr );
+	override function applyTmx() {
+		super.applyTmx();
+		rigidBody.setRotationFactor( new Vec3( 0, 0, 0 ) );
+		contactCb.postSolveSign.add( ( c ) -> {
+			footX.val = rigidBody._transform._positionX;
+			footY.val = rigidBody._transform._positionY;
+			footZ.val = rigidBody._transform._positionZ;
+		} );
 	}
 
 	function attachHoldItemToSpr( item : Item ) {
-		if ( holdItemSpr != null ) forceDrawTo = holdItemSpr.visible = item != null;
+		if ( holdItemSpr != null ) eSpr.drawToBoolStack.addLambda(() -> return ( holdItemSpr.visible = item != null ) );
 
 		if ( item != null ) {
-			if ( holdItemSpr == null ) holdItemSpr = new HSprite( Assets.items, spr );
+			if ( holdItemSpr == null ) holdItemSpr = new HSprite( Assets.items, eSpr.spr );
 			holdItemSpr.set( Data.item.get( item.cdbEntry ).atlas_name );
 		}
 	}
@@ -160,24 +161,6 @@ class Player extends Entity {
 		clientSer : hxbit.NetworkSerializable
 	) : Bool {
 		return GameClient.inst != null ? Main.inst.clientController == clientSer : cast( clientSer, ClientController ).player == this;
-	}
-
-	/**generate nickname text mesh**/
-	public function initNickname() {
-		var nicknameLabel = new TextLabelComp( nickname, Assets.fontPixel );
-		@:privateAccess nicknameLabel.sync( Boot.inst.s2d.ctx );
-
-		var nicknameTex = new Texture( nicknameLabel.outerWidth + 20, nicknameLabel.outerHeight, [Target] );
-
-		nicknameLabel.drawTo( nicknameTex );
-		nicknameMesh = new TileSprite( Tile.fromTexture( nicknameTex ), false, mesh );
-		nicknameMesh.material.mainPass.setBlendMode( AlphaAdd );
-		nicknameMesh.material.mainPass.enableLights = false;
-		nicknameMesh.material.mainPass.depth( false, LessEqual );
-		nicknameMesh.scale( .5 );
-		nicknameMesh.z += 40;
-		nicknameMesh.y += 1;
-		@:privateAccess nicknameMesh.plane.ox = (-nicknameLabel.outerWidth >> 1 ) + 2;
 	}
 
 	public static var onGenerationCallback : Void -> Void;
@@ -251,13 +234,10 @@ class Player extends Entity {
 	}
 
 	override function preUpdate() {
-
 		super.preUpdate();
 	}
 
 	override public function update() {
-		super.update();
-
 		if ( inst == this ) {
 			var lx = ca.getAnalogValue2( MoveLeft, MoveRight );
 			var ly = ca.getAnalogValue2( MoveDown, MoveUp );
@@ -286,6 +266,8 @@ class Player extends Entity {
 
 			actionState.setValue( isMoving ? Running : Idle );
 		}
+
+		super.update();
 	}
 
 	override function postUpdate() {
@@ -297,13 +279,6 @@ class Player extends Entity {
 			if ( holdItem != null && Std.isOfType( holdItem, Blueprint ) && cast( holdItem, Blueprint ).ghostStructure != null ) {
 				cast( holdItem, Blueprint ).ghostStructure.flipX();
 			}
-		}
-	}
-
-	override function updateCollisions() {
-		if ( !isLocked() ) {
-			super.updateCollisions();
-			if ( inst == this ) checkCollsAgainstAll();
 		}
 	}
 

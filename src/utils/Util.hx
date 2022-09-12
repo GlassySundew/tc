@@ -10,46 +10,47 @@ import hxd.Res;
 import ui.NinesliceWindow.NinesliceConf;
 
 @:publicFields
-@:expose
 class Util {
 
 	/** Regex to get class name provided by CompileTime libs, i.e. en.$Entity -> Entity **/
-	static var eregCompTimeClass = ~/\$([a-zA-Z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
+	public static var eregCompTimeClass = ~/\$([a-zA-Z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
 
 	/** regex to match automapping random rules **/
-	static var eregAutoMapRandomLayer = ~/(?:output|input)([0-9]+)_([a-z]+)$/gi;
+	public static var eregAutoMapRandomLayer = ~/(?:output|input)([0-9]+)_([a-z]+)$/gi;
 
 	/** regex to match automapping inputnot rules **/
-	static var eregAutoMapInputNotLayer = ~/(?:input)not_([a-z]+)$/gi;
+	public static var eregAutoMapInputNotLayer = ~/(?:input)not_([a-z]+)$/gi;
 
 	/** Regex to get '$this' class name i.e. en.Entity -> Entity **/
-	static var eregClass = ~/\.([a-z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
+	public static var eregClass = ~/\.([a-z_0-9]+)+$/gi; // regexp to remove 'en.' prefix
 
 	/** Регулярка чтобы взять из абсолютного пути название файла без расширения .png **/
-	static var eregFileName = ~/\/*([a-z_0-9]+)\./;
+	public static var eregFileName = ~/\/*([a-z_0-9]+)\./;
 
-	inline static function makePolyClockwise( points : Array<TmxPoint> ) {
+	public inline static function makePolyClockwise( points : Array<TmxPoint> ) {
 		var pts = points.copy();
 		var sum = .0;
 		for ( i => pt in pts ) {
 			var nextIdx = ( i == pts.length - 1 ) ? 0 : i + 1;
 			sum += ( pts[nextIdx].x - pt.x ) * ( pts[nextIdx].y + pt.y );
 		}
-		sum < 0 ? pts.reverse() : {};
+		if ( sum < 0 ) pts.reverse();
 		return pts;
 	}
 
-	inline static function cartToIso( x : Float, y : Float ) : Vector return new Vector( ( x - y ), ( x + y ) / 2 );
+	public inline static function cartToIso( x : Float, y : Float ) : Vector return new Vector( ( x - y ), ( x + y ) / 2 );
 
-	inline static function screenToIsoX( globalX : Float, globalY : Float ) {
+	public inline static function isoToCart( x : Float, y : Float ) : Vector return new Vector( ( x - y ) / 1.5, x / 3 + y / 1.5 );
+
+	public inline static function screenToIsoX( globalX : Float, globalY : Float ) {
 		return globalX + globalY;
 	}
 
-	inline static function screenToIsoY( globalX : Float, globalY : Float ) {
+	public inline static function screenToIsoY( globalX : Float, globalY : Float ) {
 		return globalY - globalX / 2;
 	}
 
-	inline static function screenToIso( globalX : Float, globalY : Float ) {
+	public inline static function screenToIso( globalX : Float, globalY : Float ) {
 		return new Vector( screenToIsoX( globalX, globalY ), screenToIsoY( globalX, globalY ) );
 	}
 
@@ -88,17 +89,38 @@ class Util {
 
 	inline static function emptyTiles( map : TmxMap ) return [for ( i in 0...( map.height * map.width ) ) new TmxTile( 0 )];
 
-	static inline function rotatePoly( obj : TmxObject, points : Array<TmxPoint> ) {
+	static inline function rotatePoly<T : { x : Float, y : Float }>( angle, points : Array<T> ) {
 		for ( pt in points ) {
 			var old = new Vector( pt.x, pt.y );
-			var angle = M.toRad( obj.rotation );
+			var angle = M.toRad( angle );
 
 			pt.x = ( old.x ) * Math.cos( angle ) - ( old.y ) * Math.sin( angle );
 			pt.y = ( old.x ) * Math.sin( angle ) + ( old.y ) * Math.cos( angle );
 		}
 	}
 
-	static function getProjectedDifferPolygonRect( ?obj : TmxObject, points : Array<TmxPoint> ) : differ.math.Vector {
+	/**
+		https://stackoverflow.com/questions/15022630/how-to-calculate-the-angle-from-rotation-matrix
+	**/
+	public static inline function rotMatToEuler(
+		r11 : Float,
+		r21 : Float,
+		r31 : Float,
+		r32 : Float,
+		r33 : Float
+	) {
+		var ax = Math.atan2( r32, r33 );
+		var ay = Math.atan2(-r31, Math.sqrt( r32 * r32 + r33 * r33 ) );
+		var az = Math.atan2( r21, r11 );
+
+		return new Vector( ax, ay, az );
+	}
+
+	public static function getProjPolySize<T : { x : Float, y : Float }>(
+		?obj : TmxObject,
+		points : Array<TmxPoint>,
+		resultType : Class<T>
+	) : T {
 		var pts = makePolyClockwise( points );
 		var verts : Array<Vector> = [];
 		for ( i in pts ) verts.push( new Vector( ( i.x ), ( i.y ) ) );
@@ -112,7 +134,7 @@ class Util {
 		var xCent : Float = Std.int( ( xArr[xArr.length - 1].x + xArr[0].x ) * .5 );
 		var yCent : Float = Std.int( ( yArr[yArr.length - 1].y + yArr[0].y ) * .5 );
 
-		return new differ.math.Vector( xCent, yCent );
+		return Type.createInstance( resultType, [xCent, yCent] );
 	}
 
 	/**

@@ -1,13 +1,20 @@
 package utils;
 
+import oimo.collision.geometry.CylinderGeometry;
+import game.client.level.Level;
+import h3d.Vector;
+import oimo.dynamics.rigidbody.Shape;
+import oimo.dynamics.rigidbody.RigidBody;
+import oimo.dynamics.rigidbody.RigidBodyConfig;
+import oimo.dynamics.rigidbody.ShapeConfig;
+import oimo.collision.geometry.ConvexHullGeometry;
+import oimo.common.Vec3;
 import format.tmx.Data.TmxGroup;
 import format.tmx.Data.TmxImageLayer;
 import format.tmx.Data.TmxObjectGroup;
 import format.tmx.Data.TmxTileLayer;
 import format.tmx.Data.TmxLayer;
 import format.tmx.TmxMap;
-import differ.math.Vector;
-import differ.shapes.Polygon;
 import format.tmx.Data.TmxTilesetTile;
 import format.tmx.Tools;
 import game.client.GameClient;
@@ -78,18 +85,16 @@ class TmxUtils {
 				switch obj.objectType {
 					case OTRectangle:
 					case OTEllipse:
-						var shape = new differ.shapes.Circle( 0, 0, obj.width / 2 );
-						var cent = new Vector(
-							obj.width / 2,
-							obj.height / 2
-						);
+					// var shape = new differ.shapes.Circle( 0, 0, obj.width / 2 );
+					// var cent = new Vector(
+					// 	obj.width / 2,
+					// 	obj.height / 2
+					// );
 
-						ent.collisions.set( shape, new differ.math.Vector( obj.x + cent.x, obj.y + cent.y ) );
-
-						if ( center.x == 0 && center.y == 0 ) {
-							center.x = cent.x + obj.x;
-							center.y = cent.y + obj.y;
-						}
+					// if ( center.x == 0 && center.y == 0 ) {
+					// 	center.x = cent.x + obj.x;
+					// 	center.y = cent.y + obj.y;
+					// }
 					case OTPoint:
 						switch obj.name {
 							case "center":
@@ -97,12 +102,13 @@ class TmxUtils {
 								center.y = obj.y;
 						}
 					case OTPolygon( points ):
-						var cent = getProjectedDifferPolygonRect( obj, points );
+						var cent = getProjPolySize( obj, points, Vector );
 
 						if ( center.x == 0 && center.y == 0 ) {
 							center.x = cent.x + obj.x;
 							center.y = cent.y + obj.y;
 						}
+
 					default:
 				}
 			}
@@ -111,8 +117,6 @@ class TmxUtils {
 			var pivotX = center.x;
 			var pivotY = center.y;
 
-			ent.pivot = { x : pivotX, y : pivotY };
-
 			var actualX = Std.int( ent.tmxObj.width ) >> 1;
 			var actualY = Std.int( ent.tmxObj.height );
 
@@ -120,7 +124,7 @@ class TmxUtils {
 			ent.footY.val += actualY - pivotY;
 
 			if ( ent.tmxObj.flippedHorizontally ) {
-				ent.flipX();
+				EntityUtil.flipX( ent );
 			}
 		}
 	}
@@ -140,63 +144,69 @@ class TmxUtils {
 
 			// соотношение, которое в конце будет применено к entity
 			var center = new Vector();
+			var centerPt = tilesetEntityTile.objectGroup.objects.filter( obj -> obj.name == "center" )[0];
+			if ( centerPt != null ) {
+				center.x = centerPt.x;
+				center.y = centerPt.y;
+			}
 
 			for ( obj in tilesetEntityTile.objectGroup.objects ) {
+				var height = obj.properties.exists( "h" ) ? obj.properties.getInt( "h" ) : 1;
+
 				switch obj.objectType {
 					case OTRectangle:
 					case OTEllipse:
-						var shape = new differ.shapes.Circle( 0, 0, obj.width / 2 );
-						var cent = new Vector(
-							obj.width / 2,
-							obj.height / 2
-						);
+					// var sc : ShapeConfig = new ShapeConfig();
+					// sc.geometry = new CylinderGeometry( obj.width / 2, height / 2 );
 
-						ent.collisions.set( shape, new differ.math.Vector( obj.x + cent.x, obj.y + cent.y ) );
+					// var bc : RigidBodyConfig = new RigidBodyConfig();
+					// var b : RigidBody = new RigidBody( bc );
+					// var shape = new Shape( sc );
 
-						if ( center.x == 0 && center.y == 0 ) {
-							center.x = cent.x + obj.x;
-							center.y = cent.y + obj.y;
-						}
-					case OTPoint:
-						switch obj.name {
-							case "center":
-								center.x = obj.x;
-								center.y = obj.y;
-						}
+					// b.addShape( shape );
+
 					case OTPolygon( points ):
 						var pts = makePolyClockwise( points );
-						rotatePoly( obj, pts );
-
-						var cent = getProjectedDifferPolygonRect( obj, points );
-
-						var verts : Array<Vector> = [];
-						for ( i in pts ) verts.push( new Vector( i.x, i.y ) );
-
-						var poly = new Polygon( 0, 0, verts );
-
-						poly.scaleY = -1;
-						ent.collisions.set(
-							poly,
-							new differ.math.Vector( obj.x, obj.y )
-						);
+						var cent = getProjPolySize( obj, points, Vector );
 
 						if ( center.x == 0 && center.y == 0 ) {
 							center.x = cent.x + obj.x;
 							center.y = cent.y + obj.y;
 						}
+
+						var verts : Array<Vec3> = [];
+						for ( i in pts ) verts.push( new Vec3( i.x + obj.x - center.x, ( i.y + obj.y - center.y ) * 1.333333333, 0 ) );
+						for ( i in pts ) verts.push( new Vec3( i.x + obj.x - center.x, ( i.y + obj.y - center.y ) * 1.333333333, height ) );
+
+						rotatePoly( obj.rotation - 45, verts );
+
+						var sc : ShapeConfig = new ShapeConfig();
+						// sc.position.init( obj.x - center.x, obj.y - center.y, 0 );
+
+						sc.geometry = new ConvexHullGeometry( verts );
+
+						var b : RigidBody = ent.rigidBody;
+						var shape = new Shape( sc );
+
+						if ( b == null ) {
+							var bc : RigidBodyConfig = new RigidBodyConfig();
+							b = new RigidBody( bc );
+							Level.inst.world.addRigidBody( b );
+							ent.rigidBody = b;
+						}
+						b.addShape( shape );
+
 					default:
 				}
 			}
 
-			// ending serving this particular entity 'ent' here
 			var pivotX = center.x;
 			var pivotY = center.y;
 
-			ent.pivot = { x : pivotX, y : pivotY };
+			ent.eSpr.pivot = { x : pivotX, y : pivotY };
 
 			#if depth_debug
-			if ( ent.mesh != null )
-				ent.mesh.renewDebugPts();
+			if ( ent.eSpr.mesh != null ) ent.eSpr.mesh.renewDebugPts();
 			#end
 
 			try {

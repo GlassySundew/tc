@@ -1,5 +1,6 @@
 package en.structures.hydroponics;
 
+import en.spr.EntitySprite;
 import format.tmx.Data.TmxObject;
 import hxd.Event;
 import hxd.Key in K;
@@ -8,17 +9,20 @@ import utils.Assets;
 /** Использует inv как хранилище для растений **/
 class Hydroponics extends Structure {
 
-	public function new( ?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : Data.StructureKind ) {
-		super( x, z, tmxObj, hydroponics );
+	public function new( x = 0., y = 0., z = 0., ?tmxObj : TmxObject, ?cdbEntry : Data.StructureKind ) {
+		super( x, y, z, tmxObj, hydroponics );
 	}
 
-	override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
-		if ( spr == null ) {
-			spr = new HSprite( Assets.structures, hollowScene );
-			spr.anim.registerStateAnim( "hydroponics0", 1, 1, function () return cellFlowGrid != null ? cellFlowGrid.itemCount == 0 : true );
-			spr.anim.registerStateAnim( "hydroponics1", 0, 1, function () return cellFlowGrid != null ? cellFlowGrid.itemCount > 0 : true );
-		}
-		super.init( x, z, tmxObj );
+	override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
+		eSpr = new EntitySprite(
+			this,
+			Assets.structures,
+			hollowScene
+		);
+		eSpr.spr.anim.registerStateAnim( "hydroponics0", 1, 1, function () return cellFlowGrid != null ? cellFlowGrid.itemCount == 0 : true );
+		eSpr.spr.anim.registerStateAnim( "hydroponics1", 0, 1, function () return cellFlowGrid != null ? cellFlowGrid.itemCount > 0 : true );
+
+		super.init( x, y, z, tmxObj );
 
 		interactable = true;
 

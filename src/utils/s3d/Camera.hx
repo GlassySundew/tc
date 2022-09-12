@@ -1,5 +1,7 @@
 package utils.s3d;
 
+import h3d.col.Point;
+import h3d.col.Bounds;
 import dn.Process;
 import en.Entity;
 import game.client.GameClient;
@@ -28,40 +30,48 @@ class Camera extends dn.Process {
 	public var dx : Float;
 	public var dy : Float;
 
-	public static var ppu = 2;
+	public static var ppu = 3;
 
 	var yMult : Float;
 	var parallax : Parallax;
 
-	// public var wid(get, never):Int;
-	// public var hei(get, never):Int;
+	final isoDeg = 30;
+	var xyDist = 300.;
+	var a : Float;
+	var b : Float;
 
 	public function new( ?parent : Process ) {
 		super( parent == null ? GameClient.inst : parent );
 		x = y = 0;
 		dx = dy = 0;
+
+		refreshDimensions();
 		updateCamera( M.round( x ), M.round( y ) );
-		// little hack to prevent z-fight
-		// var temp = new h3d.scene.CameraController( Boot.inst.s3d );
-		// temp.loadFromCamera();
-		// temp.remove();
 
 		parallax = new Parallax( Boot.inst.s3d );
-		parallax.y = -1;
-		onResize();
 
-		s3dCam.zNear = 0.1;
-		s3dCam.zFar = 2000;
+		s3dCam.orthoBounds = new Bounds();
+		onResize();
+	}
+
+	function refreshDimensions() {
+		var xyDistSq = xyDist * xyDist;
+		a = Math.sqrt( 2 * xyDistSq );
+		b = a * Math.tan( M.toRad( isoDeg ) );
 	}
 
 	function updateCamera( ?x = 0., ?y = 0. ) {
 		if ( parallax != null ) {
 			parallax.x = x;
-			parallax.z = y;
+			parallax.y = y;
 		}
 		s3dCam.target.x = ( x );
 		s3dCam.target.y = ( y );
-		s3dCam.pos = s3dCam.target.add( new Vector( 150, 150, 150 ) ); // 282.842666667
+
+		s3dCam.pos = s3dCam.target.add( new Vector( xyDist, xyDist, b ) ); // 282.842666667
+
+		if ( parallax != null ) parallax.setPosition( s3dCam.pos.x, s3dCam.pos.y, s3dCam.pos.z );
+
 		// s3dCam.pos = s3dCam.target.add( new Vector( 0, -( w() * 1 ) / ( 2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * ( Math.PI / 180 ) ) ), -0.01 ) );
 	}
 
@@ -83,6 +93,13 @@ class Camera extends dn.Process {
 		shakePower = pow;
 	}
 
+	public inline function refreshOrtho() {
+		if ( s3dCam.orthoBounds != null ) {
+			s3dCam.orthoBounds.setMin( new Point(-w() / ppu / 2, -h() / ppu / 2, 0.02 ) );
+			s3dCam.orthoBounds.setMax( new Point( w() / ppu / 2, h() / ppu / 2, 4000 ) );
+		}
+	}
+
 	public override function preUpdate() {
 		cd.update( tmod );
 	}
@@ -94,33 +111,31 @@ class Camera extends dn.Process {
 
 	override function postUpdate() {
 		super.postUpdate();
-		if ( !ui.Console.inst.hasFlag( "scroll" ) ) {
-			if ( target != null ) {
-				yMult = ( M.fabs( target.dx ) > 0.001 && M.fabs( target.dy ) > 0.001 ) ? .5 : 1;
-				var s = 0.006;
-				var deadZone = 5;
-				var tx = target.footX.val;
-				var ty = target.footY.val;
-				var d = M.dist( x, y, tx, ty );
-				if ( d >= deadZone ) {
-					var a = Math.atan2( ty - y, tx - x );
-					dx += Math.cos( a ) * ( d - deadZone ) * s * tmod;
-					dy += Math.sin( a ) * ( d - deadZone ) * s * tmod;
-				}
-
-				var frict = 0.9;
-				x += ( dx * tmod );
-				dx *= Math.pow( frict, tmod );
-
-				y += dy * tmod;
-				dy *= Math.pow( frict, tmod );
-				updateCamera( M.round( x ), M.round( y ) );
+		if ( target != null ) {
+			yMult = ( M.fabs( target.dx ) > 0.001 && M.fabs( target.dy ) > 0.001 ) ? .5 : 1;
+			var s = 0.006;
+			var deadZone = 5;
+			var tx = target.footX.val;
+			var ty = target.footY.val;
+			var d = M.dist( x, y, tx, ty );
+			if ( d >= deadZone ) {
+				var a = Math.atan2( ty - y, tx - x );
+				dx += Math.cos( a ) * ( d - deadZone ) * s * tmod;
+				dy += Math.sin( a ) * ( d - deadZone ) * s * tmod;
 			}
-			// Rounding
 
-			// x = M.round(x);
-			// y = M.round(y / yMult) * yMult;
+			var frict = 0.9;
+			x += ( dx * tmod );
+			dx *= Math.pow( frict, tmod );
+
+			y += dy * tmod;
+			dy *= Math.pow( frict, tmod );
+			updateCamera( M.round( x ), M.round( y ) );
 		}
+		// Rounding
+
+		// x = M.round(x);
+		// y = M.round(y / yMult) * yMult;
 	}
 
 	override function onDispose() {
@@ -134,7 +149,8 @@ class Camera extends dn.Process {
 	override function onResize() {
 		super.onResize();
 		if ( parallax != null ) {
-			parallax.drawParallax();
+			// parallax.drawParallax();
 		}
+		refreshOrtho();
 	}
 }

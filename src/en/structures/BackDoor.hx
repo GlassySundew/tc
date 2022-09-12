@@ -6,6 +6,6 @@ class BackDoor extends Door {
 
 	override function alive() {
 		super.alive();
-		mesh.flipX();
+		eSpr.mesh.flipX();
 	}
 }

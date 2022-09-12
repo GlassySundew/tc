@@ -19,8 +19,8 @@ class Chest extends Structure {
 
 	var ca : ControllerAccess<ControllerAction>;
 
-	public function new( ?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : Data.StructureKind ) {
-		super( x, z, tmxObj, cdbEntry );
+	public function new( x = 0., y = 0., z = 0., ?tmxObj : TmxObject, ?cdbEntry : Data.StructureKind ) {
+		super( x, y, z, tmxObj, cdbEntry );
 		interactable = true;
 
 		inventory = new InventoryGrid( 5, 5, Chest, this );
@@ -28,8 +28,8 @@ class Chest extends Structure {
 		ItemUtil.resolveJsonItemStorage( tmxObj.properties.getString( "items" ), inventory );
 	}
 
-	public override function init( ?x : Float, ?z : Float, ?tmxObj : TmxObject ) {
-		super.init( x, z, tmxObj );
+	public override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
+		super.init( x, y, z, tmxObj );
 	}
 
 	override function alive() {
