@@ -36,7 +36,7 @@ class Camera extends dn.Process {
 	var parallax : Parallax;
 
 	final isoDeg = 30;
-	var xyDist = 300.;
+	var xyDist = 100.;
 	var a : Float;
 	var b : Float;
 
@@ -44,11 +44,12 @@ class Camera extends dn.Process {
 		super( parent == null ? GameClient.inst : parent );
 		x = y = 0;
 		dx = dy = 0;
+		trace( "creacting new " );
 
 		refreshDimensions();
 		updateCamera( M.round( x ), M.round( y ) );
 
-		parallax = new Parallax( Boot.inst.s3d );
+		// parallax = new Parallax( Boot.inst.s3d );
 
 		s3dCam.orthoBounds = new Bounds();
 		onResize();
@@ -95,8 +96,8 @@ class Camera extends dn.Process {
 
 	public inline function refreshOrtho() {
 		if ( s3dCam.orthoBounds != null ) {
-			s3dCam.orthoBounds.setMin( new Point(-w() / ppu / 2, -h() / ppu / 2, 0.02 ) );
-			s3dCam.orthoBounds.setMax( new Point( w() / ppu / 2, h() / ppu / 2, 4000 ) );
+			s3dCam.orthoBounds.setMin( new Point(-w() / ppu / 2, -h() / ppu / 2, s3dCam.zNear ) );
+			s3dCam.orthoBounds.setMax( new Point( w() / ppu / 2, h() / ppu / 2, s3dCam.zFar ) );
 		}
 	}
 

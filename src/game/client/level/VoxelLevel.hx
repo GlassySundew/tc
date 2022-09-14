@@ -1,25 +1,21 @@
 package game.client.level;
 
-import game.client.level.batch.LUTBatcher;
-import oimo.common.Vec3;
-import utils.oimo.OimoUtil;
-import ch2.Tilemap;
-import shader.VoxelDepther;
 import shader.LUT;
-import h3d.prim.Instanced;
-import utils.tilesets.Tileset;
-import utils.Assets;
-import hxd.res.Model;
-import h3d.scene.Mesh;
-import hxd.Res;
-import format.tmx.Data.TmxTileset;
-import format.tmx.Tools;
-import format.tmx.Data.TmxTileLayer;
-import format.tmx.Data.TmxGroup;
-import utils.TmxUtils;
-import format.tmx.TmxMap;
-import h3d.scene.Object;
+import shader.DepthOffset;
 import dn.Process;
+import format.tmx.Data.TmxGroup;
+import format.tmx.Data.TmxTileLayer;
+import format.tmx.Data.TmxTileset;
+import format.tmx.TmxMap;
+import game.client.level.batch.LUTBatcher;
+import h3d.scene.Mesh;
+import h3d.scene.Object;
+import hxd.Res;
+import oimo.common.Vec3;
+import utils.Assets;
+import utils.TmxUtils;
+import utils.oimo.OimoUtil;
+import utils.tilesets.Tileset;
 
 using format.tmx.Tools;
 
@@ -70,10 +66,9 @@ class VoxelLevel extends Process {
 		return this;
 	}
 
-	function createModel( nameAppend : String, tileset : TmxTileset ) : Mesh {
-		var path = 'tiled/voxel/${tileset.name}/block_' + nameAppend + ".fbx";
-		if ( !Res.loader.exists( path ) ) throw "model does not exists on path: " + path;
-		return cast( Assets.modelCache.loadModel( Res.loader.load( path ).toModel() ), Mesh );
+	override function update() {
+		super.update();
+		inline batcher.emitAll();
 	}
 
 	var blockCache : Map<Int, Int> = [];
@@ -94,30 +89,28 @@ class VoxelLevel extends Process {
 				if ( !blockCache.exists( tile.gid ) )
 					blockCache[tile.gid] = tsFigures.bSearchModel( tsetTileX, tsetTileY, tsetTileX );
 
-				var model = createModel( '${blockCache[tile.gid]}', tileset );
+				var x = ( tileidx % tmxMap.width ) * tmxMap.tileHeight + zheight * tmxMap.tileHeight;
+				var y = Math.floor( tileidx / tmxMap.width ) * tmxMap.tileHeight + zheight * tmxMap.tileHeight;
+				var z = zheight * tmxMap.tileHeight;
 
-				threeDRoot.addChild( model );
-				model.material.shadows = false;
-				model.material.texture.filter = Nearest;
-				var p = model.material.mainPass;
-				p.addShader(
-					new LUT(
-						tsFigures.texture,
-						tsFigures.lutRows,
-						tsetTileX * tileset.tileHeight,
-						tsetTileY * tileset.tileHeight
-					)
+				var path = 'tiled/voxel/${tileset.name}/block_${blockCache[tile.gid]}.fbx';
+
+				batcher.addMesh(
+					path,
+					tsFigures.texture,
+					tsFigures.lutRows,
+					x,
+					y,
+					z,
+					tsetTileX * tileset.tileHeight,
+					tsetTileY * tileset.tileHeight,
+					( zheight + depthOff * 2 ) * 0.0005,
+					threeDRoot
 				);
-
-				p.addShader( new VoxelDepther( ( zheight + depthOff * 2 ) * 0.0005 ) );
-
-				model.x = ( tileidx % tmxMap.width ) * tmxMap.tileHeight + zheight * tmxMap.tileHeight;
-				model.y = Math.floor( tileidx / tmxMap.width ) * tmxMap.tileHeight + zheight * tmxMap.tileHeight;
-				model.z = zheight * tmxMap.tileHeight;
 
 				OimoUtil.addBox(
 					Level.inst.world,
-					new Vec3( model.x + ( tmxMap.tileHeight >> 1 ), model.y + ( tmxMap.tileHeight >> 1 ), model.z + ( tmxMap.tileHeight + 1 ) / 2 ),
+					new Vec3( x + ( tmxMap.tileHeight >> 1 ), y + ( tmxMap.tileHeight >> 1 ), z + ( tmxMap.tileHeight + 1 ) / 2 ),
 					new Vec3( tmxMap.tileHeight >> 1, tmxMap.tileHeight >> 1, ( tmxMap.tileHeight + 1 ) / 2 ),
 					true
 				);

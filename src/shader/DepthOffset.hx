@@ -3,20 +3,20 @@ package shader;
 /**
 	depth offset shader for overlapping models
 **/
-class VoxelDepther extends hxsl.Shader {
+class DepthOffset extends hxsl.Shader {
 
 	static var SRC = {
 		@:import h3d.shader.BaseMesh;
 		//
-		@param var objZ : Float;
+		@perInstance @param var offset : Float;
 		//
 		function __init__() {
-			projectedPosition.z -= objZ;
+			projectedPosition.z -= offset;
 		}
 	};
 
-	public function new( objZ : Float ) {
+	public function new( offset : Float ) {
 		super();
-		this.objZ = objZ;
+		this.offset = offset;
 	}
 }

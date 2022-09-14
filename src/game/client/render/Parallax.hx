@@ -1,14 +1,14 @@
 package game.client.render;
 
-import shader.VoxelDepther;
-import game.client.level.Level;
 import ch3.scene.TileSprite;
 import dn.heaps.slib.HSprite;
+import game.client.level.Level;
 import h2d.Tile;
 import h3d.Vector;
 import h3d.mat.Texture;
 import h3d.scene.Object;
 import h3d.scene.RenderContext;
+import shader.DepthOffset;
 import utils.Assets;
 
 class Parallax extends Object {
@@ -27,6 +27,8 @@ class Parallax extends Object {
 
 	public function new( ?parent : Object ) {
 		super( parent );
+		trace("parallax??/");
+		
 		spr = new HSprite( Assets.env );
 
 		skyTexture = new Texture( 128, 128, [Cube, Target, MipMapped] );

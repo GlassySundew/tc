@@ -1,18 +1,18 @@
 package en.spr;
 
 import ch3.scene.TileSprite;
-import h2d.Bitmap;
-import utils.BoolList;
-import utils.Assets;
-import ui.domkit.TextLabelComp;
+import en.objs.IsoTileSpr;
 import game.client.GameClient;
-import shader.VoxelDepther;
 import game.client.level.Level;
-import h3d.scene.Sphere;
+import h2d.Bitmap;
 import h2d.Object;
 import h2d.Tile;
 import h3d.mat.Texture;
-import en.objs.IsoTileSpr;
+import h3d.scene.Sphere;
+import shader.DepthOffset;
+import ui.domkit.TextLabelComp;
+import utils.Assets;
+import utils.BoolList;
 
 class EntitySprite {
 
@@ -75,7 +75,7 @@ class EntitySprite {
 		s.color = colorAdd;
 		mesh.material.mainPass.enableLights = false;
 		mesh.material.mainPass.depth( false, Less );
-		mesh.material.mainPass.addShader( new VoxelDepther( 0.001 ) );
+		mesh.material.mainPass.addShader( new DepthOffset( 0.001 ) );
 
 		if ( entity.tmxObj != null && entity.tmxObj.flippedVertically ) spr.scaleY = -1;
 
@@ -118,9 +118,8 @@ class EntitySprite {
 				spr.drawTo( tex );
 				texTile.setCenterRatio( spr.pivot.centerFactorX, spr.pivot.centerFactorY );
 				mesh.tile = texTile;
-			}
-			else
-				@:privateAccess {
+			} else {
+				@:privateAccess
 				if ( refreshTile
 					|| ( spr.tile.u != mesh.plane.u0 && spr.tile.u != mesh.plane.u1 )
 					|| ( spr.tile.u2 != mesh.plane.u1 && spr.tile.u2 != mesh.plane.u0 )
@@ -156,6 +155,8 @@ class EntitySprite {
 			mesh.primitive.dispose();
 			mesh.remove();
 		}
+		for ( i in debugObjs ) i.remove();
+
 		tex.dispose();
 	}
 

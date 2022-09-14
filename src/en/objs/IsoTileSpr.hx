@@ -13,11 +13,13 @@ import ch3.scene.TileSprite;
 class IsoTileSpr extends TileSprite {
 	public var isoWidth(default, set) : Float;
 
-	inline function set_isoWidth( v : Float ) return isoWidth = isLong ? v : throw "set isLong before setting iso width/height";
+	inline function set_isoWidth( v : Float )
+		return isoWidth = isLong ? v : throw "set isLong before setting iso width/height";
 
 	public var isoHeight(default, set) : Float;
 
-	inline function set_isoHeight( v : Float ) return isoHeight = isLong ? v : throw "set isLong before setting iso width/height";
+	inline function set_isoHeight( v : Float ) 
+		return isoHeight = isLong ? v : throw "set isLong before setting iso width/height";
 
 	public var verts(get, null) : Dynamic;
 

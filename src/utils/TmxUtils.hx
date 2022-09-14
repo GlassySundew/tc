@@ -41,16 +41,17 @@ class TmxUtils {
 				if ( tmxLayerCb.tmxImgLayerCb != null && !tmxLayerCb.tmxImgLayerCb( layer ) ) return;
 			case LGroup( group ):
 				if ( tmxLayerCb.tmxGroupLayerCb != null && !tmxLayerCb.tmxGroupLayerCb( group ) ) return;
-
-				for ( grLayer in group.layers ) {
-					var tmxLayerArg : TmxLayer = switch grLayer {
-						case LTileLayer( layer ): LTileLayer( layer );
-						case LObjectGroup( group ): LObjectGroup( group );
-						case LImageLayer( layer ): LImageLayer( layer );
-						case LGroup( group ): LGroup( group );
+				
+				if ( group.visible )
+					for ( grLayer in group.layers ) {
+						var tmxLayerArg : TmxLayer = switch grLayer {
+							case LTileLayer( layer ): LTileLayer( layer );
+							case LObjectGroup( group ): LObjectGroup( group );
+							case LImageLayer( layer ): LImageLayer( layer );
+							case LGroup( group ): LGroup( group );
+						}
+						layerRec( tmxLayerArg, tmxLayerCb );
 					}
-					layerRec( tmxLayerArg, tmxLayerCb );
-				}
 		}
 	}
 

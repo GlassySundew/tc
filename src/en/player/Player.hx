@@ -33,8 +33,6 @@ class Player extends Entity {
 
 	public var state : PlayerState;
 
-	var nicknameMesh : TileSprite;
-
 	public var pui : PlayerUI;
 
 	public var ca : ControllerAccess<ControllerAction>;
@@ -141,15 +139,23 @@ class Player extends Entity {
 	}
 
 	function attachHoldItemToSpr( item : Item ) {
-		if ( holdItemSpr != null ) eSpr.drawToBoolStack.addLambda(() -> return ( holdItemSpr.visible = item != null ) );
+		if ( holdItemSpr != null )
+			eSpr.drawToBoolStack.addLambda(
+				() -> return ( holdItemSpr.visible = item != null )
+			);
 
 		if ( item != null ) {
-			if ( holdItemSpr == null ) holdItemSpr = new HSprite( Assets.items, eSpr.spr );
+			if ( holdItemSpr == null )
+				holdItemSpr = new HSprite( Assets.items, eSpr.spr );
 			holdItemSpr.set( Data.item.get( item.cdbEntry ).atlas_name );
 		}
 	}
 
-	override function unreg( host : NetworkHost, ctx : NetworkSerializer, ?finalize ) @:privateAccess {
+	override function unreg(
+		host : NetworkHost,
+		ctx : NetworkSerializer,
+		?finalize
+	) @:privateAccess {
 		super.unreg( host, ctx );
 		host.unregister( actionState, ctx, finalize );
 		host.unregister( holdItem, ctx, finalize );
@@ -220,10 +226,6 @@ class Player extends Entity {
 			pui = null;
 		}
 
-		if ( nicknameMesh != null ) {
-			nicknameMesh.remove();
-			nicknameMesh = null;
-		}
 		if ( GameClient.inst != null ) {
 			ca.dispose();
 			belt.dispose();

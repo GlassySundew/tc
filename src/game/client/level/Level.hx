@@ -152,12 +152,14 @@ class Level extends dn.Process {
 		render level to a square 2d plane, deprecated
 	**/
 	function renderPlane() {
+		trace( "RENDERPLANE?????" );
+
 		var layerRenderer : LayerRender;
 
 		ground = new h3d.mat.Texture( wid, hei, [Target] );
 		ground.filter = Nearest;
 
-		obj = new IsoTileSpr( Tile.fromTexture( ground ), false, Boot.inst.s3d );
+		obj = new IsoTileSpr( Tile.fromTexture( ground ), false );
 		obj.alwaysSync = false;
 		obj.rotate( 0, 0, M.toRad( 90 ) );
 

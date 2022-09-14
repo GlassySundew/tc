@@ -24,7 +24,6 @@ class MainMenu extends Process {
 	var vertFlow : Flow;
 	var socialFlow : Flow;
 	var planetFlow : Object;
-	var camera : Camera;
 	var blackOverlay : Bitmap;
 
 	var isHostDebug : ShadowedText;
@@ -51,7 +50,6 @@ class MainMenu extends Process {
 
 		createRoot( Main.inst.root );
 		parentFlow = new Flow( root );
-		camera = new Camera( this );
 
 		vertFlow = new Flow( parentFlow );
 		socialFlow = new Flow( parentFlow );
@@ -239,7 +237,6 @@ class MainMenu extends Process {
 
 	override function onDispose() {
 		super.onDispose();
-		camera.destroy();
 		parentFlow.remove();
 		inst = null;
 		if ( blackOverlay != null ) blackOverlay.remove();

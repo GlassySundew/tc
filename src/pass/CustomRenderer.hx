@@ -115,33 +115,56 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 	@:access( h3d.scene.Object )
 	public override function depthSort( frontToBack : Bool, passes : PassList ) {
 		var cam = ctx.camera.m;
-		for ( p in passes ) {
-			var z = p.obj.absPos._41 * cam._13 + p.obj.absPos._42 * cam._23 + p.obj.absPos._43 * cam._33 + cam._43;
-			var w = p.obj.absPos._41 * cam._14 + p.obj.absPos._42 * cam._24 + p.obj.absPos._43 * cam._34 + cam._44;
-			p.depth = z / w;
-		}
+		// for ( p in passes ) {
+		// 	var z = p.obj.absPos._41 * cam._13 + p.obj.absPos._42 * cam._23 + p.obj.absPos._43 * cam._33 + cam._43;
+		// 	var w = p.obj.absPos._41 * cam._14 + p.obj.absPos._42 * cam._24 + p.obj.absPos._43 * cam._34 + cam._44;
+		// 	p.depth = z / w;
+		// }
 
 		passes.sort( function ( p1, p2 ) {
-			return try {
-				getFrontPassIso( p1, p2 );
-			} catch( e : Dynamic ) {
-				( p1.depth > p2.depth ? -1 : 1 );
-			};
+			return
+				if ( Std.isOfType( p1.obj, IsoTileSpr )
+					&& Std.isOfType( p2.obj, IsoTileSpr ) )
+					getFrontPassIso( p1, p2 );
+				else if ( Std.isOfType( p1.obj, IsoTileSpr )
+					|| Std.isOfType( p2.obj, IsoTileSpr ) )
+					sortIsoMeshAndVoxelBlock( p1, p2 );
+				else
+					( p1.depth > p2.depth ? -1 : 1 );
 		} );
+	}
+
+	function sortIsoMeshAndVoxelBlock( p1 : PassObject, p2 : PassObject ) {
+		// var isoMesh : IsoTileSpr;
+		// var voxelBlock : if
+		// ()
+		return -1;
 	}
 
 	function getFrontPassIso( p1 : PassObject, p2 : PassObject ) : Int {
 		var a = cast( p1.obj, IsoTileSpr ).getIsoBounds();
 		var b = cast( p2.obj, IsoTileSpr ).getIsoBounds();
-		return if ( b.zMax - b.zMin == 0 && a.zMax - a.zMin == 0 ) // point to point
-		{
+		// point to point
+		return if ( b.zMax - b.zMin == 0 && a.zMax - a.zMin == 0 ) {
 			p1.obj.z > p2.obj.z ? -1 : 1;
-			// - comparePointAndLine({x : p1.obj.x, y : 0, z : p1.obj.z}, {pt1 : {x : b.xMin, y : 0, z : b.zMin}, pt2 : {x : b.xMax, y : 0, z : b.zMax}});
-		} else if ( b.xMax - b.xMin == 0 || b.zMax - b.zMin == 0 ) { // point to long iso obj
-			- comparePointAndLine( { x : p2.obj.x, y : 0, z : p2.obj.z }, { pt1 : { x : a.xMin, y : 0, z : a.zMin }, pt2 : { x : a.xMax, y : 0, z : a.zMax } } );
+		} else if ( b.xMax - b.xMin == 0 || b.zMax - b.zMin == 0 ) {
+			-comparePointAndLine(
+				{ x : p2.obj.x, y : 0, z : p2.obj.z },
+				{
+					pt1 : { x : a.xMin, y : 0, z : a.zMin },
+					pt2 : { x : a.xMax, y : 0, z : a.zMax }
+				}
+			);
 		} else {
-			-( compareLineAndLine( { pt1 : { x : b.xMin, y : 0, z : b.zMin }, pt2 : { x : b.xMax, y : 0, z : b.zMax } },
-				{ pt1 : { x : a.xMin, y : 0, z : a.zMin }, pt2 : { x : a.xMax, y : 0, z : a.zMax } } ) );
+			-( compareLineAndLine( {
+				pt1 : { x : b.xMin, y : 0, z : b.zMin },
+				pt2 : { x : b.xMax, y : 0, z : b.zMax }
+			},
+				{
+					pt1 : { x : a.xMin, y : 0, z : a.zMin },
+					pt2 : { x : a.xMax, y : 0, z : a.zMax }
+				}
+			) );
 		}
 	}
 
