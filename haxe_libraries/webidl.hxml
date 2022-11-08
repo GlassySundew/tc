@@ -1,3 +1,0 @@
-# @install: lix --silent download "haxelib:/webidl#1.0.0" into webidl/1.0.0/haxelib
--cp ${HAXE_LIBCACHE}/webidl/1.0.0/haxelib/
--D webidl=1.0.0

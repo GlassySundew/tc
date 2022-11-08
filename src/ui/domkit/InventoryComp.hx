@@ -5,6 +5,7 @@ import haxe.CallStack;
 import ui.core.InventoryGrid.InventoryCellFlowGrid;
 import ui.domkit.WindowComp.WindowCompI;
 import utils.Assets;
+import dn.heaps.slib.HSprite;
 
 @:uiComp("inventoryComp")
 class InventoryComp extends Flow implements h2d.domkit.Object implements WindowCompI {

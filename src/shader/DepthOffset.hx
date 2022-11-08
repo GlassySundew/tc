@@ -10,7 +10,7 @@ class DepthOffset extends hxsl.Shader {
 		//
 		@perInstance @param var offset : Float;
 		//
-		function __init__() {
+		function vertex() {
 			projectedPosition.z -= offset;
 		}
 	};

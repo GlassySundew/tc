@@ -1,5 +1,7 @@
 package net;
 
+import en.Entity;
+import utils.Const;
 import cherry.soup.EventSignal.EventSignal0;
 import dn.Process;
 import game.client.GameClient;

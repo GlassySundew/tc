@@ -1,3 +1,3 @@
 
--lib hlsdl
+-D hlsdl=1.12.0
 hxml/common/hl.hxml

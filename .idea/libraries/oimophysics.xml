@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="oimophysics" type="Haxe">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/.haxelib/oimophysics/git/src" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

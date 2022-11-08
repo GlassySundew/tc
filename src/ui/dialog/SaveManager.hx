@@ -1,5 +1,10 @@
 package ui.dialog;
 
+import dn.heaps.slib.HSprite;
+import utils.Const;
+import utils.Util;
+import dn.M;
+import utils.tools.Settings;
 import ui.core.Button;
 import ui.core.ShadowedText;
 import ui.core.VerticalSlider;
@@ -61,10 +66,10 @@ class SaveManager extends FocusMenu {
 		this.mode = mode;
 		this.onGameStart = onGameStart;
 
-		refreshSaves();
+		Settings.refreshSaves();
 		centrizeContent();
 
-		var comp = new SaveManagerComp( mode, params.saveFiles, contentFlow );
+		var comp = new SaveManagerComp( mode, Settings.params.saveFiles, contentFlow );
 
 		// deprecated below
 
@@ -74,7 +79,7 @@ class SaveManager extends FocusMenu {
 		generalFlow.layout = Vertical;
 		generalFlow.horizontalAlign = Middle;
 
-		generalFlow.x += wScaled >> 2;
+		generalFlow.x += Util.wScaled >> 2;
 
 		var signText = new ShadowedText( Assets.fontPixel, generalFlow );
 		signText.text = switch mode {
@@ -91,7 +96,7 @@ class SaveManager extends FocusMenu {
 		areaBarFlow.overflow = Limit;
 
 		scrollArea = new FixedScrollArea( colWidth, 0, 16, areaBarFlow );
-		scrollArea.height = Std.int( hScaled - h2dObject.y - 20 );
+		scrollArea.height = Std.int( Util.hScaled - h2dObject.y - 20 );
 		backgroundScroll = new EventInteractive( 0, 0, scrollArea );
 
 		saveEntriesFlow = new Flow( scrollArea );
@@ -123,7 +128,7 @@ class SaveManager extends FocusMenu {
 	}
 
 	function displaySaveEntries() {
-		for ( i in params.saveFiles ) {
+		for ( i in Settings.params.saveFiles ) {
 			var e = new SaveEntry( i, mode, this, saveEntriesFlow );
 			entries.push( e );
 		}

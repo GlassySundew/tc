@@ -53,9 +53,9 @@ class Chest extends Structure {
 		interact.onTextInputEvent.add(
 			( e : Event ) -> {
 				if ( ca.isPressed( Action ) ) {
+					
 					if ( !Player.inst.pui.inventory.win.visible ) Player.inst.pui.inventory.toggleVisible();
 					chestWin.toggleVisible();
-					// Window.centrizeTwoWins(Player.inst.pui.inventory, inventory);
 				}
 			}
 		);

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="HAXE_MODULE" version="4">
+  <component name="HaxeModuleSettingsStorage">
+    <option name="buildConfig" value="1" />
+    <option name="displayDefinitions">
+      <list>
+        <option value="macro" />
+      </list>
+    </option>
+    <option name="haxeTarget" value="HashLink" />
+    <option name="hxmlPath" value="$MODULE_DIR$/hl.debug.all.hxml" />
+    <option name="outputFolder" value="$MODULE_DIR$/bin" />
+  </component>
+  <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/bin" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/libs">
+      <sourceFolder url="file://$MODULE_DIR$/libs" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/src">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="hx-concurrent" level="project" />
+    <orderEntry type="library" name="deepnightLibs" level="project" />
+    <orderEntry type="library" name="heaps" level="project" />
+    <orderEntry type="library" name="compileTime" level="project" />
+    <orderEntry type="library" name="heeps" level="project" />
+    <orderEntry type="library" name="hlopenal" level="project" />
+    <orderEntry type="library" name="hxbit" level="project" />
+    <orderEntry type="library" name="oimophysics" level="project" />
+    <orderEntry type="library" name="random" level="project" />
+    <orderEntry type="library" name="castle" level="project" />
+    <orderEntry type="library" name="hide" level="project" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library name="haxelib|format:any">
+        <CLASSES>
+          <root url="file://$USER_HOME$/lix/haxelib/format/3,5,0" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$USER_HOME$/lix/haxelib/format/3,5,0" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+  </component>
+</module>

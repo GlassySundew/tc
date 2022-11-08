@@ -1,5 +1,7 @@
 package ui;
 
+import utils.Util;
+import dn.Tweenie.TType;
 import ui.core.TextButton;
 import ui.core.ShadowedText;
 import net.Client;
@@ -96,11 +98,11 @@ class PauseMenu extends FocusMenu {
 		backgroundGraphics.endFill();
 		contentFlow.getProperties( backgroundGraphics ).isAbsolute = true;
 
-		Main.inst.tw.createMs( backgroundGraphics.scaleX, contentFlow.outerWidth, TEaseOut, 320 ).end(() -> {
+		Main.inst.tw.createMs( backgroundGraphics.scaleX, contentFlow.outerWidth, TType.TEaseOut, 320 ).end(() -> {
 			contentFlow.visible = true;
 			onResize();
 		} );
-		backgroundGraphics.scaleY = hScaled;
+		backgroundGraphics.scaleY = Util.hScaled;
 	}
 
 	override function onDispose() {

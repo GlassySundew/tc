@@ -1,5 +1,7 @@
 package ui.player;
 
+import en.Entity;
+import en.Item;
 import ui.core.ItemSprite;
 import en.Item.ItemPresense;
 import en.player.Player;

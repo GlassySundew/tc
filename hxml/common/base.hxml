@@ -1,27 +1,30 @@
 -cp src
 -cp .
 -cp libs
+# -cp libs/domkit
+-cp src/helper
+-cp .haxelib/oimophysics/git/src
 
 -dce full
 
--lib heaps
--lib hide
--lib Heeps
--lib castle
--lib hxbit
--lib deepnightLibs
+-lib heaps:git:https://github.com/HeapsIO/heaps.git
+-lib hide:git:https://github.com/HeapsIO/hide.git
+-lib heeps:git:https://github.com/Yanrishatum/heeps.git
+-lib castle:git:https://github.com/ncannasse/castle.git
+-lib hxbit:git:https://github.com/GlassySundew/hxbit.git#channels
+-lib deepnightLibs:git:https://github.com/deepnight/deepnightLibs.git
+-lib oimophysics:git:https://github.com/saharan/OimoPhysics.gitxe
 -lib compiletime
+
+# -lib domkit:git:https://github.com/HeapsIO/domkit.git
 # -lib oauth
 -lib random
 -lib seedyrng
 -lib haxe-concurrent
--lib oimophysics
 
 -D domkit
 -D heaps_enable_hl_mp3
 
--cp src/helper
 --macro Helper.init()
-
 
 -D no-deprecation-warnings

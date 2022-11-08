@@ -8,6 +8,7 @@ import h2d.domkit.Object;
 import hxd.Res;
 import hxd.res.Resource;
 import ui.domkit.WindowComp.WindowCompI;
+import utils.Const;
 
 @:uiComp( "ingred-comp" )
 class IngredComp extends Flow implements Object implements WindowCompI {

@@ -1,3 +1,0 @@
-# @install: lix --silent download "gh://github.com/jasononeil/compiletime#4064cd4238268645ed05d97a18ca25a4848b450f" into compiletime/2.8.0/github/4064cd4238268645ed05d97a18ca25a4848b450f
--cp ${HAXE_LIBCACHE}/compiletime/2.8.0/github/4064cd4238268645ed05d97a18ca25a4848b450f/src/
--D compiletime=2.8.0

@@ -21,7 +21,7 @@ class Assets {
 	public static var ui : SpriteLib;
 	public static var env : SpriteLib;
 
-	public static var modelCache = new utils.s3d.ModelCache();
+	public static var modelCache = new utils.threeD.ModelCache();
 
 	public static var CONGRUENT : Tileset;
 

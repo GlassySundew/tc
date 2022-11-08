@@ -3,6 +3,7 @@ package game.server;
 /**
 	server-side level
 **/
+import utils.Util;
 import dn.Process;
 import en.Entity;
 import format.tmx.Data.TmxLayer;
@@ -56,7 +57,7 @@ class ServerLevel extends dn.Process implements NetworkSerializable {
 						if ( ol.name == 'obstacles' ) {
 							switch( obj.objectType ) {
 								case OTPolygon( points ):
-									var pts = makePolyClockwise( points );
+									var pts = Util.makePolyClockwise( points );
 								case OTRectangle:
 								default:
 							}
@@ -68,7 +69,7 @@ class ServerLevel extends dn.Process implements NetworkSerializable {
 									case OTTile( gid ):
 										var objGid = Tools.getTileByGid( tmxMap, gid );
 										if ( objGid != null
-											&& eregFileName.match( objGid.image.source ) ) obj.name = eregFileName.matched( 1 );
+											&& Util.eregFileName.match( objGid.image.source ) ) obj.name = Util.eregFileName.matched( 1 );
 									default:
 								}
 							}

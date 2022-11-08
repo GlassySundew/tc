@@ -1,3 +1,0 @@
-# @install: lix --silent download "gh://github.com/Tanz0rz/haxe-fmod#e7a1596e329d1b4df64c9e8f916c8dd28fbe229a" into haxefmod/0.7.2-alpha/github/e7a1596e329d1b4df64c9e8f916c8dd28fbe229a
--cp ${HAXE_LIBCACHE}/haxefmod/0.7.2-alpha/github/e7a1596e329d1b4df64c9e8f916c8dd28fbe229a/
--D haxefmod=0.7.2-alpha

@@ -1,5 +1,6 @@
 package ui.dialog;
 
+import utils.tools.Settings;
 import ui.core.TextButton;
 import utils.Assets;
 import net.Client;
@@ -25,7 +26,7 @@ class DeleteDialog extends Dialog {
 			SaveManager.generalDelete( name );
 
 			Client.inst.delayer.addF(() -> {
-				refreshSaves();
+				Settings.refreshSaves();
 			}, 10 );
 		}, 0xd36363, 0x855a5a, horizontalFlow );
 

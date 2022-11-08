@@ -9,7 +9,11 @@ import en.player.Player;
 **/
 class ServerRPC {
 
-	public static function bringPlayerToLevel( player : Player, level : String, ?cb : Void -> Void ) @:privateAccess {
+	public static function bringPlayerToLevel(
+		player : Player,
+		level : String,
+		?cb : Void -> Void
+	) @:privateAccess {
 		var fromLevel = player.level;
 
 		var host = Server.inst.host;
@@ -22,7 +26,9 @@ class ServerRPC {
 			player.unreg( host, client.ctx );
 		}
 
-		var ctx = host.clientsOwners[player.clientController.__uid].ctx;
+		var ctx = host.isChannelingEnabled ? //
+			host.clientsOwners[player.clientController.__uid].ctx : host.ctx;
+
 		host.unregister( fromLevel, ctx );
 		for ( e in fromLevel.entities )
 			e.unreg( host, ctx );
@@ -47,6 +53,7 @@ class ServerRPC {
 			}
 
 		var door = player.level.entities.filter( ( e ) -> return ( e.isOfType( Door ) && cast( e, Door ).leadsTo == leadingTo ) )[0];
-		player.setFeetPos( door.footX.val, door.footY.val );
+		if ( door != null )
+			player.setFeetPos( door.footX.val, door.footY.val );
 	}
 }

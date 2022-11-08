@@ -1,5 +1,8 @@
 package ui.dialog;
 
+import utils.Util;
+import utils.Const;
+import dn.heaps.input.ControllerAccess;
 import dn.Process;
 import game.client.ControllerAction;
 import h2d.Flow;
@@ -105,8 +108,8 @@ class FocusMenu extends Process {
 	override function onResize() {
 		super.onResize();
 
-		overlayFlow.minHeight = hScaled;
-		overlayFlow.minWidth = wScaled;
+		overlayFlow.minHeight = Util.hScaled;
+		overlayFlow.minWidth = Util.wScaled;
 
 		if ( centrized ) {
 			contentFlow.minHeight = contentFlow.maxHeight = Std.int( Util.hScaled );

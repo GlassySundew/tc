@@ -1,5 +1,10 @@
 package ui;
 
+import dn.Tweenie.TType;
+import utils.tools.Settings;
+import utils.Util;
+import utils.Const;
+import dn.heaps.slib.HSprite;
 import ui.core.TextButton;
 import ui.core.Button;
 import ui.core.ShadowedText;
@@ -14,7 +19,6 @@ import ui.dialog.NewSaveDialog;
 import ui.dialog.OptionsMenu;
 import ui.dialog.SaveManager;
 import utils.Assets;
-import utils.s3d.Camera;
 
 class MainMenu extends Process {
 
@@ -163,7 +167,7 @@ class MainMenu extends Process {
 			root.add( dialog.h2dObject, Const.DP_UI );
 		}, vertFlow );
 
-		if ( params.saveFiles.length > 0 ) {
+		if ( Settings.params.saveFiles.length > 0 ) {
 			var loadObj : Object = null;
 			loadObj = new TextButton( "load game", ( _ ) -> {
 				var loadMan = new SaveManager( Load, () -> destroy() );
@@ -185,12 +189,12 @@ class MainMenu extends Process {
 			System.exit();
 		}, vertFlow );
 
-		blackOverlay = new Bitmap( Tile.fromColor( 0x000000, wScaled, hScaled ) );
+		blackOverlay = new Bitmap( Tile.fromColor( 0x000000, Util.wScaled, Util.hScaled ) );
 
 		parentFlow.addChildAt( blackOverlay, 1000 );
 		parentFlow.getProperties( blackOverlay ).isAbsolute = true;
 
-		Main.inst.tw.createS( blackOverlay.alpha, 1 > 0, TBackOut, 2 ).end(() -> {
+		Main.inst.tw.createS( blackOverlay.alpha, 1 > 0, TType.TBackOut, 2 ).end(() -> {
 			blackOverlay.remove();
 			blackOverlay = null;
 		} );

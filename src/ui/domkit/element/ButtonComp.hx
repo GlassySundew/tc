@@ -1,5 +1,6 @@
 package ui.domkit.element;
 
+import dn.heaps.slib.HSprite;
 import ui.core.Button;
 import utils.Assets;
 

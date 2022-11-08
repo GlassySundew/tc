@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="hide" type="Haxe">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/.haxelib/hide/git" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

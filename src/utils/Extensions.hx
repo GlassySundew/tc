@@ -1,14 +1,16 @@
 package utils;
 
-import net.Message;
+import format.tmx.Data.TmxProperties;
+import format.tmx.Data.TmxPropertyType;
+import format.tmx.Data.TmxLayer;
+import format.tmx.Data.TmxObject;
+import format.tmx.TmxMap;
+import h2d.Flow;
+import hxbit.NetworkHost.NetworkClient;
 import hxd.net.Socket;
 import hxd.net.SocketHost;
-import format.tmx.Data.TmxObject;
-import format.tmx.Data.TmxLayer;
-import format.tmx.TmxMap;
+import net.Message;
 import seedyrng.Random;
-import hxbit.NetworkHost.NetworkClient;
-import h2d.Flow;
 
 class MathUtil {
 
@@ -159,5 +161,30 @@ class ReverseArrayKeyValueIterator<T> {
 
 	public static inline function reversedKeyValues<T>( arr : Array<T> ) {
 		return new ReverseArrayKeyValueIterator( arr );
+	}
+}
+
+class TmxPropertiesExtension {
+
+	public static function getProp<T : TmxPropertyType>(
+		properties : TmxProperties,
+		type : TmxPropertyType,
+		name : String,
+		def = null
+	) : Dynamic {
+
+		if ( properties.existsType( name, type ) )
+			return
+				switch type {
+					case PTString: properties.getString( name );
+					case PTFile: properties.getFile( name );
+					case PTInt: properties.getInt( name );
+					case PTColor: properties.getColor( name );
+					case PTOject: properties.getInt( name );
+					case PTFloat: properties.getFloat( name );
+					case PTBool: properties.getBool( name );
+				}
+		else
+			return def;
 	}
 }

@@ -1,3 +1,0 @@
-# @install: lix --silent download "gh://github.com/deepcake/echo#8c3615f613ddaf4ddd315c6f3f573e806a8ba222" into echoes/0.1.0/github/8c3615f613ddaf4ddd315c6f3f573e806a8ba222
--cp ${HAXE_LIBCACHE}/echoes/0.1.0/github/8c3615f613ddaf4ddd315c6f3f573e806a8ba222/src/
--D echoes=0.1.0

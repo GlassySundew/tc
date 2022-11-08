@@ -1,5 +1,6 @@
 package en.structures.hydroponics;
 
+import utils.Util;
 import en.spr.EntitySprite;
 import format.tmx.Data.TmxObject;
 import hxd.Event;
@@ -17,7 +18,7 @@ class Hydroponics extends Structure {
 		eSpr = new EntitySprite(
 			this,
 			Assets.structures,
-			hollowScene
+			Util.hollowScene
 		);
 		eSpr.spr.anim.registerStateAnim( "hydroponics0", 1, 1, function () return cellFlowGrid != null ? cellFlowGrid.itemCount == 0 : true );
 		eSpr.spr.anim.registerStateAnim( "hydroponics1", 0, 1, function () return cellFlowGrid != null ? cellFlowGrid.itemCount > 0 : true );

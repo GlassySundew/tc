@@ -1,3 +1,0 @@
-# @install: lix --silent download "gh://github.com/deepnight/deepnightLibs#9522fa0e57845462972a78583ec4bd035959df3d" into deepnightLibs/1.0.70/github/9522fa0e57845462972a78583ec4bd035959df3d
--cp ${HAXE_LIBCACHE}/deepnightLibs/1.0.70/github/9522fa0e57845462972a78583ec4bd035959df3d/src/
--D deepnightLibs=1.0.70

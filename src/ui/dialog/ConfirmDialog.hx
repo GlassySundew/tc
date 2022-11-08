@@ -3,6 +3,8 @@ package ui.dialog;
 import hxd.Event;
 import h2d.Flow;
 import h2d.Object;
+import ui.domkit.element.ShadowedTextComp;
+import ui.domkit.element.TextButtonComp;
 
 class ConfirmComp extends Flow implements h2d.domkit.Object {
 
@@ -17,8 +19,7 @@ class ConfirmComp extends Flow implements h2d.domkit.Object {
 			}
 		</confirm-comp>
 	// @formatter:on
-		public
-	function new( message : String, onOkBtn : Event -> Void, ?onCancelBtn : Event -> Void, ?parent : Object ) {
+	public function new( message : String, onOkBtn : Event -> Void, ?onCancelBtn : Event -> Void, ?parent : Object ) {
 		super( parent );
 		initComponent();
 	}

@@ -11,6 +11,7 @@ import h2d.domkit.Style;
 import h2d.RenderContext;
 import h2d.ScaleGrid;
 import h2d.Flow;
+import dn.heaps.slib.HSprite;
 
 interface WindowCompI {
 	public var window : WindowComp;
@@ -36,7 +37,7 @@ class WindowComp extends Flow implements h2d.domkit.Object implements WindowComp
 
 	public function new( tile : h2d.Tile, bl : Int, bt : Int, br : Int, bb : Int, parent : Null<h2d.Object> ) {
 		super(parent);
-		
+
 		style = new h2d.domkit.Style();
 
 		initComponent();

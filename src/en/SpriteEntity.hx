@@ -1,5 +1,6 @@
 package en;
 
+import utils.Util;
 import en.spr.EntitySprite;
 import utils.Assets;
 import format.tmx.Data.TmxObject;
@@ -24,8 +25,8 @@ class SpriteEntity extends Structure {
 		eSpr = new EntitySprite(
 			this,
 			Assets.structures,
-			spriteGroup,
-			hollowScene
+			Util.hollowScene,
+			spriteGroup
 		);
 		super.alive();
 	}

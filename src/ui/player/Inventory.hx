@@ -1,5 +1,6 @@
 package ui.player;
 
+import en.Entity;
 import en.Item.ItemPresense;
 import en.util.ItemUtil;
 import en.util.item.IInventory;

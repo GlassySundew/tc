@@ -10,15 +10,11 @@ import hxbit.NetworkSerializable;
 class InventoryCell implements NetworkSerializable {
 
 	@:isVar
-	@:s public var item( get, set ) : en.Item;
+	@:s public var item( default, set ) : en.Item;
 	@:s public var containmentEntity : Entity;
 	@:s public var type : ItemPresense;
 
 	public var onSetItem : EventSignal1<Item>;
-
-	function get_item() {
-		return item;
-	}
 
 	function setPresense( item : Item, presense : ItemPresense ) {
 		item.itemPresense = presense;

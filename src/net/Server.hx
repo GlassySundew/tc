@@ -1,5 +1,6 @@
 package net;
 
+import utils.tools.Settings;
 import dn.Process;
 import en.player.Player;
 import game.server.GameServer;
@@ -8,6 +9,8 @@ import hxd.net.SocketHost;
 import net.ClientController;
 import utils.Env;
 import utils.tools.Save;
+
+using utils.Extensions.SocketHostExtender;
 
 /**
 	server-side
@@ -147,12 +150,6 @@ class Server extends Process {
 			// slapping new player in entrypoint
 			player = game.newPlayer( nickname, uid, clientController );
 		}
-
-		// host.sendTypedMessage(MapLoad(player.level));
-
-		// game.applyTmxObjOnEnt(cursorClient);
-		// host.sendMessage(MapLoad(GameServer.inst.lvlName, GameServer.inst.tmxMap), c);
-
 		clientController.uid = uid;
 		clientController.level = player.level;
 		clientController.player = player;

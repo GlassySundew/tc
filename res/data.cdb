@@ -69,7 +69,8 @@
 					"isoWidth": 0.9,
 					"isoHeight": 0.6,
 					"use_range": 20,
-					"interactable": true
+					"interactable": true,
+					"script": ""
 				},
 				{
 					"id": "door",

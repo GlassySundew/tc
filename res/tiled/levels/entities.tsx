@@ -7,9 +7,9 @@
   </properties>
   <image width="48" height="48" source="separated/player/idle_down_0.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="11" x="22.2793" y="39.1241">
+   <object id="11" x="22" y="39">
     <properties>
-     <property name="h" type="int" value="21"/>
+     <property name="h" type="float" value="21"/>
     </properties>
     <polygon points="0,0 3,0 6,-1 7,-3 6,-5 3,-6 0,-6 -3,-5 -4,-3 -3,-1"/>
    </object>
@@ -78,11 +78,11 @@
   </properties>
   <image width="48" height="72" source="separated/structures/door0.png"/>
   <objectgroup draworder="index" id="3">
-   <object id="5" name="center" x="19" y="57">
-    <point/>
-   </object>
    <object id="6" x="10" y="63">
     <polygon points="0,0 -8,-4 14,-15 22,-11"/>
+   </object>
+   <object id="5" name="center" x="18" y="56">
+    <point/>
    </object>
   </objectgroup>
  </tile>
@@ -143,24 +143,32 @@
  <tile id="17">
   <properties>
    <property name="className" value="en.structures.$BackDoor"/>
+   <property name="static" type="bool" value="true"/>
   </properties>
   <image width="48" height="60" source="separated/structures/backdoor0.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="5" name="center" x="18" y="50">
+   <object id="5" name="center" x="17" y="50">
     <point/>
    </object>
-   <object id="8" x="2" y="47">
-    <polygon points="0,0 7.5,-3.75 30,7.5 22.5,11.25"/>
+   <object id="11" x="2" y="46">
+    <properties>
+     <property name="h" type="float" value="5"/>
+    </properties>
+    <polygon points="0,0 22.5,11.25 30,7.5 7.5,-3.75"/>
    </object>
   </objectgroup>
  </tile>
  <tile id="19">
   <properties>
-   <property name="interactable" type="bool" value="false"/>
+   <property name="interactable" type="bool" value="true"/>
+   <property name="static" type="bool" value="true"/>
   </properties>
   <image width="48" height="48" source="separated/structures/chest.png"/>
   <objectgroup draworder="index" id="3">
    <object id="4" x="22" y="44">
+    <properties>
+     <property name="h" type="float" value="5"/>
+    </properties>
     <polygon points="0,0 20,-10 8,-16 -12,-6"/>
    </object>
    <object id="5" name="center" x="25" y="36">

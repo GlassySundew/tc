@@ -1,16 +1,13 @@
 package ui;
 
-import h3d.col.Bounds;
-import utils.s3d.Camera;
-import en.util.item.InventoryCell;
-import pass.CustomRenderer;
-import game.client.level.Level;
-import game.client.GameClient;
-import h2d.Console.ConsoleArgDesc;
+import en.Item;
 import en.player.Player;
-import h3d.scene.Renderer;
+import en.util.item.InventoryCell;
+import game.client.GameClient;
+import game.client.level.Level;
 import h2d.Console.ConsoleArg;
-import dn.Lib;
+import h3d.col.Bounds;
+import pass.CustomRenderer;
 
 class Console extends h2d.Console {
 
@@ -94,10 +91,6 @@ class Console extends h2d.Console {
 				GameClient.inst.camera.s3dCam.orthoBounds = new Bounds();
 				GameClient.inst.camera.refreshOrtho();
 			}
-		} );
-
-		this.addCommand( "toggleVoxelLevel", [], function ( ?k : String ) {
-			Level.inst.voxelLevel.toggleVisible();
 		} );
 
 		this.addCommand( "loadlvl", [{ name : "k", t : AString }], function ( name : String, ?manual : Bool = true ) {
@@ -327,6 +320,7 @@ class Console extends h2d.Console {
 						log( '$v should be [${values.join( "|" )}] for argument ${a.name}', errorColor );
 						return;
 					}
+                case AArray(arg) : // TODO
 			}
 		}
 

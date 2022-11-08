@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="hx-concurrent" type="Haxe">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/.haxelib/haxe-concurrent/git/src" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

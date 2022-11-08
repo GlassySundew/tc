@@ -1,9 +1,11 @@
 package en.items;
 
+import cherry.soup.EventSignal.EventSignal1;
 import game.client.GameClient;
 import game.client.level.Level.StructTile;
-import cherry.soup.EventSignal.EventSignal1;
 import h2d.Object;
+
+using en.util.EntityUtil;
 
 class Blueprint extends Item {
 

@@ -1,7 +1,9 @@
 package en.player;
 
-import ch3.scene.TileSprite;
+import oimo.dynamics.rigidbody.RigidBody;
+import dn.M;
 import dn.heaps.input.ControllerAccess;
+import dn.heaps.slib.HSprite;
 import en.items.Blueprint;
 import en.spr.EntitySprite;
 import format.tmx.Data.TmxObject;
@@ -20,6 +22,10 @@ import ui.core.InventoryGrid;
 import ui.player.ItemCursorHolder;
 import ui.player.PlayerUI;
 import utils.Assets;
+import utils.Util;
+import utils.tools.Settings;
+
+using en.util.EntityUtil;
 
 enum abstract PlayerActionState( String ) from String to String {
 
@@ -79,7 +85,6 @@ class Player extends Entity {
 	}
 
 	override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
-
 		super.init( x, y, z, tmxObj );
 	}
 
@@ -87,7 +92,7 @@ class Player extends Entity {
 		eSpr = new EntitySprite(
 			this,
 			Assets.player,
-			hollowScene
+			Util.hollowScene
 		);
 		ca = Main.inst.controller.createAccess();
 		belt = Main.inst.controller.createAccess();
@@ -117,15 +122,9 @@ class Player extends Entity {
 			pui = new PlayerUI( GameClient.inst.root, this );
 			GameClient.inst.camera.target = this;
 			GameClient.inst.camera.recenter();
-
 			GameClient.inst.player = this;
 		}
-
-		GameClient.inst.delayer.addF(
-			() -> {
-				eSpr.initTextLabel( nickname );
-				eSpr.pivotChanged = true;
-			}, 1 );
+		eSpr.initTextLabel( nickname );
 	}
 
 	override function applyTmx() {
@@ -240,6 +239,7 @@ class Player extends Entity {
 	}
 
 	override public function update() {
+
 		if ( inst == this ) {
 			var lx = ca.getAnalogValue2( MoveLeft, MoveRight );
 			var ly = ca.getAnalogValue2( MoveDown, MoveUp );
@@ -251,7 +251,7 @@ class Player extends Entity {
 				if ( leftPushed ) {
 					var s = leftDist * speed;
 					dx += Math.cos( leftAng ) * s;
-					dy += Math.sin( leftAng ) * s;
+					dy -= Math.sin( leftAng ) * s;
 
 					if ( lx < -0.3 && M.fabs( ly ) < 0.6 ) dir = 4; else if ( ly < -0.3 && M.fabs( lx ) < 0.6 ) dir = 6;
 					else if ( lx > 0.3
@@ -269,6 +269,12 @@ class Player extends Entity {
 			actionState.setValue( isMoving ? Running : Idle );
 		}
 
+		if ( rigidBody != null ) {
+			rigidBody._velX = dx * tmod / Boot.inst.deltaTime;
+			rigidBody._velY = dy * tmod / Boot.inst.deltaTime;
+			rigidBody._velZ = dz * tmod / Boot.inst.deltaTime;
+			if ( dx != 0 || dy != 0 || dz != 0 ) rigidBody.wakeUp();
+		}
 		super.update();
 	}
 
@@ -278,7 +284,11 @@ class Player extends Entity {
 		// if ( this == inst && !isLocked() && ui != null ) checkBeltInputs();
 
 		if ( ca.isKeyboardPressed( Key.R ) ) {
-			if ( holdItem != null && Std.isOfType( holdItem, Blueprint ) && cast( holdItem, Blueprint ).ghostStructure != null ) {
+			if (
+				holdItem != null
+				&& Std.isOfType( holdItem, Blueprint )
+				&& cast( holdItem, Blueprint ).ghostStructure != null
+			) {
 				cast( holdItem, Blueprint ).ghostStructure.flipX();
 			}
 		}

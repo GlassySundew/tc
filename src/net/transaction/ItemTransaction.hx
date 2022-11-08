@@ -1,5 +1,7 @@
 package net.transaction;
 
+import dn.M;
+import en.Item;
 import ui.core.InventoryGrid;
 import net.transaction.Transaction.TransactionResult;
 import en.util.item.InventoryCell;

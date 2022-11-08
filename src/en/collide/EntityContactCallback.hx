@@ -1,7 +1,7 @@
 package en.collide;
 
-import cherry.soup.EventSignal.EventSignal1;
 import cherry.soup.EventSignal.EventSignal0;
+import cherry.soup.EventSignal.EventSignal1;
 import oimo.dynamics.Contact;
 import oimo.dynamics.callback.ContactCallback;
 

@@ -1,23 +1,28 @@
 package utils;
 
-import oimo.collision.geometry.CylinderGeometry;
-import game.client.level.Level;
-import h3d.Vector;
-import oimo.dynamics.rigidbody.Shape;
-import oimo.dynamics.rigidbody.RigidBody;
-import oimo.dynamics.rigidbody.RigidBodyConfig;
-import oimo.dynamics.rigidbody.ShapeConfig;
-import oimo.collision.geometry.ConvexHullGeometry;
-import oimo.common.Vec3;
+import en.Entity;
+import en.util.EntityUtil;
 import format.tmx.Data.TmxGroup;
 import format.tmx.Data.TmxImageLayer;
+import format.tmx.Data.TmxLayer;
 import format.tmx.Data.TmxObjectGroup;
 import format.tmx.Data.TmxTileLayer;
-import format.tmx.Data.TmxLayer;
-import format.tmx.TmxMap;
 import format.tmx.Data.TmxTilesetTile;
+import format.tmx.TmxMap;
 import format.tmx.Tools;
 import game.client.GameClient;
+import game.client.level.Level;
+import h2d.col.Point;
+import h3d.Vector;
+import oimo.collision.geometry.ConvexHullGeometry;
+import oimo.common.Vec3;
+import oimo.dynamics.rigidbody.RigidBody;
+import oimo.dynamics.rigidbody.RigidBodyConfig;
+import oimo.dynamics.rigidbody.RigidBodyType.*;
+import oimo.dynamics.rigidbody.Shape;
+import oimo.dynamics.rigidbody.ShapeConfig;
+
+using utils.Extensions.TmxPropertiesExtension;
 
 typedef TmxLayerCb = {
 	var ?tmxTileLayerCb : TmxTileLayer -> Bool;
@@ -41,7 +46,7 @@ class TmxUtils {
 				if ( tmxLayerCb.tmxImgLayerCb != null && !tmxLayerCb.tmxImgLayerCb( layer ) ) return;
 			case LGroup( group ):
 				if ( tmxLayerCb.tmxGroupLayerCb != null && !tmxLayerCb.tmxGroupLayerCb( group ) ) return;
-				
+
 				if ( group.visible )
 					for ( grLayer in group.layers ) {
 						var tmxLayerArg : TmxLayer = switch grLayer {
@@ -77,7 +82,7 @@ class TmxUtils {
 		var ents = ent != null ? [ent] : Entity.ServerALL;
 
 		for ( ent in ents ) {
-			var tilesetEntityTile = getCorrespondingEntityTsTile( ent, tmxMap );
+			var tilesetEntityTile = getEntityTsTile( ent, tmxMap );
 
 			// соотношение, которое в конце будет применено к entity
 			var center = new Vector();
@@ -103,7 +108,7 @@ class TmxUtils {
 								center.y = obj.y;
 						}
 					case OTPolygon( points ):
-						var cent = getProjPolySize( obj, points, Vector );
+						var cent = Util.getProjPolySize( obj, points, Vector );
 
 						if ( center.x == 0 && center.y == 0 ) {
 							center.x = cent.x + obj.x;
@@ -118,15 +123,19 @@ class TmxUtils {
 			var pivotX = center.x;
 			var pivotY = center.y;
 
-			var actualX = Std.int( ent.tmxObj.width ) >> 1;
-			var actualY = Std.int( ent.tmxObj.height );
+			var centerOffsetX : Float = ent.tmxObj.width / 2 - pivotX;
+			var centerOffsetY = ( ent.tmxObj.height - pivotY ) * 2;
 
-			ent.footX.val -= actualX - pivotX;
-			ent.footY.val += actualY - pivotY;
+			var isoOff = Util.cartToIso( centerOffsetX, centerOffsetY );
+
+			ent.footX.val -= isoOff.x / 2;
+			ent.footY.val += isoOff.y / 2;
 
 			if ( ent.tmxObj.flippedHorizontally ) {
 				EntityUtil.flipX( ent );
 			}
+
+			ent.setFeetPos( ent.footX.val, ent.footY.val );
 		}
 	}
 
@@ -141,18 +150,18 @@ class TmxUtils {
 		var ents = ent != null ? [ent] : Entity.ALL;
 
 		for ( ent in ents ) {
-			var tilesetEntityTile = getCorrespondingEntityTsTile( ent, tmxMap );
+			var tsEntTile = getEntityTsTile( ent, tmxMap );
 
 			// соотношение, которое в конце будет применено к entity
 			var center = new Vector();
-			var centerPt = tilesetEntityTile.objectGroup.objects.filter( obj -> obj.name == "center" )[0];
+			var centerPt = tsEntTile.objectGroup.objects.filter( obj -> obj.name == "center" )[0];
 			if ( centerPt != null ) {
 				center.x = centerPt.x;
 				center.y = centerPt.y;
 			}
 
-			for ( obj in tilesetEntityTile.objectGroup.objects ) {
-				var height = obj.properties.exists( "h" ) ? obj.properties.getInt( "h" ) : 1;
+			for ( obj in tsEntTile.objectGroup.objects ) {
+				var height = obj.properties.getProp( PTFloat, "h", 1 );
 
 				switch obj.objectType {
 					case OTRectangle:
@@ -167,30 +176,36 @@ class TmxUtils {
 					// b.addShape( shape );
 
 					case OTPolygon( points ):
-						var pts = makePolyClockwise( points );
-						var cent = getProjPolySize( obj, points, Vector );
+						var pts = Util.makePolyClockwise( points );
+						var cent = Util.getProjPolySize( obj, points, Vector );
 
 						if ( center.x == 0 && center.y == 0 ) {
 							center.x = cent.x + obj.x;
 							center.y = cent.y + obj.y;
 						}
 
-						var verts : Array<Vec3> = [];
-						for ( i in pts ) verts.push( new Vec3( i.x + obj.x - center.x, ( i.y + obj.y - center.y ) * 1.333333333, 0 ) );
-						for ( i in pts ) verts.push( new Vec3( i.x + obj.x - center.x, ( i.y + obj.y - center.y ) * 1.333333333, height ) );
+						var isoVerts : Array<Point> = [];
+						for ( pt in pts ) {
+							var isoPt = Util.cartToIso( pt.x + obj.x - center.x, pt.y + obj.y - center.y );
+							isoPt = Util.isoToCart( isoPt.x, isoPt.y );
+							isoVerts.push( new Point( isoPt.x, isoPt.y ) );
+						}
 
-						rotatePoly( obj.rotation - 45, verts );
+						var verts : Array<Vec3> = [];
+						for ( isoVert in isoVerts ) verts.push( new Vec3( isoVert.x, isoVert.y, 0 ) );
+						for ( isoVert in isoVerts ) verts.push( new Vec3( isoVert.x, isoVert.y, height ) );
+
+						Util.rotatePoly( obj.rotation - 45, verts );
 
 						var sc : ShapeConfig = new ShapeConfig();
-						// sc.position.init( obj.x - center.x, obj.y - center.y, 0 );
-
 						sc.geometry = new ConvexHullGeometry( verts );
-
 						var b : RigidBody = ent.rigidBody;
 						var shape = new Shape( sc );
-
 						if ( b == null ) {
 							var bc : RigidBodyConfig = new RigidBodyConfig();
+							bc.type = if ( tsEntTile.properties.existsType( "static", PTBool ) )
+								( tsEntTile.properties.getBool( "static" ) ? STATIC : DYNAMIC );
+							else DYNAMIC;
 							b = new RigidBody( bc );
 							Level.inst.world.addRigidBody( b );
 							ent.rigidBody = b;
@@ -217,7 +232,7 @@ class TmxUtils {
 		}
 	}
 
-	private static function getCorrespondingEntityTsTile( ent : Entity, tmxMap : TmxMap ) : TmxTilesetTile {
+	private static function getEntityTsTile( ent : Entity, tmxMap : TmxMap ) : TmxTilesetTile {
 		switch ent.tmxObj.objectType {
 			case OTTile( gid ):
 				return Tools.getTileByGid( tmxMap, gid );

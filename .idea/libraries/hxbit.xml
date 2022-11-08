@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="hxbit" type="Haxe">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/.haxelib/hxbit/git" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

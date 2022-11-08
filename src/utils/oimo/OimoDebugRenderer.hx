@@ -1,18 +1,20 @@
 package utils.oimo;
 
 import dn.Process;
-import oimo.dynamics.rigidbody.RigidBodyType;
-import hxd.IndexBuffer;
+import dn.legacy.Color;
+import en.Entity;
 import h3d.col.Point;
-import h3d.prim.Polygon;
-import oimo.collision.geometry.ConvexHullGeometry;
 import h3d.prim.Cube;
+import h3d.prim.Polygon;
 import h3d.scene.Mesh;
+import hxd.IndexBuffer;
 import oimo.collision.geometry.BoxGeometry;
+import oimo.collision.geometry.ConvexHullGeometry;
 import oimo.collision.geometry.GeometryType;
 import oimo.dynamics.World;
 import oimo.dynamics.rigidbody.RigidBody;
 import oimo.dynamics.rigidbody.Shape;
+import utils.Util;
 
 class OimoDebugRenderer extends Process {
 
@@ -41,7 +43,7 @@ class OimoDebugRenderer extends Process {
 		mesh.y = shape._rigidBody._transform._positionY + shape._localTransform._positionY;
 		mesh.z = shape._rigidBody._transform._positionZ + shape._localTransform._positionZ;
 		var transform = shape._rigidBody._transform;
-		var eulerAngle = rotMatToEuler(
+		var eulerAngle = Util.rotMatToEuler(
 			transform._rotation00,
 			transform._rotation10,
 			transform._rotation20,
@@ -53,10 +55,10 @@ class OimoDebugRenderer extends Process {
 	}
 
 	public function registerEntity( ent : Entity ) {
-		drawRBList( ent.rigidBody, 0x1C4F4FC7 );
+		drawRBList( ent.rigidBody, 0x1C4F4FC7, ent );
 	}
 
-	function drawRBList( rbList : RigidBody, color = 0x3F8CCE5D ) {
+	function drawRBList( rbList : RigidBody, color = 0x3F8CCE5D, ?ent : Entity ) {
 		while( rbList != null ) {
 			var shape = rbList.getShapeList();
 			while( shape != null ) {
@@ -110,7 +112,7 @@ class OimoDebugRenderer extends Process {
 						}
 
 						// верхняя грань
-						for ( i in ( ( ptsLenHalved ) + 1 ) ... ( hpsPts.length - 1 ) ) {
+						for ( i in( ( ptsLenHalved ) + 1 ) ... ( hpsPts.length - 1 ) ) {
 							idx.push( i + 1 );
 							idx.push( i );
 							idx.push( ptsLenHalved );
@@ -130,9 +132,9 @@ class OimoDebugRenderer extends Process {
 					default:
 				}
 
-				// if ( mesh != null )
-				// 	mesh.material.mainPass.addShader( new VoxelDepther( 10 ) );
 				meshes[shape] = mesh;
+				if ( ent != null )
+					mesh.material.mainPass.addShader( ent.eSpr.depthOffset );
 				shape = shape.getNext();
 			}
 

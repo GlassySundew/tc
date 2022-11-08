@@ -1,5 +1,9 @@
 package ui.player;
 
+import utils.Util;
+import dn.heaps.slib.HSprite;
+import utils.tools.Settings;
+import utils.Const;
 import dn.Process;
 import en.player.Player;
 import en.util.item.InventoryCell;
@@ -160,8 +164,8 @@ class PlayerUI extends Process {
 
 	override function onResize() {
 		super.onResize();
-		baseFlow.minWidth = wScaled;
-		baseFlow.minHeight = hScaled;
+		baseFlow.minWidth =  Util.wScaled;
+		baseFlow.minHeight = Util.hScaled;
 	}
 }
 

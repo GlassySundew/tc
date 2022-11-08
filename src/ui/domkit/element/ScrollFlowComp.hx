@@ -6,11 +6,12 @@ import h2d.col.Point;
 import h2d.Flow;
 import h2d.domkit.Object;
 import h2d.Object;
+import dn.M;
 
 @:uiComp( "scroll-flow" )
 class ScrollFlowComp extends h2d.Flow implements h2d.domkit.Object {
 
-	// @formatter:off
+    // @formatter:off
 	static var SRC =
 		<scroll-flow layout="horizontal" >
 			<flow public id="scrollBarNew" fill-height="true" width="10" background="#646464" valign="top" alpha="0.5" >
@@ -18,97 +19,97 @@ class ScrollFlowComp extends h2d.Flow implements h2d.domkit.Object {
 			</flow>
 		</scroll-flow>
 	;
-
 	// @formatter:on
-	var scrollArea : FixedScrollArea;
-	var scrollContent : Flow;
-	var initialized = false;
 
-	public function new( ?parent : h2d.Object ) {
-		super( parent );
-		initComponent();
-		scrollBarNew.enableInteractive = enableInteractive = true;
-		scrollBarNew.interactive.cursor = Button;
-	}
+    var scrollArea : FixedScrollArea;
+    var scrollContent : Flow;
+    var initialized = false;
 
-	public function init( scrollArea : FixedScrollArea, scrollContent : Flow ) {
-		this.scrollArea = scrollArea;
-		this.scrollContent = scrollContent;
+    public function new( ?parent : h2d.Object ) {
+        super( parent );
+        initComponent( );
+        scrollBarNew.enableInteractive = enableInteractive = true;
+        scrollBarNew.interactive.cursor = Button;
+    }
 
-		initialized = true;
+    public function init( scrollArea : FixedScrollArea, scrollContent : Flow ) {
+        this.scrollArea = scrollArea;
+        this.scrollContent = scrollContent;
 
-		var scrollBounds = new Bounds();
-		scrollBounds.addPoint( new Point( 0, M.fclamp( scrollContent.innerHeight, scrollArea.height, 1 / 0 ) ) );
-		scrollBounds.addPoint( new Point( scrollContent.innerWidth, 0 ) );
-		scrollArea.scrollBounds = scrollBounds;
+        initialized = true;
 
-		interactive.onWheel = scrollEvent;
+        var scrollBounds = new Bounds();
+        scrollBounds.addPoint( new Point( 0, M.fclamp( scrollContent.innerHeight, scrollArea.height, 1 / 0 ) ) );
+        scrollBounds.addPoint( new Point( scrollContent.innerWidth, 0 ) );
+        scrollArea.scrollBounds = scrollBounds;
 
-		var handleDy = .0;
+        interactive.onWheel = scrollEvent;
 
-		function setCursor( e : hxd.Event ) {
-			var cursorY = ( ( e.relY - handleDy ) );
-			scrollArea.scrollY = ( ( cursorY * ( scrollContent.innerHeight - scrollArea.height ) ) / ( scrollBarNew.innerHeight - scrollBarCursorNew.minHeight ) );
-			updateScrollCursorNew();
-		}
+        var handleDy = .0;
 
-		scrollBarNew.interactive.onPush = ( e : hxd.Event ) -> {
-			if ( e.cancel ) return;
-			var scene = getScene();
-			if ( scene == null ) return;
+        function setCursor( e : hxd.Event ) {
+            var cursorY = ( ( e.relY - handleDy ) );
+            scrollArea.scrollY = ( ( cursorY * ( scrollContent.innerHeight - scrollArea.height ) ) / ( scrollBarNew.innerHeight - scrollBarCursorNew.minHeight ) );
+            updateScrollCursorNew( );
+        }
 
-			handleDy = if ( e.relY - scrollBarCursorNew.y < 0 || e.relY - scrollBarCursorNew.y > scrollBarCursorNew.innerHeight ) {
-				scrollBarCursorNew.innerHeight * 0.5;
-			} else e.relY - getDy();
+        scrollBarNew.interactive.onPush = ( e : hxd.Event ) -> {
+            if ( e.cancel ) return;
+            var scene = getScene( );
+            if ( scene == null ) return;
 
-			function capture( e : hxd.Event ) {
-				switch( e.kind ) {
-					case ERelease, EReleaseOutside:
-						scene.stopCapture();
-						handleDy = 0;
-					case EPush, EMove:
-						setCursor( e );
-					default:
-				}
-				e.propagate = false;
-			}
-			capture( e );
-			scrollBarNew.interactive.startCapture( capture );
-		}
-	}
+            handleDy = if ( e.relY - scrollBarCursorNew.y < 0 || e.relY - scrollBarCursorNew.y > scrollBarCursorNew.innerHeight ) {
+                scrollBarCursorNew.innerHeight * 0.5;
+            } else e.relY - getDy( );
 
-	inline function getDy() {
-		return
-			Math.round( ( scrollArea.scrollY / ( scrollContent.innerHeight - scrollArea.height ) ) * ( scrollBarNew.innerHeight - scrollBarCursorNew.minHeight ) );
-	}
+            function capture( e : hxd.Event ) {
+                switch( e.kind ) {
+                    case ERelease, EReleaseOutside:
+                        scene.stopCapture( );
+                        handleDy = 0;
+                    case EPush, EMove:
+                        setCursor( e );
+                    default:
+                }
+                e.propagate = false;
+            }
+            capture( e );
+            scrollBarNew.interactive.startCapture( capture );
+        }
+    }
 
-	function scrollEvent( e : hxd.Event ) {
-		scrollArea.scrollBy( 0, e.wheelDelta );
-		updateScrollCursorNew();
-	}
+    inline function getDy( ) {
+        return
+            Math.round( ( scrollArea.scrollY / ( scrollContent.innerHeight - scrollArea.height ) ) * ( scrollBarNew.innerHeight - scrollBarCursorNew.minHeight ) );
+    }
 
-	function updateScrollCursorNew() {
-		scrollBarCursorNew.y = getDy();
-	}
+    function scrollEvent( e : hxd.Event ) {
+        scrollArea.scrollBy( 0, e.wheelDelta );
+        updateScrollCursorNew( );
+    }
 
-	override function reflow() {
-		super.reflow();
+    function updateScrollCursorNew( ) {
+        scrollBarCursorNew.y = getDy( );
+    }
 
-		if ( initialized ) {
-			scrollArea.recalcFilling();
+    override function reflow( ) {
+        super.reflow( );
 
-			var scrollBarVisibility = contentHeight <= scrollContent.calculatedHeight;
-			scrollBarNew.visible = scrollBarVisibility;
+        if ( initialized ) {
+            scrollArea.recalcFilling( );
 
-			if ( scrollBarVisibility ) {
-				scrollBarCursorNew.minHeight = //
-					Std.int( M.fclamp(
-						1 / ( scrollContent.innerHeight / scrollArea.height ) * scrollArea.height,
-						15,
-						scrollArea.height - 0.1
-					) );
-				updateScrollCursorNew();
-			}
-		}
-	}
+            var scrollBarVisibility = contentHeight <= scrollContent.calculatedHeight;
+            scrollBarNew.visible = scrollBarVisibility;
+
+            if ( scrollBarVisibility ) {
+                scrollBarCursorNew.minHeight = //
+                Std.int( M.fclamp(
+                    1 / ( scrollContent.innerHeight / scrollArea.height ) * scrollArea.height,
+                    15,
+                    scrollArea.height - 0.1
+                ) );
+                updateScrollCursorNew( );
+            }
+        }
+    }
 }

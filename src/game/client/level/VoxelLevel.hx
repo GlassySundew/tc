@@ -1,27 +1,23 @@
 package game.client.level;
 
-import shader.LUT;
-import shader.DepthOffset;
 import dn.Process;
 import format.tmx.Data.TmxGroup;
 import format.tmx.Data.TmxTileLayer;
-import format.tmx.Data.TmxTileset;
 import format.tmx.TmxMap;
 import game.client.level.batch.LUTBatcher;
-import h3d.scene.Mesh;
 import h3d.scene.Object;
-import hxd.Res;
+import i.IDestroyable;
 import oimo.common.Vec3;
 import utils.Assets;
-import utils.TmxUtils;
 import utils.oimo.OimoUtil;
 import utils.tilesets.Tileset;
+import utils.TmxUtils;
 
 using format.tmx.Tools;
 
-class VoxelLevel extends Process {
+class VoxelLevel extends Process implements IDestroyable {
 
-	/** 
+	/**
 		a group name that when is found its containing will be converted into a 3d level
 	**/
 	private static final threeDLayerName = "3d";
@@ -42,28 +38,26 @@ class VoxelLevel extends Process {
 
 	public function render( tmxMap : TmxMap ) {
 		this.tmxMap = tmxMap;
+
 		threeDRoot.removeChildren();
 		TmxUtils.mapTmxMap(
 			tmxMap,
 			{
-				tmxGroupLayerCb : ( tmxGroup : TmxGroup ) -> {
-					return
-						if ( tmxGroup.name == threeDLayerName ) {
-							TmxUtils.layerRec( LGroup( tmxGroup ),
-								{
-									tmxTileLayerCb : ( tileLayer : TmxTileLayer ) -> {
-										if ( tileLayer.visible )
-											renderLayer( tileLayer );
-										return true;
-									}
-								}
-							);
-							false;
-						} else true;
-				} }
+				tmxTileLayerCb : ( tileLayer : TmxTileLayer ) -> {
+					if ( tileLayer.visible )
+						renderLayer( tileLayer );
+					return true;
+				}
+			}
 		);
 
 		return this;
+	}
+
+	override function onDispose() {
+		super.onDispose();
+
+		threeDRoot.removeChildren();
 	}
 
 	override function update() {

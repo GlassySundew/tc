@@ -1,5 +1,6 @@
 package ui.dialog;
 
+import utils.tools.Settings;
 import ui.core.ShadowedText;
 import ui.core.TextInput;
 import utils.Assets;

@@ -1,5 +1,7 @@
 package net;
 
+import utils.Const;
+import utils.tools.Settings;
 import hxbit.NetworkHost;
 import net.transaction.Transaction;
 import game.client.GameClient;
@@ -40,9 +42,8 @@ class ClientController implements NetworkSerializable {
 		return this.player = player;
 	}
 
-	function set_level( level : ServerLevel ) {
+	inline function set_level( level : ServerLevel ) {
 		if ( GameClient.inst != null && level != null && isOwner ) {
-			trace( "setting level" );
 			GameClient.inst.sLevel = level;
 			GameClient.inst.startLevelFromParsedTmx( level.tmxMap, level.lvlName );
 		}
@@ -55,7 +56,7 @@ class ClientController implements NetworkSerializable {
 	}
 
 	public function new() {
-		if ( !Server.inst.host.isAutoOwner ) enableReplication = true;
+		if ( !Server.inst.host.isChannelingEnabled ) enableReplication = true;
 	}
 
 	public function alive() {
@@ -65,13 +66,17 @@ class ClientController implements NetworkSerializable {
 			Client.inst.host.self.ownerObject = this;
 			Main.inst.clientController = this;
 		} else
-			if ( Client.inst.host.isAutoOwner ) throw "clientController instance is replicated on a client where it is not supposed to be";
+			if ( Client.inst.host.isChannelingEnabled ) throw "clientController instance is replicated on a client where it is not supposed to be";
 	}
 
 	// function customSerialize( ctx : hxbit.Serializer ) {}
 	// function customUnserialize( ctx : hxbit.Serializer ) {}
 
-	public function networkAllow( op : hxbit.NetworkSerializable.Operation, propId : Int, clientSer : hxbit.NetworkSerializable ) : Bool {
+	public function networkAllow(
+		op : hxbit.NetworkSerializable.Operation,
+		propId : Int,
+		clientSer : hxbit.NetworkSerializable
+	) : Bool {
 		return clientSer == this;
 	}
 

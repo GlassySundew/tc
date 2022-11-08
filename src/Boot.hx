@@ -1,3 +1,5 @@
+import utils.Util;
+import utils.tools.Settings;
 import pass.CustomRenderer;
 import utils.tools.Save;
 import utils.Env;
@@ -41,7 +43,7 @@ class Boot extends hxd.App {
 		#end
 
 		inst = this;
-		hollowScene = new Scene();
+		Util.hollowScene = new Scene();
 
 		new Main( s2d );
 

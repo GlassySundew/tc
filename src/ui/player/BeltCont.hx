@@ -1,14 +1,14 @@
 package ui.player;
 
-import en.util.item.InventoryCell;
-import net.transaction.TransactionFactory;
-import ui.core.InventoryGrid.InventoryCellFlow;
 import en.player.Player;
+import en.util.item.InventoryCell;
 import en.util.item.ItemManipulations;
 import h2d.Font;
 import h2d.Object;
 import h2d.filter.Shader;
+import net.transaction.TransactionFactory;
 import shader.CornersRounder;
+import ui.core.InventoryGrid.InventoryCellFlow;
 import ui.core.ShadowedText;
 
 @:uiComp("beltCont")

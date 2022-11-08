@@ -4,6 +4,8 @@ import utils.Assets;
 import ui.NinesliceWindow.NinesliceConf;
 import ui.domkit.WindowComp.WindowCompI;
 import h2d.Flow;
+import utils.Util;
+import dn.heaps.slib.HSprite;
 
 class NavigationComp extends Flow implements h2d.domkit.Object implements WindowCompI {
 	var navWinConf : NinesliceConf;
@@ -19,7 +21,7 @@ class NavigationComp extends Flow implements h2d.domkit.Object implements Window
         
     public function new( backgroundTile : h2d.Tile, bl : Int, bt : Int, br : Int, bb : Int, ?parent : Null<h2d.Object>, rest : haxe.Rest<Dynamic> ) {
 		super(parent);
-        navWinConf = nineSliceFromConf("nav_win");
+        navWinConf = Util.nineSliceFromConf("nav_win");
 		
         initComponent();
 

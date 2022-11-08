@@ -1,5 +1,0 @@
-# @install: lix --silent download "gh://github.com/vegardit/haxe-concurrent#8d7ce3a1e3d95c6489fde4c428039d2dc014edb5" into haxe-concurrent/3.0.2/github/8d7ce3a1e3d95c6489fde4c428039d2dc014edb5
--cp ${HAXE_LIBCACHE}/haxe-concurrent/3.0.2/github/8d7ce3a1e3d95c6489fde4c428039d2dc014edb5/src/
--D haxe-concurrent=3.0.2
---macro hx.concurrent.internal.Macros.configureNullSafety()
---macro hx.concurrent.internal.Macros.addDefines()

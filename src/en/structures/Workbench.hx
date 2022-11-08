@@ -1,5 +1,6 @@
 package en.structures;
 
+import dn.heaps.input.ControllerAccess;
 import game.client.GameClient;
 import game.client.ControllerAction;
 import hxd.Event;

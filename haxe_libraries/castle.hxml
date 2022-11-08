@@ -1,3 +1,0 @@
-# @install: lix --silent download "gh://github.com/ncannasse/castle#4405ca065565261015d69cd8c51031e971ee5616" into castle/1.6.1/github/4405ca065565261015d69cd8c51031e971ee5616
--cp ${HAXE_LIBCACHE}/castle/1.6.1/github/4405ca065565261015d69cd8c51031e971ee5616/
--D castle=1.6.1

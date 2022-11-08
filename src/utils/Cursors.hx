@@ -1,21 +1,18 @@
 package utils;
 
-import hxd.Cursor;
-import h3d.pass.Default;
-import hxd.System;
-import h2d.Object;
 import h2d.Bitmap;
-import h2d.Drawable;
-import hxd.File;
-import hxd.Cursor.CustomCursor;
-import hxd.Pixels;
+import h2d.Object;
 import h3d.mat.Texture;
+import h3d.pass.Default;
 import hxd.BitmapData;
+import hxd.Cursor.CustomCursor;
+import hxd.Cursor;
+import hxd.Pixels;
 
 class Cursors {
 
 	public static var cursorScale = 2;
-	static var currentCursor : Cursor = Default;
+	static var currentCursor : Cursor = Cursor.Default;
 
 	static var objectPool : Array<Object> = [];
 
@@ -67,7 +64,7 @@ class Cursors {
 					hxd.System.setNativeCursor( cur );
 			}
 		}
-		System.setCursor( currentCursor );
+		hxd.System.setCursor( currentCursor );
 	}
 
 	public static function passObjectForCursor( object : Object ) {

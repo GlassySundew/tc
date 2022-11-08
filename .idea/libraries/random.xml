@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="random" type="Haxe">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/.haxelib/random/1,4,1/src" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

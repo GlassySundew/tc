@@ -1,5 +1,6 @@
 package ui.core;
 
+import dn.legacy.Color;
 import hxd.Event;
 import h2d.RenderContext;
 import h2d.ScaleGrid;

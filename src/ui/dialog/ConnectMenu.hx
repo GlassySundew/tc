@@ -1,12 +1,17 @@
 package ui.dialog;
 
-import ui.core.TextInput;
-import net.Client;
-import h2d.RenderContext;
-import hxd.Res;
-import h2d.domkit.Style;
 import h2d.Flow;
 import h2d.Object;
+import h2d.RenderContext;
+import h2d.domkit.Style;
+import hxd.Res;
+import net.Client;
+import ui.core.TextInput;
+import ui.domkit.element.ButtonFlowComp;
+import ui.domkit.element.ShadowedTextComp;
+import ui.domkit.element.TextButtonComp;
+import ui.domkit.element.TextInputComp;
+import utils.tools.Settings;
 
 class ConnectComp extends Flow implements h2d.domkit.Object {
 

@@ -1,5 +1,7 @@
 package ui.core;
 
+import en.Item;
+import dn.heaps.slib.HSprite;
 import cherry.soup.EventSignal.EventSignal0;
 import ch2.ui.EventInteractive;
 import dn.heaps.input.ControllerAccess;

@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "tiled/levels/bridge.tmx",
+    "activeFile": "tiled/levels/ship_pascal.tmx",
     "automapping.whileDrawing": false,
     "expandedProjectPaths": [
         "tiled",
@@ -519,7 +519,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 214.83333333333331,
-                "y": 98.16666666666666
+                "y": 98
             }
         },
         "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx#CONGRUENT": {
@@ -534,13 +534,13 @@
         },
         "tiled/levels/CONGRUENT.tsx": {
             "dynamicWrapping": false,
-            "scaleInDock": 0.75,
+            "scaleInDock": 3,
             "scaleInEditor": 3
         },
         "tiled/levels/alpha.tsx": {
             "dynamicWrapping": true,
             "scaleInDock": 0.25,
-            "scaleInEditor": 0.33
+            "scaleInEditor": 0.75
         },
         "tiled/levels/alphamap.tmx": {
             "scale": 2,
@@ -554,19 +554,25 @@
             "scale": 0.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 2399,
-                "y": 1199
+                "x": 2400,
+                "y": 1200
             }
         },
         "tiled/levels/bridge.tmx": {
             "expandedGroupLayers": [
-                63
+                63,
+                89,
+                65
             ],
-            "scale": 2,
-            "selectedLayer": 11,
+            "expandedObjectLayers": [
+                34,
+                3
+            ],
+            "scale": 5.5,
+            "selectedLayer": 26,
             "viewCenter": {
-                "x": 575.75,
-                "y": 196.25
+                "x": 483.72727272727275,
+                "y": 217.72727272727275
             }
         },
         "tiled/levels/bridge.tmx#entities": {
@@ -607,8 +613,8 @@
             "scale": 1,
             "selectedLayer": 16,
             "viewCenter": {
-                "x": 2399.5,
-                "y": 1199.5
+                "x": 2400,
+                "y": 1200
             }
         },
         "tiled/levels/rules.tmx": {
@@ -627,8 +633,8 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 120.25,
-                "y": 60.25
+                "x": 120,
+                "y": 60
             }
         },
         "tiled/levels/rules/rules.tmx": {
@@ -765,13 +771,14 @@
                 829
             ],
             "expandedObjectLayers": [
+                829,
                 3
             ],
             "scale": 5.5,
-            "selectedLayer": 2,
+            "selectedLayer": 16,
             "viewCenter": {
-                "x": 421.3636363636364,
-                "y": 44.45454545454546
+                "x": 261,
+                "y": 166.63636363636363
             }
         },
         "tiled/levels/ship_pascal.tmx#CONGRUENT": {
@@ -788,7 +795,7 @@
             }
         },
         "tiled/levels/ui.tmx": {
-            "scale": 23,
+            "scale": 16,
             "selectedLayer": 3,
             "viewCenter": {
                 "x": 125,
@@ -798,7 +805,7 @@
         "tiled/levels/ui.tsx": {
             "dynamicWrapping": true,
             "scaleInDock": 0.5,
-            "scaleInEditor": 0.33
+            "scaleInEditor": 0.75
         }
     },
     "last.externalTilesetPath": "/home/glassysundew/Documents",
@@ -818,32 +825,32 @@
     "map.tileWidth": 48,
     "map.width": 100,
     "openFiles": [
+        "tiled/levels/ship_pascal.tmx",
         "tiled/levels/bridge.tmx",
+        "tiled/levels/entities.tsx",
         "tiled/levels/alpha.tsx",
         "tiled/levels/ui.tmx",
         "tiled/levels/ui.tsx",
-        "tiled/levels/entities.tsx",
         "tiled/levels/rules/rules.tmx",
         "tiled/levels/rules/random.tmx",
         "tiled/levels/asteroid.tmx",
         "tiled/levels/procgen/asteroids.tmx",
-        "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx",
-        "tiled/levels/ship_pascal.tmx"
+        "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx"
     ],
     "project": "res.tiled-project",
-    "property.type": "int",
+    "property.type": "string",
     "recentFiles": [
-        "tiled/levels/rules/random.tmx",
-        "tiled/levels/rules/rules.tmx",
+        "tiled/levels/ship_pascal.tmx",
+        "tiled/levels/bridge.tmx",
+        "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx",
         "tiled/levels/procgen/asteroids.tmx",
         "tiled/levels/asteroid.tmx",
-        "tiled/levels/bridge.tmx",
-        "tiled/levels/ship_pascal.tmx",
-        "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx",
-        "tiled/levels/entities.tsx",
+        "tiled/levels/rules/random.tmx",
+        "tiled/levels/rules/rules.tmx",
         "tiled/levels/ui.tsx",
         "tiled/levels/ui.tmx",
         "tiled/levels/alpha.tsx",
+        "tiled/levels/entities.tsx",
         "tiled/levels/CONGRUENT.tsx"
     ],
     "resizeMap.removeObjects": true,

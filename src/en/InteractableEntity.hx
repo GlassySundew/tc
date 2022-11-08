@@ -1,5 +1,10 @@
 package en;
 
+import dn.legacy.Color;
+import utils.Const;
+import dn.Tweenie.TType;
+import utils.Util;
+import shader.DepthOffset;
 import en.player.Player;
 import format.tmx.Data.TmxObject;
 import h2d.Object;
@@ -22,9 +27,11 @@ import ui.s3d.EventInteractive;
 class InteractableEntity extends Entity {
 
 	public var interact : EventInteractive;
+
+	@:s
 	public var interactable( default, set ) : Bool = false;
 
-	inline function set_interactable( v : Bool ) {
+	function set_interactable( v : Bool ) {
 		if ( !v ) {
 			turnOffHighlight();
 			if ( buttonIcon != null ) buttonIcon.dispose();
@@ -72,7 +79,7 @@ class InteractableEntity extends Entity {
 		polyPrim = new Polygon( translatedPoints, idx );
 		interact = new EventInteractive( polyPrim.getCollider(), eSpr.mesh );
 
-		interact.rotate( -0.01, hxd.Math.degToRad( 180 ), hxd.Math.degToRad( 90 ) );
+		interact.rotate( 0, hxd.Math.degToRad( 180 ), hxd.Math.degToRad( 90 ) );
 
 		if ( tmxObj != null && tmxObj.flippedHorizontally ) interact.scaleX = -1;
 
@@ -84,7 +91,6 @@ class InteractableEntity extends Entity {
 
 		Main.inst.delayer.addF(() -> {
 			rebuildInteract();
-
 			#if interactive_debug
 			debugInteract();
 			#end
@@ -96,13 +102,12 @@ class InteractableEntity extends Entity {
 		polyPrim.addNormals();
 
 		var isoDebugMesh = new Mesh( polyPrim, interact );
-		// isoDebugMesh.rotate(0, M.toRad(180), M.toRad(90));
 		isoDebugMesh.material.color.setColor( 0xc09900 );
 		isoDebugMesh.material.shadows = false;
+		var depthOffset = new DepthOffset( eSpr.depthOffset.offset + 0.0001 );
+		isoDebugMesh.material.mainPass.addShader( eSpr.perpendicularizer );
+		isoDebugMesh.material.mainPass.addShader( depthOffset );
 		isoDebugMesh.material.mainPass.wireframe = true;
-		isoDebugMesh.material.mainPass.depth( true, Less );
-
-		isoDebugMesh.y = -.5;
 	}
 
 	/**only x flipping is supported yet**/
@@ -136,13 +141,21 @@ class InteractableEntity extends Entity {
 
 	function updateKeyIcon() {
 		if ( !cd.has( "keyboardIconInit" ) && cd.has( "interacted" ) ) {
-			var pos = Boot.inst.s3d.camera.project( eSpr.mesh.x, 0, eSpr.mesh.z, wScaled, hScaled );
+			var pos = {
+				Boot.inst.s3d.camera.project(
+					eSpr.mesh.x,
+					0,
+					eSpr.mesh.z,
+					Util.wScaled,
+					Util.hScaled
+				);
+			}
 			cd.unset( "interacted" );
 			buttonIcon = new ButtonIcon( pos.x, pos.y );
-			tw.createS( buttonIcon.container.icon.alpha, 0 > 1, TEaseIn, .4 );
+			tw.createS( buttonIcon.container.icon.alpha, 0 > 1, TType.TEaseIn, .4 );
 		}
 		if ( buttonIcon != null ) {
-			var pos = Boot.inst.s3d.camera.project( eSpr.mesh.x, 0, eSpr.mesh.z, wScaled, hScaled );
+			var pos = Boot.inst.s3d.camera.project( eSpr.mesh.x, 0, eSpr.mesh.z, Util.wScaled, Util.hScaled );
 
 			buttonIcon.centerFlow.x = pos.x - 1;
 			buttonIcon.centerFlow.y = pos.y - 100 / Const.UI_SCALE;

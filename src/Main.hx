@@ -1,24 +1,29 @@
-import h2d.Text;
-import game.test.VoxelSceneTest;
-import ui.MainMenu;
-import utils.MapCache;
-import utils.Lang;
-import utils.Cursors;
-import pass.CustomRenderer;
-import game.client.GameClient;
-import utils.Assets;
-import game.client.ControllerAction;
-import net.Client;
 import cherry.soup.EventSignal.EventSignal0;
 import cherry.soup.EventSignal;
 import dn.Process;
 import dn.heaps.input.Controller;
 import dn.heaps.input.ControllerAccess;
 import en.player.Player;
+import game.client.ControllerAction;
+import game.client.GameClient;
+import h2d.Text;
 import hxd.Key;
+import net.Client;
 import net.ClientController;
+import pass.CustomRenderer;
+import ui.MainMenu;
+import utils.Assets;
+import utils.Const;
+import utils.Cursors;
+import utils.Lang;
+import utils.MapCache;
 import utils.Repeater;
+import utils.Util;
 import utils.tools.Save;
+import utils.tools.Settings;
+
+using utils.Extensions.TmxLayerExtender;
+using utils.Extensions.TmxMapExtender;
 
 /**
 	client-side only
@@ -42,7 +47,7 @@ class Main extends Process {
 	var fps : Text;
 
 	function set_clientController( cc : ClientController ) {
-		delayer.addF( onClientControllerSetEvent.dispatch, 1 );
+		delayer.addF( null, onClientControllerSetEvent.dispatch, 1 );
 		return clientController = cc;
 	}
 
@@ -82,9 +87,9 @@ class Main extends Process {
 		Cursors.init();
 		Lang.init( "en" );
 
-		uiMap = MapCache.inst.get( "ui" );
-		uiConf = uiMap.mapLayersByName();
-		for ( i in uiConf ) {
+		Util.uiMap = MapCache.inst.get( "ui" );
+		Util.uiConf = Util.uiMap.mapLayersByName();
+		for ( i in Util.uiConf ) {
 			var window = i.getObjectByName( "window" );
 			if ( window != null ) i.localBy( window );
 		}
@@ -93,7 +98,7 @@ class Main extends Process {
 
 		console = new ui.Console( Assets.fontPixel, s );
 
-		controller = new Controller( ControllerAction );
+		controller = Controller.createFromAbstractEnum( ControllerAction );
 		ca = controller.createAccess();
 
 		controller.bindPadLStick4( MoveLeft, MoveRight, MoveUp, MoveDown );
@@ -183,7 +188,7 @@ class Main extends Process {
 		// if ( ca.isKeyboardPressed(Key.M) ) Assets.toggleMusicPause();
 		Repeater.inst.update( tmod );
 
-		if ( fps != null ) fps.text = '${Boot.inst.engine.fps}';
+		if ( fps != null ) fps.text = '${Boot.inst.engine.fps}\ndraw calls: ${Boot.inst.engine.drawCalls}';
 		super.update();
 	}
 }

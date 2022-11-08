@@ -1,5 +1,6 @@
 package en.structures;
 
+import utils.Util;
 import en.player.Player;
 import format.tmx.Data.TmxObject;
 import game.server.ServerLevel;
@@ -20,8 +21,8 @@ class Door extends Structure {
 	}
 
 	override function alive() @:privateAccess {
-		super.alive();
 		interactable = true;
+		super.alive();
 
 		interact.onTextInputEvent.add( onTextInput );
 	}
@@ -32,7 +33,7 @@ class Door extends Structure {
 
 			if ( leadsTo != null ) {
 				bringPlayerToLevel( Player.inst, leadsTo, ( e ) -> {} );
-			}
+			}	
 		}
 	}
 

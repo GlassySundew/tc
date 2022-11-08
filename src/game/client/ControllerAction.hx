@@ -1,18 +1,18 @@
 package game.client;
 
-enum ControllerAction {
-	MoveUp;
-	MoveUpRight;
-	MoveRight;
-	MoveDownRight;
-	MoveDown;
-	MoveDownLeft;
-	MoveLeft;
-	MoveUpLeft;
+enum abstract ControllerAction(Int) to Int {
+	var MoveUp;
+	var MoveUpRight;
+	var MoveRight;
+	var MoveDownRight;
+	var MoveDown;
+	var MoveDownLeft;
+	var MoveLeft;
+	var MoveUpLeft;
 
-	Action;
-	DropItem;
-	ToggleInventory;
-	ToggleCraftingMenu;
-	Escape;
+	var Action;
+	var DropItem;
+	var ToggleInventory;
+	var ToggleCraftingMenu;
+	var Escape;
 }

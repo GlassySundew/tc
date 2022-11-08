@@ -34,7 +34,7 @@ class VoxelSceneTest {
 	}
 
 	static function wholeLutTest() {
-		var cache = new utils.s3d.ModelCache();
+		var cache = new utils.threeD.ModelCache();
 		cache.loadLibrary( Res.tiled.voxel.CONGRUENT.box );
 		var obj = cast( cache.loadModel( Res.tiled.voxel.CONGRUENT.box ), Mesh );
 		obj.material.texture.filter = Nearest;
@@ -49,7 +49,7 @@ class VoxelSceneTest {
 	}
 
 	static function meshTest() {
-		var cache = new utils.s3d.ModelCache();
+		var cache = new utils.threeD.ModelCache();
 		var cam = new h3d.scene.CameraController( 20, Boot.inst.s3d );
 		cam.loadFromCamera();
 

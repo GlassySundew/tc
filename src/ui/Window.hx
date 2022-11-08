@@ -1,5 +1,7 @@
 package ui;
 
+import utils.Util;
+import utils.Const;
 import game.client.GameClient;
 import hxbit.Serializable;
 import ch2.ui.EventInteractive;
@@ -51,7 +53,7 @@ class Window extends dn.Process {
 
 			backgroundInter = new EventInteractive( windowComp.window.getSize().width, windowComp.window.getSize().height );
 			win.addChildAt( backgroundInter, 0 );
-			backgroundInter.cursor = Default;
+			backgroundInter.cursor = hxd.Cursor.Default;
 			backgroundInter.onPush = function ( e ) {
 				bringOnTopOfALL();
 			};
@@ -61,15 +63,15 @@ class Window extends dn.Process {
 	public function recenter() {
 		if ( win != null ) {
 			var size = win.getSize();
-			win.x = Std.int( ( wScaled - size.width ) / 2 );
-			win.y = Std.int( ( hScaled - size.height ) / 2 );
+			win.x = Std.int( ( Util.wScaled - size.width ) / 2 );
+			win.y = Std.int( ( Util.hScaled - size.height ) / 2 );
 		}
 	}
 
 	function clampInScreen() {
 		if ( win != null && windowComp != null ) {
-			win.x = hxd.Math.clamp( win.x, 0, wScaled - windowComp.window.innerWidth );
-			win.y = hxd.Math.clamp( win.y, 0, hScaled - windowComp.window.innerHeight );
+			win.x = hxd.Math.clamp( win.x, 0, Util.wScaled - windowComp.window.innerWidth );
+			win.y = hxd.Math.clamp( win.y, 0, Util.hScaled - windowComp.window.innerHeight );
 		}
 	}
 
@@ -111,6 +113,7 @@ class Window extends dn.Process {
 
 	public function toggleVisible() {
 		win.visible = !win.visible;
+		clampInScreen();
 		bringOnTopOfALL();
 	}
 

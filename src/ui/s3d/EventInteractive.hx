@@ -1,8 +1,8 @@
 package ui.s3d;
 
 import cherry.soup.EventSignal;
-import hxd.Event;
 import h3d.scene.Interactive;
+import hxd.Event;
 
 /**
 	Simple wrapper to h3d.scene.Interactive that allows multiple subscriptions to on* events.

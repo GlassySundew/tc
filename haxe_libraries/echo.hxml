@@ -1,3 +1,0 @@
-# @install: lix --silent download "gh://github.com/AustinEast/echo#de28ade7eb7a802570cac864d7e265f18f1988f3" into echo/4.0.0/github/de28ade7eb7a802570cac864d7e265f18f1988f3
--cp ${HAXE_LIBCACHE}/echo/4.0.0/github/de28ade7eb7a802570cac864d7e265f18f1988f3/
--D echo=4.0.0

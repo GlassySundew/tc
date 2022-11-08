@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="deepnightLibs" type="Haxe">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/.haxelib/deepnightLibs/git/src" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

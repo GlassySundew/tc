@@ -4,6 +4,7 @@ import hxbit.Serializable;
 import hxbit.NetworkSerializable;
 
 /**
+	Primitive Network Serializable
 	обёртка над примитивным типом(Int, String, Enum, Float) для поддержки syncBack
 **/
 class PrimNS<T> implements NetworkSerializable {
@@ -31,5 +32,9 @@ class PrimNS<T> implements NetworkSerializable {
 		clientSer : hxbit.NetworkSerializable
 	) : Bool {
 		return true;
+	}
+
+	public function toString() {
+		return '$val';
 	}
 }

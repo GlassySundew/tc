@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="compileTime" type="Haxe">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/.haxelib/compiletime/2,8,0/src" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
