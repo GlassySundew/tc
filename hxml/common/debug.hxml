@@ -1,8 +1,8 @@
 
--D depth_debug
--D colliders_debug
--D entity_centers_debug
--D interactive_debug
+# -D depth_debug
+# -D colliders_debug
+# -D entity_centers_debug
+# -D interactive_debug
 
 # -D display_proto # display proto layer of tmx map (automapping)
 

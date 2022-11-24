@@ -560,8 +560,8 @@
         },
         "tiled/levels/bridge.tmx": {
             "expandedGroupLayers": [
-                63,
                 89,
+                63,
                 65
             ],
             "expandedObjectLayers": [
@@ -571,8 +571,8 @@
             "scale": 5.5,
             "selectedLayer": 26,
             "viewCenter": {
-                "x": 483.72727272727275,
-                "y": 217.72727272727275
+                "x": 452,
+                "y": 226
             }
         },
         "tiled/levels/bridge.tmx#entities": {
@@ -767,18 +767,18 @@
         },
         "tiled/levels/ship_pascal.tmx": {
             "expandedGroupLayers": [
-                830,
-                829
+                829,
+                830
             ],
             "expandedObjectLayers": [
-                829,
-                3
+                3,
+                829
             ],
-            "scale": 5.5,
-            "selectedLayer": 16,
+            "scale": 2,
+            "selectedLayer": 10,
             "viewCenter": {
-                "x": 261,
-                "y": 166.63636363636363
+                "x": 416,
+                "y": 207.5
             }
         },
         "tiled/levels/ship_pascal.tmx#CONGRUENT": {
@@ -838,7 +838,7 @@
         "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx"
     ],
     "project": "res.tiled-project",
-    "property.type": "string",
+    "property.type": "file",
     "recentFiles": [
         "tiled/levels/ship_pascal.tmx",
         "tiled/levels/bridge.tmx",

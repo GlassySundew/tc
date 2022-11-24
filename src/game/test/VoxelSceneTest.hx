@@ -1,5 +1,6 @@
 package game.test;
 
+import h3d.Vector;
 import h3d.scene.fwd.LightSystem;
 import h2d.Bitmap;
 import h3d.scene.Mesh;
@@ -11,8 +12,10 @@ class VoxelSceneTest {
 
 	public static function start() @:privateAccess {
 		Boot.inst.engine.backgroundColor = 0xB6ADAD;
-
-		var lut = new LUT( Assets.CONGRUENT.texture, 4 );
+		var fwd = cast( Boot.inst.s3d.lightSystem, LightSystem );
+		// fwd.additiveLighting = false;
+		@:privateAccess
+		fwd.ambientLight = new Vector( 0, 0, 0, 0 );
 		// wholeLutTest();
 		meshTest();
 		// bmpTest( lut );
@@ -41,7 +44,7 @@ class VoxelSceneTest {
 		obj.material.shadows = false;
 		// obj.material.li shadows = false;
 
-		obj.material.mainPass.addShader( new LUT( Assets.CONGRUENT.texture, 4 ) );
+		obj.material.mainPass.addShader( new LUT( Assets.CONGRUENT.texture, obj.material.texture, 4 ) );
 
 		Boot.inst.s3d.addChild( obj );
 		var cam = new h3d.scene.CameraController( 20, Boot.inst.s3d );
@@ -60,15 +63,15 @@ class VoxelSceneTest {
 			if ( !Res.loader.exists( "tiled/voxel/CONGRUENT/block_" + blockAppend + ".fbx" ) ) return;
 
 			var obj = cast( cache.loadModel( cast Res.loader.load( "tiled/voxel/CONGRUENT/block_" + blockAppend + ".fbx" ).toModel() ), Mesh );
-			if ( obj.material.texture != null )
-				obj.material.texture.filter = Nearest;
+			// if ( obj.material.texture != null )
+			// 	obj.material.texture.filter = Nearest;
 			obj.material.shadows = false;
+			obj.material.mainPass.enableLights = false;
 
 			if ( doLut ) {
-				obj.material.mainPass.addShader( new LUT( Assets.CONGRUENT.texture, 4, lutOffX, lutOffY ) );
+				obj.material.mainPass.addShader( new LUT( Assets.CONGRUENT.texture, obj.material.texture, 4, lutOffX, lutOffY ) );
 			}
 			Boot.inst.s3d.addChild( obj );
-
 			// obj.lightCameraCenter = true;
 
 			obj.x = blockX;

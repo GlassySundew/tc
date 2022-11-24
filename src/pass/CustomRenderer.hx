@@ -1,5 +1,6 @@
 package pass;
 
+import utils.Util;
 import h3d.scene.Mesh;
 import h3d.Vector;
 import en.objs.IsoTileSpr;
@@ -129,22 +130,55 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 	inline function getFrontPassIso( p1 : PassObject, p2 : PassObject ) : Int {
 		var a = cast( p1.obj, IsoTileSpr ).getIsoBounds();
 		var b = cast( p2.obj, IsoTileSpr ).getIsoBounds();
+
+		var p1Iso = Util.isoToCart( p1.obj.x, p1.obj.y );
+		var p2Iso = Util.isoToCart( p2.obj.x, p2.obj.y );
+
+		var aIsoMax = Util.isoToCart( a.xMax, a.yMax );
+		var aIsoMin = Util.isoToCart( a.xMin, a.yMin );
+
+		var bIsoMax = Util.isoToCart( b.xMax, b.yMax );
+		var bIsoMin = Util.isoToCart( b.xMin, b.yMin );
+
+		a = {
+			xMin : aIsoMin.x,
+			xMax : aIsoMax.x,
+			yMin : aIsoMin.y,
+			yMax : aIsoMax.y,
+		};
+
+		b = {
+			xMin : bIsoMin.x,
+			xMax : bIsoMax.x,
+			yMin : bIsoMin.y,
+			yMax : bIsoMax.y,
+		};
+
 		// point to point
-		return if ( b.yMax - b.yMin == 0 && a.yMax - a.yMin == 0 ) {
-			p1.obj.z > p2.obj.z ? -1 : 1;
-		} else if ( b.xMax - b.xMin == 0 || b.yMax - b.yMin == 0 ) {
+		return if ( b.yMax == b.yMin && a.yMax == a.yMin ) {
+			p1Iso.y > p2Iso.y ? 1 : -1;
+		} else if ( b.xMax == b.xMin ) {
 			-comparePointAndLine(
-				{ x : p2.obj.x, y : p2.obj.y },
+				{ x : p2Iso.x, y : p2Iso.y },
 				{
 					pt1 : { x : a.xMin, y : a.yMin },
 					pt2 : { x : a.xMax, y : a.yMax }
 				}
 			);
+		} else if ( a.yMax == a.yMin ) {
+			-comparePointAndLine(
+				{ x : p1Iso.x, y : p1Iso.y },
+				{
+					pt1 : { x : b.xMin, y : b.yMin },
+					pt2 : { x : b.xMax, y : b.yMax }
+				}
+			);
 		} else {
-			-( compareLineAndLine( {
-				pt1 : { x : b.xMin, y : b.yMin },
-				pt2 : { x : b.xMax, y : b.yMax }
-			},
+			-( compareLineAndLine(
+				{
+					pt1 : { x : b.xMin, y : b.yMin },
+					pt2 : { x : b.xMax, y : b.yMax }
+				},
 				{
 					pt1 : { x : a.xMin, y : a.yMin },
 					pt2 : { x : a.xMax, y : a.yMax }
@@ -155,9 +189,9 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 
 	inline function comparePointAndLine( pt : Point, line : Line ) : Int {
 		if ( pt.y > line.pt1.y && pt.y > line.pt2.y ) {
-			return 1;
-		} else if ( pt.y < line.pt1.y && pt.y < line.pt2.y ) {
 			return -1;
+		} else if ( pt.y < line.pt1.y && pt.y < line.pt2.y ) {
+			return 1;
 		} else {
 			var slope = ( line.pt2.y - line.pt1.y ) / ( line.pt2.x - line.pt1.x );
 			var intercept = line.pt1.y - ( slope * line.pt1.x );
@@ -179,8 +213,9 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 				return oneVStwo;
 			}
 			return compareLineCenters( line1, line2 );
-		} else if ( oneVStwo != -2 ) return oneVStwo; else if ( twoVSone != -2 ) return twoVSone; else
-			return compareLineCenters( line1, line2 );
+		} else if ( oneVStwo != -2 ) return oneVStwo;
+		else if ( twoVSone != -2 ) return twoVSone;
+		else return compareLineCenters( line1, line2 );
 	}
 
 	inline function compareLineCenters( line1 : Line, line2 : Line ) {

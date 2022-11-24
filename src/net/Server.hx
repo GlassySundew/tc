@@ -124,7 +124,7 @@ class Server extends Process {
 	public function destroyClient( c : SocketClient ) {
 		var cc = cast( c.ownerObject, ClientController );
 		if ( cc.__host == null ) return;
-		cc.player.level.removeEntity( cc.player );
+		cc.player.level.entities.remove( cc.player );
 		cc.player.destroy();
 		var i = 0;
 		for ( client in host.clientsOwners ) {

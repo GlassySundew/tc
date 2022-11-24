@@ -5,7 +5,7 @@ import utils.Assets;
 
 class Pcgmw extends Structure {
 
-	public function new( ?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : Data.StructureKind ) {
+	public function new( ?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : Data.EntityKind ) {
 		super( x, z, tmxObj, cdbEntry );
 	}
 

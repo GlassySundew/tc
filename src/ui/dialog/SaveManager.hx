@@ -169,7 +169,7 @@ class SaveManager extends FocusMenu {
 	}
 
 	public static function newSave( e : String, seed : String ) {
-		Main.inst.onClientControllerSetEvent.add(
+		Main.inst.onClientController.add(
 			() -> {
 				Main.inst.clientController.orderSaveSystem( CreateNewSave( e ),
 					( result ) -> {
@@ -178,8 +178,8 @@ class SaveManager extends FocusMenu {
 			},
 			true
 		);
-		Client.inst.repeatConnect( 0.05, 10 );
-		Main.inst.startGame( false );
+		Client.inst.repeatConnect( 0.1, 40 );
+		Main.inst.startGame( true );
 
 		// Client.inst.addOnConnectionCallback(() -> Client.inst.sendMessage( SaveSystemOrder( CreateNewSave( e ) ) ) );
 	};

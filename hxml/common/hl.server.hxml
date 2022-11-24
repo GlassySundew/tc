@@ -1,8 +1,6 @@
 
-hxml/common/debug.hxml
 hxml/common/base.hxml
 
--hl bin/server.hl
 -main ServerBoot
 
--D linux
+

@@ -18,7 +18,7 @@ class ServerRPC {
 
 		var host = Server.inst.host;
 
-		fromLevel.removeEntity( player );
+		fromLevel.entities.remove( player );
 
 		for ( ownerId => client in host.clientsOwners ) {
 			if ( ownerId == player.clientController.__uid
@@ -37,7 +37,7 @@ class ServerRPC {
 		player.clientController.level = toLevel;
 		player.level = toLevel;
 
-		toLevel.addEntity( player );
+		toLevel.entities.push( player );
 
 		if ( cb != null ) cb();
 

@@ -23,7 +23,6 @@
 				]
 			}
 		],
-		"haxe.enableCompilationServer": false,
-		"haxe.displayPort": "auto"
+		"haxe.enableCompilationServer": false
 	}
 }

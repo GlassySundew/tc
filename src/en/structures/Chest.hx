@@ -19,13 +19,14 @@ class Chest extends Structure {
 
 	var ca : ControllerAccess<ControllerAction>;
 
-	public function new( x = 0., y = 0., z = 0., ?tmxObj : TmxObject, ?cdbEntry : Data.StructureKind ) {
+	public function new( x = 0., y = 0., z = 0., ?tmxObj : TmxObject, ?cdbEntry : Data.EntityKind ) {
 		super( x, y, z, tmxObj, cdbEntry );
 		interactable = true;
 
 		inventory = new InventoryGrid( 5, 5, Chest, this );
 
-		ItemUtil.resolveJsonItemStorage( tmxObj.properties.getString( "items" ), inventory );
+		if ( tmxObj.properties.exists( "items" ) )
+			ItemUtil.resolveJsonItemStorage( tmxObj.properties.getString( "items" ), inventory );
 	}
 
 	public override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
@@ -53,7 +54,7 @@ class Chest extends Structure {
 		interact.onTextInputEvent.add(
 			( e : Event ) -> {
 				if ( ca.isPressed( Action ) ) {
-					
+
 					if ( !Player.inst.pui.inventory.win.visible ) Player.inst.pui.inventory.toggleVisible();
 					chestWin.toggleVisible();
 				}

@@ -5,11 +5,11 @@ import en.spr.EntitySprite;
 import utils.Assets;
 import format.tmx.Data.TmxObject;
 
-class SpriteEntity extends Structure {
+class EntityView extends Structure {
 
 	@:s var spriteGroup : String;
 
-	public function new( x = 0., y = 0., z = 0., sprite : String, ?tmxObj : TmxObject, ?cdbEntry : Data.StructureKind ) {
+	public function new( x = 0., y = 0., z = 0., sprite : String, ?tmxObj : TmxObject, ?cdbEntry : Data.EntityKind ) {
 		spriteGroup = sprite;
 		super( x, y, z, tmxObj, cdbEntry );
 	}

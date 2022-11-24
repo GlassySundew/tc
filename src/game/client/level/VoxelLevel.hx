@@ -1,5 +1,8 @@
 package game.client.level;
 
+import shader.LUT;
+import hxd.Res;
+import h3d.scene.Mesh;
 import dn.Process;
 import format.tmx.Data.TmxGroup;
 import format.tmx.Data.TmxTileLayer;
@@ -83,11 +86,36 @@ class VoxelLevel extends Process implements IDestroyable {
 				if ( !blockCache.exists( tile.gid ) )
 					blockCache[tile.gid] = tsFigures.bSearchModel( tsetTileX, tsetTileY, tsetTileX );
 
-				var x = ( tileidx % tmxMap.width ) * tmxMap.tileHeight + zheight * tmxMap.tileHeight;
-				var y = Math.floor( tileidx / tmxMap.width ) * tmxMap.tileHeight + zheight * tmxMap.tileHeight;
+				var tileX = ( tileidx % tmxMap.width );
+				var tileY = Math.floor( tileidx / tmxMap.width );
+
+				var x = tileX * tmxMap.tileHeight + zheight * tmxMap.tileHeight;
+				var y = tileY * tmxMap.tileHeight + zheight * tmxMap.tileHeight;
 				var z = zheight * tmxMap.tileHeight;
 
 				var path = 'tiled/voxel/${tileset.name}/block_${blockCache[tile.gid]}.fbx';
+				var verticalDepth = ( zheight + depthOff ) * 0.02;
+				var horizontalDepth = ( tileX - tileY ) * 0.000001;
+
+				/*
+					inline function loadMesh( path : String ) : Mesh {
+						if ( !Res.loader.exists( path ) ) throw "model does not exists on path: " + path;
+						return cast( Assets.modelCache.loadModel( Res.loader.load( path ).toModel() ), Mesh );
+					}
+
+					var mesh = loadMesh( path );
+					threeDRoot.addChild( mesh );
+					var lut = new LUT( tsFigures.texture, tsFigures.lutRows, tsetTileX * tileset.tileHeight, tsetTileY * tileset.tileHeight );
+					mesh.material.mainPass.addShader( lut );
+					var depth = new shader.DepthOffset(verticalDepth);
+					mesh.material.mainPass.addShader( depth );
+					mesh.material.texture.filter = Nearest;
+					mesh.material.shadows = false;
+
+					mesh.x = x;
+					mesh.y = y;
+					mesh.z = z;
+				 */
 
 				batcher.addMesh(
 					path,
@@ -98,7 +126,7 @@ class VoxelLevel extends Process implements IDestroyable {
 					z,
 					tsetTileX * tileset.tileHeight,
 					tsetTileY * tileset.tileHeight,
-					( zheight + depthOff * 2 ) * 0.0005,
+					verticalDepth,
 					threeDRoot
 				);
 

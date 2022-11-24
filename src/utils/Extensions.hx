@@ -166,11 +166,12 @@ class ReverseArrayKeyValueIterator<T> {
 
 class TmxPropertiesExtension {
 
-	public static function getProp<T : TmxPropertyType>(
+	public static function getProp(
 		properties : TmxProperties,
 		type : TmxPropertyType,
 		name : String,
-		def = null
+		def : Null<Dynamic> = null,
+		onNull : Null<Void -> Dynamic> = null
 	) : Dynamic {
 
 		if ( properties.existsType( name, type ) )
@@ -184,7 +185,11 @@ class TmxPropertiesExtension {
 					case PTFloat: properties.getFloat( name );
 					case PTBool: properties.getBool( name );
 				}
-		else
-			return def;
+		else {
+			return
+				if ( onNull != null )
+					onNull();
+				else def;
+		}
 	}
 }

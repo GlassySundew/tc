@@ -161,7 +161,7 @@ class TmxUtils {
 			}
 
 			for ( obj in tsEntTile.objectGroup.objects ) {
-				var height = obj.properties.getProp( PTFloat, "h", 1 );
+				var height = obj.properties.getProp( PTFloat, "h", 1, null );
 
 				switch obj.objectType {
 					case OTRectangle:

@@ -1,3 +1,5 @@
+import imgui.ImGui;
+import imgui.ImGuiDrawable;
 import utils.Util;
 import utils.tools.Settings;
 import pass.CustomRenderer;
@@ -8,7 +10,6 @@ import h2d.Scene;
 import dn.heaps.input.Controller;
 
 class Boot extends hxd.App {
-
 	public static var inst : Boot;
 
 	public var renderer : CustomRenderer;
@@ -57,12 +58,12 @@ class Boot extends hxd.App {
 
 	var speed = 1.0;
 
-	override function update( deltaTime : Float ) {
+	override function update( dt : Float ) {
 		// Manager.get().listener.syncCamera(s3d.camera);
-		this.deltaTime = deltaTime;
+		this.deltaTime = dt;
 		var tmod = hxd.Timer.tmod * speed;
 		dn.Process.updateAll( tmod );
-		super.update( deltaTime );
+		super.update( dt );
 	}
 
 	public function createServer() {

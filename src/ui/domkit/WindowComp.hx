@@ -61,7 +61,6 @@ class WindowComp extends Flow implements h2d.domkit.Object implements WindowComp
 	}
 
 	public function makeDragable() {
-		dragable_comp.fillWidth = true;
 		var dragable = new Dragable(0, 0,
 			( x, y ) -> onDrag.dispatch(x, y),
 			( e ) -> onPush(e), true, true);

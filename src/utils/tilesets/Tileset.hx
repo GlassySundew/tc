@@ -35,6 +35,7 @@ class Tileset {
 		this.tileW = tileW;
 		this.tileH = tileH;
 		this.figures = figures;
+		this.lutRows = lutRows;
 	}
 
 	public function bSearchModel(

@@ -1,7 +1,7 @@
 {
 	"sheets": [
 		{
-			"name": "structure",
+			"name": "entity",
 			"columns": [
 				{
 					"typeStr": "0",
@@ -175,7 +175,7 @@
 			]
 		},
 		{
-			"name": "structure@drop",
+			"name": "entity@drop",
 			"props": {
 				"hide": true
 			},
@@ -339,7 +339,7 @@
 					"kind": null
 				},
 				{
-					"typeStr": "6:structure",
+					"typeStr": "6:entity",
 					"name": "structure",
 					"kind": null
 				}

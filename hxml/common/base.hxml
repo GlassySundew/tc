@@ -13,14 +13,15 @@
 -lib castle:git:https://github.com/ncannasse/castle.git
 -lib hxbit:git:https://github.com/GlassySundew/hxbit.git#channels
 -lib deepnightLibs:git:https://github.com/deepnight/deepnightLibs.git
--lib oimophysics:git:https://github.com/saharan/OimoPhysics.gitxe
+-lib oimophysics:git:https://github.com/saharan/OimoPhysics.git
+-lib hlimgui:git:https://github.com/nspitko/hlimgui
 -lib compiletime
-
-# -lib domkit:git:https://github.com/HeapsIO/domkit.git
-# -lib oauth
 -lib random
 -lib seedyrng
 -lib haxe-concurrent
+
+# -lib domkit:git:https://github.com/HeapsIO/domkit.git
+# -lib oauth
 
 -D domkit
 -D heaps_enable_hl_mp3

@@ -9,11 +9,11 @@ class StructureGhost extends Structure {
 
     public var canBePlaced : Bool = false;
 
-    public function new( cdbEntry : Data.StructureKind ) {
+    public function new( cdbEntry : Data.EntityKind ) {
         eSpr = new EntitySprite( this,
         Assets.structures,
         Util.hollowScene,
-        '${Data.structure.get( cdbEntry ).id}'
+        '${Data.entity.get( cdbEntry ).id}'
         );
 
         super( 0, 0, cdbEntry );

@@ -92,9 +92,9 @@ class EntitySprite {
 		mesh.material.mainPass.setBlendMode( Alpha );
 		mesh.material.mainPass.depth( false, LessEqual );
 
-		depthOffset = new DepthOffset( 0.00008 * entity.tmxObj.height );
 		perpendicularizer = new shader.Perpendicularizer();
 		mesh.material.mainPass.addShader( perpendicularizer );
+		depthOffset = new DepthOffset( 0.1 * entity.tmxObj.height );
 		mesh.material.mainPass.addShader( depthOffset );
 
 		if ( entity.tmxObj != null && entity.tmxObj.flippedVertically ) spr.scaleY = -1;
@@ -115,15 +115,14 @@ class EntitySprite {
 
 	public function drawFrame() {
 		@:privateAccess var bounds = mesh.plane.getBounds();
-		bounds.addPos( entity.footX.val, entity.footY.val, entity.footZ.val );
-		var needForDraw = GameClient.inst.camera.s3dCam.frustum.hasBounds( bounds );
+		bounds.addPos( entity.footX, entity.footY, entity.footZ );
+		var needForDraw = true;
+		// var needForDraw = GameClient.inst.camera.s3dCam.frustum.hasBounds( bounds );
 
 		if ( !needForDraw ) {
-			mesh.culled = true;
 			mesh.visible = false;
 			spr.visible = false;
 		} else {
-			mesh.culled = false;
 			mesh.visible = true;
 			spr.visible = true;
 
@@ -188,13 +187,13 @@ class EntitySprite {
 		GameClient.inst.root.add( nicknameLabel, Const.DP_UI_NICKNAMES );
 		nicknameLabel.scale( 1 / Const.UI_SCALE );
 		entity.onMove.add( refreshNicknameLabel );
-		GameClient.inst.camera.onMove.add( refreshNicknameLabel );
+		GameClient.inst.cameraProc.camera.onMove.add( refreshNicknameLabel );
 		entity.onMove.dispatch();
 	}
 
 	function refreshNicknameLabel() {
 		if ( nicknameLabel != null ) {
-			var entityPt = GameClient.inst.camera.s3dCam.project(
+			var entityPt = GameClient.inst.cameraProc.camera.s3dCam.project(
 				entity.footX.val,
 				entity.footY.val,
 				entity.footZ.val + entity.tmxObj.height,

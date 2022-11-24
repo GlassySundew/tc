@@ -162,9 +162,8 @@ class MainMenu extends Process {
 
 		var newGame : TextButton = null;
 		newGame = new TextButton( "new game", ( _ ) -> {
-			var dialog = new NewSaveDialog( ( name ) -> destroy(), Save, null, root );
-
-			root.add( dialog.h2dObject, Const.DP_UI );
+			SaveManager.newSave( "new_game", "100000" );
+			destroy();
 		}, vertFlow );
 
 		if ( Settings.params.saveFiles.length > 0 ) {

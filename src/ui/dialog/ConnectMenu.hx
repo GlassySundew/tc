@@ -63,7 +63,7 @@ class ConnectMenu extends FocusMenu {
 		centrizeContent();
 
 		function onConnect() {
-			Main.inst.startGame( true );
+			Main.inst.startGame( false );
 			onGameStart();
 			destroy();
 		}
@@ -72,7 +72,7 @@ class ConnectMenu extends FocusMenu {
 		connectComp.localConnect.onClick = () -> {
 			MainMenu.hide();
 
-			Main.inst.onClientControllerSetEvent.add(
+			Main.inst.onClientController.add(
 				() -> Main.inst.clientController.spawnPlayer( Settings.params.nickname ),
 				true
 			);

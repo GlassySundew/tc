@@ -1,5 +1,6 @@
 
 hxml/common/hl.server.hxml
 hxml/common/debug.hxml
+-hl bin/server.hl
 
 --connect 6228

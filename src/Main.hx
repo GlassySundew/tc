@@ -1,3 +1,4 @@
+import game.test.VoxelSceneTest;
 import cherry.soup.EventSignal.EventSignal0;
 import cherry.soup.EventSignal;
 import dn.Process;
@@ -40,14 +41,14 @@ class Main extends Process {
 	public var save : Save;
 	public var onResizeEvent : EventSignal0 = new EventSignal0();
 
-	public var onClientControllerSetEvent = new EventSignal0();
+	public var onClientController = new EventSignal0();
 
 	public var clientController( default, set ) : ClientController;
 
 	var fps : Text;
 
 	function set_clientController( cc : ClientController ) {
-		delayer.addF( null, onClientControllerSetEvent.dispatch, 1 );
+		delayer.addF( onClientController.dispatch, 1 );
 		return clientController = cc;
 	}
 
@@ -137,6 +138,10 @@ class Main extends Process {
 		new Client();
 
 		fpsCounter();
+
+		#if debug
+		onClientController.add(() -> new game.client.debug.ImGuiGameClientDebug( GameClient.inst ) );
+		#end
 	}
 
 	function fpsCounter() {
@@ -159,13 +164,12 @@ class Main extends Process {
 	/**
 		start local server
 	**/
-	public function startGame( ?clientOnly = true ) {
+	public function startGame( ?spawnServer = false ) {
 		if ( GameClient.inst != null ) {
 			GameClient.inst.destroy();
 			@:privateAccess Process._garbageCollector( Process.ROOTS );
 		}
-		if ( !clientOnly )
-			Boot.inst.createServer();
+		if ( spawnServer ) Boot.inst.createServer();
 		new GameClient();
 	}
 

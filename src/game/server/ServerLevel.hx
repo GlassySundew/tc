@@ -11,20 +11,18 @@ import format.tmx.Data.TmxObject;
 import format.tmx.TmxMap;
 import format.tmx.Tools;
 import hxbit.NetworkSerializable;
+import net.ArrayNS;
 
 class ServerLevel extends dn.Process implements NetworkSerializable {
 
-	public var sqlId : Null<Int>;
 	@:s public var tmxMap : TmxMap;
-
-	@:s public var entitiesTmxObj : Array<TmxObject> = [];
-	@:s public var entities : Array<Entity> = [];
-
-	public var wid( get, never ) : Int;
-
-	public var hei( get, never ) : Int;
-
+	@:s public var entities : ArrayNS<Entity> = new ArrayNS();
 	@:s public var lvlName : String;
+
+	public var sqlId : Null<Int>;
+	public var entitiesTmxObj : Array<TmxObject> = [];
+	public var wid( get, never ) : Int;
+	public var hei( get, never ) : Int;
 
 	inline function get_wid()
 		return Std.int( ( Math.min( tmxMap.height, tmxMap.width ) + Math.abs(-tmxMap.width + tmxMap.height ) / 2 ) * tmxMap.tileWidth );
@@ -104,23 +102,14 @@ class ServerLevel extends dn.Process implements NetworkSerializable {
 			}
 	}
 
-	@:rpc( immediate )
-	public function addEntity( ent : Entity ) {
-		entities.push( ent );
-	}
-
-	@:rpc( immediate )
-	public function removeEntity( ent : Entity ) {
-		entities.remove( ent );
-	}
-
 	// public inline function cartToIsoLocal( x : Float, y : Float ) : Vector {
 	// 	return new Vector(
 	// 		-( tmxMap.width - tmxMap.height ) / 2 * tmxMap.tileHeight + wid * .5 + cartToIso( x, y ).x,
 	// 		hei - cartToIso( x, y ).y
 	// 	);
 	// }
-	// destroys itself if has no player instances for 5 seconds
+
+	// TODO destroys itself if has no player instances for 5 seconds
 	function gc() {
 		for ( e in entities ) {}
 	}

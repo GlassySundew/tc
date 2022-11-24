@@ -125,7 +125,7 @@ class InteractableEntity extends Entity {
 			eSpr.forceDrawTo = true;
 			filter.enable = true;
 			cd.setS( "keyboardIconInit", .4 );
-			cd.setS( "interacted", Const.INFINITE );
+			cd.setS( "interacted", Math.POSITIVE_INFINITY );
 		}
 	}
 

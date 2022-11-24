@@ -1,5 +1,6 @@
 package en.player;
 
+import net.PrimNS;
 import oimo.dynamics.rigidbody.RigidBody;
 import dn.M;
 import dn.heaps.input.ControllerAccess;
@@ -55,7 +56,7 @@ class Player extends Entity {
 	@:s public var sprGroup : String;
 
 	@:s public var holdItem : ItemCursorHolder;
-	@:s public var actionState : AClientToServer<PlayerActionState>;
+	@:s public var actionState : PrimNS<PlayerActionState>;
 
 	public static final speed = 0.325;
 
@@ -72,14 +73,24 @@ class Player extends Entity {
 		travelling = false;
 		onBoard = true;
 
-		actionState = new AClientToServer<PlayerActionState>( Idle );
+		actionState = new PrimNS<PlayerActionState>( Idle );
 		inventory = new InventoryGrid( 5, 6, PlayerInventory, this );
 		holdItem = new ItemCursorHolder( this );
 
 		super( x, y, z, tmxObj );
 
-		actionState.syncBack = footX.syncBack = footY.syncBack = false;
-		actionState.syncBackOwner = footX.syncBackOwner = footY.syncBackOwner = clientController;
+		actionState.syncBack = //
+			footX.syncBack = //
+				footY.syncBack = //
+					footZ.syncBack = //
+						dir.syncBack = //
+							false;
+		actionState.syncBackOwner = //
+			footX.syncBackOwner = //
+				footY.syncBackOwner = //
+					footZ.syncBackOwner = //
+						dir.syncBackOwner = //
+							clientController;
 
 		lock( 30 );
 	}
@@ -108,10 +119,10 @@ class Player extends Entity {
 			{ dir : "down_right", prio : 1 }
 		] ) {
 			eSpr.spr.anim.registerStateAnim( "walk_" + dir.dir, dir.prio, ( 1 / 60 / 0.16 ),
-				() -> return this.dir == i && actionState.getValue() == Running
+				() -> return this.dir.val == i && actionState.val == Running
 			);
 			eSpr.spr.anim.registerStateAnim( "idle_" + dir.dir, dir.prio, ( 1 / 60 / 0.16 ),
-				() -> return this.dir == i && actionState.getValue() == Idle
+				() -> return this.dir.val == i && actionState.val == Idle
 			);
 		}
 
@@ -120,8 +131,8 @@ class Player extends Entity {
 		if ( uid == net.Client.inst.uid ) {
 			inst = this;
 			pui = new PlayerUI( GameClient.inst.root, this );
-			GameClient.inst.camera.target = this;
-			GameClient.inst.camera.recenter();
+			GameClient.inst.cameraProc.camera.targetEntity.val = this;
+			GameClient.inst.cameraProc.camera.recenter();
 			GameClient.inst.player = this;
 		}
 		eSpr.initTextLabel( nickname );
@@ -129,12 +140,16 @@ class Player extends Entity {
 
 	override function applyTmx() {
 		super.applyTmx();
-		rigidBody.setRotationFactor( new Vec3( 0, 0, 0 ) );
-		contactCb.postSolveSign.add( ( c ) -> {
-			footX.val = rigidBody._transform._positionX;
-			footY.val = rigidBody._transform._positionY;
-			footZ.val = rigidBody._transform._positionZ;
-		} );
+
+		if ( rigidBody != null ) {
+			rigidBody.setRotationFactor( new Vec3( 0, 0, 0 ) );
+
+			if ( inst == this ) {
+				contactCb.postSolveSign.add( ( c ) -> {
+					forceRBCoords = true;
+				} );
+			}
+		}
 	}
 
 	function attachHoldItemToSpr( item : Item ) {
@@ -253,28 +268,34 @@ class Player extends Entity {
 					dx += Math.cos( leftAng ) * s;
 					dy -= Math.sin( leftAng ) * s;
 
-					if ( lx < -0.3 && M.fabs( ly ) < 0.6 ) dir = 4; else if ( ly < -0.3 && M.fabs( lx ) < 0.6 ) dir = 6;
-					else if ( lx > 0.3
-						&& M.fabs( ly ) < 0.6 ) dir = 0; else if ( ly > 0.3 && M.fabs( lx ) < 0.6 ) dir = 2;
+					if ( lx < -0.3 && M.fabs( ly ) < 0.6 ) dir.val = 4;
+					else if ( ly < -0.3 && M.fabs( lx ) < 0.6 ) dir.val = 6;
+					else if ( lx > 0.3 && M.fabs( ly ) < 0.6 ) dir.val = 0;
+					else if ( ly > 0.3 && M.fabs( lx ) < 0.6 ) dir.val = 2;
 
-					if ( lx > 0.3 && ly > 0.3 ) dir = 1; else if ( lx < -0.3 && ly > 0.3 ) dir = 3; else
-						if ( lx < -0.3
-							&& ly < -0.3 ) dir = 5; else if ( lx > 0.3 && ly < -0.3 ) dir = 7;
+					if ( lx > 0.3 && ly > 0.3 ) dir.val = 1;
+					else if ( lx < -0.3 && ly > 0.3 ) dir.val = 3;
+					else if ( lx < -0.3 && ly < -0.3 ) dir.val = 5;
+					else if ( lx > 0.3 && ly < -0.3 ) dir.val = 7;
 				} else {
 					dx *= Math.pow( 0.6, tmod );
 					dy *= Math.pow( 0.6, tmod );
 				}
 			}
-
-			actionState.setValue( isMoving ? Running : Idle );
+			actionState.val = isMoving ? Running : Idle;
 		}
-
 		if ( rigidBody != null ) {
-			rigidBody._velX = dx * tmod / Boot.inst.deltaTime;
-			rigidBody._velY = dy * tmod / Boot.inst.deltaTime;
-			rigidBody._velZ = dz * tmod / Boot.inst.deltaTime;
-			if ( dx != 0 || dy != 0 || dz != 0 ) rigidBody.wakeUp();
+			if ( inst == this ) {
+				rigidBody._velX = dx * tmod / Boot.inst.deltaTime;
+				rigidBody._velY = dy * tmod / Boot.inst.deltaTime;
+				rigidBody._velZ = dz * tmod / Boot.inst.deltaTime;
+				if ( dx != 0 || dy != 0 || dz != 0 ) rigidBody.wakeUp();
+			} else {
+				rigidBody.setPosition( new Vec3( footX.val, footY.val, footZ.val ) );
+			}
 		}
+		if ( inst != null && actionState.val == Running ) onMove.dispatch();
+
 		super.update();
 	}
 

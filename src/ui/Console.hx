@@ -78,18 +78,18 @@ class Console extends h2d.Console {
 
 		this.addCommand( "untarget", [], function ( ?k : String ) {
 			if ( GameClient.inst != null )
-				GameClient.inst.camera.stopTracking();
+				GameClient.inst.cameraProc.camera.stopTracking();
 			var cam = new h3d.scene.CameraController( Boot.inst.s3d );
 			// cam.lockZPlanes = true;
 			cam.loadFromCamera();
 		} );
 
 		this.addCommand( "toggleOrtho", [], function ( ?k : String ) {
-			if ( GameClient.inst.camera.s3dCam.orthoBounds != null ) {
-				GameClient.inst.camera.s3dCam.orthoBounds = null;
+			if ( GameClient.inst.cameraProc.camera.s3dCam.orthoBounds != null ) {
+				GameClient.inst.cameraProc.camera.s3dCam.orthoBounds = null;
 			} else {
-				GameClient.inst.camera.s3dCam.orthoBounds = new Bounds();
-				GameClient.inst.camera.refreshOrtho();
+				GameClient.inst.cameraProc.camera.s3dCam.orthoBounds = new Bounds();
+				GameClient.inst.cameraProc.refreshOrtho();
 			}
 		} );
 

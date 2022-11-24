@@ -1,59 +1,58 @@
 package utils.threeD;
 
-import dn.M;
 import cherry.soup.EventSignal.EventSignal0;
-import h3d.col.Point;
-import h3d.col.Bounds;
-import dn.Process;
+import core.DispProp;
+import dn.M;
 import en.Entity;
-import game.client.GameClient;
 import game.client.render.Parallax;
-import h3d.Vector;
+import h3d.scene.CameraController;
 
-class Camera extends dn.Process {
+class Camera extends CameraController {
 
-	public var target( default, set ) : Null<Entity>;
-
-	function set_target( v : Null<Entity> ) {
-		if ( parallax != null && v != null ) {
-			parallax.x = v.footX.val;
-			parallax.z = v.footY.val;
-		}
-		return target = v;
-	}
+	public var targetEntity : DispProp<Null<Entity>> = new DispProp( null );
 
 	public var s3dCam( get, never ) : h3d.Camera;
 
-	inline function get_s3dCam() return Boot.inst.s3d.camera;
+	inline function get_s3dCam() : h3d.Camera return Boot.inst.s3d.camera;
 
-	public var x : Float;
-	public var y : Float;
-
-	public var dx : Float;
-	public var dy : Float;
+	public var dx : Float = 0;
+	public var dy : Float = 0;
 
 	public var onMove : EventSignal0;
+
+	public var zNearK = 0.9;
+	public var zFarK = 100.;
 
 	var frict = 0.9;
 	var yMult : Float;
 	var parallax : Parallax;
 
 	final isoDeg = 30;
-	var xyDist = 100.;
+	var xyDist = 300.;
 	var a : Float;
 	var b : Float;
+	var shakePower = 0.0;
 
-	var firstRenderInvalidate = false;
+	var doRound = false;
 
-	public function new( ?parent : Process ) {
-		super( parent == null ? GameClient.inst : parent );
-		x = y = 0;
-		dx = dy = 0;
+	public function new() {
+		lockZPlanes = true;
+		super( Boot.inst.s3d );
 		onMove = new EventSignal0();
-
-		s3dCam.orthoBounds = new Bounds();
 		refreshDimensions();
-		onResize();
+		updateCamera();
+		loadFromCamera();
+		
+		targetEntity.onValue.add( setTargetEntity );
+		targetOffset.w = 0.1;
+	}
+
+	function setTargetEntity( v : Null<Entity> ) {
+		if ( parallax != null && v != null ) {
+			parallax.x = v.footX.val;
+			parallax.z = v.footY.val;
+		}
+		refreshDimensions();
 		updateCamera();
 	}
 
@@ -63,107 +62,70 @@ class Camera extends dn.Process {
 		b = a * Math.tan( M.toRad( isoDeg ) );
 	}
 
+	override function onAdd() {
+		scene = getScene();
+		if ( curOffset.w == 0 )
+			curPos.x *= scene.camera.fovY;
+		curOffset.w = scene.camera.fovY; // load
+		targetPos.load( curPos );
+		targetOffset.load( curOffset );
+	}
+
+	override function syncCamera() {
+		var cam = getScene().camera;
+		var distance = distance;
+		cam.target.load( curOffset );
+		cam.target.w = 1;
+		cam.pos.set(
+			distance * Math.cos( theta ) * Math.sin( phi ) + cam.target.x,
+			distance * Math.sin( theta ) * Math.sin( phi ) + cam.target.y,
+			distance * Math.cos( phi ) + cam.target.z
+		);
+		if ( !lockZPlanes ) {
+			cam.zNear = distance * zNearK;
+			cam.zFar = distance * zFarK;
+		}
+		cam.fovY = curOffset.w;
+		if ( doRound ) {
+			cam.target.x = M.round( cam.target.x );
+			cam.target.y = M.round( cam.target.y );
+			cam.target.z = M.round( cam.target.z );
+
+			cam.pos.x = M.round( cam.pos.x );
+			cam.pos.y = M.round( cam.pos.y );
+			cam.pos.z = M.round( cam.pos.z );
+		}
+		cam.update();
+	}
+
 	function updateCamera() {
 		if ( parallax != null ) {
 			parallax.x = x;
 			parallax.y = y;
 		}
 
-		s3dCam.target.x = M.round( x );
-		s3dCam.target.y = M.round( y );
+		s3dCam.target.x = Util.roundTo( targetOffset.x, 1 );
+		s3dCam.target.y = Util.roundTo( targetOffset.y, 1 );
 
-		s3dCam.pos.x = s3dCam.target.x + xyDist; // 282.842666667
-		s3dCam.pos.y = s3dCam.target.y + xyDist; // 282.842666667
-		s3dCam.pos.z = s3dCam.target.z + b; // 282.842666667
+		s3dCam.pos.x = Util.roundTo( s3dCam.target.x + xyDist, 1 );
+		s3dCam.pos.y = Util.roundTo( s3dCam.target.y + xyDist, 1 );
+		s3dCam.pos.z = Util.roundTo( s3dCam.target.z + b, 1 );
+		// s3dCam.fovY = 1;
 
 		if ( parallax != null ) parallax.setPosition( s3dCam.pos.x, s3dCam.pos.y, s3dCam.pos.z );
-
 		// s3dCam.pos = s3dCam.target.add( new Vector( 0, -( w() * 1 ) / ( 2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * ( Math.PI / 180 ) ) ), -0.01 ) );
 	}
 
 	public inline function stopTracking() {
-		target = null;
+		targetEntity.val = null;
 	}
 
 	public function recenter() {
-		if ( target != null ) {
-			x = target.footX.val;
-			y = target.footY.val;
+		if ( targetEntity.val != null ) {
+			targetOffset.x = targetEntity.val.footX;
+			targetOffset.y = targetEntity.val.footY;
 			updateCamera();
 			onMove.dispatch();
 		}
-	}
-
-	var shakePower = 1.0;
-
-	public function shakeS( t : Float, ?pow = 1.0 ) {
-		cd.setS( "shaking", t, false );
-		shakePower = pow;
-	}
-
-	public inline function refreshOrtho() : Void {
-		if ( s3dCam.orthoBounds != null ) {
-			s3dCam.orthoBounds.setMin( new Point(-w() / Const.SCALE / 2, -h() / Const.SCALE / 2, s3dCam.zNear ) );
-			s3dCam.orthoBounds.setMax( new Point( w() / Const.SCALE / 2, h() / Const.SCALE / 2, s3dCam.zFar ) );
-		}
-	}
-
-	public override function preUpdate() {
-		cd.update( tmod );
-
-		if ( target != null ) {
-			yMult = ( M.fabs( target.dx ) > 0.001 && M.fabs( target.dy ) > 0.001 ) ? .5 : 1;
-			var s = 0.006;
-			var deadZone = 5;
-			var tx = target.footX.val;
-			var ty = target.footY.val;
-			var d = M.dist( x, y, tx, ty );
-			if ( d >= deadZone ) {
-				var a = Math.atan2( ty - y, tx - x );
-				dx += Math.cos( a ) * ( d - deadZone ) * s * tmod;
-				dy += Math.sin( a ) * ( d - deadZone ) * s * tmod;
-			}
-
-			x += ( dx * tmod );
-			dx *= Math.pow( frict, tmod );
-
-			y += dy * tmod;
-			dy *= Math.pow( frict, tmod );
-
-			updateCamera();
-
-			if ( M.fabs( dx ) <= ( 0.0005 * tmod ) ) dx = 0;
-			if ( M.fabs( dy ) <= ( 0.0005 * tmod ) ) dy = 0;
-
-			if ( dy != 0 || dx != 0 ) onMove.dispatch();
-
-			if ( !firstRenderInvalidate ) {
-				firstRenderInvalidate = true;
-				GameClient.inst.delayer.addF( onMove.dispatch, 1 );
-			}
-		}
-	}
-
-	var testInvalidate = false;
-
-	override function postUpdate() {
-		super.postUpdate();
-	}
-
-	override function onDispose() {
-		super.onDispose();
-		if ( parallax != null ) {
-			parallax.remove();
-			parallax = null;
-		}
-	}
-
-	override function onResize() {
-		super.onResize();
-		if ( parallax != null ) {
-			// parallax.drawParallax();
-		}
-		onMove.dispatch();
-		refreshOrtho();
 	}
 }

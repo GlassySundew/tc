@@ -167,7 +167,7 @@
   <objectgroup draworder="index" id="3">
    <object id="4" x="22" y="44">
     <properties>
-     <property name="h" type="float" value="5"/>
+     <property name="h" type="float" value="13"/>
     </properties>
     <polygon points="0,0 20,-10 8,-16 -12,-6"/>
    </object>
