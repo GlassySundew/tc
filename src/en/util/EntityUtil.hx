@@ -6,7 +6,7 @@ import game.client.GameClient;
 import game.server.GameServer;
 import hxGeomAlgo.HxPoint;
 import hxGeomAlgo.PoleOfInaccessibility;
-import utils.TmxUtils;
+import util.TmxUtils;
 
 class EntityUtil {
 
@@ -18,28 +18,34 @@ class EntityUtil {
 	public static function clientApplyTmx( ent : Entity ) {
 		if ( GameClient.inst != null ) {
 			TmxUtils.applyTmxObjectOnEntity( ent );
-			ent.tmxAppliedInvalidate = true;
+			ent.model.tmxAppliedInvalidate = true;
 			refreshPivot( ent );
 
-			if ( ent.flippedX && ent.flippedOnClient ) ent.clientFlipX();
+			if ( ent.model.flippedX && ent.model.flippedOnClient ) ent.clientFlipX();
 
 			#if debug
 			if ( ent.eSpr != null )
 				ent.eSpr.updateDebugDisplay();
 			#end
 
-			if ( ent.rigidBody != null ) {
-				ent.contactCb = new en.collide.EntityContactCallback();
-				var shape = ent.rigidBody._shapeList;
+			if ( ent.model.rigidBody != null ) {
+				ent.model.contactCb = new en.collide.EntityContactCallback();
+				var shape = ent.model.rigidBody._shapeList;
 				while( shape != null ) {
-					shape._contactCallback = ent.contactCb;
+					shape._contactCallback = ent.model.contactCb;
 					shape = shape._next;
 				}
-				ent.rigidBody.setPosition( new Vec3( ent.footX.val, ent.footY.val, ent.footZ.val ) );
+				ent.model.rigidBody.setPosition(
+					new Vec3(
+						ent.model.footX.val,
+						ent.model.footY.val,
+						ent.model.footZ.val
+					)
+				);
 
 				ent.onMove.add(() -> {
-					if ( ent.rigidBody != null ) {
-						ent.rigidBody.wakeUp();
+					if ( ent.model.rigidBody != null ) {
+						ent.model.rigidBody.wakeUp();
 					}
 				} );
 			}
@@ -48,25 +54,34 @@ class EntityUtil {
 		}
 	}
 
+	public static inline function angTo( ethis : Entity, e : Entity )
+		return Math.atan2( e.model.footY.val - ethis.model.footY.val, e.model.footX.val - ethis.model.footX.val );
+
+	public static inline function angToPxFree( ent : Entity, x : Float, y : Float )
+		return Math.atan2( y - ent.model.footY.val, x - ent.model.footX.val );
+
 	public static function refreshPivot( ent : Entity ) {
 		ent.eSpr.pivotChanged = true;
 		if ( ent.eSpr.spr != null )
-			ent.eSpr.spr.pivot.setCenterRatio( ent.eSpr.pivot.x / ent.tmxObj.width, ent.eSpr.pivot.y / ent.tmxObj.height );
+			ent.eSpr.spr.pivot.setCenterRatio(
+				ent.eSpr.pivot.x / ent.model.tmxObj.width,
+				ent.eSpr.pivot.y / ent.model.tmxObj.height
+			);
 	}
 
 	/** Flips spr.scaleX, all of collision objects, and sorting rectangle **/
 	public static function flipX( ent : Entity ) {
-		ent.flippedX = !ent.flippedX;
+		ent.model.flippedX = !ent.model.flippedX;
 
-		ent.footX.val += ( ( 1 - ent.eSpr.pivot.x / ent.tmxObj.width * 2 ) * ent.tmxObj.width );
+		ent.model.footX.val += ( ( 1 - ent.eSpr.pivot.x / ent.model.tmxObj.width * 2 ) * ent.model.tmxObj.width );
 
 		ent.clientFlipX();
 	}
 
 	public inline static function clientFlipX( ent : Entity ) {
-		if ( !ent.tmxAppliedInvalidate ) return;
+		if ( !ent.model.tmxAppliedInvalidate ) return;
 
-		ent.eSpr.pivot.x = ent.tmxObj.width - ent.eSpr.pivot.x;
+		ent.eSpr.pivot.x = ent.model.tmxObj.width - ent.eSpr.pivot.x;
 		refreshPivot( ent );
 
 		ent.eSpr.spr.scaleX *= -1;
@@ -74,7 +89,7 @@ class EntityUtil {
 		if ( ent.eSpr.mesh.isLong ) ent.eSpr.mesh.flipX();
 		ent.eSpr.mesh.renewDebugPts();
 		ent.eSpr.refreshTile = true;
-		ent.flippedOnClient = ent.flippedX;
+		ent.model.flippedOnClient = ent.model.flippedX;
 
 		#if entity_centers_debug
 		Main.inst.delayer.addF(() -> {
@@ -84,11 +99,20 @@ class EntityUtil {
 	}
 
 	public static inline function distPx( self : Entity, e : Entity ) {
-		return M.dist( self.footX.val, self.footY.val, e.footX.val, e.footY.val );
+		return M.dist(
+			self.model.footX.val,
+			self.model.footY.val,
+			e.model.footX.val,
+			e.model.footY.val );
 	}
 
 	public static inline function distPxFree( self : Entity, x : Float, y : Float ) {
-		return M.dist( self.footX.val, self.footY.val, x, y );
+		return M.dist(
+			self.model.footX.val,
+			self.model.footY.val,
+			x,
+			y
+		);
 	}
 
 	/**
@@ -102,33 +126,49 @@ class EntityUtil {
 			var verts = self.eSpr.mesh.verts;
 			var mesh = self.eSpr.mesh;
 
-			var pt1 = new HxPoint( self.footX.val + mesh.xOff + verts.up.x, self.footY.val + mesh.yOff + verts.up.y );
-			var pt2 = new HxPoint( self.footX.val + mesh.xOff + verts.right.x, self.footY.val + mesh.yOff + verts.right.y );
-			var pt3 = new HxPoint( self.footX.val + mesh.xOff + verts.down.x, self.footY.val + mesh.yOff + verts.down.y );
-			var pt4 = new HxPoint( self.footX.val + mesh.xOff + verts.left.x, self.footY.val + mesh.yOff + verts.left.y );
+			var pt1 = new HxPoint(
+				self.model.footX.val + mesh.xOff + verts.up.x,
+				self.model.footY.val + mesh.yOff + verts.up.y
+			);
+			var pt2 = new HxPoint(
+				self.model.footX.val + mesh.xOff + verts.right.x,
+				self.model.footY.val + mesh.yOff + verts.right.y
+			);
+			var pt3 = new HxPoint(
+				self.model.footX.val + mesh.xOff + verts.down.x,
+				self.model.footY.val + mesh.yOff + verts.down.y
+			);
+			var pt4 = new HxPoint(
+				self.model.footX.val + mesh.xOff + verts.left.x,
+				self.model.footY.val + mesh.yOff + verts.left.y
+			);
 
-			var dist = PoleOfInaccessibility.pointToPolygonDist( e.footX.val, e.footY.val, [[pt1, pt2, pt3, pt4]] );
+			var dist = PoleOfInaccessibility.pointToPolygonDist(
+				e.model.footX.val,
+				e.model.footY.val,
+				[[pt1, pt2, pt3, pt4]]
+			);
 			return -dist;
 		}
 	}
 
 	public static function offsetFootByCenter( ent : Entity ) {
 		var spr = ent.eSpr.spr;
-		ent.footX.val += ( ( spr.pivot.centerFactorX - .5 ) * spr.tile.width );
-		ent.footY.val -= ( spr.pivot.centerFactorY ) * spr.tile.height - spr.tile.height;
+		ent.model.footX.val += ( ( spr.pivot.centerFactorX - .5 ) * spr.tile.width );
+		ent.model.footY.val -= ( spr.pivot.centerFactorY ) * spr.tile.height - spr.tile.height;
 	}
 
 	// used by blueprints, to preview entities
 	public static function offsetFootByCenterReversed( ent : Entity ) {
 		var spr = ent.eSpr.spr;
-		ent.footX.val -= ( ( spr.pivot.centerFactorX - .5 ) * spr.tile.width );
-		ent.footY.val += ( spr.pivot.centerFactorY ) * spr.tile.height - spr.tile.height;
+		ent.model.footX.val -= ( ( spr.pivot.centerFactorX - .5 ) * spr.tile.width );
+		ent.model.footY.val += ( spr.pivot.centerFactorY ) * spr.tile.height - spr.tile.height;
 	}
 
 	// used by save manager, when saved objects are already offset by center
 	public static function offsetFootByCenterXReversed( ent : Entity ) {
 		var spr = ent.eSpr.spr;
-		ent.footX.val += ( ( spr.pivot.centerFactorX - .5 ) * spr.tile.width );
-		ent.footY.val += ( spr.pivot.centerFactorY ) * spr.tile.height - spr.tile.height;
+		ent.model.footX.val += ( ( spr.pivot.centerFactorX - .5 ) * spr.tile.width );
+		ent.model.footY.val += ( spr.pivot.centerFactorY ) * spr.tile.height - spr.tile.height;
 	}
 }

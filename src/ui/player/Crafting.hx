@@ -1,6 +1,6 @@
 package ui.player;
 
-import utils.Const;
+import util.Const;
 import dn.M;
 import en.Item;
 import hxd.Cursor;
@@ -11,7 +11,7 @@ import ui.core.Scrollbar;
 import ui.core.FixedScrollArea;
 import en.util.item.InventoryCell;
 import game.client.GameClient;
-import utils.Assets;
+import util.Assets;
 import ch2.ui.EventInteractive;
 import ch2.ui.ScrollArea;
 import en.player.Player;
@@ -160,7 +160,7 @@ class Recipe extends NinesliceWindow {
 
 			var amountPitch = i.amount;
 			while( amountPitch > 0 ) {
-				var targetItemSlot = Player.inst.inventory.findItemKind( i.item, 1, checkedCells );
+				var targetItemSlot = Player.inst.inventoryModel.inventory.findItemKind( i.item, 1, checkedCells );
 				if ( targetItemSlot == null ) {
 					return null;
 				} else if ( targetItemSlot.item.amount >= i.amount ) {
@@ -175,7 +175,7 @@ class Recipe extends NinesliceWindow {
 		for ( i in recipe.ingred ) {
 			var amountPitch = i.amount;
 			while( amountPitch > 0 ) {
-				var targetItemSlot = Player.inst.inventory.findItemKind( i.item, 1, [] );
+				var targetItemSlot = Player.inst.inventoryModel.inventory.findItemKind( i.item, 1, [] );
 				if ( targetItemSlot == null ) {
 					return null;
 				} else if ( targetItemSlot.item.amount >= i.amount ) {
@@ -192,7 +192,7 @@ class Recipe extends NinesliceWindow {
 		for ( i in recipe.result ) {
 			var cell = new InventoryCell( Cursor, null );
 			cell.item = Item.fromCdbEntry( i.itemId, Player.inst, i.amount );
-			Player.inst.inventory.giveItem( cell );
+			Player.inst.inventoryModel.inventory.giveItem( cell );
 		}
 		return null;
 	}

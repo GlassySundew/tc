@@ -1,7 +1,7 @@
 package ui.domkit;
 
 import ui.core.Button;
-import utils.Assets;
+import util.Assets;
 import cherry.soup.EventSignal.EventSignal1;
 import dn.heaps.slib.HSprite;
 import en.player.Player;

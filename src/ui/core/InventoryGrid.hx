@@ -25,6 +25,13 @@ class InventoryGrid implements Serializable {
 	@:s public var height : Int;
 	@:s public var type( default, null ) : ItemPresense;
 
+	public var itemCount( get, never ) : Int;
+	function get_itemCount() {
+		var count = 0;
+		for ( i in grid ) for ( j in i ) if ( j.item != null ) count++;
+		return count;
+	}
+
 	public function new( width : Int, height : Int, type : ItemPresense, ?preparedGrid : Array<Array<InventoryCell>>, ?containmentEntity : Entity ) {
 		this.width = width;
 		this.height = height;
@@ -147,14 +154,6 @@ class InventoryGrid implements Serializable {
 **/
 class InventoryCellFlowGrid extends h2d.Object {
 
-	public var itemCount( get, never ) : Int;
-
-	function get_itemCount() {
-		var cout = 0;
-		for ( i in inventoryGrid.grid ) for ( j in i ) if ( j.item != null ) cout++;
-		return cout;
-	}
-
 	public var inventoryGrid : InventoryGrid;
 	public var flowGrid : Array<Array<InventoryCellFlow>> = [];
 	public var cellWidth : Int;
@@ -221,7 +220,7 @@ class InventoryCellFlow extends h2d.Flow {
 		if ( cell.onSetItem == null ) cell.onSetItem = new EventSignal1();
 
 		cell.onSetItem.add( ( v : Item ) -> {
-			inter.cursor = if ( v == null && Player.inst != null && Player.inst.holdItem.item == null ) Default else Button;
+			inter.cursor = if ( v == null && Player.inst != null && Player.inst.inventoryModel.holdItem.item == null ) Default else Button;
 
 			if ( v == null ) {
 				if ( cell.item != null && cell.item.itemSprite != null )
@@ -257,38 +256,38 @@ class InventoryCellFlow extends h2d.Flow {
 					} else {
 						// lmb
 						// no shift
-						if ( Player.inst.holdItem.item != null
+						if ( Player.inst.inventoryModel.holdItem.item != null
 							&& cell.item != null
-							&& Player.inst.holdItem.item.isSameTo( cell.item )
+							&& Player.inst.inventoryModel.holdItem.item.isSameTo( cell.item )
 							&& !cell.item.isStackFull
 						) {
-							TransactionFactory.itemPour( Player.inst.holdItem, cell, r -> utils.sfx.Sfx.playItemPickupSnd() );
+							TransactionFactory.itemPour( Player.inst.inventoryModel.holdItem, cell, r -> util.sfx.Sfx.playItemPickupSnd() );
 							return;
 						}
 						if ( //
 							(
-								Player.inst.holdItem.item != null
+								Player.inst.inventoryModel.holdItem.item != null
 								|| cell.item != null
 							) && (
 								cell.type != PlayerBelt
 								|| Player.inst.pui.inventory.isVisible
-								|| Player.inst.holdItem.item != null
+								|| Player.inst.inventoryModel.holdItem.item != null
 							)
 							&& ItemManipulations.getCursorSwappingCondition( this )
 						) {
-							TransactionFactory.itemsSwap( Player.inst.holdItem, cell, r -> utils.sfx.Sfx.playItemPickupSnd() );
+							TransactionFactory.itemsSwap( Player.inst.inventoryModel.holdItem, cell, r -> util.sfx.Sfx.playItemPickupSnd() );
 						}
 					}
 				case 1:
 					// rmb
 					if ( cell.item != null
 						&& cell.item.amount > 1
-						&& Player.inst.holdItem.item == null
+						&& Player.inst.inventoryModel.holdItem.item == null
 						&& (
 							cell.type != PlayerBelt
 							|| Player.inst.pui.inventory.isVisible
 						) ) {
-							TransactionFactory.itemSplit( cell, Player.inst.holdItem, r -> utils.sfx.Sfx.playItemPickupSnd() );
+							TransactionFactory.itemSplit( cell, Player.inst.inventoryModel.holdItem, r -> util.sfx.Sfx.playItemPickupSnd() );
 					}
 			}
 		}

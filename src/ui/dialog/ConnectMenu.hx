@@ -11,7 +11,7 @@ import ui.domkit.element.ButtonFlowComp;
 import ui.domkit.element.ShadowedTextComp;
 import ui.domkit.element.TextButtonComp;
 import ui.domkit.element.TextInputComp;
-import utils.tools.Settings;
+import util.tools.Settings;
 
 class ConnectComp extends Flow implements h2d.domkit.Object {
 

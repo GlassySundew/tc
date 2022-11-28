@@ -1,6 +1,6 @@
 package mapgen;
 
-import utils.Util;
+import util.Util;
 import dn.M;
 import format.tmx.TmxMap;
 import seedyrng.Random;
@@ -9,7 +9,7 @@ import haxe.Unserializer;
 import h3d.Vector;
 import format.tmx.Data;
 
-using utils.Extensions.TmxMapExtender;
+using util.Extensions.TmxMapExtender;
 
 enum SampleType {
     Start;

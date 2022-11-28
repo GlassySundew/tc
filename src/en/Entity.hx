@@ -1,7 +1,10 @@
 package en;
 
+import util.Util;
+import en.model.EntityModel;
+import net.NetNode;
 import dn.M;
-import utils.Const;
+import util.Const;
 import game.server.GameServer;
 import dn.Tweenie;
 import oimo.common.Vec3;
@@ -9,7 +12,7 @@ import cherry.soup.EventSignal.EventSignal0;
 import cherry.soup.EventSignal.EventSignal1;
 import en.collide.EntityContactCallback;
 import en.spr.EntitySprite;
-import en.util.Direction;
+import util.Direction;
 import en.util.EntityUtil;
 import format.tmx.Data.TmxObject;
 import game.client.GameClient;
@@ -20,105 +23,62 @@ import net.Client;
 import net.PrimNS;
 import oimo.dynamics.rigidbody.RigidBody;
 import ui.core.InventoryGrid;
-import utils.tools.Save;
+import util.tools.Save;
+import util.EregUtil;
 
 using en.util.EntityUtil;
 
 @:keep
-class Entity implements NetworkSerializable {
+@:autoBuild( util.Macros.buildEntityCdbAssign() )
+class Entity extends NetNode {
 
 	public static var ALL : Array<Entity> = [];
 	public static var ServerALL : Array<Entity> = [];
-
 	public static var GC : Array<Entity> = [];
 
-	@:s public var level( default, set ) : ServerLevel;
-	@:s public var dir : PrimNS<Direction>;
-	@:s public var footX : PrimNS<Float>;
-	@:s public var footY : PrimNS<Float>;
-	@:s public var footZ : PrimNS<Float>;
-	@:s public var tmxObj : TmxObject;
-	@:s public var flippedX : Bool;
-	@:s public var inventory : InventoryGrid;
+	@:s public var model : EntityModel;
 
-	public var rigidBody( default, set ) : RigidBody;
-
-	function set_rigidBody( rb : RigidBody ) : RigidBody {
-		return rigidBody = rb;
-	}
-
-	public var contactCb : EntityContactCallback;
-
-	function set_level( v : ServerLevel ) {
-		return level = v;
-	}
-
+	public var eSpr : EntitySprite;
 	public var destroyed( default, null ) = false;
+	public var onMove : EventSignal0 = new EventSignal0();
+	public var onDirChangedSignal : EventSignal1<Direction> = new EventSignal1();
 	public var tmod( get, never ) : Float;
-
-	public var dx = 0.;
-	public var dy = 0.;
-	public var dz = 0.;
-
-	public var frict = 0.62;
-	public var gravity = 0.02;
-	public var bumpFrict = 0.93;
-	public var bumpReduction = 0.;
 
 	inline function get_tmod() {
 		return #if headless GameServer.inst.tmod #else if ( GameClient.inst != null ) GameClient.inst.tmod else
 			Client.inst.tmod #end;
 	}
 
-	public var sqlId : Null<Int>;
+	public var isMoving( get, never ) : Bool;
 
-	public var eSpr : EntitySprite;
+	function get_isMoving() return M.fabs( model.dx ) >= 0.01 || M.fabs( model.dy ) >= 0.01;
 
-	public var cd : dn.Cooldown;
-	public var tw : Tweenie;
+	public function new( ?tmxObj : Null<TmxObject> ) {
 
-	public var cellFlowGrid : InventoryCellFlowGrid;
-	public var tmxAppliedInvalidate = false;
-
-	public var flippedOnClient = false;
-
-	public var onDirChangedSignal : EventSignal1<Direction> = new EventSignal1();
-	public var onMove : EventSignal0 = new EventSignal0();
-
-	var onMoveInvalidate = false;
-	var forceRBCoords = false;
-
-	public function new( x = 0., y = 0., z = 0., ?tmxObj : Null<TmxObject>, ?tmxGId : Null<Int> ) {
 		ServerALL.push( this );
+		model = new EntityModel();
 
-		footX = new PrimNS( x );
-		footY = new PrimNS( y );
-		footZ = new PrimNS( z );
-		dir = new PrimNS( Bottom );
-		dir.onVal.add( onDirChangedSignal.dispatch );
+		model.dir.onVal.add( onDirChangedSignal.dispatch );
 
-		flippedX = false;
-
-		if ( this.tmxObj == null && tmxObj != null ) {
-			this.tmxObj = tmxObj;
+		if ( model.tmxObj == null && tmxObj != null ) {
+			model.tmxObj = tmxObj;
 		}
 
-		init( x, z, tmxObj );
+		super();
+		
 	}
 
-	public function init( x = 0., y = 0., z = 0., ?tmxObj : Null<TmxObject> ) {
-		enableAutoReplication = true;
-
-		cd = new dn.Cooldown( Const.FPS );
-		onMove.add(() -> onMoveInvalidate = false );
-		tw = new Tweenie( Const.FPS );
+	public override function init() {
+		super.init();
+		onMove.add(() -> model.onMoveInvalidate = false );
 	}
 
 	/**
 		called only on client-side when replicating entity over network on client side
 	**/
-	public function alive() {
-		init();
+	public override function alive() {
+		super.alive();
+
 		ALL.push( this );
 		EntityUtil.refreshPivot( this );
 
@@ -134,46 +94,30 @@ class Entity implements NetworkSerializable {
 		EntityUtil.clientApplyTmx( this );
 	}
 
-	public function isOfType<T : Entity>( c : Class<T> ) return Std.isOfType( this, c );
-
-	public function as<T : Entity>( c : Class<T> ) : T return Std.downcast( this, c );
-
-	public inline function angTo( e : Entity )
-		return Math.atan2( e.footY.val - footY.val, e.footX.val - footX.val );
-
-	public inline function angToPxFree( x : Float, y : Float )
-		return Math.atan2( y - footY.val, x - footX.val );
-
 	public function blink( ?c = 0xffffff ) {
 		eSpr.colorAdd.setColor( c );
-		cd.setS( "colorMaintain", 0.03 );
+		model.cd.setS( "colorMaintain", 0.03 );
 	}
-
-	public var isMoving( get, never ) : Bool;
-
-	function get_isMoving() return M.fabs( dx ) >= 0.01 || M.fabs( dy ) >= 0.01;
-
-	public inline function at( x, y ) return footX == x && footY == y;
 
 	public inline function isAlive() {
 		return !destroyed;
 	}
 
-	public function isLocked() return cd == null ? true : cd.has( "lock" );
+	public function isLocked() return model.cd == null ? true : model.cd.has( "lock" );
 
 	@:rpc
 	public function lock( ?ms : Float ) {
-		cd.setMs( "lock", ms != null ? ms : 1 / 0 );
+		model.cd.setMs( "lock", ms != null ? ms : 1 / 0 );
 	}
 
 	@:rpc
-	public function unlock() if ( cd != null ) cd.unset( "lock" );
+	public function unlock() if ( model.cd != null ) model.cd.unset( "lock" );
 
 	public function dropItem( item : en.Item, ?angle : Float, ?power : Float ) : en.Item {
 		angle = angle == null ? Math.random() * M.toRad( 360 ) : angle;
 		power = power == null ? Math.random() * .04 * 48 + .01 : power;
 
-		var fItem = new FloatingItem( footX.val, footY.val, item );
+		var fItem = new FloatingItem( item );
 		fItem.bump( Math.cos( angle ) * power, Math.sin( angle ) * power, 0 );
 		fItem.lock( 1000 );
 		if ( item.itemSprite != null )
@@ -193,15 +137,15 @@ class Entity implements NetworkSerializable {
 	}
 
 	public function bump( x : Float, y : Float, z : Float, ?ignoreReduction = false ) {
-		var f = ignoreReduction ? 1.0 : 1 - bumpReduction;
-		dx += x * f;
-		dy += y * f;
-		dz += z * f;
+		var f = ignoreReduction ? 1.0 : 1 - model.bumpReduction;
+		model.dx += x * f;
+		model.dy += y * f;
+		model.dz += z * f;
 	}
 
 	public function cancelVelocities() {
-		dx = dx = 0;
-		dy = dy = 0;
+		model.dx = model.dx = 0;
+		model.dy = model.dy = 0;
 	}
 
 	public function destroy() {
@@ -214,31 +158,35 @@ class Entity implements NetworkSerializable {
 	public function dispose() {
 		ALL.remove( this );
 
-		if ( eSpr != null )
-			eSpr.destroy();
-		cd.dispose();
-		tw.destroy();
+		if ( eSpr != null ) eSpr.destroy();
+		model.cd.dispose();
+		model.tw.destroy();
 	}
 
 	@:rpc
-	public function setFeetPos( x : Float, y : Float ) {
-		footX.val = x;
-		footY.val = y;
-		if ( rigidBody != null )
-			rigidBody._transform.setPosition( new Vec3( footX.val, footY.val, footZ.val ) );
+	public function setFeetPos( x : Float, y : Float, z : Float ) {
+		model.footX.val = x;
+		model.footY.val = y;
+		model.footZ.val = z;
+		if ( model.rigidBody != null )
+			model.rigidBody._transform.setPosition(
+				new Vec3(
+					model.footX.val,
+					model.footY.val,
+					model.footZ.val
+				)
+			);
 	}
 
 	public function kill( by : Null<Entity> ) {
-		Save.inst.removeEntityById( sqlId );
+		Save.inst.removeEntityById( model.sqlId );
 		destroy();
 	}
 
 	public function unreg( host : NetworkHost, ctx : NetworkSerializer, ?finalize ) @:privateAccess {
 		host.unregister( this, ctx, finalize );
-		host.unregister( footX, ctx, finalize );
-		host.unregister( footY, ctx, finalize );
-		if ( inventory != null )
-			inventory.unreg( host, ctx, finalize );
+		host.unregister( model.footX, ctx, finalize );
+		host.unregister( model.footY, ctx, finalize );
 	}
 
 	public function headlessPreUpdate() {}
@@ -251,38 +199,38 @@ class Entity implements NetworkSerializable {
 
 	public function preUpdate() {
 		eSpr.spr.anim.update( tmod );
-		cd.update( tmod );
-		tw.update( tmod );
+		model.cd.update( tmod );
+		model.tw.update( tmod );
 	}
 
 	public function update() {
-		if ( !forceRBCoords ) {
-			var stepX = dx * tmod;
-			if ( stepX != 0 ) onMoveInvalidate = true;
-			footX.val += stepX;
-			var stepY = dy * tmod;
-			if ( stepY != 0 ) onMoveInvalidate = true;
-			footY.val += stepY;
-			var stepZ = dz * tmod;
-			if ( stepZ != 0 ) onMoveInvalidate = true;
-			footZ.val += stepZ;
+		if ( !model.forceRBCoords ) {
+			var stepX = model.dx * tmod;
+			if ( stepX != 0 ) model.onMoveInvalidate = true;
+			model.footX.val += stepX;
+			var stepY = model.dy * tmod;
+			if ( stepY != 0 ) model.onMoveInvalidate = true;
+			model.footY.val += stepY;
+			var stepZ = model.dz * tmod;
+			if ( stepZ != 0 ) model.onMoveInvalidate = true;
+			model.footZ.val += stepZ;
 		}
-		dx *= Math.pow( frict, tmod );
-		if ( M.fabs( dx ) <= 0.0005 * tmod ) dx = 0;
-		dy *= Math.pow( frict, tmod );
-		if ( M.fabs( dy ) <= 0.0005 * tmod ) dy = 0;
-		dz *= Math.pow( frict, tmod );
-		if ( M.fabs( dz ) <= 0.0005 * tmod ) dz = 0;
+		model.dx *= Math.pow( model.frict, tmod );
+		if ( M.fabs( model.dx ) <= 0.0005 * tmod ) model.dx = 0;
+		model.dy *= Math.pow( model.frict, tmod );
+		if ( M.fabs( model.dy ) <= 0.0005 * tmod ) model.dy = 0;
+		model.dz *= Math.pow( model.frict, tmod );
+		if ( M.fabs( model.dz ) <= 0.0005 * tmod ) model.dz = 0;
 
-		if ( forceRBCoords ) {
-			onMoveInvalidate = true;
-			forceRBCoords = false;
-			footX.val = rigidBody._transform._positionX;
-			footY.val = rigidBody._transform._positionY;
-			footZ.val = rigidBody._transform._positionZ;
+		if ( model.forceRBCoords ) {
+			model.onMoveInvalidate = true;
+			model.forceRBCoords = false;
+			model.footX.val = model.rigidBody._transform._positionX;
+			model.footY.val = model.rigidBody._transform._positionY;
+			model.footZ.val = model.rigidBody._transform._positionZ;
 		}
 
-		if ( onMoveInvalidate ) onMove.dispatch();
+		if ( model.onMoveInvalidate ) onMove.dispatch();
 	}
 
 	public function postUpdate() {}

@@ -1,12 +1,12 @@
 package en.structures;
 
 import format.tmx.Data.TmxObject;
-import utils.Assets;
+import util.Assets;
 
 class Pcgmw extends Structure {
 
-	public function new( ?x : Int = 0, ?z : Int = 0, ?tmxObj : TmxObject, ?cdbEntry : Data.EntityKind ) {
-		super( x, z, tmxObj, cdbEntry );
+	public function new( ?tmxObj : TmxObject, ?cdbEntry : Data.EntityKind ) {
+		super( tmxObj, cdbEntry );
 	}
 
 	override function postUpdate() {

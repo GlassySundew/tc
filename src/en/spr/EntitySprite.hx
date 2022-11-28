@@ -1,7 +1,7 @@
 package en.spr;
 
-import utils.Util;
-import utils.Const;
+import util.Util;
+import util.Const;
 import dn.heaps.slib.SpriteLib;
 import dn.heaps.slib.HSprite;
 import shader.Perpendicularizer;
@@ -19,8 +19,8 @@ import h3d.mat.Texture;
 import h3d.scene.Sphere;
 import shader.DepthOffset;
 import ui.domkit.TextLabelComp;
-import utils.Assets;
-import utils.BoolList;
+import util.Assets;
+import util.BoolList;
 
 class EntitySprite {
 
@@ -76,7 +76,11 @@ class EntitySprite {
 	function init() {
 		spr.colorAdd = colorAdd;
 
-		tex = new Texture( Std.int( entity.tmxObj.width ), Std.int( entity.tmxObj.height ), [Target] );
+		tex = new Texture(
+			Std.int( entity.model.tmxObj.width ),
+			Std.int( entity.model.tmxObj.height ),
+			[Target]
+		);
 
 		spr.blendMode = Alpha;
 
@@ -94,10 +98,10 @@ class EntitySprite {
 
 		perpendicularizer = new shader.Perpendicularizer();
 		mesh.material.mainPass.addShader( perpendicularizer );
-		depthOffset = new DepthOffset( 0.1 * entity.tmxObj.height );
+		depthOffset = new DepthOffset( 0.1 * entity.model.tmxObj.height );
 		mesh.material.mainPass.addShader( depthOffset );
 
-		if ( entity.tmxObj != null && entity.tmxObj.flippedVertically ) spr.scaleY = -1;
+		if ( entity.model.tmxObj != null && entity.model.tmxObj.flippedVertically ) spr.scaleY = -1;
 
 		#if depth_debug
 		mesh.renewDebugPts();
@@ -115,7 +119,11 @@ class EntitySprite {
 
 	public function drawFrame() {
 		@:privateAccess var bounds = mesh.plane.getBounds();
-		bounds.addPos( entity.footX, entity.footY, entity.footZ );
+		bounds.addPos(
+			entity.model.footX,
+			entity.model.footY,
+			entity.model.footZ
+		);
 		var needForDraw = true;
 		// var needForDraw = GameClient.inst.camera.s3dCam.frustum.hasBounds( bounds );
 
@@ -137,7 +145,7 @@ class EntitySprite {
 				tex.clear( 0, 0 );
 				spr.drawTo( tex );
 				texTile.setCenterRatio( spr.pivot.centerFactorX, spr.pivot.centerFactorY );
-				// mesh.tile = texTile;
+				mesh.tile = texTile;
 			} else {
 				@:privateAccess
 				if ( refreshTile
@@ -148,7 +156,7 @@ class EntitySprite {
 
 					mesh.tile = spr.tile;
 
-					if ( entity.flippedX ) {
+					if ( entity.model.flippedX ) {
 						var tmp = mesh.plane.u1;
 						mesh.plane.u1 = mesh.plane.u0;
 						mesh.plane.u0 = tmp;
@@ -159,9 +167,9 @@ class EntitySprite {
 				}
 			}
 
-			mesh.x = entity.footX.val;
-			mesh.y = entity.footY.val;
-			mesh.z = entity.footZ.val;
+			mesh.x = entity.model.footX.val;
+			mesh.y = entity.model.footY.val;
+			mesh.z = entity.model.footZ.val;
 
 			mesh.material.texture.filter = Nearest;
 		}
@@ -183,6 +191,7 @@ class EntitySprite {
 
 	/** generate nickname text **/
 	public function initTextLabel( displayText : String ) {
+		if ( nicknameLabel != null ) nicknameLabel.remove();
 		nicknameLabel = new TextLabelComp( displayText, Assets.fontPixel );
 		GameClient.inst.root.add( nicknameLabel, Const.DP_UI_NICKNAMES );
 		nicknameLabel.scale( 1 / Const.UI_SCALE );
@@ -194,9 +203,9 @@ class EntitySprite {
 	function refreshNicknameLabel() {
 		if ( nicknameLabel != null ) {
 			var entityPt = GameClient.inst.cameraProc.camera.s3dCam.project(
-				entity.footX.val,
-				entity.footY.val,
-				entity.footZ.val + entity.tmxObj.height,
+				entity.model.footX.val,
+				entity.model.footY.val,
+				entity.model.footZ.val + entity.model.tmxObj.height,
 				// entity.footZ.val + pivot.y,
 				Util.wScaled,
 				Util.hScaled,

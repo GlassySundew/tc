@@ -1,13 +1,13 @@
 package ui.player;
 
-import utils.Const;
+import util.Const;
 import dn.heaps.slib.HSprite;
 import game.client.GameClient;
 import h2d.domkit.Style;
 import h2d.Flow;
 import h2d.Object;
 import ui.domkit.ButtonIconComp;
-import utils.Assets;
+import util.Assets;
 
 class ButtonIcon extends Object {
 

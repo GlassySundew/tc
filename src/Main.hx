@@ -13,18 +13,18 @@ import net.Client;
 import net.ClientController;
 import pass.CustomRenderer;
 import ui.MainMenu;
-import utils.Assets;
-import utils.Const;
-import utils.Cursors;
-import utils.Lang;
-import utils.MapCache;
-import utils.Repeater;
-import utils.Util;
-import utils.tools.Save;
-import utils.tools.Settings;
+import util.Assets;
+import util.Const;
+import util.Cursors;
+import util.Lang;
+import util.MapCache;
+import util.Repeater;
+import util.Util;
+import util.tools.Save;
+import util.tools.Settings;
 
-using utils.Extensions.TmxLayerExtender;
-using utils.Extensions.TmxMapExtender;
+using util.Extensions.TmxLayerExtender;
+using util.Extensions.TmxMapExtender;
 
 /**
 	client-side only

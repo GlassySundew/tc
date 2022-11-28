@@ -24,12 +24,14 @@ class ItemManipulations {
 	**/
 	public static function toPlayer( cell : InventoryCell ) {
 		// предмет либо в поясе либо в сундуке, переносим в основной инвентарь игрока
-		var sameItemCell = Player.inst.inventory.findSameItem( cell.item, true );
+		var sameItemCell = Player.inst.inventoryModel.inventory.findSameItem(
+			cell.item, true
+		);
 		// будет неприкольно, если мы добавим предмет самого в себя
-		var freeSlot = ( sameItemCell != null ) ? sameItemCell : Player.inst.inventory.getFreeSlot();
+		var freeSlot = ( sameItemCell != null ) ? sameItemCell : Player.inst.inventoryModel.inventory.getFreeSlot();
 		if ( freeSlot != null ) {
-			TransactionFactory.transferToOtherInv( cell, Player.inst.inventory, ( r ) -> {
-				utils.sfx.Sfx.playItemPickupSnd();
+			TransactionFactory.transferToOtherInv( cell, Player.inst.inventoryModel.inventory, ( r ) -> {
+				util.sfx.Sfx.playItemPickupSnd();
 			} );
 		}
 	}
@@ -44,14 +46,14 @@ class ItemManipulations {
 			if ( w.isVisible && ( !isAnyChestOpened || w.type != PlayerBelt ) && w.type != cell.type ) {
 				var sameItemCell = w.cellFlowGrid.inventoryGrid.findSameItem( cell.item, true, true );
 				if ( sameItemCell != null ) {
-					TransactionFactory.transferToOtherInv( cell, w.cellFlowGrid.inventoryGrid, r -> utils.sfx.Sfx.playItemPickupSnd() );
+					TransactionFactory.transferToOtherInv( cell, w.cellFlowGrid.inventoryGrid, r -> util.sfx.Sfx.playItemPickupSnd() );
 					return;
 				}
 			}
 		}
 		// если мы здесь, значит, что не нашлось пустых ячеек в открытых сундуках и мы кидаем предмет в пояс
 		if ( Player.inst.pui.belt.inventory.findSameItem( cell.item, false, true ) != null ) {
-			TransactionFactory.transferToOtherInv( cell, Player.inst.pui.belt.inventory, r -> utils.sfx.Sfx.playItemPickupSnd() );
+			TransactionFactory.transferToOtherInv( cell, Player.inst.pui.belt.inventory, r -> util.sfx.Sfx.playItemPickupSnd() );
 			return;
 		}
 	}

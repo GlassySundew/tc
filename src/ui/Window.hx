@@ -1,7 +1,7 @@
 package ui;
 
-import utils.Util;
-import utils.Const;
+import util.Util;
+import util.Const;
 import game.client.GameClient;
 import hxbit.Serializable;
 import ch2.ui.EventInteractive;

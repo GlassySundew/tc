@@ -1,7 +1,7 @@
 package ui.dialog;
 
-import utils.Util;
-import utils.Const;
+import util.Util;
+import util.Const;
 import dn.heaps.input.ControllerAccess;
 import dn.Process;
 import game.client.ControllerAction;

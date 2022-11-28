@@ -12,7 +12,7 @@ import core.debug.imgui.node.WindowNode;
 import core.debug.imgui.node.intermediate.ImGuiNode;
 import dn.Process;
 import hl.Ref;
-import utils.Const;
+import util.Const;
 
 @:access( h3d.scene.CameraController )
 class ImGuiGameClientDebug extends ImGuiDebug {

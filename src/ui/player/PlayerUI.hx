@@ -1,9 +1,9 @@
 package ui.player;
 
-import utils.Util;
+import util.Util;
 import dn.heaps.slib.HSprite;
-import utils.tools.Settings;
-import utils.Const;
+import util.tools.Settings;
+import util.Const;
 import dn.Process;
 import en.player.Player;
 import en.util.item.InventoryCell;
@@ -15,7 +15,7 @@ import h3d.Vector;
 import ui.core.Button;
 import ui.core.InventoryGrid.InventoryCellFlowGrid;
 import ui.domkit.SideComp;
-import utils.Assets;
+import util.Assets;
 
 enum JumpDirection {
 	Up;
@@ -24,6 +24,7 @@ enum JumpDirection {
 
 class PlayerUI extends Process {
 
+	public var cellFlowGrid : InventoryCellFlowGrid;
 	public var inventory : Inventory;
 	public var belt : Belt;
 
@@ -43,7 +44,7 @@ class PlayerUI extends Process {
 	public var beltLayer( get, never ) : Array<InventoryCell>;
 
 	function get_beltLayer() : Array<InventoryCell> {
-		return player.inventory.grid[player.inventory.grid.length - 1];
+		return player.inventoryModel.inventory.grid[player.inventoryModel.inventory.grid.length - 1];
 	}
 
 	var player : Player;
@@ -67,13 +68,18 @@ class PlayerUI extends Process {
 		baseFlow.getProperties( topLeft ).isAbsolute = true;
 		baseFlow.getProperties( topRight ).isAbsolute = true;
 		baseFlow.getProperties( botLeft ).isAbsolute = true;
-		baseFlow.getProperties( topLeft ).align(Top, Left);
-		baseFlow.getProperties( topRight ).align(Top, Right);
-		baseFlow.getProperties( botLeft ).align(Bottom, Left);
+		baseFlow.getProperties( topLeft ).align( Top, Left );
+		baseFlow.getProperties( topRight ).align( Top, Right );
+		baseFlow.getProperties( botLeft ).align( Bottom, Left );
 
-		player.cellFlowGrid = new InventoryCellFlowGrid( player.inventory, 20, 20 );
+		if ( player.inventoryModel.inventory != null ) {
+			cellFlowGrid = new InventoryCellFlowGrid(
+				player.inventoryModel.inventory, 20, 20
+			);
+			belt = new Belt( beltLayer, botLeft );
+		}
 
-		inventory = new Inventory( player.cellFlowGrid, root );
+		inventory = new Inventory( cellFlowGrid, root );
 		inventory.containmentEntity = player;
 
 		inventory.recenter();
@@ -85,8 +91,6 @@ class PlayerUI extends Process {
 
 		root.add( inventory.win, Const.DP_UI );
 		if ( Settings.params.inventoryVisible ) inventory.toggleVisible();
-
-		belt = new Belt( beltLayer, botLeft );
 
 		craft = new PlayerCrafting( Player, root );
 		root.add( craft.win, Const.DP_UI );
@@ -148,10 +152,10 @@ class PlayerUI extends Process {
 		teleport.visible = true;
 		teleport.y = 0;
 		teleport.onClickEvent.add( ( _ ) -> {
-			Player.inst.onBoard = switch jumpDirection {
-				case Up: true;
-				case Down: false;
-			}
+			// Player.inst.onBoard = switch jumpDirection {
+			// 	case Up: true;
+			// 	case Down: false;
+			// }
 			// GameClient.inst.startLevel(name, playerLoadConf);
 		} );
 	}
@@ -164,7 +168,7 @@ class PlayerUI extends Process {
 
 	override function onResize() {
 		super.onResize();
-		baseFlow.minWidth =  Util.wScaled;
+		baseFlow.minWidth = Util.wScaled;
 		baseFlow.minHeight = Util.hScaled;
 	}
 }

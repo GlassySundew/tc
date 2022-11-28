@@ -1,6 +1,6 @@
 package en.structures;
 
-import utils.Util;
+import util.Util;
 import en.player.Player;
 import format.tmx.Data.TmxObject;
 import game.server.ServerLevel;
@@ -14,10 +14,14 @@ class Door extends Structure {
 
 	@:s public var leadsTo : String = "";
 
-	public override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
-		super.init( x, y, z, tmxObj );
-		if ( tmxObj != null && tmxObj.properties.exists( "to" ) )
-			leadsTo = Util.unifyLevelName( tmxObj.properties.getString( "to" ) );
+	public function new(?tmxObj : TmxObject) {
+		super(tmxObj);
+	}
+
+	public override function init() {
+		super.init();
+		if ( model.tmxObj != null && model.tmxObj.properties.exists( "to" ) )
+			leadsTo = Util.unifyLevelName( model.tmxObj.properties.getString( "to" ) );
 	}
 
 	override function alive() @:privateAccess {
@@ -33,7 +37,7 @@ class Door extends Structure {
 
 			if ( leadsTo != null ) {
 				bringPlayerToLevel( Player.inst, leadsTo, ( e ) -> {} );
-			}	
+			}
 		}
 	}
 
@@ -47,14 +51,14 @@ class Door extends Structure {
 
 	@:rpc( server )
 	function bringPlayerToLevel( player : Player, level : String ) : ServerLevel {
-		player.footX.syncBack = player.footY.syncBack = true;
+		player.model.footX.syncBack = player.model.footY.syncBack = true;
 		var level = ServerRPC.bringPlayerToLevel(
 			player,
 			level,
-			ServerRPC.putPlayerByDoorLeadingTo.bind( player, player.level.lvlName )
+			ServerRPC.putPlayerByDoorLeadingTo.bind( player, player.model.level.lvlName )
 		);
 		Server.inst.host.flush();
-		player.footX.syncBack = player.footY.syncBack = false;
+		player.model.footX.syncBack = player.model.footY.syncBack = false;
 		return level;
 	}
 

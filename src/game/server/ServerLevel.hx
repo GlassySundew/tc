@@ -1,9 +1,6 @@
 package game.server;
 
-/**
-	server-side level
-**/
-import utils.Util;
+import util.Util;
 import dn.Process;
 import en.Entity;
 import format.tmx.Data.TmxLayer;
@@ -12,15 +9,24 @@ import format.tmx.TmxMap;
 import format.tmx.Tools;
 import hxbit.NetworkSerializable;
 import net.ArrayNS;
+import util.EregUtil;
 
+using util.Extensions.TmxPropertiesExtension;
+
+/**
+	server-side level
+**/
 class ServerLevel extends dn.Process implements NetworkSerializable {
 
 	@:s public var tmxMap : TmxMap;
 	@:s public var entities : ArrayNS<Entity> = new ArrayNS();
 	@:s public var lvlName : String;
 
+	public var entitiesTmxObj : Map<String, TmxObject> = [];
+	public var player : TmxObject;
+
 	public var sqlId : Null<Int>;
-	public var entitiesTmxObj : Array<TmxObject> = [];
+
 	public var wid( get, never ) : Int;
 	public var hei( get, never ) : Int;
 
@@ -63,21 +69,31 @@ class ServerLevel extends dn.Process implements NetworkSerializable {
 						if ( map.orientation == Isometric ) {
 							// Если Entity никак не назван на карте - то ему присваивается имя его картинки без расширения
 							if ( obj.name == "" ) {
-								switch( obj.objectType ) {
-									case OTTile( gid ):
-										var objGid = Tools.getTileByGid( tmxMap, gid );
-										if ( objGid != null
-											&& Util.eregFileName.match( objGid.image.source ) ) obj.name = Util.eregFileName.matched( 1 );
-									default:
-								}
+								obj.name = //
+									switch( obj.objectType ) {
+										case OTTile( gid ):
+											var objTsTile = Tools.getTileByGid( tmxMap, gid );
+											objTsTile.properties.getProp( PTString, "name", null, () -> {
+												if ( EregUtil.eregFileName.match( objTsTile.image.source ) )
+													EregUtil.eregFileName.matched( 1 );
+												else
+													"";
+											} );
+
+										default: "";
+									};
 							}
+
 							if ( ol.name == 'entities' ) {
 								switch obj.objectType {
 									case OTTile( gid ):
 										Tools.propagateTilePropertiesToObject( obj, tmxMap, gid );
 									default:
 								}
-								entitiesTmxObj.push( obj );
+								if ( obj.name == "player" )
+									player = obj;
+								else
+									entitiesTmxObj[obj.name] = obj;
 							}
 						}
 					}
@@ -108,7 +124,6 @@ class ServerLevel extends dn.Process implements NetworkSerializable {
 	// 		hei - cartToIso( x, y ).y
 	// 	);
 	// }
-
 	// TODO destroys itself if has no player instances for 5 seconds
 	function gc() {
 		for ( e in entities ) {}

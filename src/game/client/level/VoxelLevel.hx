@@ -11,10 +11,10 @@ import game.client.level.batch.LUTBatcher;
 import h3d.scene.Object;
 import i.IDestroyable;
 import oimo.common.Vec3;
-import utils.Assets;
-import utils.oimo.OimoUtil;
-import utils.tilesets.Tileset;
-import utils.TmxUtils;
+import util.Assets;
+import util.oimo.OimoUtil;
+import util.tilesets.Tileset;
+import util.TmxUtils;
 
 using format.tmx.Tools;
 

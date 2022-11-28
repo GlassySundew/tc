@@ -23,11 +23,12 @@ import oimo.common.Vec3;
 import oimo.dynamics.World;
 import tiled.TileLayerRenderer;
 import ui.s3d.EventInteractive;
-import utils.Const;
-import utils.Util;
-import utils.oimo.OimoDebugRenderer;
+import util.Const;
+import util.Util;
+import util.oimo.OimoDebugRenderer;
+import util.EregUtil;
 
-using utils.TmxUtils;
+using util.TmxUtils;
 
 /**
 	client-side level rendering
@@ -81,25 +82,6 @@ class Level extends dn.Process {
 		tmxMap = map;
 
 		Boot.inst.engine.backgroundColor = tmxMap.backgroundColor;
-
-		for ( layer in map.layers ) {
-			var name : String = 'null';
-			switch( layer ) {
-				case LObjectGroup( ol ):
-					name = ol.name;
-					for ( obj in ol.objects ) {
-						if ( ol.name == 'obstacles' ) {
-							switch( obj.objectType ) {
-								case OTPolygon( points ):
-									var pts = Util.makePolyClockwise( points );
-								case OTRectangle:
-								default:
-							}
-						}
-					}
-				default:
-			}
-		}
 
 		render();
 	}
@@ -309,8 +291,8 @@ private class InternalRender extends TileLayerRenderer {
 
 		// Это должно быть visible только тогда, когда у игрока в holdItem есть blueprint
 		if (
-			Util.eregFileName.match( sourceTile.image.source )
-			&& StringTools.endsWith( Util.eregFileName.matched( 1 ), "floor" ) )
+			EregUtil.eregFileName.match( sourceTile.image.source )
+			&& StringTools.endsWith( EregUtil.eregFileName.matched( 1 ), "floor" ) )
 			GameClient.inst.structTiles.push(
 				new StructTile( bmp.x + Level.inst.tmxMap.tileWidth / 2,
 					Level.inst.hei - bmp.y - Level.inst.tmxMap.tileHeight / 2 + 2, Boot.inst.s3d )
@@ -376,14 +358,16 @@ class StructTile extends Object {
 		this.y = 0;
 
 		tile.onMoveEvent.add( ( event ) -> {
-			if ( Player.inst != null && Player.inst.holdItem != null && Std.isOfType( Player.inst.holdItem, Blueprint ) ) {
-				cast( Player.inst.holdItem, Blueprint ).onStructTileMove.dispatch( this );
+			if ( Player.inst != null
+				&& Player.inst.inventoryModel.holdItem != null
+				&& Std.isOfType( Player.inst.inventoryModel.holdItem, Blueprint ) ) {
+				cast( Player.inst.inventoryModel.holdItem, Blueprint ).onStructTileMove.dispatch( this );
 			}
 		} );
 
 		tile.onClickEvent.add( event -> {
-			if ( Player.inst != null && Player.inst.holdItem != null && Std.isOfType( Player.inst.holdItem, Blueprint ) ) {
-				cast( Player.inst.holdItem, Blueprint ).onStructurePlace.dispatch( this );
+			if ( Player.inst != null && Player.inst.inventoryModel.holdItem != null && Std.isOfType( Player.inst.inventoryModel.holdItem, Blueprint ) ) {
+				cast( Player.inst.inventoryModel.holdItem, Blueprint ).onStructurePlace.dispatch( this );
 			}
 		} );
 		#if debug

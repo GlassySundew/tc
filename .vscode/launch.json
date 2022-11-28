@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "HashLink",
+            "name": "HashLink client",
             "request": "launch",
             "type": "hl",
             "hxml": "hl.debug.hxml",
@@ -17,6 +17,19 @@
             //     "args": "active configuration"
             // }
         },
+        {
+          "name": "HashLink server",
+          "request": "launch",
+          "type": "hl",
+          "hxml": "hl.debug.hxml",
+          "program": "${workspaceRoot}/bin/server.hl",
+          "cwd": "${workspaceFolder}"
+          // ,
+          // "preLaunchTask": {
+          //     "type": "haxe",
+          //     "args": "active configuration"
+          // }
+      },
 		{
 		  "name": "HashLink (attach)",
 		  "request": "attach",

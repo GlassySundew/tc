@@ -1,9 +1,9 @@
 package en;
 
 import dn.legacy.Color;
-import utils.Const;
+import util.Const;
 import dn.Tweenie.TType;
-import utils.Util;
+import util.Util;
 import shader.DepthOffset;
 import en.player.Player;
 import format.tmx.Data.TmxObject;
@@ -28,8 +28,7 @@ class InteractableEntity extends Entity {
 
 	public var interact : EventInteractive;
 
-	@:s
-	public var interactable( default, set ) : Bool = false;
+	@:s public var interactable( default, set ) : Bool = false;
 
 	function set_interactable( v : Bool ) {
 		if ( !v ) {
@@ -52,12 +51,12 @@ class InteractableEntity extends Entity {
 	var points : Array<HxPoint>;
 	var doHighlight : Bool = true;
 
-	function new( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
-		super( x, y, z, tmxObj );
+	function new( ?tmxObj : TmxObject ) {
+		super( tmxObj );
 	}
 
-	public override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
-		super.init( x, y, z, tmxObj );
+	public override function init() {
+		super.init();
 	}
 
 	override function alive() {
@@ -81,7 +80,7 @@ class InteractableEntity extends Entity {
 
 		interact.rotate( 0, hxd.Math.degToRad( 180 ), hxd.Math.degToRad( 90 ) );
 
-		if ( tmxObj != null && tmxObj.flippedHorizontally ) interact.scaleX = -1;
+		if ( model.tmxObj != null && model.tmxObj.flippedHorizontally ) interact.scaleX = -1;
 
 		// var highlightColor = (try tmxTile.properties.get("highlight") catch (e:Dynamic) "ffffffff");
 		var highlightColor = null;
@@ -114,24 +113,24 @@ class InteractableEntity extends Entity {
 	public function rebuildInteract() {
 		@:privateAccess polyPrim.translate(-polyPrim.translatedX, 0, -polyPrim.translatedZ );
 		interact.scaleX = eSpr.spr.scaleX;
-		var facX = ( flippedX ) ? 1 - eSpr.spr.pivot.centerFactorX : eSpr.spr.pivot.centerFactorX;
+		var facX = ( model.flippedX ) ? 1 - eSpr.spr.pivot.centerFactorX : eSpr.spr.pivot.centerFactorX;
 		polyPrim.translate(-eSpr.spr.tile.width * facX, 0, -eSpr.spr.tile.height * eSpr.spr.pivot.centerFactorY );
 		interact.shape = polyPrim.getCollider();
 	}
 
 	public function turnOnHighlight() {
-		if ( cd != null ) {
+		if ( model.cd != null ) {
 			eSpr.spr.filter = filter;
 			eSpr.forceDrawTo = true;
 			filter.enable = true;
-			cd.setS( "keyboardIconInit", .4 );
-			cd.setS( "interacted", Math.POSITIVE_INFINITY );
+			model.cd.setS( "keyboardIconInit", .4 );
+			model.cd.setS( "interacted", Math.POSITIVE_INFINITY );
 		}
 	}
 
 	public function turnOffHighlight() {
-		if ( cd != null ) {
-			cd.unset( "interacted" );
+		if ( model != null && model.cd != null ) {
+			model.cd.unset( "interacted" );
 			eSpr.forceDrawTo = false;
 			eSpr.spr.filter = null;
 			filter.enable = false;
@@ -140,7 +139,7 @@ class InteractableEntity extends Entity {
 	}
 
 	function updateKeyIcon() {
-		if ( !cd.has( "keyboardIconInit" ) && cd.has( "interacted" ) ) {
+		if ( !model.cd.has( "keyboardIconInit" ) && model.cd.has( "interacted" ) ) {
 			var pos = {
 				Boot.inst.s3d.camera.project(
 					eSpr.mesh.x,
@@ -150,9 +149,9 @@ class InteractableEntity extends Entity {
 					Util.hScaled
 				);
 			}
-			cd.unset( "interacted" );
+			model.cd.unset( "interacted" );
 			buttonIcon = new ButtonIcon( pos.x, pos.y );
-			tw.createS( buttonIcon.container.icon.alpha, 0 > 1, TType.TEaseIn, .4 );
+			model.tw.createS( buttonIcon.container.icon.alpha, 0 > 1, TType.TEaseIn, .4 );
 		}
 		if ( buttonIcon != null ) {
 			var pos = Boot.inst.s3d.camera.project( eSpr.mesh.x, 0, eSpr.mesh.z, Util.wScaled, Util.hScaled );

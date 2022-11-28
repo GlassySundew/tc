@@ -1,5 +1,7 @@
 package en.player;
 
+import en.model.InventoryModel;
+import en.model.PlayerModel;
 import net.PrimNS;
 import oimo.dynamics.rigidbody.RigidBody;
 import dn.M;
@@ -16,15 +18,14 @@ import hxbit.NetworkSerializable;
 import hxbit.Serializer;
 import hxd.Key;
 import net.ClientController;
-import net.ClientToServer.AClientToServer;
 import oimo.common.Vec3;
 import ui.Navigation;
 import ui.core.InventoryGrid;
 import ui.player.ItemCursorHolder;
 import ui.player.PlayerUI;
-import utils.Assets;
-import utils.Util;
-import utils.tools.Settings;
+import util.Assets;
+import util.Util;
+import util.tools.Settings;
 
 using en.util.EntityUtil;
 
@@ -34,69 +35,60 @@ enum abstract PlayerActionState( String ) from String to String {
 	var Idle = "Idle";
 }
 
+@:keep
 class Player extends Entity {
 
 	public static var inst : Player;
 
-	public var state : PlayerState;
-
 	public var pui : PlayerUI;
-
 	public var ca : ControllerAccess<ControllerAction>;
 	public var belt : ControllerAccess<ControllerAction>;
 
-	public var clientController : ClientController;
+	/** server-side only **/
+	public var clientController( default, set ) : ClientController;
+
+	function set_clientController( cc : ClientController ) : ClientController {
+		clientController = cc;
+
+		playerModel.actionState.syncBackOwner = //
+			model.footX.syncBackOwner = //
+				model.footY.syncBackOwner = //
+					model.footZ.syncBackOwner = //
+						model.dir.syncBackOwner = //
+							clientController;
+		return cc;
+	}
 
 	/** generated name of the asteroid **/
-	@:s public var residesOnId( default, set ) : String;
-	@:s public var travelling : Bool;
-	@:s public var onBoard : Bool;
-	@:s public var nickname : String;
-	@:s public var uid : Int;
+	@:s public var playerModel : PlayerModel;
+	@:s public var inventoryModel : InventoryModel;
 	@:s public var sprGroup : String;
 
-	@:s public var holdItem : ItemCursorHolder;
-	@:s public var actionState : PrimNS<PlayerActionState>;
-
 	public static final speed = 0.325;
+	public static var onGenerationCallback : Void -> Void;
 
 	var holdItemSpr : HSprite;
 
-	function set_residesOnId( v : String ) {
-		return residesOnId = v;
-	}
+	public function new( tmxObj : TmxObject ) {
+		super( tmxObj );
 
-	public function new( x = 0., y = 0., z = 0., tmxObj : TmxObject, nickname : String, uid : Int, clientController : ClientController ) {
-		this.nickname = nickname;
-		this.uid = uid;
-		this.clientController = clientController;
-		travelling = false;
-		onBoard = true;
+		playerModel = new PlayerModel();
+		inventoryModel = new InventoryModel();
 
-		actionState = new PrimNS<PlayerActionState>( Idle );
-		inventory = new InventoryGrid( 5, 6, PlayerInventory, this );
-		holdItem = new ItemCursorHolder( this );
+		inventoryModel.holdItem = new ItemCursorHolder( this );
 
-		super( x, y, z, tmxObj );
-
-		actionState.syncBack = //
-			footX.syncBack = //
-				footY.syncBack = //
-					footZ.syncBack = //
-						dir.syncBack = //
+		playerModel.actionState.syncBack = //
+			model.footX.syncBack = //
+				model.footY.syncBack = //
+					model.footZ.syncBack = //
+						model.dir.syncBack = //
 							false;
-		actionState.syncBackOwner = //
-			footX.syncBackOwner = //
-				footY.syncBackOwner = //
-					footZ.syncBackOwner = //
-						dir.syncBackOwner = //
-							clientController;
 
 		lock( 30 );
 	}
 
-	override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
-		super.init( x, y, z, tmxObj );
+	override function init() {
+		super.init();
 	}
 
 	public override function alive() {
@@ -119,34 +111,39 @@ class Player extends Entity {
 			{ dir : "down_right", prio : 1 }
 		] ) {
 			eSpr.spr.anim.registerStateAnim( "walk_" + dir.dir, dir.prio, ( 1 / 60 / 0.16 ),
-				() -> return this.dir.val == i && actionState.val == Running
+				() -> return model.dir.val == i && playerModel.actionState.val == Running
 			);
 			eSpr.spr.anim.registerStateAnim( "idle_" + dir.dir, dir.prio, ( 1 / 60 / 0.16 ),
-				() -> return this.dir.val == i && actionState.val == Idle
+				() -> return model.dir.val == i && playerModel.actionState.val == Idle
 			);
 		}
 
 		super.alive();
 
-		if ( uid == net.Client.inst.uid ) {
+		if ( model.controlId == net.Client.inst.uid ) {
 			inst = this;
 			pui = new PlayerUI( GameClient.inst.root, this );
 			GameClient.inst.cameraProc.camera.targetEntity.val = this;
 			GameClient.inst.cameraProc.camera.recenter();
 			GameClient.inst.player = this;
 		}
-		eSpr.initTextLabel( nickname );
+		// playerModel.nickname.onVal.add( eSpr.initTextLabel );
+		
+		eSpr.initTextLabel( playerModel.nickname );
+		GameClient.inst.delayer.addF(() -> {
+			trace( playerModel.nickname );
+		}, 10 );
 	}
 
 	override function applyTmx() {
 		super.applyTmx();
 
-		if ( rigidBody != null ) {
-			rigidBody.setRotationFactor( new Vec3( 0, 0, 0 ) );
+		if ( model.rigidBody != null ) {
+			model.rigidBody.setRotationFactor( new Vec3( 0, 0, 0 ) );
 
 			if ( inst == this ) {
-				contactCb.postSolveSign.add( ( c ) -> {
-					forceRBCoords = true;
+				model.contactCb.postSolveSign.add( ( c ) -> {
+					model.forceRBCoords = true;
 				} );
 			}
 		}
@@ -171,8 +168,8 @@ class Player extends Entity {
 		?finalize
 	) @:privateAccess {
 		super.unreg( host, ctx );
-		host.unregister( actionState, ctx, finalize );
-		host.unregister( holdItem, ctx, finalize );
+		// host.unregister( actionState, ctx, finalize );
+		// host.unregister( holdItem, ctx, finalize );
 	}
 
 	override public function networkAllow(
@@ -181,34 +178,6 @@ class Player extends Entity {
 		clientSer : hxbit.NetworkSerializable
 	) : Bool {
 		return GameClient.inst != null ? Main.inst.clientController == clientSer : cast( clientSer, ClientController ).player == this;
-	}
-
-	public static var onGenerationCallback : Void -> Void;
-
-	/** 
-		shows teleport button if the map is already generated or add callback to show butotn
-		@param acceptTmxPlayerCoord if true, then player's position will be set as the player objct in tmx entities layer, false is regular
-	**/
-	public function checkTeleport() {
-
-		// search for a target to put a link to in a teleport button
-		var target = Navigation.serverInst.getTargetById( residesOnId );
-
-		onGenerationCallback = () -> {
-			if ( onBoard )
-				pui.prepareTeleportDown( target.bodyLevelName, true );
-			else
-				pui.prepareTeleportUp( "ship_pascal", false );
-		}
-
-		if ( pui != null ) if ( target != null &&
-			target.generator != null &&
-			target.generator.mapIsGenerating ) {
-			target.generator.onGeneration.add( onGenerationCallback );
-		} else if ( target != null &&
-			target.generator != null ) {
-			onGenerationCallback();
-		}
 	}
 
 	/* записывает настройки  */
@@ -244,8 +213,8 @@ class Player extends Entity {
 			ca.dispose();
 			belt.dispose();
 
-			holdItem.onSetItem.remove( attachHoldItemToSpr );
-			holdItem = null;
+			inventoryModel.holdItem.onSetItem.remove( attachHoldItemToSpr );
+			inventoryModel.holdItem = null;
 		}
 	}
 
@@ -265,36 +234,43 @@ class Player extends Entity {
 			if ( !isLocked() ) {
 				if ( leftPushed ) {
 					var s = leftDist * speed;
-					dx += Math.cos( leftAng ) * s;
-					dy -= Math.sin( leftAng ) * s;
+					model.dx += Math.cos( leftAng ) * s;
+					model.dy -= Math.sin( leftAng ) * s;
 
-					if ( lx < -0.3 && M.fabs( ly ) < 0.6 ) dir.val = 4;
-					else if ( ly < -0.3 && M.fabs( lx ) < 0.6 ) dir.val = 6;
-					else if ( lx > 0.3 && M.fabs( ly ) < 0.6 ) dir.val = 0;
-					else if ( ly > 0.3 && M.fabs( lx ) < 0.6 ) dir.val = 2;
+					if ( lx < -0.3 && M.fabs( ly ) < 0.6 ) model.dir.val = 4;
+					else if ( ly < -0.3 && M.fabs( lx ) < 0.6 ) model.dir.val = 6;
+					else if ( lx > 0.3 && M.fabs( ly ) < 0.6 ) model.dir.val = 0;
+					else if ( ly > 0.3 && M.fabs( lx ) < 0.6 ) model.dir.val = 2;
 
-					if ( lx > 0.3 && ly > 0.3 ) dir.val = 1;
-					else if ( lx < -0.3 && ly > 0.3 ) dir.val = 3;
-					else if ( lx < -0.3 && ly < -0.3 ) dir.val = 5;
-					else if ( lx > 0.3 && ly < -0.3 ) dir.val = 7;
+					if ( lx > 0.3 && ly > 0.3 ) model.dir.val = 1;
+					else if ( lx < -0.3 && ly > 0.3 ) model.dir.val = 3;
+					else if ( lx < -0.3 && ly < -0.3 ) model.dir.val = 5;
+					else if ( lx > 0.3 && ly < -0.3 ) model.dir.val = 7;
 				} else {
-					dx *= Math.pow( 0.6, tmod );
-					dy *= Math.pow( 0.6, tmod );
+					model.dx *= Math.pow( 0.6, tmod );
+					model.dy *= Math.pow( 0.6, tmod );
 				}
 			}
-			actionState.val = isMoving ? Running : Idle;
+			playerModel.actionState.val = isMoving ? Running : Idle;
 		}
-		if ( rigidBody != null ) {
+		if ( model.rigidBody != null ) {
 			if ( inst == this ) {
-				rigidBody._velX = dx * tmod / Boot.inst.deltaTime;
-				rigidBody._velY = dy * tmod / Boot.inst.deltaTime;
-				rigidBody._velZ = dz * tmod / Boot.inst.deltaTime;
-				if ( dx != 0 || dy != 0 || dz != 0 ) rigidBody.wakeUp();
+				model.rigidBody._velX = model.dx * tmod / Boot.inst.deltaTime;
+				model.rigidBody._velY = model.dy * tmod / Boot.inst.deltaTime;
+				model.rigidBody._velZ = model.dz * tmod / Boot.inst.deltaTime;
+				if ( model.dx != 0 || model.dy != 0 || model.dz != 0 )
+					model.rigidBody.wakeUp();
 			} else {
-				rigidBody.setPosition( new Vec3( footX.val, footY.val, footZ.val ) );
+				model.rigidBody.setPosition(
+					new Vec3(
+						model.footX.val,
+						model.footY.val,
+						model.footZ.val
+					)
+				);
 			}
 		}
-		if ( inst != null && actionState.val == Running ) onMove.dispatch();
+		if ( inst != null && playerModel.actionState.val == Running ) onMove.dispatch();
 
 		super.update();
 	}
@@ -306,11 +282,11 @@ class Player extends Entity {
 
 		if ( ca.isKeyboardPressed( Key.R ) ) {
 			if (
-				holdItem != null
-				&& Std.isOfType( holdItem, Blueprint )
-				&& cast( holdItem, Blueprint ).ghostStructure != null
+				inventoryModel.holdItem != null
+				&& Std.isOfType( inventoryModel.holdItem, Blueprint )
+				&& cast( inventoryModel.holdItem, Blueprint ).ghostStructure != null
 			) {
-				cast( holdItem, Blueprint ).ghostStructure.flipX();
+				cast( inventoryModel.holdItem, Blueprint ).ghostStructure.flipX();
 			}
 		}
 	}
@@ -348,19 +324,30 @@ class Player extends Entity {
 
 		if ( ca.isPressed( DropItem ) ) {
 			// Q
-			if ( holdItem != null ) {
+			if ( inventoryModel.holdItem != null ) {
 				if ( Key.isDown( Key.CTRL ) ) {
 
 					// dropping whole stack
-					dropItem( Item.fromCdbEntry( holdItem.item.cdbEntry, this, holdItem.item.amount ), angToPxFree( Level.inst.cursX, Level.inst.cursY ), 2.3 );
-					holdItem.item.amount = 0;
-					holdItem = null;
+					dropItem(
+						Item.fromCdbEntry(
+							inventoryModel.holdItem.item.cdbEntry,
+							this,
+							inventoryModel.holdItem.item.amount
+						),
+						this.angToPxFree( Level.inst.cursX, Level.inst.cursY ), 2.3 );
+					inventoryModel.holdItem.item.amount = 0;
+					inventoryModel.holdItem = null;
 				} else {
 					// dropping 1 item
-					dropItem( Item.fromCdbEntry( holdItem.item.cdbEntry, this, 1 ), angToPxFree( Level.inst.cursX, Level.inst.cursY ), 2.3 );
-					holdItem.item.amount--;
+					dropItem(
+						Item.fromCdbEntry(
+							inventoryModel.holdItem.item.cdbEntry,
+							this,
+							1 ),
+						this.angToPxFree( Level.inst.cursX, Level.inst.cursY ), 2.3 );
+					inventoryModel.holdItem.item.amount--;
 				}
-				if ( holdItem == null ) {
+				if ( inventoryModel.holdItem == null ) {
 
 					Player.inst.pui.belt.deselectCells();
 				}

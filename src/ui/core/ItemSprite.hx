@@ -9,7 +9,7 @@ import game.client.ControllerAction;
 import h2d.Flow;
 import h2d.Object;
 import ui.domkit.TextLabelComp;
-import utils.Assets;
+import util.Assets;
 
 /**
 	ui обёртка над en.Item

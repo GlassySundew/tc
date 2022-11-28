@@ -1,10 +1,10 @@
 package ui.domkit;
 
-import utils.Assets;
+import util.Assets;
 import ui.NinesliceWindow.NinesliceConf;
 import ui.domkit.WindowComp.WindowCompI;
 import h2d.Flow;
-import utils.Util;
+import util.Util;
 import dn.heaps.slib.HSprite;
 
 class NavigationComp extends Flow implements h2d.domkit.Object implements WindowCompI {

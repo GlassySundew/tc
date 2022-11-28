@@ -14,13 +14,13 @@ class Workbench extends Structure {
 
 	var ca : ControllerAccess<ControllerAction>;
 
-	public function new( x = 0., y = 0., z = 0., ?tmxObject : TmxObject ) {
-		super( x, y, z, tmxObject );
+	public function new( ?tmxObject : TmxObject ) {
+		super( tmxObject );
 		interactable = true;
 	}
 
-	override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
-		super.init( x, y, z, tmxObj );
+	override function init() {
+		super.init();
 		ca = Main.inst.controller.createAccess();
 
 		GameClient.inst.delayer.addF(() -> {

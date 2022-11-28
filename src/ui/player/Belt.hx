@@ -12,7 +12,7 @@ import h2d.domkit.Style;
 import hxd.Event;
 import hxd.Key;
 import ui.core.InventoryGrid;
-import utils.Assets;
+import util.Assets;
 
 class Belt extends Flow implements IInventory {
 
@@ -77,14 +77,15 @@ class Belt extends Flow implements IInventory {
 	public function selectCell( number : Int = 1 ) {
 		deselectCells();
 
-		if ( Player.inst.holdItem.item == null || Player.inst.holdItem.item.itemPresense != Cursor ) {
+		if ( Player.inst.inventoryModel.holdItem.item == null
+			|| Player.inst.inventoryModel.holdItem.item.itemPresense != Cursor ) {
 			selectedCellNumber = number;
 			var cell = beltSlots[number];
 
 			cell.dom.active = true;
 			cell.backgroundFlow.dom.active = true;
 
-			Player.inst.holdItem.item = Player.inst.pui.beltLayer[number].item;
+			Player.inst.inventoryModel.holdItem.item = Player.inst.pui.beltLayer[number].item;
 
 			style.addObject( cell );
 			cell.onSelect();

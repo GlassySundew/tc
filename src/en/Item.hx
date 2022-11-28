@@ -1,10 +1,11 @@
 package en;
 
-import utils.Util;
+import util.Util;
 import cherry.soup.EventSignal.EventSignal1;
 import cherry.soup.EventSignal.EventSignal0;
 import hxbit.NetworkSerializable;
 import ui.core.ItemSprite;
+import util.EregUtil;
 
 using en.Item.StackExtender;
 
@@ -61,8 +62,8 @@ class Item implements NetworkSerializable {
 
         var entClasses = CompileTime.getAllClasses( Item );
         for ( e in entClasses ) {
-            if ( Util.eregCompTimeClass.match( '$e'.toLowerCase( ) )
-            && Util.eregCompTimeClass.matched( 1 ) == Data.item.get( cdbEntry ).id.toString( ).toLowerCase( ) ) {
+            if ( EregUtil.eregCompTimeClass.match( '$e'.toLowerCase( ) )
+            && EregUtil.eregCompTimeClass.matched( 1 ) == Data.item.get( cdbEntry ).id.toString( ).toLowerCase( ) ) {
                 item = Type.createInstance( e, [cdbEntry] );
             }
         }

@@ -1,7 +1,7 @@
 package net;
 
-import utils.Const;
-import utils.tools.Settings;
+import util.Const;
+import util.tools.Settings;
 import hxbit.NetworkHost;
 import net.transaction.Transaction;
 import game.client.GameClient;
@@ -9,7 +9,7 @@ import game.server.ServerLevel;
 import en.player.Player;
 import hxbit.NetworkHost.NetworkClient;
 import hxbit.NetworkSerializable;
-import utils.tools.Save;
+import util.tools.Save;
 
 enum SaveSystemOrderType {
 	CreateNewSave( name : String );
@@ -45,7 +45,7 @@ class ClientController implements NetworkSerializable {
 	inline function set_level( level : ServerLevel ) {
 		if ( GameClient.inst != null && level != null && isOwner ) {
 			GameClient.inst.sLevel = level;
-			GameClient.inst.startLevelFromParsedTmx( level.tmxMap, level.lvlName );
+			GameClient.inst.startLevelFromTmx( level.tmxMap, level.lvlName );
 		}
 
 		return this.level = level;
@@ -94,7 +94,7 @@ class ClientController implements NetworkSerializable {
 
 	@:rpc( server )
 	public function spawnPlayer( nickname : String ) {
-		Server.inst.spawnPlayer( uid, nickname, this );
+		Server.inst.game.entityFactory.spawnPlayer( uid, nickname, this );
 	}
 
 	@:rpc( server )

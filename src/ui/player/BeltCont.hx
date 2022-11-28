@@ -31,8 +31,8 @@ class BeltCont extends h2d.Flow implements h2d.domkit.Object {
 					|| cellFlow.cell.type != PlayerBelt 
 				) && cellFlow.cell.item != null ) {
 					ItemManipulations.cursorSwappingConditions.remove( "beltSelectLock" );
-					Player.inst.holdItem.item = null;
-					TransactionFactory.itemsSwap( Player.inst.holdItem, cellFlow.cell, r -> utils.sfx.Sfx.playItemPickupSnd() );
+					Player.inst.inventoryModel.holdItem.item = null;
+					TransactionFactory.itemsSwap( Player.inst.inventoryModel.holdItem, cellFlow.cell, r -> util.sfx.Sfx.playItemPickupSnd() );
 				}
 				return false;
 			}

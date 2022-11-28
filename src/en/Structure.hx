@@ -1,38 +1,44 @@
 package en;
 
+import en.model.InventoryModel;
 import dn.M;
-import utils.Util;
+import util.Util;
 import en.spr.EntitySprite;
 import game.client.GameClient;
 import game.client.GameClient;
-import utils.Assets;
+import util.Assets;
 import en.player.Player;
 import format.tmx.Data.TmxObject;
 import hxbit.Serializer;
+import util.EregUtil;
 
 using en.util.EntityUtil;
 
 class Structure extends en.InteractableEntity {
 
 	@:s public var cdbEntry : Data.EntityKind;
+	@:s public var inventoryModel : InventoryModel;
+
 	public var toBeCollidedAgainst = true;
 	public var health : Float;
 
-	public function new( x = 0., y = 0., z = 0., ?tmxObject : TmxObject, ?cdbEntry : Data.EntityKind ) {
+	public function new( ?tmxObject : TmxObject, ?cdbEntry : Data.EntityKind ) {
 		this.cdbEntry = cdbEntry;
-		super( x, y, z, tmxObject );
+		inventoryModel = new InventoryModel();
+
+		super( tmxObject );
 
 		// CDB parsed entry corresponding to this structure instance class name
 		if ( cdbEntry == null ) try {
-			Util.eregClass.match( '$this'.toLowerCase() );
-			cdbEntry = Data.entity.resolve( Util.eregClass.matched( 1 ) ).id;
+			EregUtil.eregClass.match( '$this'.toLowerCase() );
+			cdbEntry = Data.entity.resolve( EregUtil.eregClass.matched( 1 ) ).id;
 		}
 		catch( e ) {
 			// trace(e);
 		}
 	}
 
-	public override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
+	public override function init() {
 		// Initializing spr and making it static sprite from structures atlas as a
 		// class name if not initialized in custom structure class file
 
@@ -41,15 +47,15 @@ class Structure extends en.InteractableEntity {
 		}
 		catch( Dynamic ) {}
 
-		super.init( x, y, z, tmxObj );
+		super.init();
 	}
 
 	override function alive() {
 		if ( eSpr == null ) {
 			eSpr = new EntitySprite( this, Assets.structures, Util.hollowScene );
-			Util.eregClass.match( '$this'.toLowerCase() );
+			EregUtil.eregClass.match( '$this'.toLowerCase() );
 			try {
-				eSpr.setSprGroup( Util.eregClass.matched( 1 ) );
+				eSpr.setSprGroup( EregUtil.eregClass.matched( 1 ) );
 			} catch( e : Dynamic ) {
 				trace( e );
 			}
@@ -80,7 +86,8 @@ class Structure extends en.InteractableEntity {
 
 		// Нажатие для того, чтобы сломать структуру
 		interact.onPushEvent.add( event -> {
-			if ( GameClient.inst.player.holdItem != null ) applyItem( GameClient.inst.player.holdItem.item );
+			if ( GameClient.inst.player.inventoryModel.holdItem != null )
+				applyItem( GameClient.inst.player.inventoryModel.holdItem.item );
 		} );
 		interact.onOverEvent.add( ( _ ) -> {
 			activateInteractive();
@@ -120,21 +127,21 @@ class Structure extends en.InteractableEntity {
 	function isInPlayerRange() return this.distPolyToPt( Player.inst ) <= useRange;
 
 	public function offsetFootByTile() {
-		footY.val += 1.;
+		model.footY.val += 1.;
 		// footY += ( StructTile.polyPrim != null ? ( StructTile.polyPrim.getBounds().zSize / 2 - Level.inst.data.tileHeight ) : 0 );
 	}
 
 	function dropAllItems( ?angle : Float, ?power : Float ) {
-		if ( inventory != null ) {
-			for ( i in inventory.grid ) {
-				for ( j in i ) {
-					if ( j.item != null ) {
-						j.item = dropItem( j.item, angle == null ? Math.random() * M.toRad( 360 ) : angle,
-							power == null ? Math.random() * .03 * 48 + .01 : power );
-					}
-				}
-			}
-		}
+		// if ( inv.inventory != null ) {
+		// 	for ( i in inv.inventory.grid ) {
+		// 		for ( j in i ) {
+		// 			if ( j.item != null ) {
+		// 				j.item = dropItem( j.item, angle == null ? Math.random() * M.toRad( 360 ) : angle,
+		// 					power == null ? Math.random() * .03 * 48 + .01 : power );
+		// 			}
+		// 		}
+		// 	}
+		// }
 	}
 
 	public function applyItem( item : Item ) {
@@ -190,12 +197,12 @@ class Structure extends en.InteractableEntity {
 		var structure : Structure = null;
 		var entClasses = ( CompileTime.getAllClasses( Structure ) );
 		for ( e in entClasses ) {
-			if ( Util.eregCompTimeClass.match( '$e'.toLowerCase() )
-				&& Util.eregCompTimeClass.matched( 1 ) == Data.entity.get( cdbEntry ).id.toString() ) {
-				structure = Type.createInstance( e, [x, y, null, cdbEntry] );
+			if ( EregUtil.eregCompTimeClass.match( '$e'.toLowerCase() )
+				&& EregUtil.eregCompTimeClass.matched( 1 ) == Data.entity.get( cdbEntry ).id.toString() ) {
+				structure = Type.createInstance( e, [null, cdbEntry] );
 			}
 		}
-		structure = structure == null ? new Structure( x, y, cdbEntry ) : structure;
+		structure = structure == null ? new Structure( cdbEntry ) : structure;
 		return structure;
 	}
 

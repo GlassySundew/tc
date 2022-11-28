@@ -1,29 +1,43 @@
 package en.structures.hydroponics;
 
-import utils.Util;
+import util.Util;
 import en.spr.EntitySprite;
 import format.tmx.Data.TmxObject;
 import hxd.Event;
 import hxd.Key in K;
-import utils.Assets;
+import util.Assets;
 
 /** Использует inv как хранилище для растений **/
 class Hydroponics extends Structure {
 
-	public function new( x = 0., y = 0., z = 0., ?tmxObj : TmxObject, ?cdbEntry : Data.EntityKind ) {
-		super( x, y, z, tmxObj, hydroponics );
+	public function new( ?tmxObj : TmxObject, ?cdbEntry : Data.EntityKind ) {
+		super( tmxObj, hydroponics );
 	}
 
-	override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
+	override function init() {
 		eSpr = new EntitySprite(
 			this,
 			Assets.structures,
 			Util.hollowScene
 		);
-		eSpr.spr.anim.registerStateAnim( "hydroponics0", 1, 1, function () return cellFlowGrid != null ? cellFlowGrid.itemCount == 0 : true );
-		eSpr.spr.anim.registerStateAnim( "hydroponics1", 0, 1, function () return cellFlowGrid != null ? cellFlowGrid.itemCount > 0 : true );
+		eSpr.spr.anim.registerStateAnim(
+			"hydroponics0",
+			1,
+			1,
+			function ()
+				return
+					inventoryModel.inventory != null ? inventoryModel.inventory.itemCount == 0 : true
+		);
+		eSpr.spr.anim.registerStateAnim(
+			"hydroponics1",
+			0,
+			1,
+			function ()
+				return
+					inventoryModel.inventory != null ? inventoryModel.inventory.itemCount >= 0 : true
+		);
 
-		super.init( x, y, z, tmxObj );
+		super.init();
 
 		interactable = true;
 
@@ -41,7 +55,7 @@ class Hydroponics extends Structure {
 
 	function dropGrownPlant() {
 		// inv.grid[0][0].item = dropItem(inv.grid[0][0].item);
-		if ( cellFlowGrid.itemCount > 0 ) {
+		if ( inventoryModel.inventory.itemCount > 0 ) {
 			dropAllItems();
 		}
 

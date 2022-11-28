@@ -1,7 +1,7 @@
 package net;
 
 import en.Entity;
-import utils.Const;
+import util.Const;
 import cherry.soup.EventSignal.EventSignal0;
 import dn.Process;
 import game.client.GameClient;
@@ -10,8 +10,8 @@ import ui.MainMenu;
 import ui.core.ShadowedText;
 import ui.core.TextButton;
 import ui.dialog.ConfirmDialog;
-import utils.Assets;
-import utils.Repeater;
+import util.Assets;
+import util.Repeater;
 
 class Client extends Process {
 
@@ -60,7 +60,7 @@ class Client extends Process {
 				Repeater.inst.unset( "connect" );
 			} );
 
-			Repeater.inst.setS( "connect", interval, repeats, () -> {
+			util.Repeater.inst.setS( "connect", interval, repeats, () -> {
 				connect();
 			} );
 		}
@@ -107,7 +107,7 @@ class Client extends Process {
 
 			onConnection.dispatch();
 		} );
-		
+
 		@:privateAccess
 		host.socket.onError = onError;
 

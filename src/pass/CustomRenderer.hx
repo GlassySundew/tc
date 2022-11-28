@@ -1,6 +1,6 @@
 package pass;
 
-import utils.Util;
+import util.Util;
 import h3d.scene.Mesh;
 import h3d.Vector;
 import en.objs.IsoTileSpr;

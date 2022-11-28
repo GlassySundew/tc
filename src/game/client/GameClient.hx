@@ -12,9 +12,9 @@ import h3d.scene.CameraController;
 import h3d.scene.Object;
 import net.Client;
 import ui.PauseMenu;
-import utils.Const;
-import utils.threeD.CameraProcess;
-import utils.tools.Settings;
+import util.Const;
+import util.threeD.CameraProcess;
+import util.tools.Settings;
 
 /** 
 	@param manual debug parameter, if true, player will not be kept and will be load clear from tmx entity named 'player'
@@ -90,7 +90,7 @@ class GameClient extends Process {
 		// startLevel(lvlName);
 	}
 
-	public function startLevelFromParsedTmx( tmxMap : TmxMap, name : String ) {
+	public function startLevelFromTmx( tmxMap : TmxMap, name : String ) {
 		this.tmxMap = tmxMap;
 		engine.clear( 0, 1 );
 

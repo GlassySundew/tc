@@ -4,6 +4,7 @@
  <tile id="2">
   <properties>
    <property name="className" value="en.player.$Player"/>
+   <property name="name" value="player"/>
   </properties>
   <image width="48" height="48" source="separated/player/idle_down_0.png"/>
   <objectgroup draworder="index" id="2">

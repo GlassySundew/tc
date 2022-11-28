@@ -29,7 +29,7 @@ class Blueprint extends Item {
 
 		onStructTileMove.add( ( tile ) -> {
 			if ( ghostStructure != null ) {
-				ghostStructure.setFeetPos( tile.x, tile.z );
+				ghostStructure.setFeetPos( tile.x, tile.z, ghostStructure.model.footZ );
 				ghostStructure.offsetFootByCenter();
 				ghostStructure.offsetFootByTile();
 			}
@@ -39,7 +39,7 @@ class Blueprint extends Item {
 				amount--;
 				var ent = Structure.fromCdbEntry( Std.int( tile.x ), Std.int( tile.z ), Data.blueprint.get( blueprintScheme ).structureId );
 				// GameClient.inst.applyTmxObjOnEnt(ent);
-				if ( ghostStructure.flippedX ) ent.flipX();
+				if ( ghostStructure.model.flippedX ) ent.flipX();
 				ent.offsetFootByTile();
 			}
 		} );

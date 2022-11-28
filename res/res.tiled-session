@@ -838,7 +838,7 @@
         "/mnt/part2/SteamLibrary/congruent/CONGRUENT.tmx"
     ],
     "project": "res.tiled-project",
-    "property.type": "file",
+    "property.type": "string",
     "recentFiles": [
         "tiled/levels/ship_pascal.tmx",
         "tiled/levels/bridge.tmx",

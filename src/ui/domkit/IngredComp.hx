@@ -1,6 +1,6 @@
 package ui.domkit;
 
-import utils.Assets;
+import util.Assets;
 import dn.heaps.slib.HSprite;
 import h2d.Flow;
 import h2d.Tile;
@@ -8,7 +8,7 @@ import h2d.domkit.Object;
 import hxd.Res;
 import hxd.res.Resource;
 import ui.domkit.WindowComp.WindowCompI;
-import utils.Const;
+import util.Const;
 
 @:uiComp( "ingred-comp" )
 class IngredComp extends Flow implements Object implements WindowCompI {

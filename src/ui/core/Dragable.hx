@@ -1,6 +1,6 @@
 package ui.core;
 
-import utils.Const;
+import util.Const;
 import h2d.col.Point;
 import h2d.Flow;
 import h2d.RenderContext;

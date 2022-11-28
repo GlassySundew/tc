@@ -61,7 +61,7 @@ class Console extends h2d.Console {
 			if ( Data.item.get( k ) != null ) {
 				var cell = new InventoryCell( Cursor, null );
 				cell.item = Item.fromCdbEntry( k, Player.inst, amount );
-				Player.inst.inventory.giveItem( cell, false );
+				Player.inst.inventoryModel.inventory.giveItem( cell, false );
 			}
 		} );
 

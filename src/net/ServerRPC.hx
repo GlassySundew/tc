@@ -14,7 +14,7 @@ class ServerRPC {
 		level : String,
 		?cb : Void -> Void
 	) @:privateAccess {
-		var fromLevel = player.level;
+		var fromLevel = player.model.level;
 
 		var host = Server.inst.host;
 
@@ -35,7 +35,7 @@ class ServerRPC {
 
 		var toLevel = GameServer.inst.getLevel( level, {} );
 		player.clientController.level = toLevel;
-		player.level = toLevel;
+		player.model.level = toLevel;
 
 		toLevel.entities.push( player );
 
@@ -46,14 +46,21 @@ class ServerRPC {
 
 	public static function putPlayerByDoorLeadingTo( player : Player, leadingTo : String ) {
 		var testDoor : Door = null;
-		for ( i in player.level.entities )
-			if ( i.isOfType( Door ) ) {
+		for ( i in player.model.level.entities )
+			if ( Std.isOfType( i, Door ) ) {
 				testDoor = cast( i, Door );
 				break;
 			}
 
-		var door = player.level.entities.filter( ( e ) -> return ( e.isOfType( Door ) && cast( e, Door ).leadsTo == leadingTo ) )[0];
+		var door = player.model.level.entities.filter(
+			( e ) -> return ( Std.isOfType( e, Door ) && cast( e, Door ).leadsTo == leadingTo )
+		)[0];
+
 		if ( door != null )
-			player.setFeetPos( door.footX.val, door.footY.val );
+			player.setFeetPos(
+				door.model.footX.val,
+				door.model.footY.val,
+				door.model.footZ.val
+			);
 	}
 }

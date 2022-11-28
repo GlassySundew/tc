@@ -1,15 +1,16 @@
 package mapgen;
 
 import dn.M;
-import utils.Util;
+import util.Util;
 import format.tmx.TmxMap;
-import utils.MapCache;
+import util.MapCache;
 import format.tmx.Data;
 import haxe.Serializer;
 import haxe.Unserializer;
 import hxd.Res;
+import util.EregUtil;
 
-using utils.Extensions.TmxMapExtender;
+using util.Extensions.TmxMapExtender;
 
 typedef Rules = Map<{
     regions_input : CoordinatedIsland, regions_output : CoordinatedIsland
@@ -555,7 +556,7 @@ class AutoMap {
                 }
 
                 var notIsMatched = false;
-                if ( Util.eregAutoMapInputNotLayer.match( layerName ) ) {
+                if ( EregUtil.eregAutoMapInputNotLayer.match( layerName ) ) {
                     notIsMatched = true;
                     layerName = "%not%" + StringTools.replace( layerName, "not", "" );
                 }

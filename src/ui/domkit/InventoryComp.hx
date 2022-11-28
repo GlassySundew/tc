@@ -4,7 +4,7 @@ import h2d.Flow;
 import haxe.CallStack;
 import ui.core.InventoryGrid.InventoryCellFlowGrid;
 import ui.domkit.WindowComp.WindowCompI;
-import utils.Assets;
+import util.Assets;
 import dn.heaps.slib.HSprite;
 
 @:uiComp( "inventoryComp" )

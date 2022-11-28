@@ -7,7 +7,7 @@ import game.client.GameClient;
 import imgui.ImGuiDrawable.ImGuiDrawableBuffers;
 import h2d.Interactive;
 import hxd.Key;
-import utils.Const;
+import util.Const;
 import dn.Process;
 import imgui.ImGui;
 import i.IDestroyable;

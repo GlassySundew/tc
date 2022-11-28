@@ -2,7 +2,7 @@ package ui.core;
 
 import dn.legacy.Color;
 import hxd.Res;
-import utils.Assets;
+import util.Assets;
 import h3d.mat.Texture;
 import hxd.Event;
 

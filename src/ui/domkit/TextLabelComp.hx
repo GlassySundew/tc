@@ -1,6 +1,6 @@
 package ui.domkit;
 
-import utils.Assets;
+import util.Assets;
 import h2d.Font;
 import h2d.Object;
 import h2d.RenderContext;

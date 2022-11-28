@@ -1,9 +1,9 @@
 package ui.dialog;
 
-import utils.tools.Settings;
+import util.tools.Settings;
 import ui.core.ShadowedText;
 import ui.core.TextInput;
-import utils.Assets;
+import util.Assets;
 import h2d.RenderContext;
 import hxd.Event;
 import h2d.Object;

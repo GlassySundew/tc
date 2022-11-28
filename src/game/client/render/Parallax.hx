@@ -10,7 +10,7 @@ import h3d.mat.Texture;
 import h3d.scene.Object;
 import h3d.scene.RenderContext;
 import shader.DepthOffset;
-import utils.Assets;
+import util.Assets;
 
 class Parallax extends Object {
 

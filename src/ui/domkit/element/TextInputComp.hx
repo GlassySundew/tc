@@ -1,7 +1,7 @@
 package ui.domkit.element;
 
 import ui.core.TextInput;
-import utils.Assets;
+import util.Assets;
 import h2d.Font;
 import h2d.domkit.Object;
 

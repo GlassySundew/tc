@@ -8,17 +8,6 @@
 					"name": "id"
 				},
 				{
-					"typeStr": "1",
-					"name": "className",
-					"opt": true
-				},
-				{
-					"typeStr": "1",
-					"name": "script",
-					"opt": true,
-					"kind": "script"
-				},
-				{
 					"typeStr": "8",
 					"name": "drop"
 				},
@@ -49,7 +38,7 @@
 			],
 			"lines": [
 				{
-					"id": "backdoor",
+					"id": "back_door",
 					"use_range": 20,
 					"isoWidth": 1,
 					"isoHeight": 0.1,
@@ -69,8 +58,16 @@
 					"isoWidth": 0.9,
 					"isoHeight": 0.6,
 					"use_range": 20,
-					"interactable": true,
-					"script": ""
+					"interactable": true
+				},
+				{
+					"id": "player",
+					"drop": [],
+					"interactable": false,
+					"hp": 0,
+					"isoWidth": 0,
+					"isoHeight": 0,
+					"use_range": 0
 				},
 				{
 					"id": "door",
@@ -101,7 +98,7 @@
 					"interactable": true
 				},
 				{
-					"id": "navigationconsole",
+					"id": "navigation_console",
 					"use_range": 60,
 					"isoWidth": 0,
 					"isoHeight": 0,
@@ -110,7 +107,7 @@
 					"interactable": true
 				},
 				{
-					"id": "sleepingpod",
+					"id": "sleeping_pod",
 					"drop": [],
 					"hp": -1,
 					"isoWidth": 0,
@@ -134,7 +131,6 @@
 					"isoWidth": 0,
 					"isoHeight": 0,
 					"use_range": 25,
-					"script": "",
 					"interactable": true
 				},
 				{
@@ -169,10 +165,48 @@
 			"props": {},
 			"separators": [
 				{
+					"title": "ent",
+					"id": "back_door"
+				},
+				{
 					"title": "resources",
 					"id": "emerald"
 				}
 			]
+		},
+		{
+			"name": "inventory",
+			"columns": [
+				{
+					"typeStr": "6:entity",
+					"name": "entity",
+					"kind": null
+				},
+				{
+					"typeStr": "3",
+					"name": "width",
+					"kind": null
+				},
+				{
+					"typeStr": "3",
+					"name": "height",
+					"kind": null
+				}
+			],
+			"lines": [
+				{
+					"entity": "player",
+					"width": 4,
+					"height": 4
+				},
+				{
+					"entity": "chest",
+					"width": 5,
+					"height": 4
+				}
+			],
+			"separators": [],
+			"props": {}
 		},
 		{
 			"name": "entity@drop",
@@ -433,7 +467,11 @@
 				}
 			],
 			"separators": [],
-			"props": {}
+			"props": {
+				"editor": {
+					"categories": null
+				}
+			}
 		},
 		{
 			"name": "navigation_target",
@@ -469,7 +507,11 @@
 				}
 			],
 			"separators": [],
-			"props": {}
+			"props": {
+				"editor": {
+					"categories": null
+				}
+			}
 		},
 		{
 			"name": "recipe@result",
@@ -508,16 +550,6 @@
 			]
 		}
 	],
-	"customTypes": [
-		{
-			"name": "Hui",
-			"cases": [
-				{
-					"name": "One",
-					"args": []
-				}
-			]
-		}
-	],
+	"customTypes": [],
 	"compress": false
 }

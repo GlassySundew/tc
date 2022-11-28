@@ -5,7 +5,7 @@ import h3d.scene.Object;
 import h3d.mat.Texture;
 import shader.LUT;
 import h3d.prim.HMDModel;
-import utils.Assets;
+import util.Assets;
 import hxd.Res;
 import h3d.scene.Mesh;
 import h3d.scene.MeshBatch;

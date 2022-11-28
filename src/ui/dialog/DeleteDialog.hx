@@ -1,8 +1,8 @@
 package ui.dialog;
 
-import utils.tools.Settings;
+import util.tools.Settings;
 import ui.core.TextButton;
-import utils.Assets;
+import util.Assets;
 import net.Client;
 import dn.Process;
 import h2d.Flow;

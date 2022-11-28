@@ -1,8 +1,8 @@
 package ui;
 
-import utils.Util;
+import util.Util;
 import dn.heaps.slib.HSprite;
-import utils.Assets;
+import util.Assets;
 import h2d.Object;
 
 typedef NinesliceConf = {

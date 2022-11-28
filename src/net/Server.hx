@@ -1,22 +1,22 @@
 package net;
 
-import utils.tools.Settings;
+import util.tools.Settings;
 import dn.Process;
 import en.player.Player;
 import game.server.GameServer;
 import hxbit.NetworkHost.NetworkClient;
 import hxd.net.SocketHost;
 import net.ClientController;
-import utils.Env;
-import utils.tools.Save;
+import util.Env;
+import util.tools.Save;
 
-using utils.Extensions.SocketHostExtender;
+using util.Extensions.SocketHostExtender;
 
 /**
 	server-side
 	network host setup
 **/
-@:build( utils.Macros.buildServerMessagesSignals() )
+@:build( util.Macros.buildServerMessagesSignals() )
 class Server extends Process {
 
 	public static var inst : Server;
@@ -115,7 +115,6 @@ class Server extends Process {
 
 			log( "Server Started" );
 			host.makeAlive();
-			host.flush();
 		} catch( e : Dynamic ) {
 			log( "port 6676 is already taken, server will not be booted..." );
 		}
@@ -124,7 +123,7 @@ class Server extends Process {
 	public function destroyClient( c : SocketClient ) {
 		var cc = cast( c.ownerObject, ClientController );
 		if ( cc.__host == null ) return;
-		cc.player.level.entities.remove( cc.player );
+		cc.player.model.level.entities.remove( cc.player );
 		cc.player.destroy();
 		var i = 0;
 		for ( client in host.clientsOwners ) {
@@ -132,31 +131,8 @@ class Server extends Process {
 		}
 	}
 
-	public function spawnPlayer( uid : Int, nickname : String, clientController : ClientController ) {
-
-		log( "Client identified ( uid:" + uid + " nickname: " + nickname + ")" );
-
-		var savedPlayerByNickname = null;
-		//  Save.inst.getPlayerByNickname(nickname);
-
-		var player : Player = null;
-		if ( savedPlayerByNickname != null ) {
-			// loading level
-
-			// Save.inst.load
-			// loading this bastard
-			player = Save.inst.loadEntity( savedPlayerByNickname ).as( Player );
-		} else {
-			// slapping new player in entrypoint
-			player = game.newPlayer( nickname, uid, clientController );
-		}
-		clientController.uid = uid;
-		clientController.level = player.level;
-		clientController.player = player;
-	}
-
-	override function update() {
-		super.update();
+	override function postUpdate() {
+		super.postUpdate();
 		host.flush();
 	}
 

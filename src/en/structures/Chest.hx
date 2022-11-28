@@ -16,21 +16,23 @@ import ui.player.Inventory;
 class Chest extends Structure {
 
 	public var chestWin : ChestWin;
+	public var cellFlowGrid : InventoryCellFlowGrid;
 
 	var ca : ControllerAccess<ControllerAction>;
-
-	public function new( x = 0., y = 0., z = 0., ?tmxObj : TmxObject, ?cdbEntry : Data.EntityKind ) {
-		super( x, y, z, tmxObj, cdbEntry );
+ 
+	public function new( ?tmxObj : TmxObject, ?cdbEntry : Data.EntityKind ) {
+		super( tmxObj, cdbEntry );
 		interactable = true;
 
-		inventory = new InventoryGrid( 5, 5, Chest, this );
-
 		if ( tmxObj.properties.exists( "items" ) )
-			ItemUtil.resolveJsonItemStorage( tmxObj.properties.getString( "items" ), inventory );
+			ItemUtil.resolveJsonItemStorage(
+				tmxObj.properties.getString( "items" ),
+				inventoryModel.inventory
+			);
 	}
 
-	public override function init( x = 0., y = 0., z = 0., ?tmxObj : TmxObject ) {
-		super.init( x, y, z, tmxObj );
+	public override function init() {
+		super.init();
 	}
 
 	override function alive() {
@@ -40,7 +42,7 @@ class Chest extends Structure {
 
 		GameClient.inst.delayer.addF(() -> {
 			try {
-				cellFlowGrid = new InventoryCellFlowGrid( inventory, 20, 20 );
+				cellFlowGrid = new InventoryCellFlowGrid( inventoryModel.inventory, 20, 20 );
 
 				if ( Player.inst != null && Player.inst.pui != null ) {
 					chestWin = new ChestWin( cellFlowGrid, Player.inst.pui.root );

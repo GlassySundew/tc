@@ -2,7 +2,7 @@ package ui.domkit.element;
 
 import dn.heaps.slib.HSprite;
 import ui.core.Button;
-import utils.Assets;
+import util.Assets;
 
 @:uiComp( "button" )
 class ButtonComp extends Button implements h2d.domkit.Object {

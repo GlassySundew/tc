@@ -1,9 +1,9 @@
 package ui;
 
 import dn.Tweenie.TType;
-import utils.tools.Settings;
-import utils.Util;
-import utils.Const;
+import util.tools.Settings;
+import util.Util;
+import util.Const;
 import dn.heaps.slib.HSprite;
 import ui.core.TextButton;
 import ui.core.Button;
@@ -18,7 +18,7 @@ import ui.dialog.ConnectMenu;
 import ui.dialog.NewSaveDialog;
 import ui.dialog.OptionsMenu;
 import ui.dialog.SaveManager;
-import utils.Assets;
+import util.Assets;
 
 class MainMenu extends Process {
 

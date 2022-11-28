@@ -1,11 +1,11 @@
 import imgui.ImGui;
 import imgui.ImGuiDrawable;
-import utils.Util;
-import utils.tools.Settings;
+import util.Util;
+import util.tools.Settings;
 import pass.CustomRenderer;
-import utils.tools.Save;
-import utils.Env;
-import utils.Repeater;
+import util.tools.Save;
+import util.Env;
+import util.Repeater;
 import h2d.Scene;
 import dn.heaps.input.Controller;
 

@@ -1,6 +1,6 @@
 package ui.core;
 
-import utils.Assets;
+import util.Assets;
 import h2d.col.Bounds;
 import dn.heaps.filter.PixelOutline;
 import h2d.Drawable;

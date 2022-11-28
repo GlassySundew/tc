@@ -1,15 +1,15 @@
 package ui.dialog;
 
 import dn.heaps.slib.HSprite;
-import utils.Const;
-import utils.Util;
+import util.Const;
+import util.Util;
 import dn.M;
-import utils.tools.Settings;
+import util.tools.Settings;
 import ui.core.Button;
 import ui.core.ShadowedText;
 import ui.core.VerticalSlider;
 import ui.core.FixedScrollArea;
-import utils.Assets;
+import util.Assets;
 import net.Client;
 import ch2.ui.EventInteractive;
 import dn.Process;
@@ -253,10 +253,7 @@ class SaveEntry extends Process {
 				case Load:
 					saveMan.destroy();
 					if ( saveMan.onGameStart != null ) saveMan.onGameStart();
-					utils.tools.Save.inst.loadGame( name );
-				// case New( name ):
-				// 	dialog = new NewSaveDialog( ( e ) -> {}, mode, saveMan, Main.inst.root );
-				// 	syncDialog( dialog );
+					// util.tools.Save.inst.loadGame( name );
 				default:
 			}
 		};
