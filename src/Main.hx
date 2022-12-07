@@ -1,3 +1,4 @@
+import game.server.GameServer;
 import game.test.VoxelSceneTest;
 import cherry.soup.EventSignal.EventSignal0;
 import cherry.soup.EventSignal;
@@ -69,12 +70,8 @@ class Main extends Process {
 
 		#if debug
 		hxd.Res.data.watch( function () {
-			delayer.cancelById( "cdb" );
-
-			delayer.addS( "cdb", function () {
-				Data.load( hxd.Res.data.entry.getBytes().toString() );
-				if ( GameClient.inst != null ) GameClient.inst.onCdbReload();
-			}, 0.2 );
+			Data.load( hxd.Res.data.entry.getBytes().toString() );
+			// if ( GameServer.inst != null ) GameServer.inst.onCdbReload();
 		} );
 		#end
 

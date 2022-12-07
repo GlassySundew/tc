@@ -46,7 +46,8 @@ class Blueprint extends Item {
 
 		onPlayerHold.add(() -> {
 			GameClient.inst.showStrTiles();
-			ghostStructure = new StructureGhost( Data.blueprint.get( blueprintScheme ).structureId );
+			ghostStructure = new StructureGhost();
+			ghostStructure.model.cdb = Data.blueprint.get( blueprintScheme ).structureId;
 		} );
 
 		onPlayerRemove.add(() -> {

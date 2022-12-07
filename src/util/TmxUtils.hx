@@ -1,5 +1,6 @@
 package util;
 
+import dn.M;
 import en.Entity;
 import format.tmx.Data.TmxGroup;
 import format.tmx.Data.TmxImageLayer;
@@ -108,7 +109,7 @@ class TmxUtils {
 								center.y = obj.y;
 						}
 					case OTPolygon( points ):
-						var cent = Util.getProjPolySize( obj, points, Vector );
+						var cent = Util.getProjPolySize( points, Vector );
 
 						if ( center.x == 0 && center.y == 0 ) {
 							center.x = cent.x + obj.x;
@@ -150,7 +151,7 @@ class TmxUtils {
 		// если ent не определён, то на все Entity из массива ALL будут добавлены TmxObject из тайлсета с названием colls
 		var tmxMap = GameClient.inst.tmxMap;
 		if ( tmxMap == null ) {
-			trace( 'failed to apply tmx object' );
+			trace( 'failed to apply tmx object, tmx map of GameClient.inst.level was not loaded' );
 			return;
 		}
 
@@ -160,9 +161,10 @@ class TmxUtils {
 			var tsEntTile = getEntityTsTile( ent, tmxMap );
 
 			// соотношение, которое в конце будет применено к entity
-			var center = new Vector();
+			var center : Vector = null;
 			var centerPt = tsEntTile.objectGroup.objects.filter( obj -> obj.name == "center" )[0];
 			if ( centerPt != null ) {
+				center = new Vector( centerPt.x, centerPt.y );
 				center.x = centerPt.x;
 				center.y = centerPt.y;
 			}
@@ -184,28 +186,34 @@ class TmxUtils {
 
 					case OTPolygon( points ):
 						var pts = Util.makePolyClockwise( points );
-						var cent = Util.getProjPolySize( obj, points, Vector );
-
-						if ( center.x == 0 && center.y == 0 ) {
-							center.x = cent.x + obj.x;
-							center.y = cent.y + obj.y;
-						}
 
 						var isoVerts : Array<Point> = [];
 						for ( pt in pts ) {
-							var isoPt = Util.cartToIso( pt.x + obj.x - center.x, pt.y + obj.y - center.y );
+							var isoPt = Util.cartToIso( pt.x, -pt.y );
 							isoPt = Util.isoToCart( isoPt.x, isoPt.y );
-							isoVerts.push( new Point( isoPt.x, isoPt.y ) );
+							isoVerts.push( new Point( M.round( isoPt.x ), M.round( isoPt.y ) ) );
 						}
+
+						var cent = Util.getProjPolySize( isoVerts, Vector );
+
+						if ( center == null ) {
+							center = new Vector( cent.x + obj.x, cent.y + obj.y );
+						}
+
+						Util.rotatePoly( obj.rotation - 135, isoVerts );
 
 						var verts : Array<Vec3> = [];
 						for ( isoVert in isoVerts ) verts.push( new Vec3( isoVert.x, isoVert.y, 0 ) );
 						for ( isoVert in isoVerts ) verts.push( new Vec3( isoVert.x, isoVert.y, height ) );
 
-						Util.rotatePoly( obj.rotation - 45, verts );
+						var isoOffset = Util.cartToIso( center.x - obj.x, -center.y + obj.y );
+						isoOffset = Util.isoToCart( isoOffset.x, isoOffset.y );
+						Util.rotatePoly( 45, [isoOffset] );
 
 						var sc : ShapeConfig = new ShapeConfig();
 						sc.geometry = new ConvexHullGeometry( verts );
+						sc.position.init( isoOffset.x, isoOffset.y, 0 );
+
 						var b : RigidBody = ent.model.rigidBody;
 						var shape = new Shape( sc );
 						if ( b == null ) {
@@ -239,7 +247,7 @@ class TmxUtils {
 		}
 	}
 
-	private static function getEntityTsTile( ent : Entity, tmxMap : TmxMap ) : TmxTilesetTile {
+	public static function getEntityTsTile( ent : Entity, tmxMap : TmxMap ) : TmxTilesetTile {
 		switch ent.model.tmxObj.objectType {
 			case OTTile( gid ):
 				return Tools.getTileByGid( tmxMap, gid );

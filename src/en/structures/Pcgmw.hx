@@ -5,8 +5,8 @@ import util.Assets;
 
 class Pcgmw extends Structure {
 
-	public function new( ?tmxObj : TmxObject, ?cdbEntry : Data.EntityKind ) {
-		super( tmxObj, cdbEntry );
+	public function new( ?tmxObj : TmxObject ) {
+		super( tmxObj );
 	}
 
 	override function postUpdate() {

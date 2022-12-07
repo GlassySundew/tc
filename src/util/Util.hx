@@ -16,7 +16,10 @@ using util.Extensions.TmxLayerExtender;
 @:publicFields
 class Util {
 
-	public inline static function makePolyClockwise( points : Array<TmxPoint> ) {
+	public inline static function makePolyClockwise<T : {
+		x : Float,
+		y : Float
+	}, K>( points : Array<T> ) {
 
 		var pts = points.copy();
 		var sum = .0;
@@ -114,11 +117,10 @@ class Util {
 	public static function getProjPolySize<T : {
 		x : Float,
 		y : Float
-	}>(
-		?obj : TmxObject,
-		points : Array<TmxPoint>,
-		resultType : Class<T>
-	) : T {
+	}, K>(
+		points : Array<T>,
+		resultType : Class<K>
+	) : K {
 		var pts = makePolyClockwise( points );
 		var verts : Array<Vector> = [];
 		for ( i in pts ) verts.push( new Vector( ( i.x ), ( i.y ) ) );

@@ -9,9 +9,9 @@ class SpriteEntity extends Structure {
 
 	@:s var spriteGroup : String;
 
-	public function new( sprite : String, ?tmxObj : TmxObject, ?cdbEntry : Data.EntityKind ) {
+	public function new( sprite : String, ?tmxObj : TmxObject ) {
 		spriteGroup = sprite;
-		super( tmxObj, cdbEntry );
+		super( tmxObj );
 	}
 
 	override function init() {

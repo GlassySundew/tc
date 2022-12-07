@@ -1,5 +1,6 @@
 package en;
 
+import en.model.HealthModel;
 import en.model.InventoryModel;
 import dn.M;
 import util.Util;
@@ -16,71 +17,39 @@ using en.util.EntityUtil;
 
 class Structure extends en.InteractableEntity {
 
-	@:s public var cdbEntry : Data.EntityKind;
 	@:s public var inventoryModel : InventoryModel;
+	@:s public var healthModel : HealthModel;
 
-	public var toBeCollidedAgainst = true;
-	public var health : Float;
-
-	public function new( ?tmxObject : TmxObject, ?cdbEntry : Data.EntityKind ) {
-		this.cdbEntry = cdbEntry;
+	public function new( ?tmxObject : TmxObject ) {
 		inventoryModel = new InventoryModel();
+		healthModel = new HealthModel();
 
 		super( tmxObject );
-
-		// CDB parsed entry corresponding to this structure instance class name
-		if ( cdbEntry == null ) try {
-			EregUtil.eregClass.match( '$this'.toLowerCase() );
-			cdbEntry = Data.entity.resolve( EregUtil.eregClass.matched( 1 ) ).id;
-		}
-		catch( e ) {
-			// trace(e);
-		}
 	}
 
 	public override function init() {
-		// Initializing spr and making it static sprite from structures atlas as a
-		// class name if not initialized in custom structure class file
-
-		if ( cdbEntry == null && eSpr != null ) try {
-			cdbEntry = Data.entity.resolve( eSpr.spr.groupName ).id;
-		}
-		catch( Dynamic ) {}
-
 		super.init();
 	}
 
 	override function alive() {
 		if ( eSpr == null ) {
 			eSpr = new EntitySprite( this, Assets.structures, Util.hollowScene );
-			EregUtil.eregClass.match( '$this'.toLowerCase() );
-			try {
-				eSpr.setSprGroup( EregUtil.eregClass.matched( 1 ) );
-			} catch( e : Dynamic ) {
-				trace( e );
-			}
+			if ( EregUtil.eregClass.match( '$this'.toLowerCase() ) )
+				try {
+					eSpr.setSprGroup( EregUtil.eregClass.matched( 1 ) );
+				} catch( e : Dynamic ) {
+					trace( e );
+				}
 		}
 
 		super.alive();
 
-		// Setting parameters from cdb entry
-		if ( cdbEntry != null ) {
-			useRange = Data.entity.get( cdbEntry ).use_range;
-			health = Data.entity.get( cdbEntry ).hp;
+		if ( model.cdb != null ) {
+			useRange = Data.entity.get( model.cdb ).use_range;
 
-			if ( Data.entity.get( cdbEntry ).interactable ) {
+			if ( Data.entity.get( model.cdb ).interactable ) {
 				doHighlight = true;
 				interactable = true;
-			}
-
-			if ( Data.entity.get( cdbEntry ).isoHeight != 0 && Data.entity.get( cdbEntry ).isoWidth != 0 ) {
-				eSpr.mesh.isoWidth = Data.entity.get( cdbEntry ).isoWidth;
-				eSpr.mesh.isoHeight = Data.entity.get( cdbEntry ).isoHeight;
-				eSpr.mesh.refreshVerts();
-
-				#if depth_debug
-				eSpr.mesh.renewDebugPts();
-				#end
 			}
 		}
 
@@ -145,22 +114,21 @@ class Structure extends en.InteractableEntity {
 	}
 
 	public function applyItem( item : Item ) {
-		// this should not exist
-		if ( health != -1 && Data.item.get( item.cdbEntry ).can_hit ) {
-			emitDestroyItem( item );
-			// Damaging the structure
-			if ( health > Data.item.get( item.cdbEntry ).damage ) {
-				health -= Data.item.get( item.cdbEntry ).damage;
-			} else {
-				if ( cdbEntry != null ) {
-					for ( i in Data.entity.get( cdbEntry ).drop ) dropItem( Item.fromCdbEntry( i.item.id, null, i.amount ) );
-					dropAllItems();
-				}
-				kill( Player.inst );
-			}
-		} else {
-			item.onStructureUse.dispatch();
-		}
+		// if ( health != -1 && Data.item.get( item.cdbEntry ).can_hit ) {
+		// 	emitDestroyItem( item );
+		// 	// Damaging the structure
+		// 	if ( health > Data.item.get( item.cdbEntry ).damage ) {
+		// 		health -= Data.item.get( item.cdbEntry ).damage;
+		// 	} else {
+		// 		if ( cdbEntry != null ) {
+		// 			for ( i in Data.entity.get( cdbEntry ).drop ) dropItem( Item.fromCdbEntry( i.item.id, null, i.amount ) );
+		// 			dropAllItems();
+		// 		}
+		// 		kill( Player.inst );
+		// 	}
+		// } else {
+		// 	item.onStructureUse.dispatch();
+		// }
 	}
 
 	@:rpc( server )
@@ -202,7 +170,7 @@ class Structure extends en.InteractableEntity {
 				structure = Type.createInstance( e, [null, cdbEntry] );
 			}
 		}
-		structure = structure == null ? new Structure( cdbEntry ) : structure;
+		structure = structure == null ? new Structure() : structure;
 		return structure;
 	}
 

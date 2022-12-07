@@ -97,6 +97,8 @@ class Player extends Entity {
 			Assets.player,
 			Util.hollowScene
 		);
+		eSpr.initTextLabel( playerModel.nickname );
+
 		ca = Main.inst.controller.createAccess();
 		belt = Main.inst.controller.createAccess();
 
@@ -118,8 +120,6 @@ class Player extends Entity {
 			);
 		}
 
-		super.alive();
-
 		if ( model.controlId == net.Client.inst.uid ) {
 			inst = this;
 			pui = new PlayerUI( GameClient.inst.root, this );
@@ -127,12 +127,8 @@ class Player extends Entity {
 			GameClient.inst.cameraProc.camera.recenter();
 			GameClient.inst.player = this;
 		}
-		// playerModel.nickname.onVal.add( eSpr.initTextLabel );
-		
-		eSpr.initTextLabel( playerModel.nickname );
-		GameClient.inst.delayer.addF(() -> {
-			trace( playerModel.nickname );
-		}, 10 );
+
+		super.alive();
 	}
 
 	override function applyTmx() {

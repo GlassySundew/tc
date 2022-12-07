@@ -75,7 +75,11 @@ class GameServer extends Process {
 		}
 	}
 
-	public function startLevelFromTmx( tmxMap : TmxMap, name : String, playerLoadConf : LevelLoadPlayerConfig ) : ServerLevel {
+	public function startLevelFromTmx(
+		tmxMap : TmxMap,
+		name : String,
+		playerLoadConf : LevelLoadPlayerConfig
+	) : ServerLevel {
 		execAfterLvlLoad = new EventSignal0();
 
 		var sLevel : ServerLevel = levels[name];
@@ -90,7 +94,7 @@ class GameServer extends Process {
 		var loadedLevel = Save.inst.saveLevel( sLevel );
 
 		for ( e in sLevel.entitiesTmxObj ) {
-			var ent = entityFactory.searchAndSpawnEnt( e, entClasses, sLevel);
+			entityFactory.spawnEntity( e, sLevel );
 		}
 
 		return sLevel;

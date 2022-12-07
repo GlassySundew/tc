@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "tiled/levels/ship_pascal.tmx",
+    "activeFile": "tiled/levels/entities.tsx",
     "automapping.whileDrawing": false,
     "expandedProjectPaths": [
-        "tiled",
-        "."
+        ".",
+        "tiled"
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
@@ -565,8 +565,8 @@
                 65
             ],
             "expandedObjectLayers": [
-                34,
-                3
+                3,
+                34
             ],
             "scale": 5.5,
             "selectedLayer": 26,
@@ -767,18 +767,18 @@
         },
         "tiled/levels/ship_pascal.tmx": {
             "expandedGroupLayers": [
-                829,
-                830
+                830,
+                829
             ],
             "expandedObjectLayers": [
                 3,
                 829
             ],
-            "scale": 2,
-            "selectedLayer": 10,
+            "scale": 3,
+            "selectedLayer": 25,
             "viewCenter": {
                 "x": 416,
-                "y": 207.5
+                "y": 207.66666666666663
             }
         },
         "tiled/levels/ship_pascal.tmx#CONGRUENT": {

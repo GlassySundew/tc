@@ -44,7 +44,7 @@ class ArrayNSBase<T : Serializable> implements NetworkSerializable {
 
 	public inline function push( item : T ) pushRpc( item );
 
-	@:rpc( immediate )
+	@:rpc
 	function pushRpc( item : Dynamic ) {
 		array.push( item );
 		onPush.dispatch( item );
@@ -52,7 +52,7 @@ class ArrayNSBase<T : Serializable> implements NetworkSerializable {
 
 	public inline function remove( item : T ) removeRpc( item );
 
-	@:rpc( immediate )
+	@:rpc
 	function removeRpc( item : Dynamic ) {
 		array.remove( item );
 		onRemove.dispatch( item );

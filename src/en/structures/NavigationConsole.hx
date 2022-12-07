@@ -14,8 +14,8 @@ class NavigationConsole extends Structure {
 	var navigation : NavigationWindow;
 	var ca : ControllerAccess<ControllerAction>;
 
-	public function new( ?tmxObject : TmxObject, ?cdbEntry : Data.EntityKind ) {
-		super(  tmxObject, cdbEntry );
+	public function new( ?tmxObject : TmxObject ) {
+		super(  tmxObject );
 		interactable = true;
 	}
 

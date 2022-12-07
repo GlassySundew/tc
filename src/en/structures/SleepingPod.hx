@@ -5,8 +5,8 @@ import format.tmx.Data.TmxObject;
 
 class SleepingPod extends Structure {
 
-	public function new( ?tmxObj : TmxObject, ?cdbEntry : Data.EntityKind ) {
-		super( tmxObj, cdbEntry );
+	public function new( ?tmxObj : TmxObject ) {
+		super( tmxObj );
 	}
 
 	override function postUpdate() {

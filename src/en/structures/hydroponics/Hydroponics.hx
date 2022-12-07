@@ -10,8 +10,8 @@ import util.Assets;
 /** Использует inv как хранилище для растений **/
 class Hydroponics extends Structure {
 
-	public function new( ?tmxObj : TmxObject, ?cdbEntry : Data.EntityKind ) {
-		super( tmxObj, hydroponics );
+	public function new( ?tmxObj : TmxObject ) {
+		super( tmxObj );
 	}
 
 	override function init() {

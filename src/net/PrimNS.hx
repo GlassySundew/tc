@@ -5,7 +5,7 @@ import cherry.soup.EventSignal.EventSignal1;
 import hxbit.NetworkSerializable;
 
 @:forward
-abstract PrimNS<T>( PrimNSBase<T> ) {
+abstract  PrimNS<T>( PrimNSBase<T> ) {
 
 	@:to inline function toT() : T {
 		return this.val;

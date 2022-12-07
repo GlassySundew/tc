@@ -1,32 +1,34 @@
 package en;
 
-import util.Util;
-import en.model.EntityModel;
-import net.NetNode;
-import dn.M;
-import util.Const;
-import game.server.GameServer;
-import dn.Tweenie;
-import oimo.common.Vec3;
 import cherry.soup.EventSignal.EventSignal0;
 import cherry.soup.EventSignal.EventSignal1;
+import dn.M;
+import dn.Tweenie;
 import en.collide.EntityContactCallback;
+import en.model.EntityModel;
 import en.spr.EntitySprite;
-import util.Direction;
 import en.util.EntityUtil;
 import format.tmx.Data.TmxObject;
 import game.client.GameClient;
+import game.server.GameServer;
 import game.server.ServerLevel;
 import hxbit.NetworkHost;
 import hxbit.NetworkSerializable;
 import net.Client;
+import net.NetNode;
 import net.PrimNS;
+import oimo.common.Vec3;
 import oimo.dynamics.rigidbody.RigidBody;
 import ui.core.InventoryGrid;
-import util.tools.Save;
+import util.Const;
+import util.Direction;
 import util.EregUtil;
+import util.Util;
+import util.tools.Save;
 
+using en.EntityTmxDataParser;
 using en.util.EntityUtil;
+using util.TmxUtils;
 
 @:keep
 @:autoBuild( util.Macros.buildEntityCdbAssign() )
@@ -38,10 +40,14 @@ class Entity extends NetNode {
 
 	@:s public var model : EntityModel;
 
+	public var clientConfig : EntityTmxDataParser;
+
 	public var eSpr : EntitySprite;
 	public var destroyed( default, null ) = false;
+
 	public var onMove : EventSignal0 = new EventSignal0();
 	public var onDirChangedSignal : EventSignal1<Direction> = new EventSignal1();
+
 	public var tmod( get, never ) : Float;
 
 	inline function get_tmod() {
@@ -65,7 +71,6 @@ class Entity extends NetNode {
 		}
 
 		super();
-		
 	}
 
 	public override function init() {
@@ -74,20 +79,17 @@ class Entity extends NetNode {
 	}
 
 	/**
-		called only on client-side when replicating entity over network on client side
+		called only on client-side when
+		replicating entity over network on client side
 	**/
 	public override function alive() {
 		super.alive();
-
 		ALL.push( this );
-		EntityUtil.refreshPivot( this );
+		clientConfig = EntityTmxDataParser.fromTsTile(
+			this.getEntityTsTile( model.level.tmxMap )
+		);
 
-		Main.inst.delayer.addF(() -> {
-			// ждём пока придёт уровень с сервера
-			if ( Main.inst.clientController.level == null ) {
-				GameClient.inst.onLevelChanged.add( applyTmx, true );
-			} else applyTmx();
-		}, 1 );
+		applyTmx();
 	}
 
 	function applyTmx() {

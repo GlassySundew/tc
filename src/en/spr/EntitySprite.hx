@@ -1,5 +1,6 @@
 package en.spr;
 
+import en.util.CdbUtil;
 import util.Util;
 import util.Const;
 import dn.heaps.slib.SpriteLib;
@@ -98,7 +99,15 @@ class EntitySprite {
 
 		perpendicularizer = new shader.Perpendicularizer();
 		mesh.material.mainPass.addShader( perpendicularizer );
-		depthOffset = new DepthOffset( 0.1 * entity.model.tmxObj.height );
+
+		var cdbDepth : Data.EntityDepth = CdbUtil.getEntry(
+			entity.model.cdb,
+			"entity",
+			Data.entityDepth.all
+		);
+
+		var depth = cdbDepth != null ? cdbDepth.depth : 0;
+		depthOffset = new DepthOffset( 0.1 * entity.model.tmxObj.height + depth );
 		mesh.material.mainPass.addShader( depthOffset );
 
 		if ( entity.model.tmxObj != null && entity.model.tmxObj.flippedVertically ) spr.scaleY = -1;

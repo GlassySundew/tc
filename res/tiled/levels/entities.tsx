@@ -14,6 +14,9 @@
     </properties>
     <polygon points="0,0 3,0 6,-1 7,-3 6,-5 3,-6 0,-6 -3,-5 -4,-3 -3,-1"/>
    </object>
+   <object id="12" name="center" x="23" y="36">
+    <point/>
+   </object>
   </objectgroup>
  </tile>
  <tile id="3">
@@ -148,14 +151,14 @@
   </properties>
   <image width="48" height="60" source="separated/structures/backdoor0.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="5" name="center" x="17" y="50">
-    <point/>
-   </object>
    <object id="11" x="2" y="46">
     <properties>
      <property name="h" type="float" value="5"/>
     </properties>
     <polygon points="0,0 22.5,11.25 30,7.5 7.5,-3.75"/>
+   </object>
+   <object id="5" name="center" x="23" y="57">
+    <point/>
    </object>
   </objectgroup>
  </tile>
@@ -166,13 +169,13 @@
   </properties>
   <image width="48" height="48" source="separated/structures/chest.png"/>
   <objectgroup draworder="index" id="3">
-   <object id="4" x="22" y="44">
+   <object id="4" name="coliistion+depth" x="22" y="44">
     <properties>
      <property name="h" type="float" value="13"/>
     </properties>
     <polygon points="0,0 20,-10 8,-16 -12,-6"/>
    </object>
-   <object id="5" name="center" x="25" y="36">
+   <object id="5" name="center" x="22" y="44">
     <point/>
    </object>
   </objectgroup>

@@ -23,16 +23,6 @@
 				},
 				{
 					"typeStr": "4",
-					"name": "isoWidth",
-					"documentation": "изометрическая ширина сортирующего прямоугольника по X, умноженная на 10; если 0 - то это точка"
-				},
-				{
-					"typeStr": "4",
-					"name": "isoHeight",
-					"documentation": "изометрическая длина сортирующего прямоугольника по Y, умноженная на 10; если 0 - то это точка"
-				},
-				{
-					"typeStr": "4",
 					"name": "use_range"
 				}
 			],
@@ -40,8 +30,6 @@
 				{
 					"id": "back_door",
 					"use_range": 20,
-					"isoWidth": 1,
-					"isoHeight": 0.1,
 					"hp": -1,
 					"drop": [],
 					"interactable": true
@@ -55,8 +43,6 @@
 						}
 					],
 					"hp": 3,
-					"isoWidth": 0.9,
-					"isoHeight": 0.6,
 					"use_range": 20,
 					"interactable": true
 				},
@@ -65,15 +51,11 @@
 					"drop": [],
 					"interactable": false,
 					"hp": 0,
-					"isoWidth": 0,
-					"isoHeight": 0,
 					"use_range": 0
 				},
 				{
 					"id": "door",
 					"use_range": 20,
-					"isoWidth": 1,
-					"isoHeight": 0.1,
 					"hp": -1,
 					"drop": [
 						{
@@ -86,8 +68,6 @@
 				{
 					"id": "hydroponics",
 					"use_range": 40,
-					"isoWidth": 2,
-					"isoHeight": 1,
 					"hp": 3,
 					"drop": [
 						{
@@ -100,8 +80,6 @@
 				{
 					"id": "navigation_console",
 					"use_range": 60,
-					"isoWidth": 0,
-					"isoHeight": 0,
 					"hp": -1,
 					"drop": [],
 					"interactable": true
@@ -110,8 +88,6 @@
 					"id": "sleeping_pod",
 					"drop": [],
 					"hp": -1,
-					"isoWidth": 0,
-					"isoHeight": 0,
 					"use_range": 0,
 					"interactable": true
 				},
@@ -119,8 +95,6 @@
 					"id": "teleport",
 					"drop": [],
 					"hp": -1,
-					"isoWidth": 0,
-					"isoHeight": 0,
 					"use_range": 7,
 					"interactable": true
 				},
@@ -128,8 +102,6 @@
 					"id": "workbench",
 					"drop": [],
 					"hp": 3,
-					"isoWidth": 0,
-					"isoHeight": 0,
 					"use_range": 25,
 					"interactable": true
 				},
@@ -142,8 +114,6 @@
 						}
 					],
 					"hp": 3,
-					"isoWidth": 0,
-					"isoHeight": 0,
 					"use_range": 20,
 					"interactable": false
 				},
@@ -156,8 +126,6 @@
 						}
 					],
 					"hp": 4,
-					"isoWidth": 0,
-					"isoHeight": 0,
 					"use_range": 20,
 					"interactable": false
 				}
@@ -173,6 +141,28 @@
 					"id": "emerald"
 				}
 			]
+		},
+		{
+			"name": "entityDepth",
+			"columns": [
+				{
+					"typeStr": "6:entity",
+					"name": "entity",
+					"kind": null
+				},
+				{
+					"typeStr": "4",
+					"name": "depth"
+				}
+			],
+			"lines": [
+				{
+					"entity": "chest",
+					"depth": 0.3
+				}
+			],
+			"separators": [],
+			"props": {}
 		},
 		{
 			"name": "inventory",

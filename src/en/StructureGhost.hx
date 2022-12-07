@@ -9,16 +9,14 @@ class StructureGhost extends Structure {
 
 	public var canBePlaced : Bool = false;
 
-	public function new( cdbEntry : Data.EntityKind ) {
-		eSpr = new EntitySprite( this,
-			Assets.structures,
-			Util.hollowScene,
-			'${Data.entity.get( cdbEntry ).id}'
-		);
+	public function new() {
+		// eSpr = new EntitySprite( this,
+		// 	Assets.structures,
+		// 	Util.hollowScene,
+		// 	'${Data.entity.get( cdbEntry ).id}'
+		// );
 
-		super( cdbEntry );
-
-		toBeCollidedAgainst = false;
+		super();
 
 		interact.onPushEvent.removeAll();
 		interact.onOverEvent.removeAll();

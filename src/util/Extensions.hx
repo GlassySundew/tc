@@ -193,3 +193,12 @@ class TmxPropertiesExtension {
 		}
 	}
 }
+
+class ArrayExtensions {
+
+	public inline static function at<T>( array : Array<T>, i : Int ) : T {
+		i = i % array.length;
+		if ( i < 0 ) i = array.length + i;
+		return array[i];
+	}
+}

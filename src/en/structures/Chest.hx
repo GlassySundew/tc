@@ -19,9 +19,9 @@ class Chest extends Structure {
 	public var cellFlowGrid : InventoryCellFlowGrid;
 
 	var ca : ControllerAccess<ControllerAction>;
- 
-	public function new( ?tmxObj : TmxObject, ?cdbEntry : Data.EntityKind ) {
-		super( tmxObj, cdbEntry );
+
+	public function new( ?tmxObj : TmxObject ) {
+		super( tmxObj );
 		interactable = true;
 
 		if ( tmxObj.properties.exists( "items" ) )
