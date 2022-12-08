@@ -151,7 +151,7 @@
   </properties>
   <image width="48" height="60" source="separated/structures/backdoor0.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="11" x="2" y="46">
+   <object id="11" name="collision+depth" x="2" y="46">
     <properties>
      <property name="h" type="float" value="5"/>
     </properties>

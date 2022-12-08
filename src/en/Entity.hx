@@ -6,7 +6,7 @@ import dn.M;
 import dn.Tweenie;
 import en.collide.EntityContactCallback;
 import en.model.EntityModel;
-import en.spr.EntitySprite;
+import en.spr.EntityView;
 import en.util.EntityUtil;
 import format.tmx.Data.TmxObject;
 import game.client.GameClient;
@@ -42,7 +42,7 @@ class Entity extends NetNode {
 
 	public var clientConfig : EntityTmxDataParser;
 
-	public var eSpr : EntitySprite;
+	public var eSpr : EntityView;
 	public var destroyed( default, null ) = false;
 
 	public var onMove : EventSignal0 = new EventSignal0();
@@ -88,9 +88,12 @@ class Entity extends NetNode {
 		clientConfig = EntityTmxDataParser.fromTsTile(
 			this.getEntityTsTile( model.level.tmxMap )
 		);
-
+		createView();
 		applyTmx();
 	}
+
+	/** to be overriden **/
+	function createView() {}
 
 	function applyTmx() {
 		EntityUtil.clientApplyTmx( this );
@@ -200,7 +203,8 @@ class Entity extends NetNode {
 	public function headlessFrameEnd() {}
 
 	public function preUpdate() {
-		eSpr.spr.anim.update( tmod );
+		if ( eSpr != null )
+			eSpr.spr.anim.update( tmod );
 		model.cd.update( tmod );
 		model.tw.update( tmod );
 	}

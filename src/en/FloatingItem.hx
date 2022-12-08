@@ -3,7 +3,7 @@ package en;
 import dn.heaps.slib.HSprite;
 import util.Util;
 import dn.M;
-import en.spr.EntitySprite;
+import en.spr.EntityView;
 import game.client.GameClient;
 import util.Assets;
 import util.Assets;
@@ -41,7 +41,7 @@ class FloatingItem extends en.InteractableEntity {
 	}
 
 	override function init() {
-		eSpr = new EntitySprite(
+		eSpr = new EntityView(
 			this,
 			Assets.items,
 			Util.hollowScene,

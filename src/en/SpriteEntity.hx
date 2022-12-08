@@ -1,7 +1,7 @@
 package en;
 
 import util.Util;
-import en.spr.EntitySprite;
+import en.spr.EntityView;
 import util.Assets;
 import format.tmx.Data.TmxObject;
 
@@ -22,7 +22,7 @@ class SpriteEntity extends Structure {
 	}
 
 	public override function alive() {
-		eSpr = new EntitySprite(
+		eSpr = new EntityView(
 			this,
 			Assets.structures,
 			Util.hollowScene,

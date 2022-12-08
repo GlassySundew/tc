@@ -158,18 +158,9 @@ class TmxUtils {
 		var ents = ent != null ? [ent] : Entity.ALL;
 
 		for ( ent in ents ) {
-			var tsEntTile = getEntityTsTile( ent, tmxMap );
+			var center : Vector = ent.clientConfig.center;
 
-			// соотношение, которое в конце будет применено к entity
-			var center : Vector = null;
-			var centerPt = tsEntTile.objectGroup.objects.filter( obj -> obj.name == "center" )[0];
-			if ( centerPt != null ) {
-				center = new Vector( centerPt.x, centerPt.y );
-				center.x = centerPt.x;
-				center.y = centerPt.y;
-			}
-
-			for ( obj in tsEntTile.objectGroup.objects ) {
+			for ( obj in ent.clientConfig.collisions ) {
 				var height = obj.properties.getProp( PTFloat, "h", 1, null );
 
 				switch obj.objectType {
@@ -218,9 +209,7 @@ class TmxUtils {
 						var shape = new Shape( sc );
 						if ( b == null ) {
 							var bc : RigidBodyConfig = new RigidBodyConfig();
-							bc.type = if ( tsEntTile.properties.existsType( "static", PTBool ) )
-								( tsEntTile.properties.getBool( "static" ) ? STATIC : DYNAMIC );
-							else DYNAMIC;
+							bc.type = ent.clientConfig.tsTile.properties.getProp( PTBool, "static", DYNAMIC ) ? STATIC : DYNAMIC;
 							b = new RigidBody( bc );
 							Level.inst.world.addRigidBody( b );
 							ent.model.rigidBody = b;

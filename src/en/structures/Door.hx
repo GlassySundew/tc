@@ -14,8 +14,8 @@ class Door extends Structure {
 
 	@:s public var leadsTo : String = "";
 
-	public function new(?tmxObj : TmxObject) {
-		super(tmxObj);
+	public function new( ?tmxObj : TmxObject ) {
+		super( tmxObj );
 	}
 
 	public override function init() {
@@ -24,7 +24,7 @@ class Door extends Structure {
 			leadsTo = Util.unifyLevelName( model.tmxObj.properties.getString( "to" ) );
 	}
 
-	override function alive() @:privateAccess {
+	override function alive() {
 		interactable = true;
 		super.alive();
 

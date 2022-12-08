@@ -1,7 +1,7 @@
 package en;
 
 import util.Util;
-import en.spr.EntitySprite;
+import en.spr.EntityView;
 import util.Assets;
 
 // Just an helping indicator that should show if structure can be placed on

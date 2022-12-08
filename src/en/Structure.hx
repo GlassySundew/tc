@@ -4,7 +4,7 @@ import en.model.HealthModel;
 import en.model.InventoryModel;
 import dn.M;
 import util.Util;
-import en.spr.EntitySprite;
+import en.spr.EntityView;
 import game.client.GameClient;
 import game.client.GameClient;
 import util.Assets;
@@ -32,16 +32,6 @@ class Structure extends en.InteractableEntity {
 	}
 
 	override function alive() {
-		if ( eSpr == null ) {
-			eSpr = new EntitySprite( this, Assets.structures, Util.hollowScene );
-			if ( EregUtil.eregClass.match( '$this'.toLowerCase() ) )
-				try {
-					eSpr.setSprGroup( EregUtil.eregClass.matched( 1 ) );
-				} catch( e : Dynamic ) {
-					trace( e );
-				}
-		}
-
 		super.alive();
 
 		if ( model.cdb != null ) {
@@ -68,6 +58,18 @@ class Structure extends en.InteractableEntity {
 		Main.inst.delayer.addF(() -> {
 			interactCheck();
 		}, 10 );
+	}
+
+	override function createView() {
+		if ( eSpr == null ) {
+			eSpr = new EntityView( this, Assets.structures, Util.hollowScene );
+			if ( EregUtil.eregClass.match( '$this'.toLowerCase() ) )
+				try {
+					eSpr.setSprGroup( EregUtil.eregClass.matched( 1 ) );
+				} catch( e : Dynamic ) {
+					trace( e );
+				}
+		}
 	}
 
 	function activateInteractive() {

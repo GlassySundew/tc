@@ -8,7 +8,7 @@ import dn.M;
 import dn.heaps.input.ControllerAccess;
 import dn.heaps.slib.HSprite;
 import en.items.Blueprint;
-import en.spr.EntitySprite;
+import en.spr.EntityView;
 import format.tmx.Data.TmxObject;
 import game.client.ControllerAction;
 import game.client.GameClient;
@@ -92,15 +92,20 @@ class Player extends Entity {
 	}
 
 	public override function alive() {
-		eSpr = new EntitySprite(
-			this,
-			Assets.player,
-			Util.hollowScene
-		);
-		eSpr.initTextLabel( playerModel.nickname );
-
 		ca = Main.inst.controller.createAccess();
 		belt = Main.inst.controller.createAccess();
+
+		if ( model.controlId == net.Client.inst.uid ) {
+			inst = this;
+			pui = new PlayerUI( GameClient.inst.root, this );
+			GameClient.inst.cameraProc.camera.targetEntity.val = this;
+			GameClient.inst.cameraProc.camera.recenter();
+			GameClient.inst.player = this;
+		}
+
+		super.alive();
+
+		eSpr.initTextLabel( playerModel.nickname );
 
 		for ( i => dir in [
 			{ dir : "right", prio : 0 },
@@ -119,16 +124,14 @@ class Player extends Entity {
 				() -> return model.dir.val == i && playerModel.actionState.val == Idle
 			);
 		}
+	}
 
-		if ( model.controlId == net.Client.inst.uid ) {
-			inst = this;
-			pui = new PlayerUI( GameClient.inst.root, this );
-			GameClient.inst.cameraProc.camera.targetEntity.val = this;
-			GameClient.inst.cameraProc.camera.recenter();
-			GameClient.inst.player = this;
-		}
-
-		super.alive();
+	override function createView() {
+		eSpr = new EntityView(
+			this,
+			Assets.player,
+			Util.hollowScene
+		);
 	}
 
 	override function applyTmx() {

@@ -9,5 +9,5 @@
 # -D hx_concurrent
 # -D network_debug
 
-# --no-inline
+--no-inline
 -debug

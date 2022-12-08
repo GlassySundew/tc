@@ -9,14 +9,19 @@ using util.Extensions.ArrayExtensions;
 class EntityTmxDataParser {
 
 	public var collisions : Array<TmxObject> = [];
-	public var depth : TmxObject;
+	public var center : Vector;
+	public var depth : EntityDepthConfig;
+	public var tsTile : TmxTilesetTile;
 
 	public static function fromTsTile( tsTile : TmxTilesetTile ) : EntityTmxDataParser {
 		var ep = new EntityTmxDataParser();
+		ep.tsTile = tsTile;
 
-		var depthObj : TmxObject = null;
-		
 		for ( obj in tsTile.objectGroup.objects ) {
+			if ( ep.center == null && obj.name == "center" ) {
+				ep.center = new Vector( obj.x, obj.y );
+				continue;
+			}
 			if ( obj.name == "" ) {
 				ep.collisions.push( obj );
 				continue;
@@ -24,14 +29,17 @@ class EntityTmxDataParser {
 			if ( StringTools.contains( obj.name, "collision" ) ) {
 				ep.collisions.push( obj );
 			}
-			if ( StringTools.contains( obj.name, "depth" ) ) {
-				if ( ep.depth != null ) trace( "WARNING: DOUBLE DEPTH DEFINITION" );
-				ep.depth = obj;
+			if ( ep.depth == null && StringTools.contains( obj.name, "depth" ) ) {
+				ep.depth = EntityDepthConfig.fromTmxObject( obj );
 			}
 		}
 
-		if ( ep.depth != null )
-			EntityDepthOffsetConfig.fromTmxObject( ep.depth );
+		if ( ep.depth != null && ep.center != null ) {
+			ep.depth.leftPoint.x -= ep.center.x;
+			ep.depth.rightPoint.x -= ep.center.x;
+			ep.depth.leftPoint.y -= ep.center.y;
+			ep.depth.rightPoint.y -= ep.center.y;
+		}
 
 		return ep;
 	}
@@ -39,13 +47,16 @@ class EntityTmxDataParser {
 	public function new() {}
 }
 
-class EntityDepthOffsetConfig {
+/**
+	iso sorting
+**/
+class EntityDepthConfig {
 
 	public var leftPoint : Vector;
 	public var rightPoint : Vector;
 
 	public static function fromTmxObject( obj : TmxObject ) {
-		var conf = new EntityDepthOffsetConfig();
+		var conf = new EntityDepthConfig();
 
 		var points = switch obj.objectType {
 			case OTPolygon( points ):

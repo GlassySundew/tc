@@ -119,37 +119,7 @@ class EntityUtil {
 		подразумевается, что у этой сущности есть длинный изометрический меш
 	**/
 	public static function distPolyToPt( self : Entity, e : Entity ) : Float {
-		if ( self.eSpr.mesh == null || !self.eSpr.mesh.isLong )
-			return distPx( self, e );
-		else {
-
-			var verts = self.eSpr.mesh.verts;
-			var mesh = self.eSpr.mesh;
-
-			var pt1 = new HxPoint(
-				self.model.footX.val + mesh.xOff + verts.up.x,
-				self.model.footY.val + mesh.yOff + verts.up.y
-			);
-			var pt2 = new HxPoint(
-				self.model.footX.val + mesh.xOff + verts.right.x,
-				self.model.footY.val + mesh.yOff + verts.right.y
-			);
-			var pt3 = new HxPoint(
-				self.model.footX.val + mesh.xOff + verts.down.x,
-				self.model.footY.val + mesh.yOff + verts.down.y
-			);
-			var pt4 = new HxPoint(
-				self.model.footX.val + mesh.xOff + verts.left.x,
-				self.model.footY.val + mesh.yOff + verts.left.y
-			);
-
-			var dist = PoleOfInaccessibility.pointToPolygonDist(
-				e.model.footX.val,
-				e.model.footY.val,
-				[[pt1, pt2, pt3, pt4]]
-			);
-			return -dist;
-		}
+		return distPx( self, e );
 	}
 
 	public static function offsetFootByCenter( ent : Entity ) {

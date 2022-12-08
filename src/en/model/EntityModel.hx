@@ -8,7 +8,7 @@ import util.Direction;
 import ui.core.InventoryGrid.InventoryCellFlowGrid;
 import net.Client;
 import dn.Tweenie;
-import en.spr.EntitySprite;
+import en.spr.EntityView;
 import game.client.GameClient;
 import oimo.dynamics.rigidbody.RigidBody;
 import format.tmx.Data.TmxObject;

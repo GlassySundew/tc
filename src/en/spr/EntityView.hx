@@ -23,7 +23,7 @@ import ui.domkit.TextLabelComp;
 import util.Assets;
 import util.BoolList;
 
-class EntitySprite {
+class EntityView {
 
 	public var colorAdd : h3d.Vector;
 	public var spr : HSprite;
@@ -88,7 +88,8 @@ class EntitySprite {
 		texTile = Tile.fromTexture( tex );
 
 		mesh = new IsoTileSpr( texTile, true, Boot.inst.s3d );
-
+		mesh.conf = entity.clientConfig.depth;
+		
 		var s = mesh.material.mainPass.addShader( new h3d.shader.ColorAdd() );
 		s.color = colorAdd;
 

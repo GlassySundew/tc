@@ -1,7 +1,7 @@
 package en.structures.hydroponics;
 
 import util.Util;
-import en.spr.EntitySprite;
+import en.spr.EntityView;
 import format.tmx.Data.TmxObject;
 import hxd.Event;
 import hxd.Key in K;
@@ -15,7 +15,7 @@ class Hydroponics extends Structure {
 	}
 
 	override function init() {
-		eSpr = new EntitySprite(
+		eSpr = new EntityView(
 			this,
 			Assets.structures,
 			Util.hollowScene
