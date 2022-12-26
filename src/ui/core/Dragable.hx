@@ -10,8 +10,8 @@ import h2d.Drawable;
 import hxd.Event;
 import ch2.ui.EventInteractive;
 
-// Невидимый Interactive, за который можно потянуть всё окно
 class Dragable extends EventInteractive {
+
 	var handleDX = 0.0;
 	var handleDY = 0.0;
 
@@ -20,20 +20,30 @@ class Dragable extends EventInteractive {
 
 	public var onDrag : EventSignal2<Float, Float> = new EventSignal2();
 
-	public function new( width, height, ?onDrag : Float -> Float -> Void, ?onPush : Event -> Void, ?parent, ?shape, ?fillWidth : Bool = false,
-		?fillHeight : Bool = false ) {
-		super(width, height, parent, shape);
+	public function new(
+		width,
+		height,
+		?onDrag : Float -> Float -> Void,
+		?onPush : Event -> Void,
+		?onRelease : Event -> Void,
+		?parent,
+		?shape,
+		?fillWidth : Bool = false,
+		?fillHeight : Bool = false
+	) {
+		super( width, height, parent, shape );
 		this.fillWidth = fillWidth;
 		this.fillHeight = fillHeight;
 		if ( onPush != null ) this.onPush = onPush;
-		if ( onDrag != null ) this.onDrag.add(onDrag);
+		if ( onDrag != null ) this.onDrag.add( onDrag );
+		this.onReleaseEvent.add( onRelease );
 	}
 
 	override function sync( ctx : RenderContext ) {
-		super.sync(ctx);
+		super.sync( ctx );
 		try {
-			if ( fillHeight ) height = cast(parent, Flow).innerHeight;
-			if ( fillWidth ) width = cast(parent, Flow).innerWidth;
+			if ( fillHeight ) height = cast( parent, Flow ).innerHeight;
+			if ( fillWidth ) width = cast( parent, Flow ).innerWidth;
 		} catch( e ) {}
 	}
 
@@ -41,24 +51,28 @@ class Dragable extends EventInteractive {
 		if ( e.cancel ) return;
 		switch( e.kind ) {
 			case EPush:
-				var mouseHandle = new Point(Boot.inst.s2d.mouseX, Boot.inst.s2d.mouseY);
+				var mouseHandle = new Point( Boot.inst.s2d.mouseX, Boot.inst.s2d.mouseY );
 
 				var scene = scene;
-				startCapture(function ( e ) {
+				startCapture( function ( e ) {
 					if ( this.scene != scene || e.kind == ERelease ) {
 						scene.stopCapture();
 						return;
 					}
 
-					var deltaX = (Boot.inst.s2d.mouseX - mouseHandle.x) / Const.UI_SCALE;
-					var deltaY = (Boot.inst.s2d.mouseY - mouseHandle.y) / Const.UI_SCALE;
-					mouseHandle = new Point(Boot.inst.s2d.mouseX, Boot.inst.s2d.mouseY);
+					var deltaX = ( Boot.inst.s2d.mouseX - mouseHandle.x ) / Const.UI_SCALE;
+					var deltaY = ( Boot.inst.s2d.mouseY - mouseHandle.y ) / Const.UI_SCALE;
+					mouseHandle = new Point( Boot.inst.s2d.mouseX, Boot.inst.s2d.mouseY );
 
-					if ( onDrag != null ) onDrag.dispatch(deltaX - deltaX % (1 / Const.UI_SCALE), deltaY - deltaY % (1 / Const.UI_SCALE));
-				});
+					if ( onDrag != null )
+						onDrag.dispatch(
+							deltaX,
+							deltaY
+						);
+				} );
 
 			default:
 		}
-		super.handleEvent(e);
+		super.handleEvent( e );
 	}
 }

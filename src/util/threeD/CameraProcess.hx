@@ -1,5 +1,6 @@
 package util.threeD;
 
+import cherry.soup.EventSignal.EventSignal0;
 import h3d.col.Point;
 import dn.M;
 import dn.Process;
@@ -9,11 +10,11 @@ class CameraProcess extends Process {
 
 	public final camera : Camera;
 
+	public var onFrame : EventSignal0 = new EventSignal0();
+
 	public function new( parent : Process ) {
 		super( parent );
-		camera = new Camera();
-
-		camera.targetEntity.onValue.add( ( e ) -> delayer.addF( camera.onMove.dispatch, 3 ) );
+		camera = new Camera( this );
 	}
 
 	public override function preUpdate() {
@@ -41,6 +42,8 @@ class CameraProcess extends Process {
 			if ( M.fabs( camera.dy ) <= ( 0.0005 * tmod ) ) camera.dy = 0;
 
 			if ( camera.dy != 0 || camera.dx != 0 ) camera.onMove.dispatch();
+
+			onFrame.dispatch();
 		}
 	}
 
@@ -51,7 +54,15 @@ class CameraProcess extends Process {
 
 			camera.s3dCam.orthoBounds.setMin( new Point(-halfW, -halfH, camera.s3dCam.zNear ) );
 			camera.s3dCam.orthoBounds.setMax( new Point( halfW, halfH, camera.s3dCam.zFar ) );
-			trace( camera.s3dCam.orthoBounds );
+		}
+	}
+
+	public function recenterCamera() {
+		if ( camera.targetEntity.val != null ) {
+			camera.targetOffset.x = camera.targetEntity.val.model.footX;
+			camera.targetOffset.y = camera.targetEntity.val.model.footY;
+			camera.updateCamera();
+			camera.onMove.dispatch(); // let it render once for correct projecting
 		}
 	}
 
@@ -70,6 +81,7 @@ class CameraProcess extends Process {
 
 	override function onDispose() {
 		super.onDispose();
+		camera.remove();
 		if ( camera.parallax != null ) {
 			camera.parallax.remove();
 			camera.parallax = null;

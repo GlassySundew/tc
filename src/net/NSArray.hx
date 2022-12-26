@@ -6,19 +6,19 @@ import hxbit.NetworkSerializable;
 import haxe.iterators.ArrayIterator;
 
 @:forward
-abstract ArrayNS<T : Serializable>( ArrayNSBase<T> ) {
+abstract NSArray<T : Serializable>( NSArrayBase<T> ) {
 
 	@:to function toIter() : ArrayIterator<T> {
 		return cast this.array.iterator();
 	}
 
 	public function new() {
-		this = new ArrayNSBase();
+		this = new NSArrayBase();
 	}
 }
 
-@:allow( net.ArrayNS )
-class ArrayNSBase<T : Serializable> implements NetworkSerializable {
+@:allow( net.NSArray )
+class NSArrayBase<T : Serializable> implements NetworkSerializable {
 
 	@:s final array : Array<Dynamic> = [];
 

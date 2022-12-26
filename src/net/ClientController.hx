@@ -64,9 +64,10 @@ class ClientController implements NetworkSerializable {
 
 		if ( isOwner ) {
 			Client.inst.host.self.ownerObject = this;
-			Main.inst.clientController = this;
+			Main.inst.cliCon = this;
 		} else
-			if ( Client.inst.host.isChannelingEnabled ) throw "clientController instance is replicated on a client where it is not supposed to be";
+			if ( Client.inst.host.isChannelingEnabled )
+				throw "clientController instance is replicated on a client where it is not supposed to be";
 	}
 
 	// function customSerialize( ctx : hxbit.Serializer ) {}
@@ -80,8 +81,12 @@ class ClientController implements NetworkSerializable {
 		return clientSer == this;
 	}
 
-	public function unreg( host : NetworkHost, ctx : NetworkSerializer, ?finalize ) @:privateAccess {
-		if ( ctx.refs.exists( player.__uid ) )
+	public function unreg(
+		host : NetworkHost,
+		ctx : NetworkSerializer,
+		?finalize
+	) @:privateAccess {
+		if ( player != null && ctx.refs.exists( player.__uid ) )
 			host.unregister( player, ctx, finalize );
 	}
 

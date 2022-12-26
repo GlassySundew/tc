@@ -1,5 +1,6 @@
 package en.model;
 
+import net.PrimNS;
 import ui.player.ItemCursorHolder;
 import util.Const;
 import en.collide.EntityContactCallback;
@@ -12,7 +13,7 @@ import en.spr.EntityView;
 import game.client.GameClient;
 import oimo.dynamics.rigidbody.RigidBody;
 import format.tmx.Data.TmxObject;
-import net.PrimNS;
+import net.NSMutable;
 import game.server.ServerLevel;
 import net.NetNode;
 
@@ -20,12 +21,12 @@ class EntityModel extends NetNode {
 
 	/** used for players to control entities **/
 	@:s public var controlId : Int;
-	@:s public var cdb : Data.EntityKind;
+	@:s public var cdb : PrimNS<Data.EntityKind> = new PrimNS( null );
 	@:s public var level( default, set ) : ServerLevel;
-	@:s public var dir : PrimNS<Direction>;
-	@:s public var footX : PrimNS<Float>;
-	@:s public var footY : PrimNS<Float>;
-	@:s public var footZ : PrimNS<Float>;
+	@:s public var dir : PrimNS<Direction> = new PrimNS( Bottom );
+	@:s public var footX : PrimNS<Float> = new PrimNS( 0. );
+	@:s public var footY : PrimNS<Float> = new PrimNS( 0. );
+	@:s public var footZ : PrimNS<Float> = new PrimNS( 0. );
 	@:s public var tmxObj : TmxObject;
 	@:s public var flippedX : Bool = false;
 
@@ -65,12 +66,6 @@ class EntityModel extends NetNode {
 
 	public function new() {
 		super();
-		init();
-
-		footX = new PrimNS( 0. );
-		footY = new PrimNS( 0. );
-		footZ = new PrimNS( 0. );
-		dir = new PrimNS( Bottom );
 	}
 
 	override function init() {
@@ -80,6 +75,6 @@ class EntityModel extends NetNode {
 	}
 
 	public override function alive() {
-		init();
+		super.alive();
 	}
 }

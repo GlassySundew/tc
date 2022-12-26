@@ -12,6 +12,14 @@ import hxd.Res;
 import ui.NinesliceWindow.NinesliceConf;
 
 using util.Extensions.TmxLayerExtender;
+using util.Extensions.ArrayExtensions;
+using util.Extensions.VectorExtensions;
+
+typedef Point3 = {
+	var x : Float;
+	var y : Float;
+	var z : Float;
+}
 
 @:publicFields
 class Util {
@@ -126,9 +134,13 @@ class Util {
 		for ( i in pts ) verts.push( new Vector( ( i.x ), ( i.y ) ) );
 
 		var yArr = verts.copy();
-		yArr.sort( function ( a, b ) return ( a.y < b.y ) ? -1 : ( ( a.y > b.y ) ? 1 : 0 ) );
+		yArr.sort( function ( a, b )
+			return ( a.y < b.y ) ? -1 : ( ( a.y > b.y ) ? 1 : 0 )
+		);
 		var xArr = verts.copy();
-		xArr.sort( function ( a, b ) return ( a.x < b.x ) ? -1 : ( ( a.x > b.x ) ? 1 : 0 ) );
+		xArr.sort( function ( a, b )
+			return ( a.x < b.x ) ? -1 : ( ( a.x > b.x ) ? 1 : 0 )
+		);
 
 		// xCent и yCent - половины ширины и высоты неповёрнутого полигона соответственно
 		var xCent : Float = Std.int( ( xArr[xArr.length - 1].x + xArr[0].x ) * .5 );
@@ -149,7 +161,9 @@ class Util {
 
 	public static var inventoryCoordRatio : Vector = new Vector( -1, -1 );
 
-	public static function nineSliceFromConf( ?conf : String = "window" ) : NinesliceConf {
+	public static function nineSliceFromConf(
+		?conf : String = "window"
+	) : NinesliceConf {
 		var backgroundConf = uiConf.get( conf ).getObjectByName( "window" );
 		var nineSlice = uiConf.get( conf ).getObjectByName( "9slice" );
 
@@ -182,5 +196,35 @@ class Util {
 		if ( EregUtil.eregFileName.match( level ) )
 			level = EregUtil.eregFileName.matched( 1 );
 		return level;
+	}
+
+	public static inline function distToPoly<T : Point3>(
+		from : Vector,
+		to : Array<T>
+	) : Float {
+
+		var minDist = Math.POSITIVE_INFINITY;
+
+		for ( i in 0...to.length ) {
+			var p1 = to.at( i ).toVector();
+			var p2 = to.at( i + 1 ).toVector();
+
+			var r = p2.sub( p1 ).dot( from.sub( p1 ) );
+			r /= Math.pow( p2.sub( p1 ).length(), 3 );
+
+			var dist = minDist;
+
+			if ( r < 0 )
+				dist = from.sub( p1 ).length();
+			else if ( r > 1 )
+				dist = p2.sub( from ).length();
+			else
+				dist = Math.pow( Math.sqrt( from.sub( p1 ).length() ), 3 ) -
+					Math.pow( r * p2.sub( p1 ).length(), 3 );
+
+			minDist = Math.min( dist, minDist );
+		}
+
+		return minDist;
 	}
 }

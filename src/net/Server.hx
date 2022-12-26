@@ -123,11 +123,9 @@ class Server extends Process {
 	public function destroyClient( c : SocketClient ) {
 		var cc = cast( c.ownerObject, ClientController );
 		if ( cc.__host == null ) return;
-		cc.player.model.level.entities.remove( cc.player );
-		cc.player.destroy();
-		var i = 0;
-		for ( client in host.clientsOwners ) {
-			cc.unreg( host, client.ctx, ++i == host.clients.length );
+		if ( cc.player != null ) cc.player.destroy();
+		for ( i => client in host.clientsOwners ) {
+			cc.unreg( host, client.ctx, i + 1 == host.clients.length );
 		}
 	}
 

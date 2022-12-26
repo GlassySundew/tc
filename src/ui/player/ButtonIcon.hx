@@ -40,13 +40,10 @@ class ButtonIcon extends Object {
 		};
 	}
 
-	public function dispose() {
-		buttonSpr.remove();
-		centerFlow.remove();
-	}
-
+	/**
+		Я НЕ ЗНАЮ ПОЧЕМУ НО ВСЕ МАКРО ЛОМАЮТСЯ БЕЗ ЭТОЙ ФУНКЦИИ
+	**/
 	override function onRemove() {
 		super.onRemove();
-		dispose();
 	}
 }

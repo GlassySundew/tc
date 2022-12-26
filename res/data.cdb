@@ -10,29 +10,12 @@
 				{
 					"typeStr": "8",
 					"name": "drop"
-				},
-				{
-					"typeStr": "2",
-					"name": "interactable",
-					"kind": null
-				},
-				{
-					"typeStr": "3",
-					"name": "hp",
-					"documentation": "прочность строения, если (-1 - то структура неразрушаемая"
-				},
-				{
-					"typeStr": "4",
-					"name": "use_range"
 				}
 			],
 			"lines": [
 				{
 					"id": "back_door",
-					"use_range": 20,
-					"hp": -1,
-					"drop": [],
-					"interactable": true
+					"drop": []
 				},
 				{
 					"id": "chest",
@@ -41,69 +24,45 @@
 							"item": "iron",
 							"amount": 4
 						}
-					],
-					"hp": 3,
-					"use_range": 20,
-					"interactable": true
+					]
 				},
 				{
 					"id": "player",
-					"drop": [],
-					"interactable": false,
-					"hp": 0,
-					"use_range": 0
+					"drop": []
 				},
 				{
 					"id": "door",
-					"use_range": 20,
-					"hp": -1,
 					"drop": [
 						{
 							"item": "iron",
 							"amount": 3
 						}
-					],
-					"interactable": true
+					]
 				},
 				{
 					"id": "hydroponics",
-					"use_range": 40,
-					"hp": 3,
 					"drop": [
 						{
 							"item": "iron",
 							"amount": 3
 						}
-					],
-					"interactable": true
+					]
 				},
 				{
 					"id": "navigation_console",
-					"use_range": 60,
-					"hp": -1,
-					"drop": [],
-					"interactable": true
+					"drop": []
 				},
 				{
 					"id": "sleeping_pod",
-					"drop": [],
-					"hp": -1,
-					"use_range": 0,
-					"interactable": true
+					"drop": []
 				},
 				{
 					"id": "teleport",
-					"drop": [],
-					"hp": -1,
-					"use_range": 7,
-					"interactable": true
+					"drop": []
 				},
 				{
 					"id": "workbench",
-					"drop": [],
-					"hp": 3,
-					"use_range": 25,
-					"interactable": true
+					"drop": []
 				},
 				{
 					"id": "emerald",
@@ -112,10 +71,7 @@
 							"item": "emerald",
 							"amount": 4
 						}
-					],
-					"hp": 3,
-					"use_range": 20,
-					"interactable": false
+					]
 				},
 				{
 					"id": "iron",
@@ -124,10 +80,7 @@
 							"item": "iron",
 							"amount": 3
 						}
-					],
-					"hp": 4,
-					"use_range": 20,
-					"interactable": false
+					]
 				}
 			],
 			"props": {},
@@ -141,6 +94,29 @@
 					"id": "emerald"
 				}
 			]
+		},
+		{
+			"name": "structure",
+			"columns": [
+				{
+					"typeStr": "6:entity",
+					"name": "entity",
+					"kind": null
+				},
+				{
+					"typeStr": "3",
+					"name": "use_range",
+					"kind": null
+				}
+			],
+			"lines": [
+				{
+					"entity": "chest",
+					"use_range": 25
+				}
+			],
+			"separators": [],
+			"props": {}
 		},
 		{
 			"name": "entityDepth",
@@ -157,8 +133,8 @@
 			],
 			"lines": [
 				{
-					"entity": "chest",
-					"depth": 0.3
+					"entity": "player",
+					"depth": 5
 				}
 			],
 			"separators": [],

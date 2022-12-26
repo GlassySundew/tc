@@ -163,61 +163,25 @@ class TmxUtils {
 			for ( obj in ent.clientConfig.collisions ) {
 				var height = obj.properties.getProp( PTFloat, "h", 1, null );
 
-				switch obj.objectType {
-					case OTRectangle:
-					case OTEllipse:
-					// var sc : ShapeConfig = new ShapeConfig();
-					// sc.geometry = new CylinderGeometry( obj.width / 2, height / 2 );
+				// polygon
+				var verts : Array<Vec3> = [];
+				for ( isoVert in obj.points ) verts.push( new Vec3( isoVert.x, isoVert.y, 0 ) );
+				for ( isoVert in obj.points ) verts.push( new Vec3( isoVert.x, isoVert.y, height ) );
 
-					// var bc : RigidBodyConfig = new RigidBodyConfig();
-					// var b : RigidBody = new RigidBody( bc );
-					// var shape = new Shape( sc );
+				var sc : ShapeConfig = new ShapeConfig();
+				sc.geometry = new ConvexHullGeometry( verts );
+				sc.position.init( obj.centerOffset.x, obj.centerOffset.y, 0 );
 
-					// b.addShape( shape );
-
-					case OTPolygon( points ):
-						var pts = Util.makePolyClockwise( points );
-
-						var isoVerts : Array<Point> = [];
-						for ( pt in pts ) {
-							var isoPt = Util.cartToIso( pt.x, -pt.y );
-							isoPt = Util.isoToCart( isoPt.x, isoPt.y );
-							isoVerts.push( new Point( M.round( isoPt.x ), M.round( isoPt.y ) ) );
-						}
-
-						var cent = Util.getProjPolySize( isoVerts, Vector );
-
-						if ( center == null ) {
-							center = new Vector( cent.x + obj.x, cent.y + obj.y );
-						}
-
-						Util.rotatePoly( obj.rotation - 135, isoVerts );
-
-						var verts : Array<Vec3> = [];
-						for ( isoVert in isoVerts ) verts.push( new Vec3( isoVert.x, isoVert.y, 0 ) );
-						for ( isoVert in isoVerts ) verts.push( new Vec3( isoVert.x, isoVert.y, height ) );
-
-						var isoOffset = Util.cartToIso( center.x - obj.x, -center.y + obj.y );
-						isoOffset = Util.isoToCart( isoOffset.x, isoOffset.y );
-						Util.rotatePoly( 45, [isoOffset] );
-
-						var sc : ShapeConfig = new ShapeConfig();
-						sc.geometry = new ConvexHullGeometry( verts );
-						sc.position.init( isoOffset.x, isoOffset.y, 0 );
-
-						var b : RigidBody = ent.model.rigidBody;
-						var shape = new Shape( sc );
-						if ( b == null ) {
-							var bc : RigidBodyConfig = new RigidBodyConfig();
-							bc.type = ent.clientConfig.tsTile.properties.getProp( PTBool, "static", DYNAMIC ) ? STATIC : DYNAMIC;
-							b = new RigidBody( bc );
-							Level.inst.world.addRigidBody( b );
-							ent.model.rigidBody = b;
-						}
-						b.addShape( shape );
-
-					default:
+				var b : RigidBody = ent.model.rigidBody;
+				var shape = new Shape( sc );
+				if ( b == null ) {
+					var bc : RigidBodyConfig = new RigidBodyConfig();
+					bc.type = ent.clientConfig.tsTile.properties.getProp( PTBool, "static", DYNAMIC ) ? STATIC : DYNAMIC;
+					b = new RigidBody( bc );
+					Level.inst.world.addRigidBody( b );
+					ent.model.rigidBody = b;
 				}
+				b.addShape( shape );
 			}
 
 			var pivotX = center.x;

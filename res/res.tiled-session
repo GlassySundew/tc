@@ -6,8 +6,8 @@
     "activeFile": "tiled/levels/entities.tsx",
     "automapping.whileDrawing": false,
     "expandedProjectPaths": [
-        ".",
-        "tiled"
+        "tiled",
+        "."
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
@@ -540,7 +540,7 @@
         "tiled/levels/alpha.tsx": {
             "dynamicWrapping": true,
             "scaleInDock": 0.25,
-            "scaleInEditor": 0.75
+            "scaleInEditor": 1.5
         },
         "tiled/levels/alphamap.tmx": {
             "scale": 2,
@@ -586,7 +586,7 @@
         "tiled/levels/entities.tsx": {
             "dynamicWrapping": true,
             "scaleInDock": 0.33,
-            "scaleInEditor": 0.75
+            "scaleInEditor": 1.5
         },
         "tiled/levels/env.tsx": {
             "dynamicWrapping": false,
@@ -767,18 +767,18 @@
         },
         "tiled/levels/ship_pascal.tmx": {
             "expandedGroupLayers": [
-                830,
-                829
+                829,
+                830
             ],
             "expandedObjectLayers": [
-                3,
-                829
+                829,
+                3
             ],
-            "scale": 3,
-            "selectedLayer": 25,
+            "scale": 16,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 416,
-                "y": 207.66666666666663
+                "y": 207.9375
             }
         },
         "tiled/levels/ship_pascal.tmx#CONGRUENT": {
@@ -805,7 +805,7 @@
         "tiled/levels/ui.tsx": {
             "dynamicWrapping": true,
             "scaleInDock": 0.5,
-            "scaleInEditor": 0.75
+            "scaleInEditor": 1.5
         }
     },
     "last.externalTilesetPath": "/home/glassysundew/Documents",

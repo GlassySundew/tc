@@ -62,7 +62,12 @@ class EntityView {
 
 	var entity : Entity;
 
-	public function new( entity : Entity, lib : SpriteLib, parent : Object, ?group : String ) {
+	public function new(
+		entity : Entity,
+		lib : SpriteLib,
+		parent : Object,
+		?group : String
+	) {
 		this.entity = entity;
 
 		pivot = { x : 0., y : 0. };
@@ -89,7 +94,7 @@ class EntityView {
 
 		mesh = new IsoTileSpr( texTile, true, Boot.inst.s3d );
 		mesh.conf = entity.clientConfig.depth;
-		
+
 		var s = mesh.material.mainPass.addShader( new h3d.shader.ColorAdd() );
 		s.color = colorAdd;
 
@@ -108,8 +113,9 @@ class EntityView {
 		);
 
 		var depth = cdbDepth != null ? cdbDepth.depth : 0;
-		depthOffset = new DepthOffset( 0.1 * entity.model.tmxObj.height + depth );
-		mesh.material.mainPass.addShader( depthOffset );
+		depthOffset = new DepthOffset( depth );
+
+		if ( depth > 0 ) mesh.material.mainPass.addShader( depthOffset );
 
 		if ( entity.model.tmxObj != null && entity.model.tmxObj.flippedVertically ) spr.scaleY = -1;
 
@@ -134,8 +140,8 @@ class EntityView {
 			entity.model.footY,
 			entity.model.footZ
 		);
-		var needForDraw = true;
-		// var needForDraw = GameClient.inst.camera.s3dCam.frustum.hasBounds( bounds );
+		var needForDraw = //
+			GameClient.inst.cameraProc.camera.s3dCam.frustum.hasBounds( bounds );
 
 		if ( !needForDraw ) {
 			mesh.visible = false;
@@ -196,7 +202,9 @@ class EntityView {
 		for ( i in debugObjs ) i.remove();
 
 		tex.dispose();
-		if ( nicknameLabel != null ) {}
+		if ( nicknameLabel != null ) {
+			nicknameLabel.remove();
+		}
 	}
 
 	/** generate nickname text **/
@@ -207,7 +215,9 @@ class EntityView {
 		nicknameLabel.scale( 1 / Const.UI_SCALE );
 		entity.onMove.add( refreshNicknameLabel );
 		GameClient.inst.cameraProc.camera.onMove.add( refreshNicknameLabel );
-		entity.onMove.dispatch();
+		GameClient.inst.cameraProc.onFrame.add(() -> {
+			GameClient.inst.cameraProc.delayer.addF( refreshNicknameLabel, 1 );
+		}, true );
 	}
 
 	function refreshNicknameLabel() {

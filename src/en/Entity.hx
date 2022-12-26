@@ -1,5 +1,9 @@
 package en;
 
+import core.ClassMap;
+import i.IDestroyable;
+import en.comp.controller.EntityController;
+import net.NSArray;
 import cherry.soup.EventSignal.EventSignal0;
 import cherry.soup.EventSignal.EventSignal1;
 import dn.M;
@@ -16,7 +20,7 @@ import hxbit.NetworkHost;
 import hxbit.NetworkSerializable;
 import net.Client;
 import net.NetNode;
-import net.PrimNS;
+import net.NSMutable;
 import oimo.common.Vec3;
 import oimo.dynamics.rigidbody.RigidBody;
 import ui.core.InventoryGrid;
@@ -38,7 +42,14 @@ class Entity extends NetNode {
 	public static var ServerALL : Array<Entity> = [];
 	public static var GC : Array<Entity> = [];
 
-	@:s public var model : EntityModel;
+	/**
+		client
+	**/
+	public var components = new ClassMap<
+		Class<EntityController>,
+		EntityController>();
+
+	@:s public var model : EntityModel = new EntityModel();
 
 	public var clientConfig : EntityTmxDataParser;
 
@@ -62,7 +73,6 @@ class Entity extends NetNode {
 	public function new( ?tmxObj : Null<TmxObject> ) {
 
 		ServerALL.push( this );
-		model = new EntityModel();
 
 		model.dir.onVal.add( onDirChangedSignal.dispatch );
 
@@ -75,7 +85,6 @@ class Entity extends NetNode {
 
 	public override function init() {
 		super.init();
-		onMove.add(() -> model.onMoveInvalidate = false );
 	}
 
 	/**
@@ -85,17 +94,22 @@ class Entity extends NetNode {
 	public override function alive() {
 		super.alive();
 		ALL.push( this );
+
 		clientConfig = EntityTmxDataParser.fromTsTile(
 			this.getEntityTsTile( model.level.tmxMap )
 		);
-		createView();
-		applyTmx();
+		Main.inst.delayer.addF(() -> {
+
+			// Main.inst.clientController.level.onAppear(  );
+			createView();
+			applyTmx();
+		}, 1 );
 	}
 
 	/** to be overriden **/
 	function createView() {}
 
-	function applyTmx() {
+	function applyTmx( ?v ) {
 		EntityUtil.clientApplyTmx( this );
 	}
 
@@ -153,14 +167,28 @@ class Entity extends NetNode {
 		model.dy = model.dy = 0;
 	}
 
+	@:rpc
 	public function destroy() {
+		trace( "destroying " + this );
+
 		if ( !destroyed ) {
 			destroyed = true;
 			GC.push( this );
 		}
 	}
 
-	public function dispose() {
+	override function disconnect(
+		host : NetworkHost,
+		ctx : NetworkSerializer,
+		?finalize : Bool
+	) {
+		if ( finalize ) model.level.entities.remove( this );
+		super.disconnect( host, ctx, finalize );
+	}
+
+	@:allow( game.client.GameClient, game.server.GameServer )
+	function dispose() {
+		destroyed = true;
 		ALL.remove( this );
 
 		if ( eSpr != null ) eSpr.destroy();
@@ -189,7 +217,6 @@ class Entity extends NetNode {
 	}
 
 	public function unreg( host : NetworkHost, ctx : NetworkSerializer, ?finalize ) @:privateAccess {
-		host.unregister( this, ctx, finalize );
 		host.unregister( model.footX, ctx, finalize );
 		host.unregister( model.footY, ctx, finalize );
 	}
@@ -214,13 +241,31 @@ class Entity extends NetNode {
 			var stepX = model.dx * tmod;
 			if ( stepX != 0 ) model.onMoveInvalidate = true;
 			model.footX.val += stepX;
+
 			var stepY = model.dy * tmod;
 			if ( stepY != 0 ) model.onMoveInvalidate = true;
 			model.footY.val += stepY;
+
 			var stepZ = model.dz * tmod;
 			if ( stepZ != 0 ) model.onMoveInvalidate = true;
 			model.footZ.val += stepZ;
 		}
+		if ( model.forceRBCoords ) {
+			if (
+				model.footX.val != model.rigidBody._transform._positionX ||
+				model.footY.val != model.rigidBody._transform._positionY ||
+				model.footZ.val != model.rigidBody._transform._positionZ
+			)
+				model.onMoveInvalidate = true;
+
+			model.forceRBCoords = false;
+			model.footX.val = model.rigidBody._transform._positionX;
+			model.footY.val = model.rigidBody._transform._positionY;
+			model.footZ.val = model.rigidBody._transform._positionZ;
+		}
+	}
+
+	public function postUpdate() {
 		model.dx *= Math.pow( model.frict, tmod );
 		if ( M.fabs( model.dx ) <= 0.0005 * tmod ) model.dx = 0;
 		model.dy *= Math.pow( model.frict, tmod );
@@ -228,18 +273,11 @@ class Entity extends NetNode {
 		model.dz *= Math.pow( model.frict, tmod );
 		if ( M.fabs( model.dz ) <= 0.0005 * tmod ) model.dz = 0;
 
-		if ( model.forceRBCoords ) {
-			model.onMoveInvalidate = true;
-			model.forceRBCoords = false;
-			model.footX.val = model.rigidBody._transform._positionX;
-			model.footY.val = model.rigidBody._transform._positionY;
-			model.footZ.val = model.rigidBody._transform._positionZ;
+		if ( model.onMoveInvalidate ) {
+			onMove.dispatch();
+			model.onMoveInvalidate = false;
 		}
-
-		if ( model.onMoveInvalidate ) onMove.dispatch();
 	}
-
-	public function postUpdate() {}
 
 	public function frameEnd() {
 		if ( eSpr != null ) {

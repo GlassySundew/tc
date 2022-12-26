@@ -28,7 +28,6 @@ class Parallax extends Object {
 
 	public function new( ?parent : Object ) {
 		super( parent );
-		trace("parallax??/");
 		
 		spr = new HSprite( Assets.env );
 

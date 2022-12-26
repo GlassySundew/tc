@@ -1,8 +1,11 @@
 package en.player;
 
+import en.comp.controller.view.StructureInteractRestrictor;
+import h3d.Vector;
+import oimo.collision.geometry.ConvexHullGeometry;
+import util.Const;
 import en.model.InventoryModel;
 import en.model.PlayerModel;
-import net.PrimNS;
 import oimo.dynamics.rigidbody.RigidBody;
 import dn.M;
 import dn.heaps.input.ControllerAccess;
@@ -64,7 +67,7 @@ class Player extends Entity {
 	@:s public var inventoryModel : InventoryModel;
 	@:s public var sprGroup : String;
 
-	public static final speed = 0.325;
+	public static final speed = 0.35;
 	public static var onGenerationCallback : Void -> Void;
 
 	var holdItemSpr : HSprite;
@@ -97,14 +100,19 @@ class Player extends Entity {
 
 		if ( model.controlId == net.Client.inst.uid ) {
 			inst = this;
-			pui = new PlayerUI( GameClient.inst.root, this );
 			GameClient.inst.cameraProc.camera.targetEntity.val = this;
-			GameClient.inst.cameraProc.camera.recenter();
 			GameClient.inst.player = this;
 		}
 
 		super.alive();
+	}
 
+	override function createView() {
+		eSpr = new EntityView(
+			this,
+			Assets.player,
+			Util.hollowScene
+		);
 		eSpr.initTextLabel( playerModel.nickname );
 
 		for ( i => dir in [
@@ -124,25 +132,24 @@ class Player extends Entity {
 				() -> return model.dir.val == i && playerModel.actionState.val == Idle
 			);
 		}
+		if ( model.controlId == net.Client.inst.uid ) {
+			pui = new PlayerUI( GameClient.inst.root, this );
+			GameClient.inst.cameraProc.recenterCamera();
+		}
 	}
 
-	override function createView() {
-		eSpr = new EntityView(
-			this,
-			Assets.player,
-			Util.hollowScene
-		);
-	}
-
-	override function applyTmx() {
+	override function applyTmx( ?v ) {
 		super.applyTmx();
 
 		if ( model.rigidBody != null ) {
 			model.rigidBody.setRotationFactor( new Vec3( 0, 0, 0 ) );
 
 			if ( inst == this ) {
+				new StructureInteractRestrictor().attach( this );
+
 				model.contactCb.postSolveSign.add( ( c ) -> {
 					model.forceRBCoords = true;
+					model.rigidBody._velX = model.rigidBody._velY = model.rigidBody._velZ = 0;
 				} );
 			}
 		}
@@ -161,22 +168,16 @@ class Player extends Entity {
 		}
 	}
 
-	override function unreg(
-		host : NetworkHost,
-		ctx : NetworkSerializer,
-		?finalize
-	) @:privateAccess {
-		super.unreg( host, ctx );
-		// host.unregister( actionState, ctx, finalize );
-		// host.unregister( holdItem, ctx, finalize );
-	}
-
 	override public function networkAllow(
 		op : hxbit.NetworkSerializable.Operation,
 		propId : Int,
 		clientSer : hxbit.NetworkSerializable
 	) : Bool {
-		return GameClient.inst != null ? Main.inst.clientController == clientSer : cast( clientSer, ClientController ).player == this;
+		return
+			if ( GameClient.inst != null )
+				Main.inst.cliCon == clientSer
+			else
+				cast( clientSer, ClientController ).player == this;
 	}
 
 	/* записывает настройки  */
@@ -196,45 +197,31 @@ class Player extends Entity {
 		}
 	}
 
-	override function dispose() {
-		super.dispose();
-		if ( inst == this ) {
-			saveSettings();
-			inst = null;
-		}
-
-		if ( pui != null ) {
-			pui.destroy();
-			pui = null;
-		}
-
-		if ( GameClient.inst != null ) {
-			ca.dispose();
-			belt.dispose();
-
-			inventoryModel.holdItem.onSetItem.remove( attachHoldItemToSpr );
-			inventoryModel.holdItem = null;
-		}
-	}
-
 	override function preUpdate() {
 		super.preUpdate();
 	}
 
-	override public function update() {
+	override public function update() @:privateAccess {
 
 		if ( inst == this ) {
 			var lx = ca.getAnalogValue2( MoveLeft, MoveRight );
 			var ly = ca.getAnalogValue2( MoveDown, MoveUp );
 
+			if ( Math.abs( lx ) == 1 && Math.abs( ly ) == 1 ) { // wasd cornering
+				lx *= Math.cos( Const.FOURTY_FIVE_DEGREE_RAD );
+				ly *= Math.sin( Const.FOURTY_FIVE_DEGREE_RAD );
+			}
+
 			var leftDist = M.dist( 0, 0, lx, ly );
 			var leftPushed = leftDist >= 0.3;
 			var leftAng = Math.atan2( ly, lx );
+
 			if ( !isLocked() ) {
 				if ( leftPushed ) {
 					var s = leftDist * speed;
-					model.dx += Math.cos( leftAng ) * s;
-					model.dy -= Math.sin( leftAng ) * s;
+
+					model.dx += Math.cos( leftAng + Const.FOURTY_FIVE_DEGREE_RAD ) * s;
+					model.dy -= Math.sin( leftAng + Const.FOURTY_FIVE_DEGREE_RAD ) * s;
 
 					if ( lx < -0.3 && M.fabs( ly ) < 0.6 ) model.dir.val = 4;
 					else if ( ly < -0.3 && M.fabs( lx ) < 0.6 ) model.dir.val = 6;
@@ -252,6 +239,11 @@ class Player extends Entity {
 			}
 			playerModel.actionState.val = isMoving ? Running : Idle;
 		}
+
+		if ( inst != this && playerModel.actionState.val == Running ) onMove.dispatch();
+
+		super.update();
+
 		if ( model.rigidBody != null ) {
 			if ( inst == this ) {
 				model.rigidBody._velX = model.dx * tmod / Boot.inst.deltaTime;
@@ -269,9 +261,6 @@ class Player extends Entity {
 				);
 			}
 		}
-		if ( inst != null && playerModel.actionState.val == Running ) onMove.dispatch();
-
-		super.update();
 	}
 
 	override function postUpdate() {
@@ -352,5 +341,40 @@ class Player extends Entity {
 				}
 			}
 		}
+	}
+
+	override function unreg(
+		host : NetworkHost,
+		ctx : NetworkSerializer,
+		?finalize
+	) @:privateAccess {
+		super.unreg( host, ctx );
+		// host.unregister( actionState, ctx, finalize );
+		// host.unregister( holdItem, ctx, finalize );
+	}
+
+	override function dispose() {
+		super.dispose();
+		if ( inst == this ) {
+			saveSettings();
+			inst = null;
+		}
+
+		if ( pui != null ) {
+			pui.destroy();
+			pui = null;
+		}
+
+		if ( GameClient.inst != null ) {
+			if ( ca != null ) {
+				ca.dispose();
+				belt.dispose();
+				ca = null;
+			}
+		}
+	}
+
+	override function headlessUpdate() {
+		super.headlessUpdate();
 	}
 }

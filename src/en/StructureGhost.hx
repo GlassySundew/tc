@@ -52,8 +52,6 @@ class StructureGhost extends Structure {
 
 	override function emitDestroyItem( item : Item ) {}
 
-	override function updateInteract() {}
-
 	override function postUpdate() {
 		super.postUpdate();
 		isValidToPlace();

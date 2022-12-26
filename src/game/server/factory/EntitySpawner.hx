@@ -1,5 +1,6 @@
 package game.server.factory;
 
+import net.Server;
 import en.Entity;
 import en.SpriteEntity;
 import util.EregUtil;
@@ -67,7 +68,10 @@ class EntitySpawner {
 			&& EregUtil.eregFileName.match( tsTile.image.source )
 			&& !tsTile.properties.existsType( "className", PTString ) //
 		) {
-			resultEntity = new SpriteEntity( EregUtil.eregFileName.matched( 1 ), e );
+			resultEntity = new SpriteEntity(
+				EregUtil.eregFileName.matched( 1 ),
+				e
+			);
 		}
 
 		if ( resultEntity != null ) @:privateAccess {

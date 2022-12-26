@@ -54,8 +54,6 @@ class InventoryCell implements NetworkSerializable {
 	}
 
 	public function alive() {
-		if ( __next == null )
-			enableAutoReplication = true;
 		onSetItem = new EventSignal1();
 	}
 }

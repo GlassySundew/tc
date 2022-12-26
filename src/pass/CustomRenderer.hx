@@ -127,7 +127,8 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 				( p1.depth > p2.depth ? -1 : 1 );
 	}
 
-	inline function getFrontPassIso( p1 : PassObject, p2 : PassObject ) : Int {
+	#if !debug inline #end
+	function getFrontPassIso( p1 : PassObject, p2 : PassObject ) : Int {
 		var a = cast( p1.obj, IsoTileSpr ).getIsoBounds();
 		var b = cast( p2.obj, IsoTileSpr ).getIsoBounds();
 
@@ -141,17 +142,17 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 		var bIsoMin = Util.isoToCart( b.xMin, b.yMin );
 
 		a = {
-			xMin : aIsoMin.x,
-			xMax : aIsoMax.x,
-			yMin : aIsoMin.y,
-			yMax : aIsoMax.y,
+			xMin : Std.int( aIsoMin.x ),
+			xMax : Std.int( aIsoMax.x ),
+			yMin : Std.int( aIsoMin.y ),
+			yMax : Std.int( aIsoMax.y ),
 		};
 
 		b = {
-			xMin : bIsoMin.x,
-			xMax : bIsoMax.x,
-			yMin : bIsoMin.y,
-			yMax : bIsoMax.y,
+			xMin : Std.int( bIsoMin.x ),
+			xMax : Std.int( bIsoMax.x ),
+			yMin : Std.int( bIsoMin.y ),
+			yMax : Std.int( bIsoMax.y ),
 		};
 
 		// point to point

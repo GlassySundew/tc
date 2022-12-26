@@ -1,5 +1,6 @@
 
 hxml/common/base.hxml
+-D server
 
 -main ServerBoot
 

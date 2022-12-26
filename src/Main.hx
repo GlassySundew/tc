@@ -1,3 +1,4 @@
+import core.VO;
 import game.server.GameServer;
 import game.test.VoxelSceneTest;
 import cherry.soup.EventSignal.EventSignal0;
@@ -44,17 +45,18 @@ class Main extends Process {
 
 	public var onClientController = new EventSignal0();
 
-	public var clientController( default, set ) : ClientController;
+	public var cliCon( default, set ) : ClientController;
+
+	function set_cliCon( cc : ClientController ) {
+		delayer.addF( onClientController.dispatch, 1 );
+		return cliCon = cc;
+	}
 
 	var fps : Text;
 
-	function set_clientController( cc : ClientController ) {
-		delayer.addF( onClientController.dispatch, 1 );
-		return clientController = cc;
-	}
-
 	public function new( s : h2d.Scene ) {
 		super();
+		// cliCon = new VO( null );
 
 		inst = this;
 		createRoot( s );
@@ -99,12 +101,12 @@ class Main extends Process {
 		controller = Controller.createFromAbstractEnum( ControllerAction );
 		ca = controller.createAccess();
 
-		controller.bindPadLStick4( MoveLeft, MoveRight, MoveUp, MoveDown );
-
 		controller.bindKeyboard( MoveUp, [Key.UP, Key.W] );
 		controller.bindKeyboard( MoveLeft, [Key.LEFT, Key.A] );
 		controller.bindKeyboard( MoveDown, [Key.DOWN, Key.S] );
 		controller.bindKeyboard( MoveRight, [Key.RIGHT, Key.D] );
+
+		controller.bindPadLStick4( MoveLeft, MoveRight, MoveUp, MoveDown );
 
 		controller.bindKeyboard( Action, Key.E );
 		controller.bindKeyboard( DropItem, Key.Q );
@@ -131,13 +133,15 @@ class Main extends Process {
 			return true;
 		}
 
-		delayer.addF( start, 1 );
+		start();
 		new Client();
 
 		fpsCounter();
 
 		#if debug
-		onClientController.add(() -> new game.client.debug.ImGuiGameClientDebug( GameClient.inst ) );
+		// cliCon.onAppear(
+		// 	( cc ) -> new game.client.debug.ImGuiGameClientDebug( GameClient.inst )
+		// );
 		#end
 	}
 

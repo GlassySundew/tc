@@ -48,7 +48,7 @@ class GameClient extends Process {
 
 	public var sLevel : ServerLevel;
 
-	var level : Level;
+	public var level : Level;
 
 	public var tmxMap : TmxMap;
 
@@ -132,7 +132,10 @@ class GameClient extends Process {
 		#end
 
 		if ( cameraProc != null ) cameraProc.destroy();
-		for ( e in Entity.ALL ) e.destroy();
+
+		for ( e in Entity.ALL.copy() ) {
+			e.dispose();
+		}
 		gc();
 
 		Client.inst.disconnect();
@@ -148,6 +151,7 @@ class GameClient extends Process {
 		#end
 
 		// Updates
+
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.preUpdate();
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.update();
 

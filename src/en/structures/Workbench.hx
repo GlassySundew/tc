@@ -16,7 +16,7 @@ class Workbench extends Structure {
 
 	public function new( ?tmxObject : TmxObject ) {
 		super( tmxObject );
-		interactable = true;
+		canBeInteractedWith.val = true;
 	}
 
 	override function init() {
@@ -24,8 +24,7 @@ class Workbench extends Structure {
 		ca = Main.inst.controller.createAccess();
 
 		GameClient.inst.delayer.addF(() -> {
-
-			crafting = new Crafting( Workbench, Player.inst.pui.root );
+			crafting = new Crafting( Workbench, GameClient.inst.root );
 			crafting.recenter();
 		}, 2 );
 

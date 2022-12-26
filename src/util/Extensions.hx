@@ -1,5 +1,6 @@
 package util;
 
+import h3d.Vector;
 import format.tmx.Data.TmxProperties;
 import format.tmx.Data.TmxPropertyType;
 import format.tmx.Data.TmxLayer;
@@ -198,7 +199,14 @@ class ArrayExtensions {
 
 	public inline static function at<T>( array : Array<T>, i : Int ) : T {
 		i = i % array.length;
-		if ( i < 0 ) i = array.length + i;
+		if ( i < 0 ) i += array.length;
 		return array[i];
+	}
+}
+
+class VectorExtensions {
+
+	public inline static function toVector<T : util.Util.Point3>( pt : T ) {
+		return new Vector( pt.x, pt.y, pt.z );
 	}
 }

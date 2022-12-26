@@ -1,5 +1,5 @@
 package i;
 
 interface IDestroyable {
-    function destroy( ) : Void;
+	function destroy() : Void;
 }

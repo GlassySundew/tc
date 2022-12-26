@@ -15,8 +15,8 @@ class NavigationConsole extends Structure {
 	var ca : ControllerAccess<ControllerAction>;
 
 	public function new( ?tmxObject : TmxObject ) {
-		super(  tmxObject );
-		interactable = true;
+		super( tmxObject );
+		canBeInteractedWith.val = true;
 	}
 
 	public override function init() {

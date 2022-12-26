@@ -39,7 +39,7 @@ class Hydroponics extends Structure {
 
 		super.init();
 
-		interactable = true;
+		canBeInteractedWith.val = true;
 
 		// inv.giveItem(new en.Item(axe));
 		#if debug
@@ -59,7 +59,7 @@ class Hydroponics extends Structure {
 			dropAllItems();
 		}
 
-		interactable = false;
+		canBeInteractedWith.val = false;
 	}
 
 	override function update() {

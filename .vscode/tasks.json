@@ -68,7 +68,7 @@
 			"type": "shell",
 			"command": "clear && hl bin/game.hl",
 			"runOptions": {
-				"instanceLimit": 2
+				"instanceLimit":4
 			}
 		},
 		{

@@ -70,12 +70,12 @@ class Boot extends hxd.App {
 		sys.thread.Thread.create(() -> {
 			switch Env.system {
 				case Windows:
-					Sys.command( ".\tc.exe server.hl" );
+					Sys.command( "./tc.exe server.hl" );
 				default:
 					#if debug
 					Sys.command( "hl bin/server.hl" );
 					#else
-					Sys.command( "./tc server.hl" );
+					Sys.command( "./hl server.hl" );
 					#end
 			};
 		} );

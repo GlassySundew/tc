@@ -54,7 +54,8 @@ class PlayerSpawner extends EntitySpawner {
 		var player = Std.downcast( resultEntity, Player );
 
 		player.playerModel.nickname = nickname;
-		player.model.controlId = uid;		player.clientController = clientController;
+		player.model.controlId = uid;
+		player.clientController = clientController;
 
 		clientController.uid = uid;
 		clientController.player = player;

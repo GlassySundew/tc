@@ -1,7 +1,9 @@
 package util.threeD;
 
+import game.client.GameClient;
+import h3d.Vector;
 import cherry.soup.EventSignal.EventSignal0;
-import core.DispProp;
+import core.VO;
 import dn.M;
 import en.Entity;
 import game.client.render.Parallax;
@@ -9,7 +11,7 @@ import h3d.scene.CameraController;
 
 class Camera extends CameraController {
 
-	public var targetEntity : DispProp<Null<Entity>> = new DispProp( null );
+	public var targetEntity : VO<Null<Entity>> = new VO( null );
 
 	public var s3dCam( get, never ) : h3d.Camera;
 
@@ -28,22 +30,25 @@ class Camera extends CameraController {
 	var parallax : Parallax;
 
 	final isoDeg = 30;
-	var xyDist = 300.;
+	var xyDist = 0.;
 	var a : Float;
 	var b : Float;
 	var shakePower = 0.0;
 
 	var doRound = true;
+	var proc : CameraProcess;
 
-	public function new() {
+	public function new( proc : CameraProcess ) {
 		lockZPlanes = true;
 		super( Boot.inst.s3d );
 		onMove = new EventSignal0();
 		refreshDimensions();
 		updateCamera();
 		loadFromCamera();
-		
-		targetEntity.onValue.add( setTargetEntity );
+
+		this.proc = proc;
+
+		targetEntity.onVal.add( setTargetEntity );
 		targetOffset.w = 0.5;
 	}
 
@@ -52,14 +57,18 @@ class Camera extends CameraController {
 			parallax.x = v.model.footX.val;
 			parallax.z = v.model.footY.val;
 		}
-		refreshDimensions();
+
 		updateCamera();
+		// proc.delayer.addF( refreshDimensions, 1 );
 	}
 
 	function refreshDimensions() {
-		var xyDistSq = xyDist * xyDist;
-		a = Math.sqrt( 2 * xyDistSq );
-		b = a * Math.tan( M.toRad( isoDeg ) );
+		var finalDist = -( GameClient.inst.w() * 1 ) / ( 2 * 3 * Math.tan(-s3dCam.getFovX() * 0.5 * ( Math.PI / 180 ) ) );
+
+		b = finalDist * Math.sin( M.toRad( isoDeg ) );
+		a = finalDist * Math.cos( M.toRad( isoDeg ) );
+
+		xyDist = a * Math.cos( M.toRad( 45 ) );
 	}
 
 	override function onAdd() {
@@ -73,29 +82,16 @@ class Camera extends CameraController {
 
 	override function syncCamera() {
 		var cam = getScene().camera;
-		var distance = distance;
-		cam.target.load( curOffset );
-		cam.target.w = 1;
-		cam.pos.set(
-			distance * Math.cos( theta ) * Math.sin( phi ) + cam.target.x,
-			distance * Math.sin( theta ) * Math.sin( phi ) + cam.target.y,
-			distance * Math.cos( phi ) + cam.target.z
-		);
+
 		if ( !lockZPlanes ) {
 			cam.zNear = distance * zNearK;
 			cam.zFar = distance * zFarK;
 		}
-		cam.fovY = curOffset.w;
-		if ( doRound ) {
-			cam.target.x = M.round( cam.target.x );
-			cam.target.y = M.round( cam.target.y );
-			cam.target.z = M.round( cam.target.z );
+		updateCamera();
 
-			cam.pos.x = M.round( cam.pos.x );
-			cam.pos.y = M.round( cam.pos.y );
-			cam.pos.z = M.round( cam.pos.z );
-		}
-		cam.update();
+		cam.fovY = curOffset.w;
+
+		// cam.update();
 	}
 
 	function updateCamera() {
@@ -103,29 +99,31 @@ class Camera extends CameraController {
 			parallax.x = x;
 			parallax.y = y;
 		}
+		refreshDimensions();
+		
+		s3dCam.target.x = targetOffset.x;
+		s3dCam.target.y = targetOffset.y;
 
-		s3dCam.target.x = Util.roundTo( targetOffset.x, 1 );
-		s3dCam.target.y = Util.roundTo( targetOffset.y, 1 );
+		if ( doRound ) {
+			s3dCam.target.x = M.round( s3dCam.target.x );
+			s3dCam.target.y = M.round( s3dCam.target.y );
+			s3dCam.target.z = M.round( s3dCam.target.z );
+		}
 
-		s3dCam.pos.x = Util.roundTo( s3dCam.target.x + xyDist, 1 );
-		s3dCam.pos.y = Util.roundTo( s3dCam.target.y + xyDist, 1 );
-		s3dCam.pos.z = Util.roundTo( s3dCam.target.z + b, 1 );
+		s3dCam.pos.x = s3dCam.target.x + xyDist;
+		s3dCam.pos.y = s3dCam.target.y + xyDist;
+		s3dCam.pos.z = s3dCam.target.z + b;
 		// s3dCam.fovY = 1;
 
-		if ( parallax != null ) parallax.setPosition( s3dCam.pos.x, s3dCam.pos.y, s3dCam.pos.z );
-		// s3dCam.pos = s3dCam.target.add( new Vector( 0, -( w() * 1 ) / ( 2 * ppu * Math.tan(-s3dCam.getFovX() * 0.5 * ( Math.PI / 180 ) ) ), -0.01 ) );
+		if ( parallax != null )
+			parallax.setPosition(
+				s3dCam.pos.x,
+				s3dCam.pos.y,
+				s3dCam.pos.z
+			);
 	}
 
 	public inline function stopTracking() {
 		targetEntity.val = null;
-	}
-
-	public function recenter() {
-		if ( targetEntity.val != null ) {
-			targetOffset.x = targetEntity.val.model.footX;
-			targetOffset.y = targetEntity.val.model.footY;
-			updateCamera();
-			onMove.dispatch();
-		}
 	}
 }

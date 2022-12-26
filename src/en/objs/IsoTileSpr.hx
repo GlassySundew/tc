@@ -1,5 +1,6 @@
 package en.objs;
 
+import h3d.scene.RenderContext;
 import util.Util;
 import haxe.exceptions.NotImplementedException;
 import en.EntityTmxDataParser.EntityDepthConfig;
@@ -16,21 +17,15 @@ import ch3.scene.TileSprite;
 
 class IsoTileSpr extends TileSprite {
 
-	public var isoLeftPt : Vector;
-	public var isoRightPt : Vector;
-
 	public var conf( default, set ) : EntityDepthConfig;
 
 	inline function set_conf( v : EntityDepthConfig ) : EntityDepthConfig {
 		conf = v;
-		updateIsoCoords();
 		#if( debug && depth_debug )
 		renewDebugPts();
 		#end
 		return v;
 	}
-
-	public var verts : Dynamic;
 
 	public var isLong( get, never ) : Bool;
 
@@ -40,58 +35,67 @@ class IsoTileSpr extends TileSprite {
 	}
 
 	public var isoDebugMesh : Mesh;
-
 	public function new( tile : Tile, ppu : Float = 1, faceCamera : Bool = true, ?parent : Object ) {
 		super( tile, ppu, faceCamera, parent );
 	}
 
-	public function updateIsoCoords() {
-		isoLeftPt = Util.cartToIso( conf.leftPoint.x, conf.leftPoint.y );
-		isoLeftPt = Util.isoToCart( isoLeftPt.x, isoLeftPt.y );
-
-		isoRightPt = Util.cartToIso( conf.rightPoint.x, conf.rightPoint.y );
-		isoRightPt = Util.isoToCart( isoRightPt.x, isoRightPt.y );
-	}
-
 	public function renewDebugPts() {
-		// #if( debug && depth_debug )
-		// if(isoDebugMes)
-		// pts = [];
-		// pts.push( new Point( verts.right.x + xOff, verts.right.y + yOff ) );
-		// pts.push( new Point( verts.down.x + xOff, verts.down.y + yOff ) );
-		// pts.push( new Point( verts.left.x + xOff, verts.left.y + yOff ) );
-		// pts.push( new Point( verts.up.x + xOff, verts.up.y + yOff ) );
+		#if( debug && depth_debug )
+		if ( isoDebugMesh != null ) isoDebugMesh.remove();
 
-		// var idx = new IndexBuffer();
-		// idx.push( 1 );
-		// idx.push( 2 );
-		// idx.push( 0 );
+		var pts = [];
+		pts.push( new Point( conf.leftPoint.x, conf.leftPoint.y ) );
+		pts.push( new Point( conf.leftPoint.x, conf.rightPoint.y ) );
+		pts.push( new Point( conf.rightPoint.x, conf.rightPoint.y ) );
+		pts.push( new Point( conf.rightPoint.x, conf.leftPoint.y ) );
 
-		// idx.push( 2 );
-		// idx.push( 3 );
-		// idx.push( 0 );
+		var idx = new IndexBuffer();
+		idx.push( 1 );
+		idx.push( 2 );
+		idx.push( 0 );
 
-		// if ( isoDebugMesh != null ) isoDebugMesh.remove();
+		idx.push( 2 );
+		idx.push( 3 );
+		idx.push( 0 );
 
-		// var polyPrim = new Polygon( pts, idx );
-		// polyPrim.addUVs();
-		// polyPrim.addNormals();
+		if ( isoDebugMesh != null ) isoDebugMesh.remove();
 
-		// isoDebugMesh = new Mesh( polyPrim, this );
-		// isoDebugMesh.rotate( 0, 0, M.toRad( -90 ) );
-		// isoDebugMesh.material.color.setColor( 0xffffff );
-		// isoDebugMesh.material.shadows = false;
-		// isoDebugMesh.material.mainPass.wireframe = true;
-		// #end
+		var polyPrim = new Polygon( pts, idx );
+		polyPrim.addUVs();
+		polyPrim.addNormals();
+
+		isoDebugMesh = new Mesh( polyPrim, Boot.inst.s3d );
+		isoDebugMesh.material.color.setColor( 0xe50b0b );
+		isoDebugMesh.material.shadows = false;
+		isoDebugMesh.material.mainPass.wireframe = true;
+		#end
 	}
 
-	public inline function getIsoBounds() {
+	override function onRemove() {
+		super.onRemove();
+		if ( isoDebugMesh != null ) isoDebugMesh.remove();
+	}
+
+	#if !debug inline #end
+	public function getIsoBounds() {
+
 		return {
-			xMin : x + isoLeftPt.x,
-			xMax : x + isoRightPt.x,
-			yMin : y + isoLeftPt.y,
-			yMax : y + isoRightPt.y,
+			xMin : x + conf.leftPoint.x,
+			xMax : x + conf.rightPoint.x,
+			yMin : y + conf.leftPoint.y,
+			yMax : y + conf.rightPoint.y,
 		}
+	}
+
+	override function sync( ctx : RenderContext ) {
+		super.sync( ctx );
+		#if depth_debug
+		if ( isoDebugMesh != null ) {
+			isoDebugMesh.x = x;
+			isoDebugMesh.y = y;
+			isoDebugMesh.z = z;
+		}
+		#end
 	}
 
 	override function getBoundsRec( b : Bounds ) : Bounds {

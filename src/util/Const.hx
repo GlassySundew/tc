@@ -1,6 +1,10 @@
 package util;
 
+import dn.M;
+
 class Const {
+
+	static var FOURTY_FIVE_DEGREE_RAD = M.toRad( 45 );
 
 	public static var FPS = 60;
 	public static var AUTO_SCALE_TARGET_WID = -1; // -1 to disable auto-scaling on width
@@ -33,7 +37,6 @@ class Const {
 	public static var DP_MASK = inc++;
 	public static var DP_IMGUI = inc++;
 
-	
 	public static var LEVELS_PATH = "tiled/levels/";
 	public static var ATLAS_PATH = "tiled/atlas/";
 	public static var SAVEFILE_EXT = ".zhopa";

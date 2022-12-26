@@ -170,13 +170,13 @@ class SaveManager extends FocusMenu {
 
 	public static function newSave( e : String, seed : String ) {
 		Main.inst.onClientController.add(
-			() -> {
-				Main.inst.clientController.orderSaveSystem( CreateNewSave( e ),
+			(  ) -> {
+				Main.inst.cliCon.orderSaveSystem( CreateNewSave( e ),
 					( result ) -> {
-						Main.inst.clientController.spawnPlayer( Settings.params.nickname );
-					} );
-			},
-			true
+						Main.inst.cliCon.spawnPlayer( Settings.params.nickname );
+					}
+				);
+			}
 		);
 		Client.inst.repeatConnect( 0.1, 40 );
 		Main.inst.startGame( true );
@@ -253,7 +253,7 @@ class SaveEntry extends Process {
 				case Load:
 					saveMan.destroy();
 					if ( saveMan.onGameStart != null ) saveMan.onGameStart();
-					// util.tools.Save.inst.loadGame( name );
+				// util.tools.Save.inst.loadGame( name );
 				default:
 			}
 		};

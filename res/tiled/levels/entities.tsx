@@ -8,7 +8,7 @@
   </properties>
   <image width="48" height="48" source="separated/player/idle_down_0.png"/>
   <objectgroup draworder="index" id="2">
-   <object id="11" x="22" y="39">
+   <object id="11" x="22" y="40">
     <properties>
      <property name="h" type="float" value="21"/>
     </properties>
@@ -169,11 +169,11 @@
   </properties>
   <image width="48" height="48" source="separated/structures/chest.png"/>
   <objectgroup draworder="index" id="3">
-   <object id="4" name="coliistion+depth" x="22" y="44">
+   <object id="4" name="collision+depth" x="22" y="44">
     <properties>
      <property name="h" type="float" value="13"/>
     </properties>
-    <polygon points="0,0 20,-10 8,-16 -12,-6"/>
+    <polygon points="-1,0 19,-10 7,-16 -13,-6"/>
    </object>
    <object id="5" name="center" x="22" y="44">
     <point/>

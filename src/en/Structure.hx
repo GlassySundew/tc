@@ -1,5 +1,9 @@
 package en;
 
+import game.server.GameServer;
+import net.Server;
+import en.util.CdbUtil;
+import en.model.StructureModel;
 import en.model.HealthModel;
 import en.model.InventoryModel;
 import dn.M;
@@ -17,14 +21,26 @@ using en.util.EntityUtil;
 
 class Structure extends en.InteractableEntity {
 
+	public static var CLIENT_STRUCTURES : Array<Structure> = [];
+
 	@:s public var inventoryModel : InventoryModel;
 	@:s public var healthModel : HealthModel;
+	@:s public var structureModel : StructureModel;
 
 	public function new( ?tmxObject : TmxObject ) {
 		inventoryModel = new InventoryModel();
 		healthModel = new HealthModel();
+		structureModel = new StructureModel();
 
 		super( tmxObject );
+
+		model.cdb.onVal.add( ( v ) -> {
+			structureModel.structureCdb = CdbUtil.getEntry(
+				v,
+				"entity",
+				Data.structure.all
+			);
+		} );
 	}
 
 	public override function init() {
@@ -33,31 +49,7 @@ class Structure extends en.InteractableEntity {
 
 	override function alive() {
 		super.alive();
-
-		if ( model.cdb != null ) {
-			useRange = Data.entity.get( model.cdb ).use_range;
-
-			if ( Data.entity.get( model.cdb ).interactable ) {
-				doHighlight = true;
-				interactable = true;
-			}
-		}
-
-		// Нажатие для того, чтобы сломать структуру
-		interact.onPushEvent.add( event -> {
-			if ( GameClient.inst.player.inventoryModel.holdItem != null )
-				applyItem( GameClient.inst.player.inventoryModel.holdItem.item );
-		} );
-		interact.onOverEvent.add( ( _ ) -> {
-			activateInteractive();
-		} );
-		interact.onOutEvent.add( ( e : hxd.Event ) -> {
-			turnOffHighlight();
-		} );
-
-		Main.inst.delayer.addF(() -> {
-			interactCheck();
-		}, 10 );
+		CLIENT_STRUCTURES.push( this );
 	}
 
 	override function createView() {
@@ -70,32 +62,18 @@ class Structure extends en.InteractableEntity {
 					trace( e );
 				}
 		}
-	}
+		super.createView();
 
-	function activateInteractive() {
-		if ( interactable && isInPlayerRange() ) {
-			if ( doHighlight )
-				turnOnHighlight();
-			return true;
-		} else
-			return false;
+		// Нажатие для того, чтобы сломать структуру
+		interact.onPushEvent.add( event -> {
+			if ( GameClient.inst.player.inventoryModel.holdItem != null )
+				applyItem( GameClient.inst.player.inventoryModel.holdItem.item );
+		} );
+		interact.onOverEvent.add( turnOnHighlight );
+		interact.onOutEvent.add( ( e : hxd.Event ) -> {
+			turnOffHighlight();
+		} );
 	}
-
-	function updateInteract() {
-		if ( interactable ) updateKeyIcon();
-		if ( interact != null && Player.inst != null && Player.inst.isMoving )
-			interactCheck();
-	}
-
-	function interactCheck() {
-		interact.visible =
-			interactable
-			&& Player.inst != null
-			&& !Player.inst.destroyed
-			&& isInPlayerRange();
-	}
-
-	function isInPlayerRange() return this.distPolyToPt( Player.inst ) <= useRange;
 
 	public function offsetFootByTile() {
 		model.footY.val += 1.;
@@ -158,11 +136,6 @@ class Structure extends en.InteractableEntity {
 		// };
 	}
 
-	override function postUpdate() {
-		super.postUpdate();
-		updateInteract();
-	}
-
 	public static function fromCdbEntry( x : Int, y : Int, cdbEntry : Data.EntityKind, ?amount : Int = 1 ) : Structure {
 		var structure : Structure = null;
 		var entClasses = ( CompileTime.getAllClasses( Structure ) );
@@ -178,5 +151,6 @@ class Structure extends en.InteractableEntity {
 
 	override function dispose() {
 		super.dispose();
+		CLIENT_STRUCTURES.remove( this );
 	}
 }

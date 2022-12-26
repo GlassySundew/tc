@@ -73,7 +73,7 @@ class ConnectMenu extends FocusMenu {
 			MainMenu.hide();
 
 			Main.inst.onClientController.add(
-				() -> Main.inst.clientController.spawnPlayer( Settings.params.nickname ),
+				() -> Main.inst.cliCon.spawnPlayer( Settings.params.nickname ),
 				true
 			);
 

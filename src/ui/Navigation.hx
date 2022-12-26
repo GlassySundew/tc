@@ -484,7 +484,7 @@ class NavigationTarget implements Serializable {
 
 	function travelToThis() {
 		disposeArrowButton();
-		Player.inst.pui.unprepareTeleport();
+		// Player.inst.pui.unprepareTeleport();
 		if ( Navigation.clientInst != null )
 			Navigation.clientInst.navWin.locked = true;
 

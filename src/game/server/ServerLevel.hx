@@ -8,7 +8,7 @@ import format.tmx.Data.TmxObject;
 import format.tmx.TmxMap;
 import format.tmx.Tools;
 import hxbit.NetworkSerializable;
-import net.ArrayNS;
+import net.NSArray;
 import util.EregUtil;
 
 using util.Extensions.TmxPropertiesExtension;
@@ -19,10 +19,11 @@ using util.Extensions.TmxPropertiesExtension;
 class ServerLevel extends dn.Process implements NetworkSerializable {
 
 	@:s public var tmxMap : TmxMap;
-	@:s public var entities : ArrayNS<Entity> = new ArrayNS();
+	@:s public var entities : NSArray<Entity> = new NSArray();
 	@:s public var lvlName : String;
+	// @:s public var 
 
-	public var entitiesTmxObj : Map<String, TmxObject> = [];
+	public var entitiesTmxObj : Array<TmxObject> = [];
 	public var player : TmxObject;
 
 	public var sqlId : Null<Int>;
@@ -93,7 +94,7 @@ class ServerLevel extends dn.Process implements NetworkSerializable {
 								if ( obj.name == "player" )
 									player = obj;
 								else
-									entitiesTmxObj[obj.name] = obj;
+									entitiesTmxObj.push( obj );
 							}
 						}
 					}

@@ -19,11 +19,11 @@ abstract class NodeBase<T : NodeBase<T>> {
 		this.parent = parent;
 	}
 
-	public function removeChild( n : T ) {
+	function removeChild( n : T ) {
 		children.remove( n );
 	}
 
-	public function addChild( n : T ) {
+	function addChild( n : T ) {
 		children.push( n );
 	}
 }

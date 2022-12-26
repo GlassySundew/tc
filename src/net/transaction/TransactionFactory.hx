@@ -12,7 +12,7 @@ class TransactionFactory {
 
 	public static function itemsSwap( from : InventoryCell, to : InventoryCell, ?cb : TransactionResult -> Void ) {
 		var transaction = new ItemSwapTransaction( from, to );
-		Main.inst.clientController.sendTransaction( transaction, cb );
+		Main.inst.cliCon.sendTransaction( transaction, cb );
 	}
 
 	/**
@@ -20,7 +20,7 @@ class TransactionFactory {
 	**/
 	public static function itemSplit( from : InventoryCell, to : InventoryCell, ?cb : TransactionResult -> Void ) {
 		var transaction = new SplitItemInHalfTransaction( from, to );
-		Main.inst.clientController.sendTransaction( transaction, cb );
+		Main.inst.cliCon.sendTransaction( transaction, cb );
 	}
 
 	/**
@@ -28,11 +28,11 @@ class TransactionFactory {
 	**/
 	public static function itemPour( from : InventoryCell, to : InventoryCell, ?cb : TransactionResult -> Void ) {
 		var transaction = new ItemPourTransaction( from, to );
-		Main.inst.clientController.sendTransaction( transaction, cb );
+		Main.inst.cliCon.sendTransaction( transaction, cb );
 	}
 
 	public static function transferToOtherInv( from : InventoryCell, to : InventoryGrid, ?cb : TransactionResult -> Void ) {
 		var transaction = new MoveItemToInvTransaction( from, to );
-		Main.inst.clientController.sendTransaction( transaction, cb );
+		Main.inst.cliCon.sendTransaction( transaction, cb );
 	}
 }

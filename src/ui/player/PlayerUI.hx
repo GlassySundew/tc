@@ -17,11 +17,6 @@ import ui.core.InventoryGrid.InventoryCellFlowGrid;
 import ui.domkit.SideComp;
 import util.Assets;
 
-enum JumpDirection {
-	Up;
-	Down;
-}
-
 class PlayerUI extends Process {
 
 	public var cellFlowGrid : InventoryCellFlowGrid;
@@ -53,9 +48,7 @@ class PlayerUI extends Process {
 		super( GameClient.inst );
 		this.player = player;
 
-		createRootInLayers( GameClient.inst.root, Const.DP_UI );
-
-		baseFlow = new Flow( root );
+		baseFlow = new Flow( GameClient.inst.root );
 
 		topLeft = new SideComp( Top, Left, baseFlow );
 		topRight = new SideComp( Top, Right, baseFlow );
@@ -79,7 +72,7 @@ class PlayerUI extends Process {
 			belt = new Belt( beltLayer, botLeft );
 		}
 
-		inventory = new Inventory( cellFlowGrid, root );
+		inventory = new Inventory( cellFlowGrid, GameClient.inst.root );
 		inventory.containmentEntity = player;
 
 		inventory.recenter();
@@ -89,11 +82,11 @@ class PlayerUI extends Process {
 		inventory.win.y = Settings.params.inventoryCoordRatio.toString() == new Vector( -1,
 			-1 ).toString() ? inventory.win.y : Settings.params.inventoryCoordRatio.y * Main.inst.h();
 
-		root.add( inventory.win, Const.DP_UI );
+		GameClient.inst.root.add( inventory.win, Const.DP_UI );
 		if ( Settings.params.inventoryVisible ) inventory.toggleVisible();
 
-		craft = new PlayerCrafting( Player, root );
-		root.add( craft.win, Const.DP_UI );
+		craft = new PlayerCrafting( Player, GameClient.inst.root );
+		GameClient.inst.root.add( craft.win, Const.DP_UI );
 
 		var craftWinToggle = new Button( [
 			new HSprite( Assets.ui, "craftWinToggle0" ).tile,
@@ -130,40 +123,6 @@ class PlayerUI extends Process {
 		// var style = new h2d.domkit.Style();
 		// style.load(hxd.Res.domkit.side);
 		// style.addObject(topLeft);
-	}
-
-	public function prepareTeleportDown( name : String, acceptTmxPlayerCoord : Bool = false ) {
-		teleport.scaleY = 1;
-		topRight.getProperties( teleport ).offsetY = 0;
-		prepareTeleport( name, { acceptTmxPlayerCoord : acceptTmxPlayerCoord }, Down );
-	}
-
-	public function prepareTeleportUp( name : String, acceptTmxPlayerCoord : Bool ) {
-		teleport.scaleY = -1;
-		topRight.getProperties( teleport ).offsetY = Std.int( teleport.height );
-		prepareTeleport( name, { acceptTmxPlayerCoord : acceptTmxPlayerCoord, acceptSqlPlayerCoord : true }, Up );
-	}
-
-	public inline function prepareTeleport(
-		name : String,
-		playerLoadConf : LevelLoadPlayerConfig,
-		jumpDirection : JumpDirection
-	) {
-		teleport.visible = true;
-		teleport.y = 0;
-		teleport.onClickEvent.add( ( _ ) -> {
-			// Player.inst.onBoard = switch jumpDirection {
-			// 	case Up: true;
-			// 	case Down: false;
-			// }
-			// GameClient.inst.startLevel(name, playerLoadConf);
-		} );
-	}
-
-	public function unprepareTeleport() {
-		teleport.visible = false;
-		Player.onGenerationCallback = () -> {};
-		teleport.onClickEvent.removeAll();
 	}
 
 	override function onResize() {

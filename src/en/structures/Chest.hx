@@ -22,7 +22,7 @@ class Chest extends Structure {
 
 	public function new( ?tmxObj : TmxObject ) {
 		super( tmxObj );
-		interactable = true;
+		canBeInteractedWith.val = true;
 
 		if ( tmxObj.properties.exists( "items" ) )
 			ItemUtil.resolveJsonItemStorage(
@@ -39,19 +39,18 @@ class Chest extends Structure {
 		super.alive();
 
 		ca = Main.inst.controller.createAccess();
+	}
 
-		GameClient.inst.delayer.addF(() -> {
-			try {
-				cellFlowGrid = new InventoryCellFlowGrid( inventoryModel.inventory, 20, 20 );
+	override function createView() {
+		super.createView();
 
-				if ( Player.inst != null && Player.inst.pui != null ) {
-					chestWin = new ChestWin( cellFlowGrid, Player.inst.pui.root );
-					chestWin.containmentEntity = this;
-				}
-			} catch( e ) {
-				trace( e );
-			}
-		}, 1 );
+		try {
+			cellFlowGrid = new InventoryCellFlowGrid( inventoryModel.inventory, 20, 20 );
+			chestWin = new ChestWin( cellFlowGrid, GameClient.inst.root );
+			chestWin.containmentEntity = this;
+		} catch( e ) {
+			trace( e );
+		}
 
 		interact.onTextInputEvent.add(
 			( e : Event ) -> {
@@ -66,16 +65,6 @@ class Chest extends Structure {
 
 	override function postUpdate() {
 		super.postUpdate();
-
-		if (
-			Player.inst != null
-			&& Player.inst.isMoving
-			&& !isInPlayerRange()
-			&& chestWin != null
-			&& chestWin.win.visible == true
-		) {
-			chestWin.toggleVisible();
-		}
 	}
 
 	override function dispose() {

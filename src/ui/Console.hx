@@ -78,7 +78,7 @@ class Console extends h2d.Console {
 
 		this.addCommand( "untarget", [], function ( ?k : String ) {
 			if ( GameClient.inst != null )
-				GameClient.inst.cameraProc.camera.stopTracking();
+				GameClient.inst.cameraProc.camera.remove();
 			var cam = new h3d.scene.CameraController( Boot.inst.s3d );
 			// cam.lockZPlanes = true;
 			cam.loadFromCamera();

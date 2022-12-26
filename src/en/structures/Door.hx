@@ -25,8 +25,8 @@ class Door extends Structure {
 	}
 
 	override function alive() {
-		interactable = true;
 		super.alive();
+		if ( leadsTo != "" ) canBeInteractedWith.val = true;
 
 		interact.onTextInputEvent.add( onTextInput );
 	}

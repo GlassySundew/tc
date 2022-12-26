@@ -38,6 +38,6 @@ class EntityFactory {
 		playerSpawner.nickname = nickname;
 		playerSpawner.clientController = clientController;
 
-		playerSpawner.spawnPlayer();
+		var player = playerSpawner.spawnPlayer();
 	}
 }

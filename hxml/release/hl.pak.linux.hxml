@@ -3,3 +3,11 @@ hxml/common/hl.sdl.hxml
 
 -D pak
 -D linux
+
+--next
+
+hxml/common/hl.server.hxml
+-hl redist/sdl_linux/server.hl
+
+-D pak
+-D linux

@@ -5,7 +5,7 @@ hxml/common/hl.sdl.hxml
 
 --next
 
-hxml/common/hl.sdl.hxml
+hxml/common/hl.server.hxml
 -hl redist/sdl_win/server.hl
 -D pak
 -D windows

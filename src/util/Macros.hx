@@ -145,7 +145,7 @@ class Macros {
 		entityConstructor.push(
 			macro {
 				try {
-					model.cdb = Data.entity.resolve( $v{entClass} ).id;
+					model.cdb.val = Data.entity.resolve( $v{entClass} ).id;
 				} catch( e ) {}
 			}
 		);
