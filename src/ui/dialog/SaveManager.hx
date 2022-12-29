@@ -168,16 +168,24 @@ class SaveManager extends FocusMenu {
 		e.selected = true;
 	}
 
-	public static function newSave( e : String, seed : String ) {
-		Main.inst.onClientController.add(
-			(  ) -> {
-				Main.inst.cliCon.orderSaveSystem( CreateNewSave( e ),
+	public static function newSave( e : String, seed : String ) @:privateAccess {
+		trace( "adding cb" );
+
+		trace(Main.inst.cliCon.val == null);
+
+		Main.inst.cliCon.onAppear(
+			( cc ) -> {
+				trace( "aksakmskdmaksmk" );
+				cc.orderSaveSystem( CreateNewSave( e ),
 					( result ) -> {
-						Main.inst.cliCon.spawnPlayer( Settings.params.nickname );
+						cc.spawnPlayer( Settings.params.nickname );
 					}
 				);
 			}
 		);
+		Main.inst.cliCon.val = null;
+		
+
 		Client.inst.repeatConnect( 0.1, 40 );
 		Main.inst.startGame( true );
 

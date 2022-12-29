@@ -480,6 +480,24 @@
 			}
 		},
 		{
+			"name": "world",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "id",
+					"kind": null,
+					"scope": null
+				}
+			],
+			"lines": [
+				{
+					"id": "overworld"
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
 			"name": "recipe@result",
 			"props": {
 				"hide": true

@@ -1,7 +1,7 @@
 package en;
 
 import core.VO;
-import net.NSMutable;
+import net.NSVO;
 import game.client.GameClient;
 import dn.legacy.Color;
 import util.Const;
@@ -33,8 +33,8 @@ class InteractableEntity extends Entity {
 
 	public var reachable = new VO<Bool>( false );
 
-	@:s public var canBeInteractedWith : NSMutable<Bool> = //
-		new NSMutable<Bool>( false );
+	@:s public var canBeInteractedWith : NSVO<Bool> = //
+		new NSVO<Bool>( false );
 
 	var highlightingColor : String;
 	var polyPrim : Polygon;
@@ -56,12 +56,12 @@ class InteractableEntity extends Entity {
 	override function alive() {
 		super.alive();
 
-		canBeInteractedWith.onVal.add( ( v ) -> {
+		canBeInteractedWith.addOnVal( ( v ) -> {
 			if ( !v ) {
 				reachable.val = false;
 			}
 		} );
-		reachable.onVal.add( ( v ) -> {
+		reachable.addOnVal( ( v ) -> {
 			if ( interact != null ) interact.visible = v;
 			if ( !v ) {
 				turnOffHighlight();

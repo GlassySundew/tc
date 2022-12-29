@@ -6,7 +6,7 @@ import cherry.soup.EventSignal.EventSignal1;
 import hxbit.NetworkSerializable;
 
 @:forward
-abstract NSMutable<T>( NSVO<T> ) {
+abstract NSVO<T>( NSVOBase<T> ) {
 
 	@:to inline function toT() : T {
 		return this.val;
@@ -17,7 +17,7 @@ abstract NSMutable<T>( NSVO<T> ) {
 	}
 
 	public function new( v : T ) {
-		this = new NSVO( v );
+		this = new NSVOBase( v );
 	}
 }
 
@@ -25,8 +25,8 @@ abstract NSMutable<T>( NSVO<T> ) {
 	Network Serializable Value Object
 	обёртка над примитивным типом(Int, String, Enum, Float) для поддержки syncBack
 **/
-@:allow( net.NSMutable )
-class NSVO<T> extends VOBase<T> implements NetworkSerializable {
+@:allow( net.NSVO )
+class NSVOBase<T> extends VOBase<T> implements NetworkSerializable {
 
 	override function get_val() : T {
 		return maskVal;

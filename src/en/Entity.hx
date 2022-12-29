@@ -20,7 +20,7 @@ import hxbit.NetworkHost;
 import hxbit.NetworkSerializable;
 import net.Client;
 import net.NetNode;
-import net.NSMutable;
+import net.NSVO;
 import oimo.common.Vec3;
 import oimo.dynamics.rigidbody.RigidBody;
 import ui.core.InventoryGrid;
@@ -74,7 +74,7 @@ class Entity extends NetNode {
 
 		ServerALL.push( this );
 
-		model.dir.onVal.add( onDirChangedSignal.dispatch );
+		model.dir.addOnVal( onDirChangedSignal.dispatch );
 
 		if ( model.tmxObj == null && tmxObj != null ) {
 			model.tmxObj = tmxObj;
@@ -237,19 +237,6 @@ class Entity extends NetNode {
 	}
 
 	public function update() {
-		if ( !model.forceRBCoords ) {
-			var stepX = model.dx * tmod;
-			if ( stepX != 0 ) model.onMoveInvalidate = true;
-			model.footX.val += stepX;
-
-			var stepY = model.dy * tmod;
-			if ( stepY != 0 ) model.onMoveInvalidate = true;
-			model.footY.val += stepY;
-
-			var stepZ = model.dz * tmod;
-			if ( stepZ != 0 ) model.onMoveInvalidate = true;
-			model.footZ.val += stepZ;
-		}
 		if ( model.forceRBCoords ) {
 			if (
 				model.footX.val != model.rigidBody._transform._positionX ||
@@ -262,6 +249,18 @@ class Entity extends NetNode {
 			model.footX.val = model.rigidBody._transform._positionX;
 			model.footY.val = model.rigidBody._transform._positionY;
 			model.footZ.val = model.rigidBody._transform._positionZ;
+		} else {
+			var stepX = model.dx * tmod;
+			if ( stepX != 0 ) model.onMoveInvalidate = true;
+			model.footX.val += stepX;
+
+			var stepY = model.dy * tmod;
+			if ( stepY != 0 ) model.onMoveInvalidate = true;
+			model.footY.val += stepY;
+
+			var stepZ = model.dz * tmod;
+			if ( stepZ != 0 ) model.onMoveInvalidate = true;
+			model.footZ.val += stepZ;
 		}
 	}
 

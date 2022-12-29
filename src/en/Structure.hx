@@ -34,7 +34,7 @@ class Structure extends en.InteractableEntity {
 
 		super( tmxObject );
 
-		model.cdb.onVal.add( ( v ) -> {
+		model.cdb.onAppear( ( v ) -> {
 			structureModel.structureCdb = CdbUtil.getEntry(
 				v,
 				"entity",

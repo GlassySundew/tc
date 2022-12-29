@@ -1,5 +1,6 @@
 package core;
 
+import cherry.soup.EventSignal;
 import cherry.soup.EventSignal.EventSignal1;
 
 @:forward
@@ -35,7 +36,7 @@ class VOBase<T> {
 		return val = v;
 	}
 
-	public var onVal( get, default ) : EventSignal1<T> = new EventSignal1<T>();
+	private var onVal( get, default ) : EventSignal1<T>;
 
 	function get_onVal() : EventSignal1<T> {
 		if ( onVal == null ) onVal = new EventSignal1<T>();
@@ -53,14 +54,23 @@ class VOBase<T> {
 	public function onAppear( cb : T -> Void ) {
 		var cbWrapped = null;
 		cbWrapped = ( val ) -> {
-			if ( val != null ) {
+			if ( val == null ) {
+				throw "unsupported behavior";
+			} else {
 				cb( val );
-				onVal.remove( cbWrapped );
 			}
 		};
 		if ( val != null )
 			cb( val );
 		else
-			onVal.add( cbWrapped );
+			addOnValOnce( cbWrapped );
+	}
+
+	public function addOnVal( cb : T -> Void ) {
+		onVal.add( cb );
+	}
+
+	public function addOnValOnce( cb : T -> Void ) {
+		onVal.add( cb, true );
 	}
 }

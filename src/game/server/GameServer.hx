@@ -1,23 +1,15 @@
 package game.server;
 
-import game.server.factory.EntityFactory;
-import net.Server;
 import cherry.soup.EventSignal.EventSignal0;
 import dn.Process;
 import en.Entity;
-import en.player.Player;
-import en.SpriteEntity;
 import format.tmx.*;
-import format.tmx.Data;
 import game.client.GameClient.LevelLoadPlayerConfig;
-import hxbit.Serializable;
+import game.server.factory.EntityFactory;
 import hxbit.Serializer;
-import net.ClientController;
-import ui.Navigation;
 import util.MapCache;
-import util.tools.Save;
 import util.Util;
-import util.EregUtil;
+import util.tools.Save;
 
 using en.util.EntityUtil;
 using util.Extensions.TmxPropertiesExtension;
@@ -36,7 +28,6 @@ class GameServer extends Process {
 	public var execAfterLvlLoad : EventSignal0;
 	public var levels : Map<String, ServerLevel> = [];
 
-	@:s public var _fields : NavigationFields;
 	@:s public var seed : String;
 
 	public function new( ?seed : String ) {
@@ -48,7 +39,6 @@ class GameServer extends Process {
 		entityFactory.game = this;
 
 		CompileTime.importPackage( "en" );
-		// entClasses = CompileTime.getAllClasses( Entity );
 
 		Data.load( hxd.Res.data.entry.getText() );
 	}

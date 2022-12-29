@@ -21,8 +21,8 @@ class ServerLevel extends dn.Process implements NetworkSerializable {
 	@:s public var tmxMap : TmxMap;
 	@:s public var entities : NSArray<Entity> = new NSArray();
 	@:s public var lvlName : String;
-	// @:s public var 
-
+	
+	// public var chunks
 	public var entitiesTmxObj : Array<TmxObject> = [];
 	public var player : TmxObject;
 

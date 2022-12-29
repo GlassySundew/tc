@@ -1,6 +1,5 @@
 package en.model;
 
-import net.PrimNS;
 import ui.player.ItemCursorHolder;
 import util.Const;
 import en.collide.EntityContactCallback;
@@ -13,7 +12,7 @@ import en.spr.EntityView;
 import game.client.GameClient;
 import oimo.dynamics.rigidbody.RigidBody;
 import format.tmx.Data.TmxObject;
-import net.NSMutable;
+import net.NSVO;
 import game.server.ServerLevel;
 import net.NetNode;
 
@@ -21,12 +20,12 @@ class EntityModel extends NetNode {
 
 	/** used for players to control entities **/
 	@:s public var controlId : Int;
-	@:s public var cdb : PrimNS<Data.EntityKind> = new PrimNS( null );
+	@:s public var cdb : NSVO<Data.EntityKind> = new NSVO( null );
 	@:s public var level( default, set ) : ServerLevel;
-	@:s public var dir : PrimNS<Direction> = new PrimNS( Bottom );
-	@:s public var footX : PrimNS<Float> = new PrimNS( 0. );
-	@:s public var footY : PrimNS<Float> = new PrimNS( 0. );
-	@:s public var footZ : PrimNS<Float> = new PrimNS( 0. );
+	@:s public var dir : NSVO<Direction> = new NSVO( Bottom );
+	@:s public var footX : NSVO<Float> = new NSVO( 0. );
+	@:s public var footY : NSVO<Float> = new NSVO( 0. );
+	@:s public var footZ : NSVO<Float> = new NSVO( 0. );
 	@:s public var tmxObj : TmxObject;
 	@:s public var flippedX : Bool = false;
 

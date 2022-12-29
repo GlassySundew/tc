@@ -43,20 +43,13 @@ class Main extends Process {
 	public var save : Save;
 	public var onResizeEvent : EventSignal0 = new EventSignal0();
 
-	public var onClientController = new EventSignal0();
-
-	public var cliCon( default, set ) : ClientController;
-
-	function set_cliCon( cc : ClientController ) {
-		delayer.addF( onClientController.dispatch, 1 );
-		return cliCon = cc;
-	}
+	public var cliCon : VO<ClientController>;
 
 	var fps : Text;
 
 	public function new( s : h2d.Scene ) {
 		super();
-		// cliCon = new VO( null );
+		cliCon = new VO( null );
 
 		inst = this;
 		createRoot( s );
@@ -139,9 +132,9 @@ class Main extends Process {
 		fpsCounter();
 
 		#if debug
-		// cliCon.onAppear(
-		// 	( cc ) -> new game.client.debug.ImGuiGameClientDebug( GameClient.inst )
-		// );
+		cliCon.onAppear(
+			( cc ) -> new game.client.debug.ImGuiGameClientDebug( GameClient.inst )
+		);
 		#end
 	}
 

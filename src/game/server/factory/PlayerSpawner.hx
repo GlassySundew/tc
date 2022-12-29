@@ -50,7 +50,10 @@ class PlayerSpawner extends EntitySpawner {
 		return player;
 	}
 
-	override function submitToLevel( resultEntity : Entity, sLevel : ServerLevel ) {
+	override function submitToLevel(
+		resultEntity : Entity,
+		sLevel : ServerLevel
+	) {
 		var player = Std.downcast( resultEntity, Player );
 
 		player.playerModel.nickname = nickname;

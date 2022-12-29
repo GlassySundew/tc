@@ -21,7 +21,7 @@ enum SaveSystemOrderType {
 class ClientController implements NetworkSerializable {
 
 	@:s public var uid( default, set ) : Int;
-
+	// @:s public var channelContainer : 
 	@:s public var player( default, set ) : Player;
 	@:s public var level( default, set ) : ServerLevel;
 
@@ -64,7 +64,9 @@ class ClientController implements NetworkSerializable {
 
 		if ( isOwner ) {
 			Client.inst.host.self.ownerObject = this;
-			Main.inst.cliCon = this;
+			@:privateAccess
+			trace( "setting clicon ", Main.inst.cliCon.onVal.listeners );
+			Main.inst.cliCon.val = this;
 		} else
 			if ( Client.inst.host.isChannelingEnabled )
 				throw "clientController instance is replicated on a client where it is not supposed to be";

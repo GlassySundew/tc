@@ -1,16 +1,12 @@
 package en.player;
 
-import en.comp.controller.view.StructureInteractRestrictor;
-import h3d.Vector;
-import oimo.collision.geometry.ConvexHullGeometry;
-import util.Const;
-import en.model.InventoryModel;
-import en.model.PlayerModel;
-import oimo.dynamics.rigidbody.RigidBody;
 import dn.M;
 import dn.heaps.input.ControllerAccess;
 import dn.heaps.slib.HSprite;
+import en.comp.controller.view.StructureInteractRestrictor;
 import en.items.Blueprint;
+import en.model.InventoryModel;
+import en.model.PlayerModel;
 import en.spr.EntityView;
 import format.tmx.Data.TmxObject;
 import game.client.ControllerAction;
@@ -22,11 +18,10 @@ import hxbit.Serializer;
 import hxd.Key;
 import net.ClientController;
 import oimo.common.Vec3;
-import ui.Navigation;
-import ui.core.InventoryGrid;
 import ui.player.ItemCursorHolder;
 import ui.player.PlayerUI;
 import util.Assets;
+import util.Const;
 import util.Util;
 import util.tools.Settings;
 
@@ -95,6 +90,7 @@ class Player extends Entity {
 	}
 
 	public override function alive() {
+
 		ca = Main.inst.controller.createAccess();
 		belt = Main.inst.controller.createAccess();
 

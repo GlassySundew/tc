@@ -72,9 +72,8 @@ class ConnectMenu extends FocusMenu {
 		connectComp.localConnect.onClick = () -> {
 			MainMenu.hide();
 
-			Main.inst.onClientController.add(
-				() -> Main.inst.cliCon.spawnPlayer( Settings.params.nickname ),
-				true
+			Main.inst.cliCon.onAppear(
+				(cc) -> cc.spawnPlayer( Settings.params.nickname )
 			);
 
 			Client.inst.addOnConnectionCallback( onConnect );

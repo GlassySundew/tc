@@ -31,7 +31,6 @@ class Camera extends CameraController {
 
 	final isoDeg = 30;
 	var xyDist = 0.;
-	var a : Float;
 	var b : Float;
 	var shakePower = 0.0;
 
@@ -48,7 +47,7 @@ class Camera extends CameraController {
 
 		this.proc = proc;
 
-		targetEntity.onVal.add( setTargetEntity );
+		targetEntity.addOnVal( setTargetEntity );
 		targetOffset.w = 0.5;
 	}
 
@@ -59,14 +58,14 @@ class Camera extends CameraController {
 		}
 
 		updateCamera();
-		// proc.delayer.addF( refreshDimensions, 1 );
+		proc.delayer.addF( refreshDimensions, 1 );
 	}
 
 	function refreshDimensions() {
 		var finalDist = -( GameClient.inst.w() * 1 ) / ( 2 * 3 * Math.tan(-s3dCam.getFovX() * 0.5 * ( Math.PI / 180 ) ) );
 
 		b = finalDist * Math.sin( M.toRad( isoDeg ) );
-		a = finalDist * Math.cos( M.toRad( isoDeg ) );
+		var a = finalDist * Math.cos( M.toRad( isoDeg ) );
 
 		xyDist = a * Math.cos( M.toRad( 45 ) );
 	}
@@ -100,14 +99,14 @@ class Camera extends CameraController {
 			parallax.y = y;
 		}
 		refreshDimensions();
-		
+
 		s3dCam.target.x = targetOffset.x;
 		s3dCam.target.y = targetOffset.y;
 
 		if ( doRound ) {
-			s3dCam.target.x = M.round( s3dCam.target.x );
-			s3dCam.target.y = M.round( s3dCam.target.y );
-			s3dCam.target.z = M.round( s3dCam.target.z );
+			s3dCam.target.x = M.floor( s3dCam.target.x );
+			s3dCam.target.y = M.floor( s3dCam.target.y );
+			s3dCam.target.z = M.floor( s3dCam.target.z );
 		}
 
 		s3dCam.pos.x = s3dCam.target.x + xyDist;
