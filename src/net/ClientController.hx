@@ -23,8 +23,7 @@ class ClientController implements NetworkSerializable {
 	@:s public var uid( default, set ) : Int;
 	// @:s public var channelContainer : 
 	@:s public var player( default, set ) : Player;
-	@:s public var level( default, set ) : ServerLevel;
-
+	
 	public var networkClient : NetworkClient;
 
 	/**
@@ -36,19 +35,11 @@ class ClientController implements NetworkSerializable {
 
 	function set_player( player : Player ) {
 		if ( player != null && GameClient.inst != null && isOwner ) {
+			
 			emptyPing();
 		}
 
 		return this.player = player;
-	}
-
-	inline function set_level( level : ServerLevel ) {
-		if ( GameClient.inst != null && level != null && isOwner ) {
-			GameClient.inst.sLevel = level;
-			GameClient.inst.startLevelFromTmx( level.tmxMap, level.lvlName );
-		}
-
-		return this.level = level;
 	}
 
 	function set_uid( v : Int ) {
@@ -64,8 +55,6 @@ class ClientController implements NetworkSerializable {
 
 		if ( isOwner ) {
 			Client.inst.host.self.ownerObject = this;
-			@:privateAccess
-			trace( "setting clicon ", Main.inst.cliCon.onVal.listeners );
 			Main.inst.cliCon.val = this;
 		} else
 			if ( Client.inst.host.isChannelingEnabled )

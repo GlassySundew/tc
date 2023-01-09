@@ -43,51 +43,32 @@ class GameServer extends Process {
 		Data.load( hxd.Res.data.entry.getText() );
 	}
 
-	public function getLevel( name : String, playerLoadConf : LevelLoadPlayerConfig ) : ServerLevel {
+	// TODO
+	public function getLevel(
+		name : String
+	) : ServerLevel {
 		name = Util.unifyLevelName( name );
 
 		if ( levels[name] != null ) return levels[name];
 
-		var savedLevel = Save.inst.getLevelByName( name );
+		var level = createLevel( Data.world.get( Data.WorldKind.overworld ) );
+		levels[name] = level;
 
-		if ( savedLevel != null ) {
-			var s = new Serializer();
-			var sLevel = startLevelFromTmx(
-				s.unserialize( haxe.crypto.Base64.decode( savedLevel.tmx ), TmxMap ),
-				savedLevel.name,
-				playerLoadConf
-			);
-			levels[name].sqlId = Std.int( savedLevel.id );
-			Save.inst.loadSavedEntities( savedLevel );
-			return sLevel;
-		} else {
-			return startLevelFromTmx( MapCache.inst.get( name ), name, playerLoadConf );
-		}
+		return level;
 	}
 
-	public function startLevelFromTmx(
-		tmxMap : TmxMap,
-		name : String,
-		playerLoadConf : LevelLoadPlayerConfig
-	) : ServerLevel {
-		execAfterLvlLoad = new EventSignal0();
+	function createLevel( conf : Data.World ) : ServerLevel {
+		var level = new ServerLevel();
+		level.cdb = conf;
 
-		var sLevel : ServerLevel = levels[name];
+		level.generator = Type.createInstance(
+			game.server.generation.ClassResolver.resolve( level.cdb.generator ), []
+		);
 
-		if ( sLevel == null ) {
-			sLevel = new ServerLevel( tmxMap );
-			levels[name] = sLevel;
-			sLevel.lvlName = name;
-		}
+		level.generator.level = level;
+		level.generator.placeSnippet( 0, 0, "ship_pascal" );
 
-		// получаем sql id для уровня
-		var loadedLevel = Save.inst.saveLevel( sLevel );
-
-		for ( e in sLevel.entitiesTmxObj ) {
-			entityFactory.spawnEntity( e, sLevel );
-		}
-
-		return sLevel;
+		return level;
 	}
 
 	function gc() {

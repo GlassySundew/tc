@@ -1,0 +1,58 @@
+{
+    "activeFile": "tiled/levels/entities.tsx",
+    "automapping.whileDrawing": true,
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "tiled/levels/CONGRUENT.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "tiled/levels/entities.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tiled/levels/ship_pascal.tmx": {
+            "expandedGroupLayers": [
+                830,
+                829
+            ],
+            "scale": 2,
+            "selectedLayer": 9,
+            "viewCenter": {
+                "x": 347.75,
+                "y": 86.25
+            }
+        }
+    },
+    "map.fixedSize": true,
+    "map.height": 100,
+    "map.layerDataFormat": 3,
+    "map.orientation": 2,
+    "map.renderOrder": 1,
+    "map.tileHeight": 48,
+    "map.tileWidth": 24,
+    "map.width": 100,
+    "openFiles": [
+        "tiled/levels/ship_pascal.tmx",
+        "tiled/levels/entities.tsx"
+    ],
+    "project": "res.tiled-project",
+    "property.type": "bool",
+    "recentFiles": [
+        "tiled/levels/ship_pascal.tmx",
+        "tiled/levels/entities.tsx"
+    ],
+    "tileset.embedInMap": false,
+    "tileset.margin": 0,
+    "tileset.spacing": 0,
+    "tileset.tileSize": {
+        "height": 24,
+        "width": 48
+    },
+    "tileset.transparentColor": "#ff00ff",
+    "tileset.type": 0,
+    "tileset.useTransparentColor": false
+}

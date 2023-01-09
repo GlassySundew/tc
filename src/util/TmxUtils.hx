@@ -2,16 +2,11 @@ package util;
 
 import dn.M;
 import en.Entity;
-import format.tmx.Data.TmxGroup;
-import format.tmx.Data.TmxImageLayer;
-import format.tmx.Data.TmxLayer;
-import format.tmx.Data.TmxObjectGroup;
-import format.tmx.Data.TmxTileLayer;
-import format.tmx.Data.TmxTilesetTile;
+import format.tmx.Data;
 import format.tmx.TmxMap;
 import format.tmx.Tools;
 import game.client.GameClient;
-import game.client.level.Level;
+import game.client.level.LevelView;
 import h2d.col.Point;
 import h3d.Vector;
 import oimo.collision.geometry.ConvexHullGeometry;
@@ -26,10 +21,10 @@ using util.Extensions.TmxPropertiesExtension;
 using en.util.EntityUtil;
 
 typedef TmxLayerCb = {
-	var ?tmxTileLayerCb : TmxTileLayer -> Bool;
-	var ?tmxObjLayerCb : TmxObjectGroup -> Bool;
-	var ?tmxImgLayerCb : TmxImageLayer -> Bool;
-	var ?tmxGroupLayerCb : TmxGroup -> Bool;
+	var ?tmxTileLayerCb : TmxTileLayer -> Void;
+	var ?tmxObjLayerCb : TmxObjectGroup -> Void;
+	var ?tmxImgLayerCb : TmxImageLayer -> Void;
+	var ?tmxGroupLayerCb : TmxGroup -> Void;
 }
 
 class TmxUtils {
@@ -40,24 +35,21 @@ class TmxUtils {
 	) {
 		switch( layer ) {
 			case LTileLayer( layer ):
-				if ( tmxLayerCb.tmxTileLayerCb != null && !tmxLayerCb.tmxTileLayerCb( layer ) ) return;
+				if ( tmxLayerCb.tmxTileLayerCb != null )
+					tmxLayerCb.tmxTileLayerCb( layer );
 			case LObjectGroup( group ):
-				if ( tmxLayerCb.tmxObjLayerCb != null && !tmxLayerCb.tmxObjLayerCb( group ) ) return;
+				if ( tmxLayerCb.tmxObjLayerCb != null )
+					tmxLayerCb.tmxObjLayerCb( group );
 			case LImageLayer( layer ):
-				if ( tmxLayerCb.tmxImgLayerCb != null && !tmxLayerCb.tmxImgLayerCb( layer ) ) return;
+				if ( tmxLayerCb.tmxImgLayerCb != null )
+					tmxLayerCb.tmxImgLayerCb( layer );
 			case LGroup( group ):
-				if ( tmxLayerCb.tmxGroupLayerCb != null && !tmxLayerCb.tmxGroupLayerCb( group ) ) return;
+				if ( tmxLayerCb.tmxGroupLayerCb != null )
+					tmxLayerCb.tmxGroupLayerCb( group );
 
 				if ( group.visible )
-					for ( grLayer in group.layers ) {
-						var tmxLayerArg : TmxLayer = switch grLayer {
-							case LTileLayer( layer ): LTileLayer( layer );
-							case LObjectGroup( group ): LObjectGroup( group );
-							case LImageLayer( layer ): LImageLayer( layer );
-							case LGroup( group ): LGroup( group );
-						}
-						layerRec( tmxLayerArg, tmxLayerCb );
-					}
+					for ( grLayer in group.layers )
+						layerRec( grLayer, tmxLayerCb );
 		}
 	}
 
@@ -76,14 +68,13 @@ class TmxUtils {
 		server-side
 	**/
 	public static function calculateCoordinateOffset( ?ent : Null<Entity> ) {
-		// если ent не определён, то на все Entity из массива ALL будут добавлены TmxObject из тайлсета с названием colls
-		var tmxMap = ent.model.level.tmxMap;
-		if ( tmxMap == null ) return;
+		// если ent не определён, то на все Entity из массива
+		// ALL будут добавлены TmxObject из тайлсета с названием colls
 
 		var ents = ent != null ? [ent] : Entity.ServerALL;
 
 		for ( ent in ents ) {
-			var tilesetEntityTile = getEntityTsTile( ent, tmxMap );
+			var tilesetEntityTile = ent.model.tsTile;
 
 			// соотношение, которое в конце будет применено к entity
 			var center = new Vector();
@@ -149,11 +140,6 @@ class TmxUtils {
 	**/
 	public static function applyTmxObjectOnEntity( ?ent : Null<Entity> ) {
 		// если ent не определён, то на все Entity из массива ALL будут добавлены TmxObject из тайлсета с названием colls
-		var tmxMap = GameClient.inst.tmxMap;
-		if ( tmxMap == null ) {
-			trace( 'failed to apply tmx object, tmx map of GameClient.inst.level was not loaded' );
-			return;
-		}
 
 		var ents = ent != null ? [ent] : Entity.ALL;
 
@@ -165,8 +151,10 @@ class TmxUtils {
 
 				// polygon
 				var verts : Array<Vec3> = [];
-				for ( isoVert in obj.points ) verts.push( new Vec3( isoVert.x, isoVert.y, 0 ) );
-				for ( isoVert in obj.points ) verts.push( new Vec3( isoVert.x, isoVert.y, height ) );
+				for ( isoVert in obj.points )
+					verts.push( new Vec3( isoVert.x, isoVert.y, 0 ) );
+				for ( isoVert in obj.points )
+					verts.push( new Vec3( isoVert.x, isoVert.y, height ) );
 
 				var sc : ShapeConfig = new ShapeConfig();
 				sc.geometry = new ConvexHullGeometry( verts );
@@ -176,9 +164,13 @@ class TmxUtils {
 				var shape = new Shape( sc );
 				if ( b == null ) {
 					var bc : RigidBodyConfig = new RigidBodyConfig();
-					bc.type = ent.clientConfig.tsTile.properties.getProp( PTBool, "static", DYNAMIC ) ? STATIC : DYNAMIC;
+					bc.type = ent.clientConfig.tsTile.properties.getProp(
+						PTBool,
+						"static",
+						DYNAMIC
+					) ? STATIC : DYNAMIC;
 					b = new RigidBody( bc );
-					Level.inst.world.addRigidBody( b );
+					LevelView.inst.world.addRigidBody( b );
 					ent.model.rigidBody = b;
 				}
 				b.addShape( shape );
@@ -200,8 +192,11 @@ class TmxUtils {
 		}
 	}
 
-	public static function getEntityTsTile( ent : Entity, tmxMap : TmxMap ) : TmxTilesetTile {
-		switch ent.model.tmxObj.objectType {
+	public static function getTmxObjTsTile(
+		tmxObj : TmxObject,
+		tmxMap : TmxMap
+	) : TmxTilesetTile {
+		switch tmxObj.objectType {
 			case OTTile( gid ):
 				return Tools.getTileByGid( tmxMap, gid );
 			default:

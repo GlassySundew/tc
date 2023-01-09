@@ -487,15 +487,120 @@
 					"name": "id",
 					"kind": null,
 					"scope": null
+				},
+				{
+					"typeStr": "3",
+					"name": "tileHeight",
+					"kind": null
+				},
+				{
+					"typeStr": "3",
+					"name": "tileWidth",
+					"kind": null
+				},
+				{
+					"typeStr": "3",
+					"name": "chunkSize",
+					"kind": null
+				},
+				{
+					"typeStr": "1",
+					"name": "generator",
+					"kind": null
 				}
 			],
 			"lines": [
 				{
-					"id": "overworld"
+					"id": "overworld",
+					"generator": "game.server.generation.StubGenerator",
+					"tileHeight": 4,
+					"tileWidth": 8,
+					"chunkSize": 64
 				}
 			],
 			"separators": [],
 			"props": {}
+		},
+		{
+			"name": "tileset",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "id",
+					"kind": null,
+					"scope": null
+				},
+				{
+					"typeStr": "9:BlockRenderer",
+					"name": "type",
+					"kind": null
+				},
+				{
+					"typeStr": "5:vertical,horizontal",
+					"name": "orientation"
+				},
+				{
+					"typeStr": "8",
+					"name": "sequences",
+					"kind": null
+				}
+			],
+			"lines": [
+				{
+					"id": "CONGRUENT",
+					"type": [
+						0,
+						1
+					],
+					"sequences": [
+						{
+							"startX": 0,
+							"startY": 0,
+							"palettes": 31,
+							"amount": 43
+						},
+						{
+							"startX": 0,
+							"startY": 31,
+							"palettes": 11,
+							"amount": 8
+						}
+					],
+					"orientation": 0
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "tileset@sequences",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "3",
+					"name": "startX",
+					"kind": null
+				},
+				{
+					"typeStr": "3",
+					"name": "startY",
+					"kind": null
+				},
+				{
+					"typeStr": "3",
+					"name": "amount",
+					"kind": null
+				},
+				{
+					"typeStr": "3",
+					"name": "palettes",
+					"kind": null
+				}
+			]
 		},
 		{
 			"name": "recipe@result",
@@ -534,6 +639,21 @@
 			]
 		}
 	],
-	"customTypes": [],
+	"customTypes": [
+		{
+			"name": "BlockRenderer",
+			"cases": [
+				{
+					"name": "LUT",
+					"args": [
+						{
+							"name": "tileW",
+							"typeStr": "3"
+						}
+					]
+				}
+			]
+		}
+	],
 	"compress": false
 }

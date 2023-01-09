@@ -1,5 +1,10 @@
 package game.server;
 
+import game.server.level.Chunks;
+import en.util.EntityUtil.EntityTmxData;
+import format.tmx.Data.TmxProperties;
+import game.server.level.LevelController;
+import game.server.generation.ChunkGenerator;
 import util.Util;
 import dn.Process;
 import en.Entity;
@@ -14,96 +19,27 @@ import util.EregUtil;
 using util.Extensions.TmxPropertiesExtension;
 
 /**
-	server-side level
+	server-side level model
 **/
-class ServerLevel extends dn.Process implements NetworkSerializable {
+class ServerLevel implements NetworkSerializable {
 
-	@:s public var tmxMap : TmxMap;
 	@:s public var entities : NSArray<Entity> = new NSArray();
 	@:s public var lvlName : String;
-	
-	// public var chunks
+
+	public var chunks : Chunks;
 	public var entitiesTmxObj : Array<TmxObject> = [];
-	public var player : TmxObject;
-
+	public var player : EntityTmxData = {};
+	public var cdb : Data.World;
 	public var sqlId : Null<Int>;
+	public var generator : ChunkGenerator;
+	public var properties : TmxProperties = new TmxProperties();
+	public var ctrl : LevelController;
 
-	public var wid( get, never ) : Int;
-	public var hei( get, never ) : Int;
-
-	inline function get_wid()
-		return Std.int( ( Math.min( tmxMap.height, tmxMap.width ) + Math.abs(-tmxMap.width + tmxMap.height ) / 2 ) * tmxMap.tileWidth );
-
-	inline function get_hei()
-		return Std.int( ( Math.min( tmxMap.height, tmxMap.width ) + Math.abs(-tmxMap.width + tmxMap.height ) / 2 ) * tmxMap.tileHeight );
-
-	var layersByName : Map<String, TmxLayer> = new Map();
-
-	public function alive() {
-		initSer();
-	}
-
-	public function initSer() {
+	public function new() {
 		enableAutoReplication = true;
-	}
 
-	public function new( map : TmxMap, ?parentProc : Process ) {
-		super( parentProc == null ? GameServer.inst : parentProc );
-		initSer();
-
-		tmxMap = map;
-
-		for ( layer in tmxMap.layers ) {
-			var name : String = 'null';
-			switch( layer ) {
-				case LObjectGroup( ol ):
-					name = ol.name;
-					for ( obj in ol.objects ) {
-						if ( ol.name == 'obstacles' ) {
-							switch( obj.objectType ) {
-								case OTPolygon( points ):
-									var pts = Util.makePolyClockwise( points );
-								case OTRectangle:
-								default:
-							}
-						}
-						if ( map.orientation == Isometric ) {
-							// Если Entity никак не назван на карте - то ему присваивается имя его картинки без расширения
-							if ( obj.name == "" ) {
-								obj.name = //
-									switch( obj.objectType ) {
-										case OTTile( gid ):
-											var objTsTile = Tools.getTileByGid( tmxMap, gid );
-											objTsTile.properties.getProp( PTString, "name", null, () -> {
-												if ( EregUtil.eregFileName.match( objTsTile.image.source ) )
-													EregUtil.eregFileName.matched( 1 );
-												else
-													"";
-											} );
-
-										default: "";
-									};
-							}
-
-							if ( ol.name == 'entities' ) {
-								switch obj.objectType {
-									case OTTile( gid ):
-										Tools.propagateTilePropertiesToObject( obj, tmxMap, gid );
-									default:
-								}
-								if ( obj.name == "player" )
-									player = obj;
-								else
-									entitiesTmxObj.push( obj );
-							}
-						}
-					}
-				case LTileLayer( tl ):
-					name = tl.name;
-				default:
-			}
-			layersByName.set( name, layer );
-		}
+		ctrl = new LevelController( this );
+		chunks = new Chunks( this );
 	}
 
 	public function networkAllow(
@@ -119,13 +55,7 @@ class ServerLevel extends dn.Process implements NetworkSerializable {
 			}
 	}
 
-	// public inline function cartToIsoLocal( x : Float, y : Float ) : Vector {
-	// 	return new Vector(
-	// 		-( tmxMap.width - tmxMap.height ) / 2 * tmxMap.tileHeight + wid * .5 + cartToIso( x, y ).x,
-	// 		hei - cartToIso( x, y ).y
-	// 	);
-	// }
-	// TODO destroys itself if has no player instances for 5 seconds
+	// TODO destroy itself if has no player instances for 5 seconds
 	function gc() {
 		for ( e in entities ) {}
 	}

@@ -77,7 +77,7 @@ class Structure extends en.InteractableEntity {
 
 	public function offsetFootByTile() {
 		model.footY.val += 1.;
-		// footY += ( StructTile.polyPrim != null ? ( StructTile.polyPrim.getBounds().zSize / 2 - Level.inst.data.tileHeight ) : 0 );
+		// footY += ( StructTile.polyPrim != null ? ( StructTile.polyPrim.getBounds().zSize / 2 - LevelView.inst.data.tileHeight ) : 0 );
 	}
 
 	function dropAllItems( ?angle : Float, ?power : Float ) {

@@ -95,15 +95,18 @@ class Entity extends NetNode {
 		super.alive();
 		ALL.push( this );
 
-		clientConfig = EntityTmxDataParser.fromTsTile(
-			this.getEntityTsTile( model.level.tmxMap )
-		);
-		Main.inst.delayer.addF(() -> {
+		clientConfig = EntityTmxDataParser.fromTsTile( model.tsTile );
 
+		Main.inst.delayer.addF(() -> {
 			// Main.inst.clientController.level.onAppear(  );
 			createView();
 			applyTmx();
 		}, 1 );
+	}
+
+	/** to be overriden **/
+	function getActionType() {
+		return null;
 	}
 
 	/** to be overriden **/

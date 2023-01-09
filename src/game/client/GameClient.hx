@@ -6,7 +6,7 @@ import dn.heaps.input.ControllerAccess;
 import en.Entity;
 import en.player.Player;
 import format.tmx.TmxMap;
-import game.client.level.Level;
+import game.client.level.LevelView;
 import game.server.ServerLevel;
 import h3d.scene.CameraController;
 import h3d.scene.Object;
@@ -46,18 +46,11 @@ class GameClient extends Process {
 
 	private var cam : CameraController;
 
-	public var sLevel : ServerLevel;
-
-	public var level : Level;
-
+	public var levelView : LevelView;
 	public var tmxMap : TmxMap;
-
 	public var player : en.player.Player;
-
-	public var structTiles : Array<StructTile> = [];
-
+	// public var structTiles : Array<StructTile> = [];
 	public var suspended : Bool = false;
-
 	public var navFieldsGenerated : Null<Int>;
 
 	var ca : ControllerAccess<ControllerAction>;
@@ -82,6 +75,7 @@ class GameClient extends Process {
 		createRootInLayers( Main.inst.root, Const.DP_BG );
 
 		cameraProc = new CameraProcess( this );
+		levelView = new LevelView(null);
 	}
 
 	public function onCdbReload() {}
@@ -91,23 +85,20 @@ class GameClient extends Process {
 	}
 
 	public function startLevelFromTmx( tmxMap : TmxMap, name : String ) {
-		this.tmxMap = tmxMap;
-		engine.clear( 0, 1 );
+		// this.tmxMap = tmxMap;
+		// engine.clear( 0, 1 );
 
-		if ( level != null ) {
-			level.destroy();
-			gc();
-		}
-		level = new Level( tmxMap );
+		// if ( level != null ) {
+		// 	level.destroy();
+		// 	gc();
+		// }
+		// level = new Level( tmxMap );
 
-		// получаем sql id для уровня
-		// var loadedLevel = Save.inst.saveLevel(level);
+		// hideStrTiles();
 
-		hideStrTiles();
+		// onLevelChanged.dispatch();
 
-		onLevelChanged.dispatch();
-
-		return level;
+		// return level;
 	}
 
 	public function gc() {
@@ -155,7 +146,7 @@ class GameClient extends Process {
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.preUpdate();
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.update();
 
-		if ( level != null ) level.world.step( Boot.inst.deltaTime );
+		if ( levelView != null ) levelView.world.step( Boot.inst.deltaTime );
 
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.postUpdate();
 		for ( e in Entity.ALL ) if ( !e.destroyed ) e.frameEnd();
@@ -167,13 +158,13 @@ class GameClient extends Process {
 		}
 	}
 
-	public function showStrTiles() {
-		for ( i in structTiles ) i.visible = true;
-	}
+	// public function showStrTiles() {
+	// 	for ( i in structTiles ) i.visible = true;
+	// }
 
-	public function hideStrTiles() {
-		for ( i in structTiles ) i.visible = false;
-	}
+	// public function hideStrTiles() {
+	// 	for ( i in structTiles ) i.visible = false;
+	// }
 
 	override function pause() {
 		super.pause();

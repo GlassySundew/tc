@@ -33,8 +33,7 @@ class ServerRPC {
 		for ( e in fromLevel.entities )
 			e.unreg( host, ctx );
 
-		var toLevel = GameServer.inst.getLevel( level, {} );
-		player.clientController.level = toLevel;
+		var toLevel = GameServer.inst.getLevel( level );
 		player.model.level = toLevel;
 
 		toLevel.entities.push( player );

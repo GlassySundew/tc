@@ -12,7 +12,7 @@ import h3d.col.Point;
 import ch3.scene.TileSprite;
 import en.objs.IsoTileSpr;
 import game.client.GameClient;
-import game.client.level.Level;
+import game.client.level.LevelView;
 import h2d.Bitmap;
 import h2d.Object;
 import h2d.Tile;
@@ -249,7 +249,7 @@ class EntityView {
 		#end
 
 		#if colliders_debug
-		Level.inst.oimoDebug.registerEntity( entity );
+		LevelView.inst.oimoDebug.registerEntity( entity );
 		#end
 	}
 }

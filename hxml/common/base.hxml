@@ -9,7 +9,7 @@
 -dce full
 
 -lib heaps:git:https://github.com/HeapsIO/heaps.git
--lib hide:git:https://github.com/HeapsIO/hide.git#1e8cf011ff5f27c2b21f3434c7be9bcb14eacde6
+-lib hide:git:https://github.com/HeapsIO/hide.git
 -lib heeps:git:https://github.com/Yanrishatum/heeps.git
 -lib castle:git:https://github.com/ncannasse/castle.git
 -lib hxbit:git:https://github.com/GlassySundew/hxbit.git#channels

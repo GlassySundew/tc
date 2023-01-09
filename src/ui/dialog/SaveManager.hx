@@ -169,13 +169,8 @@ class SaveManager extends FocusMenu {
 	}
 
 	public static function newSave( e : String, seed : String ) @:privateAccess {
-		trace( "adding cb" );
-
-		trace(Main.inst.cliCon.val == null);
-
 		Main.inst.cliCon.onAppear(
 			( cc ) -> {
-				trace( "aksakmskdmaksmk" );
 				cc.orderSaveSystem( CreateNewSave( e ),
 					( result ) -> {
 						cc.spawnPlayer( Settings.params.nickname );

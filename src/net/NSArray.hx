@@ -6,10 +6,18 @@ import hxbit.NetworkSerializable;
 import haxe.iterators.ArrayIterator;
 
 @:forward
-abstract NSArray<T : Serializable>( NSArrayBase<T> ) {
+abstract NSArray<T : Serializable>( NSArrayBase<T> ) from NSArrayBase<T> to NSArrayBase<T> {
 
 	@:to function toIter() : ArrayIterator<T> {
 		return cast this.array.iterator();
+	}
+
+	@:arrayAccess function get( i : Int ) : T {
+		return this.array[i];
+	}
+
+	@:arrayAccess function set( i : Int, v : T ) {
+		return this.array[i] = v;
 	}
 
 	public function new() {

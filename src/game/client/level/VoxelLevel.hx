@@ -39,27 +39,12 @@ class VoxelLevel extends Process implements IDestroyable {
 		threeDRoot.visible = !threeDRoot.visible;
 	}
 
-	public function render( tmxMap : TmxMap ) {
-		this.tmxMap = tmxMap;
-
-		threeDRoot.removeChildren();
-		TmxUtils.mapTmxMap(
-			tmxMap,
-			{
-				tmxTileLayerCb : ( tileLayer : TmxTileLayer ) -> {
-					if ( tileLayer.visible )
-						renderLayer( tileLayer );
-					return true;
-				}
-			}
-		);
-
+	public function render() {
 		return this;
 	}
 
 	override function onDispose() {
 		super.onDispose();
-
 		threeDRoot.removeChildren();
 	}
 
@@ -97,26 +82,6 @@ class VoxelLevel extends Process implements IDestroyable {
 				var verticalDepth = ( zheight + depthOff ) * 0.02;
 				var horizontalDepth = ( tileX - tileY ) * 0.000001;
 
-				/*
-					inline function loadMesh( path : String ) : Mesh {
-						if ( !Res.loader.exists( path ) ) throw "model does not exists on path: " + path;
-						return cast( Assets.modelCache.loadModel( Res.loader.load( path ).toModel() ), Mesh );
-					}
-
-					var mesh = loadMesh( path );
-					threeDRoot.addChild( mesh );
-					var lut = new LUT( tsFigures.texture, tsFigures.lutRows, tsetTileX * tileset.tileHeight, tsetTileY * tileset.tileHeight );
-					mesh.material.mainPass.addShader( lut );
-					var depth = new shader.DepthOffset(verticalDepth);
-					mesh.material.mainPass.addShader( depth );
-					mesh.material.texture.filter = Nearest;
-					mesh.material.shadows = false;
-
-					mesh.x = x;
-					mesh.y = y;
-					mesh.z = z;
-				 */
-
 				batcher.addMesh(
 					path,
 					tsFigures.texture,
@@ -131,7 +96,7 @@ class VoxelLevel extends Process implements IDestroyable {
 				);
 
 				OimoUtil.addBox(
-					Level.inst.world,
+					LevelView.inst.world,
 					new Vec3( x + ( tmxMap.tileHeight >> 1 ), y + ( tmxMap.tileHeight >> 1 ), z + ( tmxMap.tileHeight + 1 ) / 2 ),
 					new Vec3( tmxMap.tileHeight >> 1, tmxMap.tileHeight >> 1, ( tmxMap.tileHeight + 1 ) / 2 ),
 					true

@@ -4,7 +4,7 @@ import en.Item;
 import en.player.Player;
 import en.util.item.InventoryCell;
 import game.client.GameClient;
-import game.client.level.Level;
+import game.client.level.LevelView;
 import h2d.Console.ConsoleArg;
 import h3d.col.Bounds;
 import pass.CustomRenderer;

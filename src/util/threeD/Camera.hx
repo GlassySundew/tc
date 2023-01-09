@@ -22,7 +22,7 @@ class Camera extends CameraController {
 
 	public var onMove : EventSignal0;
 
-	public var zNearK = 0.9;
+	public var zNearK = 0.6;
 	public var zFarK = 100.;
 
 	var frict = 0.9;

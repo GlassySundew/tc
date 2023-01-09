@@ -6,8 +6,8 @@ import core.NodeBase;
 
 class NetNode extends NodeBase<NetNode> implements NetworkSerializable {
 
-	public function new() {
-		super();
+	public function new( ?parent : NetNode ) {
+		super( parent );
 		init();
 	}
 

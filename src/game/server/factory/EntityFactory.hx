@@ -24,20 +24,36 @@ class EntityFactory {
 		entityFactoryMediator = new EntityFactoryMediator( GameServer.entClasses );
 	}
 
-	public function spawnEntity( e : TmxObject, sLevel : ServerLevel ) {
+	public function spawnEntity( obj : TmxObject, sLevel : ServerLevel ) {
 		var entitySpawner = new EntitySpawner( entityFactoryMediator );
-		entitySpawner.e = e;
+		entitySpawner.tmxData.obj = obj;
 		entitySpawner.sLevel = sLevel;
 		entitySpawner.spawn();
 	}
 
-	public inline function spawnPlayer( uid, nickname, clientController ) {
+	public inline function spawnPlayer(
+		uid : Int,
+		nickname : String,
+		clientController : ClientController
+	) {
+		Server.inst.log( "Client identified ( uid:" + uid + " nickname: " + nickname + ")" );
+
 		var playerSpawner = new PlayerSpawner( entityFactoryMediator );
 		playerSpawner.uid = uid;
-		playerSpawner.game = GameServer.inst;
+		playerSpawner.game = game;
 		playerSpawner.nickname = nickname;
 		playerSpawner.clientController = clientController;
 
-		var player = playerSpawner.spawnPlayer();
+		var savedPlayerByNickname = null;
+		//  Save.inst.getPlayerByNickname(nickname);
+
+		if ( savedPlayerByNickname != null ) {
+			// Save.inst.load
+			// loading this bastard
+			Std.downcast( Save.inst.loadEntity( savedPlayerByNickname ), Player );
+		} else {
+			// slapping new player in entrypoint
+			playerSpawner.newPlayer();
+		}
 	}
 }

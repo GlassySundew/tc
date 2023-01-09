@@ -7,6 +7,14 @@ import game.server.GameServer;
 import hxGeomAlgo.HxPoint;
 import hxGeomAlgo.PoleOfInaccessibility;
 import util.TmxUtils;
+import format.tmx.Data;
+
+@:structInit
+class EntityTmxData {
+
+	@:optional public var obj : TmxObject;
+	@:optional public var tsTile : TmxTilesetTile;
+}
 
 class EntityUtil {
 

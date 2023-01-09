@@ -27,6 +27,7 @@ class EntityModel extends NetNode {
 	@:s public var footY : NSVO<Float> = new NSVO( 0. );
 	@:s public var footZ : NSVO<Float> = new NSVO( 0. );
 	@:s public var tmxObj : TmxObject;
+	@:s public var tsTile : format.tmx.Data.TmxTilesetTile;
 	@:s public var flippedX : Bool = false;
 
 	public var rigidBody( default, set ) : RigidBody;

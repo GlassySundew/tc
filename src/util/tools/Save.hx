@@ -288,33 +288,34 @@ class Save {
 	}
 
 	public function saveLevel( level : ServerLevel ) : SavedLevel {
+		// TODO
 		// checking if maindb attached
-		if ( isMainDbAttached() ) {
-			// dropping "entities" tmx layer in favor of previously saved layer
-			var tmxMap : format.tmx.TmxMap = Unserializer.run( haxe.Serializer.run( level.tmxMap ) );
-			var entitiesTmxLayer = tmxMap.getLayersByName( 'entities' );
+		// if ( isMainDbAttached() ) {
+		// 	// dropping "entities" tmx layer in favor of previously saved layer
+		// 	var tmxMap : format.tmx.TmxMap = Unserializer.run( haxe.Serializer.run( level.tmxMap ) );
+		// 	var entitiesTmxLayer = tmxMap.getLayersByName( 'entities' );
 
-			if ( entitiesTmxLayer != null )
-				for ( i in entitiesTmxLayer )
-					switch i {
-						case LObjectGroup( group ):
-							for ( obj in group.objects.copy() ) if ( obj.name != "player" ) group.objects.remove( obj );
-						default:
-					}
+		// 	if ( entitiesTmxLayer != null )
+		// 		for ( i in entitiesTmxLayer )
+		// 			switch i {
+		// 				case LObjectGroup( group ):
+		// 					for ( obj in group.objects.copy() ) if ( obj.name != "player" ) group.objects.remove( obj );
+		// 				default:
+		// 			}
 
-			var cachedLevel = upsertLevelMap( level.lvlName, tmxMap );
+		// 	var cachedLevel = upsertLevelMap( level.lvlName, tmxMap );
 
-			// requesting our newly updated/inserted room to assign sql id to it's instance
-			// if ( cachedLevel != null )
-			level.sqlId = cachedLevel.id;
+		// 	// requesting our newly updated/inserted room to assign sql id to it's instance
+		// 	// if ( cachedLevel != null )
+		// 	level.sqlId = cachedLevel.id;
 
-			for ( i in Entity.ServerALL ) {
-				if ( i.model.level.sqlId == level.sqlId ) {
-					saveEntity( i );
-				}
-			}
-			return cachedLevel;
-		}
+		// 	for ( i in Entity.ServerALL ) {
+		// 		if ( i.model.level.sqlId == level.sqlId ) {
+		// 			saveEntity( i );
+		// 		}
+		// 	}
+		// 	return cachedLevel;
+		// }
 		return null;
 	}
 

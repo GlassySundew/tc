@@ -15,25 +15,6 @@ class PlayerSpawner extends EntitySpawner {
 	public var nickname : String;
 	public var clientController : ClientController;
 
-	public function spawnPlayer() : Player {
-		Server.inst.log( "Client identified ( uid:" + uid + " nickname: " + nickname + ")" );
-
-		var savedPlayerByNickname = null;
-		//  Save.inst.getPlayerByNickname(nickname);
-
-		var player : Player = null;
-		if ( savedPlayerByNickname != null ) {
-			// Save.inst.load
-			// loading this bastard
-			player = Std.downcast( Save.inst.loadEntity( savedPlayerByNickname ), Player );
-		} else {
-			// slapping new player in entrypoint
-			player = newPlayer();
-		}
-
-		return player;
-	}
-
 	/**
 		starts entrypoint level if doesnt exists and slaps player onto it
 	**/
@@ -41,12 +22,17 @@ class PlayerSpawner extends EntitySpawner {
 		// TODO our temporary entrypoint
 		var entryPointLevel = "ship_pascal.tmx";
 
-		var sLevel = game.getLevel( entryPointLevel, {} );
+		var sLevel = game.getLevel( entryPointLevel );
 		// раз игрок новый, то спавним его из tmxObject
 		this.sLevel = sLevel;
-		this.e = sLevel.player;
-		var player = Std.downcast( spawn(), Player );
+		tmxData = sLevel.player;
 
+		var player = Std.downcast( spawn(), Player );
+		player.onMove.add(
+			() -> {
+				trace( "moving" );
+			}
+		);
 		return player;
 	}
 
@@ -64,7 +50,5 @@ class PlayerSpawner extends EntitySpawner {
 		clientController.player = player;
 
 		super.submitToLevel( resultEntity, sLevel );
-
-		clientController.level = player.model.level;
 	}
 }

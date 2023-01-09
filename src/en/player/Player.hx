@@ -11,7 +11,7 @@ import en.spr.EntityView;
 import format.tmx.Data.TmxObject;
 import game.client.ControllerAction;
 import game.client.GameClient;
-import game.client.level.Level;
+import game.client.level.LevelView;
 import hxbit.NetworkHost;
 import hxbit.NetworkSerializable;
 import hxbit.Serializer;
@@ -318,7 +318,7 @@ class Player extends Entity {
 							this,
 							inventoryModel.holdItem.item.amount
 						),
-						this.angToPxFree( Level.inst.cursX, Level.inst.cursY ), 2.3 );
+						this.angToPxFree( ( ( LevelView.inst : LevelView ).cursX : Float ), ( ( LevelView.inst : LevelView ).cursY : Float ) ), 2.3 );
 					inventoryModel.holdItem.item.amount = 0;
 					inventoryModel.holdItem = null;
 				} else {
@@ -328,7 +328,7 @@ class Player extends Entity {
 							inventoryModel.holdItem.item.cdbEntry,
 							this,
 							1 ),
-						this.angToPxFree( Level.inst.cursX, Level.inst.cursY ), 2.3 );
+						this.angToPxFree( ( ( LevelView.inst : LevelView ).cursX : Float ), ( ( LevelView.inst : LevelView ).cursY : Float ) ), 2.3 );
 					inventoryModel.holdItem.item.amount--;
 				}
 				if ( inventoryModel.holdItem == null ) {
