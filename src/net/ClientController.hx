@@ -1,5 +1,6 @@
 package net;
 
+import en.player.PlayerChannelContainer;
 import util.Const;
 import util.tools.Settings;
 import hxbit.NetworkHost;
@@ -18,16 +19,22 @@ enum SaveSystemOrderType {
 	DeleteSave( name : String );
 }
 
-class ClientController implements NetworkSerializable {
+class ClientController extends NetNode {
 
 	@:s public var uid( default, set ) : Int;
-	// @:s public var channelContainer : 
 	@:s public var player( default, set ) : Player;
-	
+	@:s public var channelContainer : PlayerChannelContainer;
+
+	function set_uid( v : Int ) {
+		return uid = v;
+	}
+
+	/** server-side **/
 	public var networkClient : NetworkClient;
 
 	/**
-		check if we are the owner on this client ( should only be called on client )
+		client-side
+		check if we are the owner on this client
 	**/
 	public var isOwner( get, never ) : Bool;
 
@@ -35,23 +42,20 @@ class ClientController implements NetworkSerializable {
 
 	function set_player( player : Player ) {
 		if ( player != null && GameClient.inst != null && isOwner ) {
-			
+
 			emptyPing();
 		}
 
 		return this.player = player;
 	}
 
-	function set_uid( v : Int ) {
-		return uid = v;
-	}
-
 	public function new() {
-		if ( !Server.inst.host.isChannelingEnabled ) enableReplication = true;
+		super();
+		channelContainer = new PlayerChannelContainer( this );
 	}
 
-	public function alive() {
-		enableReplication = true;
+	override public function alive() {
+		super.alive();
 
 		if ( isOwner ) {
 			Client.inst.host.self.ownerObject = this;
@@ -64,7 +68,7 @@ class ClientController implements NetworkSerializable {
 	// function customSerialize( ctx : hxbit.Serializer ) {}
 	// function customUnserialize( ctx : hxbit.Serializer ) {}
 
-	public function networkAllow(
+	public override function networkAllow(
 		op : hxbit.NetworkSerializable.Operation,
 		propId : Int,
 		clientSer : hxbit.NetworkSerializable

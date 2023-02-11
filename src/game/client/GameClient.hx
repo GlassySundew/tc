@@ -1,5 +1,6 @@
 package game.client;
 
+import game.server.level.LevelController;
 import cherry.soup.EventSignal.EventSignal0;
 import dn.Process;
 import dn.heaps.input.ControllerAccess;
@@ -43,19 +44,14 @@ class GameClient extends Process {
 	public static var inst : GameClient;
 
 	public var cameraProc : CameraProcess;
-
-	private var cam : CameraController;
-
 	public var levelView : LevelView;
 	public var tmxMap : TmxMap;
 	public var player : en.player.Player;
-	// public var structTiles : Array<StructTile> = [];
 	public var suspended : Bool = false;
 	public var navFieldsGenerated : Null<Int>;
-
+	
 	var ca : ControllerAccess<ControllerAction>;
-
-	public var onLevelChanged = new EventSignal0();
+	private var cam : CameraController;
 
 	#if game_tmod
 	var stats : h2d.Text;

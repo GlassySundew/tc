@@ -1,5 +1,6 @@
 package util;
 
+import game.client.GameClient;
 import h3d.Vector;
 import format.tmx.Data.TmxProperties;
 import format.tmx.Data.TmxPropertyType;
@@ -208,5 +209,38 @@ class VectorExtensions {
 
 	public inline static function toVector<T : util.Util.Point3>( pt : T ) {
 		return new Vector( pt.x, pt.y, pt.z );
+	}
+}
+
+class TilesetDataExtensions {
+
+	public inline static function bSearchModel(
+		tileset : Data.Tileset,
+		x : Int,
+		y : Int,
+		?figi : Int,
+		?start : Int = 0,
+		?end : Int
+	) : Int {
+		var conf = GameClient.inst.levelView.tilesetCache.getLUT( tileset );
+		if ( figi == null )
+			figi = conf.figuresAmount >> 1;
+		if ( start == null )
+			start = 0;
+		if ( end == null )
+			end = conf.figuresAmount;
+
+		var fig = conf.figures[figi];
+
+		var result = null;
+
+		if ( x == fig.figStartX && y >= fig.figStartY && y < ( fig.figStartY + fig.palettes ) ) {
+			result = figi;
+		} else if ( ( x < fig.figStartX || y < fig.figStartY ) && y < fig.figStartY + fig.palettes ) {
+			result = bSearchModel( tileset, x, y, figi - ( ( figi - start ) >> 1 ) - 1, start, figi );
+		} else {
+			result = bSearchModel( tileset, x, y, figi + ( ( end - figi + 1 ) >> 1 ), figi, end );
+		}
+		return result;
 	}
 }

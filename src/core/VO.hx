@@ -10,7 +10,7 @@ abstract VO<T>( VOBase<T> ) {
 		return this.val;
 	}
 
-	public inline function new( v : T ) {
+	public inline function new( ?v : T ) {
 		this = new VOBase( v );
 	}
 }

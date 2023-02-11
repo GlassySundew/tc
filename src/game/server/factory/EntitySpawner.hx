@@ -32,6 +32,7 @@ class EntitySpawner {
 			sLevel.properties.getProp(
 				PTInt,
 				"defaultEntitySpawnLevel",
+				0,
 				() -> return tmxData.obj.properties.getProp( PTInt, "z" )
 			) * sLevel.cdb.tileHeight + 1;
 
@@ -85,5 +86,6 @@ class EntitySpawner {
 		resultEntity.model.level = sLevel;
 		sLevel.entities.push( resultEntity );
 		resultEntity.serverApplyTmx();
+		resultEntity.onMove.dispatch();
 	}
 }

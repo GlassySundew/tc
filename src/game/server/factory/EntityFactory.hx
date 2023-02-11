@@ -42,12 +42,12 @@ class EntityFactory {
 		playerSpawner.uid = uid;
 		playerSpawner.game = game;
 		playerSpawner.nickname = nickname;
-		playerSpawner.clientController = clientController;
+		playerSpawner.cliCon = clientController;
 
 		var savedPlayerByNickname = null;
 		//  Save.inst.getPlayerByNickname(nickname);
 
-		if ( savedPlayerByNickname != null ) {
+		var player = if ( savedPlayerByNickname != null ) {
 			// Save.inst.load
 			// loading this bastard
 			Std.downcast( Save.inst.loadEntity( savedPlayerByNickname ), Player );
@@ -55,5 +55,7 @@ class EntityFactory {
 			// slapping new player in entrypoint
 			playerSpawner.newPlayer();
 		}
+
+		// playerSpawner;
 	}
 }

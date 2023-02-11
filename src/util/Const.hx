@@ -42,4 +42,6 @@ class Const {
 	public static var SAVEFILE_EXT = ".zhopa";
 
 	public static var jumpReach = 80;
+
+	public static var chunkVisionRadius = 4;
 }

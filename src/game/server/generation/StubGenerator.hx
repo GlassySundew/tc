@@ -60,10 +60,11 @@ class StubGenerator extends ChunkGenerator {
 				},
 				tmxTileLayerCb : ( tl ) -> {
 					var z = tl.properties.getProp( PTFloat, "zHeight", 0 );
+					var depthOff = tl.properties.getProp( PTInt, "depthOff", 0 );
 
 					for ( i => tile in tl.data.tiles ) {
 						if ( tile.gid != 0 ) {
-							level.ctrl.placeBlockTmx( i, z, tile, tmxMap );
+							level.ctrl.placeBlockTmx( i, z, tile, depthOff, tmxMap );
 						}
 					}
 				}

@@ -515,7 +515,7 @@
 					"generator": "game.server.generation.StubGenerator",
 					"tileHeight": 4,
 					"tileWidth": 8,
-					"chunkSize": 64
+					"chunkSize": 2
 				}
 			],
 			"separators": [],
@@ -536,8 +536,18 @@
 					"kind": null
 				},
 				{
+					"typeStr": "3",
+					"name": "tileSize",
+					"kind": null
+				},
+				{
 					"typeStr": "5:vertical,horizontal",
 					"name": "orientation"
+				},
+				{
+					"typeStr": "13",
+					"name": "texturePath",
+					"kind": null
 				},
 				{
 					"typeStr": "8",
@@ -550,7 +560,7 @@
 					"id": "CONGRUENT",
 					"type": [
 						0,
-						1
+						4
 					],
 					"sequences": [
 						{
@@ -566,7 +576,9 @@
 							"amount": 8
 						}
 					],
-					"orientation": 0
+					"orientation": 0,
+					"texturePath": "tiled/atlas/CONGRUENT.png",
+					"tileSize": 8
 				}
 			],
 			"separators": [],
@@ -647,7 +659,7 @@
 					"name": "LUT",
 					"args": [
 						{
-							"name": "tileW",
+							"name": "lutRows",
 							"typeStr": "3"
 						}
 					]

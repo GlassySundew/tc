@@ -1,5 +1,7 @@
 package en.model;
 
+import core.VO;
+import game.server.level.Chunk;
 import ui.player.ItemCursorHolder;
 import util.Const;
 import en.collide.EntityContactCallback;
@@ -63,6 +65,9 @@ class EntityModel extends NetNode {
 	public var flippedOnClient = false;
 
 	public var onMoveInvalidate = false;
+
+	/** server-side **/
+	public var chunk : VO<Chunk> = new VO( null );
 
 	public function new() {
 		super();

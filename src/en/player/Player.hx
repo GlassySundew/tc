@@ -27,10 +27,10 @@ import util.tools.Settings;
 
 using en.util.EntityUtil;
 
-enum abstract PlayerActionState( String ) from String to String {
+enum abstract PlayerActionState( Int ) {
 
-	var Running = "Running";
-	var Idle = "Idle";
+	var Running;
+	var Idle;
 }
 
 @:keep
@@ -83,6 +83,13 @@ class Player extends Entity {
 							false;
 
 		lock( 30 );
+
+		onFrame.add(() -> {
+			if ( playerModel.actionState == Running ) {
+				trace( "on moving" );
+				onMove.dispatch();
+			}
+		} );
 	}
 
 	override function init() {
@@ -142,6 +149,10 @@ class Player extends Entity {
 
 			if ( inst == this ) {
 				new StructureInteractRestrictor().attach( this );
+
+				var deltaX = model.footX.val;
+				var deltaY = model.footY.val;
+				var deltaZ = model.footZ.val;
 
 				model.contactCb.postSolveSign.add( ( c ) -> {
 					model.forceRBCoords = true;
@@ -368,9 +379,5 @@ class Player extends Entity {
 				ca = null;
 			}
 		}
-	}
-
-	override function headlessUpdate() {
-		super.headlessUpdate();
 	}
 }

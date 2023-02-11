@@ -33,15 +33,16 @@ class NSVOBase<T> extends VOBase<T> implements NetworkSerializable {
 	}
 
 	override function set_val( v : T ) : T {
-		super.set_val( v );
-
-		if ( v == maskVal ) return v;
-		return maskVal = v;
+		if ( v != maskVal ) maskVal = v;
+		return val = v;
 	}
 
 	@:s private var maskVal( default, set ) : Dynamic;
 
 	function set_maskVal( v : Dynamic ) : Dynamic {
+		if ( maskVal != v )
+			onVal.dispatch( v );
+
 		return val = maskVal = v;
 	}
 

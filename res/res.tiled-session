@@ -40,7 +40,7 @@
         "tiled/levels/entities.tsx"
     ],
     "project": "res.tiled-project",
-    "property.type": "bool",
+    "property.type": "string",
     "recentFiles": [
         "tiled/levels/ship_pascal.tmx",
         "tiled/levels/entities.tsx"

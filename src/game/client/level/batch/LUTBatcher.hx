@@ -1,5 +1,6 @@
 package game.client.level.batch;
 
+import i.IDestroyable;
 import shader.DepthOffset;
 import h3d.scene.Object;
 import h3d.mat.Texture;
@@ -26,21 +27,23 @@ class LUTBatcher {
 		lutOffX : Int,
 		lutOffY : Int,
 		depthOffset : Float,
-		?parent : Object
-	) {
+		parent : Object
+	) : LUTBatchElement {
 		if ( batchMap[path] == null ) {
 			batchMap[path] = new LUTBatch( path, lookup, lutRows, parent );
 		}
-		batchMap[path].meshes.push(
-			new LUTMesh(
-				x,
-				y,
-				z,
-				depthOffset,
-				lutOffX,
-				lutOffY
-			)
+		var ele = new LUTBatchElement(
+			x,
+			y,
+			z,
+			depthOffset,
+			lutOffX,
+			lutOffY
 		);
+		batchMap[path].meshes.push( ele );
+		ele.onDestroy = () -> batchMap[path].meshes.remove( ele );
+
+		return ele;
 	}
 
 	public function emitAll() {
@@ -66,7 +69,7 @@ class LUTBatcher {
 class LUTBatch {
 
 	public var mb : MeshBatch;
-	public var meshes : Array<LUTMesh> = [];
+	public var meshes : Array<LUTBatchElement> = [];
 	public var depthOffsetShader : DepthOffset;
 	public var lutShader : LUT;
 
@@ -91,7 +94,7 @@ class LUTBatch {
 	}
 }
 
-class LUTMesh {
+class LUTBatchElement implements IDestroyable {
 
 	public var x : Float;
 	public var y : Float;
@@ -100,6 +103,9 @@ class LUTMesh {
 	public var lutOffX : Int;
 	public var lutOffY : Int;
 
+	@:allow( game.client.level.batch.LUTBatcher )
+	var onDestroy : Void -> Void;
+
 	public inline function new( x, y, z, depthOffset : Float, lutOffX, lutOffY ) {
 		this.x = x;
 		this.y = y;
@@ -107,5 +113,9 @@ class LUTMesh {
 		this.depthOffset = depthOffset;
 		this.lutOffX = lutOffX;
 		this.lutOffY = lutOffY;
+	}
+
+	public function destroy() {
+		if ( onDestroy != null ) inline onDestroy();
 	}
 }

@@ -1,5 +1,6 @@
 package en;
 
+import game.server.level.Chunk;
 import core.ClassMap;
 import i.IDestroyable;
 import en.comp.controller.EntityController;
@@ -45,9 +46,8 @@ class Entity extends NetNode {
 	/**
 		client
 	**/
-	public var components = new ClassMap<
-		Class<EntityController>,
-		EntityController>();
+	public var components = //
+		new ClassMap<Class<EntityController>, EntityController>();
 
 	@:s public var model : EntityModel = new EntityModel();
 
@@ -56,25 +56,26 @@ class Entity extends NetNode {
 	public var eSpr : EntityView;
 	public var destroyed( default, null ) = false;
 
+	public var onFrame : EventSignal0 = new EventSignal0();
 	public var onMove : EventSignal0 = new EventSignal0();
-	public var onDirChangedSignal : EventSignal1<Direction> = new EventSignal1();
 
 	public var tmod( get, never ) : Float;
 
 	inline function get_tmod() {
-		return #if headless GameServer.inst.tmod #else if ( GameClient.inst != null ) GameClient.inst.tmod else
-			Client.inst.tmod #end;
+		return
+			#if headless GameServer.inst.tmod; #else //
+			if ( GameClient.inst != null ) GameClient.inst.tmod else
+				Client.inst.tmod; #end
 	}
 
 	public var isMoving( get, never ) : Bool;
 
-	function get_isMoving() return M.fabs( model.dx ) >= 0.01 || M.fabs( model.dy ) >= 0.01;
+	inline function get_isMoving()
+		return M.fabs( model.dx ) >= 0.01 || M.fabs( model.dy ) >= 0.01;
 
 	public function new( ?tmxObj : Null<TmxObject> ) {
 
 		ServerALL.push( this );
-
-		model.dir.addOnVal( onDirChangedSignal.dispatch );
 
 		if ( model.tmxObj == null && tmxObj != null ) {
 			model.tmxObj = tmxObj;
@@ -85,6 +86,7 @@ class Entity extends NetNode {
 
 	public override function init() {
 		super.init();
+		model.footX.val;
 	}
 
 	/**
@@ -102,11 +104,6 @@ class Entity extends NetNode {
 			createView();
 			applyTmx();
 		}, 1 );
-	}
-
-	/** to be overriden **/
-	function getActionType() {
-		return null;
 	}
 
 	/** to be overriden **/
@@ -135,7 +132,11 @@ class Entity extends NetNode {
 	@:rpc
 	public function unlock() if ( model.cd != null ) model.cd.unset( "lock" );
 
-	public function dropItem( item : en.Item, ?angle : Float, ?power : Float ) : en.Item {
+	public function dropItem(
+		item : en.Item,
+		?angle : Float,
+		?power : Float
+	) : en.Item {
 		angle = angle == null ? Math.random() * M.toRad( 360 ) : angle;
 		power = power == null ? Math.random() * .04 * 48 + .01 : power;
 
@@ -153,12 +154,22 @@ class Entity extends NetNode {
 		EntityUtil.clientFlipX( this );
 	}
 
-	public inline function bumpAwayFrom( e : Entity, spd : Float, ?spdZ = 0., ?ignoreReduction = false ) {
+	public inline function bumpAwayFrom(
+		e : Entity,
+		spd : Float,
+		?spdZ = 0.,
+		?ignoreReduction = false
+	) {
 		var a = e.angTo( this );
 		bump( Math.cos( a ) * spd, Math.sin( a ) * spd, spdZ, ignoreReduction );
 	}
 
-	public function bump( x : Float, y : Float, z : Float, ?ignoreReduction = false ) {
+	public function bump(
+		x : Float,
+		y : Float,
+		z : Float,
+		?ignoreReduction = false
+	) {
 		var f = ignoreReduction ? 1.0 : 1 - model.bumpReduction;
 		model.dx += x * f;
 		model.dy += y * f;
@@ -226,7 +237,9 @@ class Entity extends NetNode {
 
 	public function headlessPreUpdate() {}
 
-	public function headlessUpdate() {}
+	public function headlessUpdate() {
+		onFrame.dispatch();
+	}
 
 	public function headlessPostUpdate() {}
 
@@ -241,28 +254,18 @@ class Entity extends NetNode {
 
 	public function update() {
 		if ( model.forceRBCoords ) {
-			if (
-				model.footX.val != model.rigidBody._transform._positionX ||
-				model.footY.val != model.rigidBody._transform._positionY ||
-				model.footZ.val != model.rigidBody._transform._positionZ
-			)
-				model.onMoveInvalidate = true;
-
 			model.forceRBCoords = false;
 			model.footX.val = model.rigidBody._transform._positionX;
 			model.footY.val = model.rigidBody._transform._positionY;
 			model.footZ.val = model.rigidBody._transform._positionZ;
 		} else {
 			var stepX = model.dx * tmod;
-			if ( stepX != 0 ) model.onMoveInvalidate = true;
 			model.footX.val += stepX;
 
 			var stepY = model.dy * tmod;
-			if ( stepY != 0 ) model.onMoveInvalidate = true;
 			model.footY.val += stepY;
 
 			var stepZ = model.dz * tmod;
-			if ( stepZ != 0 ) model.onMoveInvalidate = true;
 			model.footZ.val += stepZ;
 		}
 	}
@@ -274,11 +277,6 @@ class Entity extends NetNode {
 		if ( M.fabs( model.dy ) <= 0.0005 * tmod ) model.dy = 0;
 		model.dz *= Math.pow( model.frict, tmod );
 		if ( M.fabs( model.dz ) <= 0.0005 * tmod ) model.dz = 0;
-
-		if ( model.onMoveInvalidate ) {
-			onMove.dispatch();
-			model.onMoveInvalidate = false;
-		}
 	}
 
 	public function frameEnd() {

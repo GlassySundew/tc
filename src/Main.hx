@@ -43,13 +43,12 @@ class Main extends Process {
 	public var save : Save;
 	public var onResizeEvent : EventSignal0 = new EventSignal0();
 
-	public var cliCon : VO<ClientController>;
+	public var cliCon : VO<ClientController> = new VO( null );
 
 	var fps : Text;
 
 	public function new( s : h2d.Scene ) {
 		super();
-		cliCon = new VO( null );
 
 		inst = this;
 		createRoot( s );

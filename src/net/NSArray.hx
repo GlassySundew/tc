@@ -8,6 +8,10 @@ import haxe.iterators.ArrayIterator;
 @:forward
 abstract NSArray<T : Serializable>( NSArrayBase<T> ) from NSArrayBase<T> to NSArrayBase<T> {
 
+	@:to function toArray() : Array<T> {
+		return cast this.array;
+	}
+
 	@:to function toIter() : ArrayIterator<T> {
 		return cast this.array.iterator();
 	}

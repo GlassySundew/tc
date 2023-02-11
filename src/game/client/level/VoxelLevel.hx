@@ -25,14 +25,17 @@ class VoxelLevel extends Process implements IDestroyable {
 	**/
 	private static final threeDLayerName = "3d";
 
+	public var blockCache : Map<Int, Int> = [];
+
 	var threeDRoot : Object;
 	var tmxMap : TmxMap;
 	var batcher : LUTBatcher;
 
+	@:deprecated
 	public function new( parent : Process ) {
 		super( parent );
 		threeDRoot = new Object( Boot.inst.s3d );
-		batcher = new LUTBatcher();
+		batcher = new LUTBatcher( threeDRoot );
 	}
 
 	public function toggleVisible() {
@@ -53,15 +56,12 @@ class VoxelLevel extends Process implements IDestroyable {
 		inline batcher.emitAll();
 	}
 
-	var blockCache : Map<Int, Int> = [];
-
 	function renderLayer( tileLayer : TmxTileLayer ) {
 		var zheight = tileLayer.properties.existsType( "zheight", PTFloat ) ? tileLayer.properties.getFloat( "zheight" ) : 0.;
 		var depthOff = tileLayer.properties.existsType( "depthOff", PTInt ) ? tileLayer.properties.getInt( "depthOff" ) : 0;
 
 		for ( tileidx => tile in tileLayer.data.tiles ) {
 			if ( tile.gid != 0 ) {
-
 				var tileset = Tools.getTilesetByGid( tmxMap, tile.gid );
 				var tilesetLine = tileset.getTilesCountInLineOnTileset();
 				var tsFigures : Tileset = Reflect.field( Assets, tileset.name );
@@ -80,7 +80,6 @@ class VoxelLevel extends Process implements IDestroyable {
 
 				var path = 'tiled/voxel/${tileset.name}/block_${blockCache[tile.gid]}.fbx';
 				var verticalDepth = ( zheight + depthOff ) * 0.02;
-				var horizontalDepth = ( tileX - tileY ) * 0.000001;
 
 				batcher.addMesh(
 					path,
@@ -91,8 +90,7 @@ class VoxelLevel extends Process implements IDestroyable {
 					z,
 					tsetTileX * tileset.tileHeight,
 					tsetTileY * tileset.tileHeight,
-					verticalDepth,
-					threeDRoot
+					verticalDepth
 				);
 
 				OimoUtil.addBox(

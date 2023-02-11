@@ -88,7 +88,9 @@ class Server extends Process {
 					log( "Client Connected" );
 				},
 				function ( c : SocketClient, e : String ) {
-					if ( c.host != null ) destroyClient( c );
+					if ( c.host != null ) {
+						destroyClient( c );
+					}
 				}
 			);
 

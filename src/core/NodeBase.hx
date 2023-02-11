@@ -5,7 +5,7 @@ import cherry.soup.EventSignal.EventSignal1;
 abstract class NodeBase<T : NodeBase<T>> {
 
 	var parent( default, set ) : T;
-	var children : Array<T> = [];
+	var children : Array<T>;
 
 	function set_parent( p : T ) {
 		if ( parent != null )
@@ -16,6 +16,7 @@ abstract class NodeBase<T : NodeBase<T>> {
 	}
 
 	public inline function new( ?parent : T ) {
+		children = [];
 		this.parent = parent;
 	}
 

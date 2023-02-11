@@ -44,9 +44,7 @@ class GameServer extends Process {
 	}
 
 	// TODO
-	public function getLevel(
-		name : String
-	) : ServerLevel {
+	public function getLevel( name : String ) : ServerLevel {
 		name = Util.unifyLevelName( name );
 
 		if ( levels[name] != null ) return levels[name];

@@ -13,7 +13,7 @@ class PlayerSpawner extends EntitySpawner {
 
 	public var uid : Int;
 	public var nickname : String;
-	public var clientController : ClientController;
+	public var cliCon : ClientController;
 
 	/**
 		starts entrypoint level if doesnt exists and slaps player onto it
@@ -28,11 +28,6 @@ class PlayerSpawner extends EntitySpawner {
 		tmxData = sLevel.player;
 
 		var player = Std.downcast( spawn(), Player );
-		player.onMove.add(
-			() -> {
-				trace( "moving" );
-			}
-		);
 		return player;
 	}
 
@@ -44,10 +39,15 @@ class PlayerSpawner extends EntitySpawner {
 
 		player.playerModel.nickname = nickname;
 		player.model.controlId = uid;
-		player.clientController = clientController;
+		player.clientController = cliCon;
+		sLevel.chunks.attachWatcherEntity(
+			player,
+			cliCon.networkClient.ctx,
+			cliCon.channelContainer
+		);
 
-		clientController.uid = uid;
-		clientController.player = player;
+		cliCon.uid = uid;
+		cliCon.player = player;
 
 		super.submitToLevel( resultEntity, sLevel );
 	}
