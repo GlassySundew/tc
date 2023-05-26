@@ -28,5 +28,8 @@ class NetNode extends NodeBase<NetNode> implements NetworkSerializable {
 		?finalize
 	) @:privateAccess {
 		host.unregister( this, ctx, finalize );
+		for ( child in children ) {
+			child.disconnect( host, ctx, finalize );
+		}
 	}
 }

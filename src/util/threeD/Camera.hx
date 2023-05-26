@@ -1,5 +1,7 @@
 package util.threeD;
 
+import h2d.Tile;
+import h2d.Bitmap;
 import game.client.GameClient;
 import h3d.Vector;
 import cherry.soup.EventSignal.EventSignal0;
@@ -47,16 +49,14 @@ class Camera extends CameraController {
 
 		this.proc = proc;
 
+		new Bitmap( Tile.fromColor( 0xffffff, 50, 50 ), Boot.inst.sceneBehind3d );
+
+		parallax = new Parallax( Boot.inst.sceneBehind3d );
 		targetEntity.addOnVal( setTargetEntity );
 		targetOffset.w = 0.5;
 	}
 
 	function setTargetEntity( v : Null<Entity> ) {
-		if ( parallax != null && v != null ) {
-			parallax.x = v.model.footX.val;
-			parallax.z = v.model.footY.val;
-		}
-
 		updateCamera();
 		proc.delayer.addF( refreshDimensions, 1 );
 	}
@@ -94,10 +94,7 @@ class Camera extends CameraController {
 	}
 
 	function updateCamera() {
-		if ( parallax != null ) {
-			parallax.x = x;
-			parallax.y = y;
-		}
+
 		refreshDimensions();
 
 		s3dCam.target.x = targetOffset.x;
@@ -113,13 +110,6 @@ class Camera extends CameraController {
 		s3dCam.pos.y = s3dCam.target.y + xyDist;
 		s3dCam.pos.z = s3dCam.target.z + b;
 		// s3dCam.fovY = 1;
-
-		if ( parallax != null )
-			parallax.setPosition(
-				s3dCam.pos.x,
-				s3dCam.pos.y,
-				s3dCam.pos.z
-			);
 	}
 
 	public inline function stopTracking() {

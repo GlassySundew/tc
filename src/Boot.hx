@@ -1,3 +1,4 @@
+import h3d.Engine;
 import imgui.ImGui;
 import imgui.ImGuiDrawable;
 import util.Util;
@@ -10,13 +11,26 @@ import h2d.Scene;
 import dn.heaps.input.Controller;
 
 class Boot extends hxd.App {
-	public static var inst : Boot;
 
+	public static var inst( default, null ) : Boot;
+
+	public var sceneBehind3d : Scene;
 	public var renderer : CustomRenderer;
 	public var deltaTime( default, null ) : Float;
 
 	static function main() {
 		new Boot();
+	}
+
+	override function setup() {
+		super.setup();
+		sevents.addScene( sceneBehind3d );
+	}
+
+	override function mainLoop() {
+		super.mainLoop();
+		var dt = hxd.Timer.dt;
+		if ( sceneBehind3d != null ) sceneBehind3d.setElapsedTime( dt );
 	}
 
 	// Engine ready
@@ -26,6 +40,8 @@ class Boot extends hxd.App {
 		Save.initFields();
 
 		new Repeater( hxd.Timer.wantedFPS );
+
+		sceneBehind3d = new Scene();
 
 		haxe.Log.trace = function ( v : Dynamic, ?infos : haxe.PosInfos ) {
 			#if hx_concurrent
@@ -51,9 +67,17 @@ class Boot extends hxd.App {
 		onResize();
 	}
 
+	override function render( e : Engine ) {
+		// e.clear( h3d.Engine.getCurrent().backgroundColor, 1 );
+		sceneBehind3d.render( e );
+		s3d.render( e );
+		s2d.render( e );
+	}
+
 	override function onResize() {
 		super.onResize();
 		dn.Process.resizeAll();
+		sceneBehind3d.checkResize();
 	}
 
 	var speed = 1.0;

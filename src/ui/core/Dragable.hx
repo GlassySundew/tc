@@ -18,6 +18,8 @@ class Dragable extends EventInteractive {
 	var fillWidth : Bool;
 	var fillHeight : Bool;
 
+	var mouseHandle : Point = new Point();
+
 	public var onDrag : EventSignal2<Float, Float> = new EventSignal2();
 
 	public function new(
@@ -51,7 +53,7 @@ class Dragable extends EventInteractive {
 		if ( e.cancel ) return;
 		switch( e.kind ) {
 			case EPush:
-				var mouseHandle = new Point( Boot.inst.s2d.mouseX, Boot.inst.s2d.mouseY );
+				mouseHandle.set( e.relX, e.relY );
 
 				var scene = scene;
 				startCapture( function ( e ) {
@@ -60,15 +62,17 @@ class Dragable extends EventInteractive {
 						return;
 					}
 
-					var deltaX = ( Boot.inst.s2d.mouseX - mouseHandle.x ) / Const.UI_SCALE;
-					var deltaY = ( Boot.inst.s2d.mouseY - mouseHandle.y ) / Const.UI_SCALE;
-					mouseHandle = new Point( Boot.inst.s2d.mouseX, Boot.inst.s2d.mouseY );
+					
+					
+					// var deltaX = ( Boot.inst.s2d.mouseX - mouseHandle.x ) / Const.UI_SCALE;
+					// var deltaY = ( Boot.inst.s2d.mouseY - mouseHandle.y ) / Const.UI_SCALE;
+					// mouseHandle = new Point( Boot.inst.s2d.mouseX, Boot.inst.s2d.mouseY );
 
-					if ( onDrag != null )
-						onDrag.dispatch(
-							deltaX,
-							deltaY
-						);
+					// if ( onDrag != null )
+					// 	onDrag.dispatch(
+					// 		deltaX,
+					// 		deltaY
+					// 	);
 				} );
 
 			default:

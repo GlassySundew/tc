@@ -69,7 +69,7 @@ class CameraProcess extends Process {
 	override function onResize() {
 		super.onResize();
 		if ( camera.parallax != null ) {
-			camera.parallax.drawParallax();
+			// camera.parallax.drawParallax();
 		}
 		camera.onMove.dispatch();
 	}

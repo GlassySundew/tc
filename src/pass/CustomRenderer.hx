@@ -84,7 +84,7 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 	}
 
 	override function render() {
-		if ( has( "shadow" ) ) renderPass( shadow, get( "shadow" ) );
+		// if ( has( "shadow" ) ) renderPass( shadow, get( "shadow" ) );
 
 		var colorTex = allocTarget( "color" );
 		var depthTex = allocTarget( "depth" );
@@ -93,12 +93,12 @@ class CustomRenderer extends h3d.scene.fwd.Renderer {
 
 		setTargets( [colorTex, depthTex, normalTex, additiveTex] );
 		clear( h3d.Engine.getCurrent().backgroundColor, 1 );
+
 		renderPass( defaultPass, get( "default" ) );
 		renderPass( defaultPass, get( "alpha" ), backToFront );
 		resetTarget();
 
 		setTarget( additiveTex );
-		clear( 0 );
 		draw( "additive" );
 		resetTarget();
 

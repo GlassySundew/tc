@@ -83,7 +83,11 @@
 					]
 				}
 			],
-			"props": {},
+			"props": {
+				"editor": {
+					"categories": null
+				}
+			},
 			"separators": [
 				{
 					"title": "ent",
@@ -515,7 +519,7 @@
 					"generator": "game.server.generation.StubGenerator",
 					"tileHeight": 4,
 					"tileWidth": 8,
-					"chunkSize": 2
+					"chunkSize": 16
 				}
 			],
 			"separators": [],
@@ -558,27 +562,27 @@
 			"lines": [
 				{
 					"id": "CONGRUENT",
-					"type": [
-						0,
-						4
-					],
 					"sequences": [
-						{
-							"startX": 0,
-							"startY": 0,
-							"palettes": 31,
-							"amount": 43
-						},
 						{
 							"startX": 0,
 							"startY": 31,
 							"palettes": 11,
 							"amount": 8
+						},
+						{
+							"startX": 0,
+							"startY": 0,
+							"palettes": 31,
+							"amount": 43
 						}
 					],
 					"orientation": 0,
 					"texturePath": "tiled/atlas/CONGRUENT.png",
-					"tileSize": 8
+					"tileSize": 8,
+					"type": [
+						0,
+						1
+					]
 				}
 			],
 			"separators": [],
@@ -663,6 +667,15 @@
 							"typeStr": "3"
 						}
 					]
+				}
+			]
+		},
+		{
+			"name": "Nothing",
+			"cases": [
+				{
+					"name": "Amogus",
+					"args": []
 				}
 			]
 		}

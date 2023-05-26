@@ -83,13 +83,6 @@ class Player extends Entity {
 							false;
 
 		lock( 30 );
-
-		onFrame.add(() -> {
-			if ( playerModel.actionState == Running ) {
-				trace( "on moving" );
-				onMove.dispatch();
-			}
-		} );
 	}
 
 	override function init() {

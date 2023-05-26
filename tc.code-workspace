@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../lix/versions/4.2.5"
+		}
+	],
+	"settings": {
+		"haxe.enableCompilationServer": false
+	}
+}

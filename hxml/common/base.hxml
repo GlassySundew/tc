@@ -8,7 +8,6 @@
 
 -dce full
 
--lib heaps:git:https://github.com/HeapsIO/heaps.git
 -lib hide:git:https://github.com/HeapsIO/hide.git
 -lib heeps:git:https://github.com/Yanrishatum/heeps.git
 -lib castle:git:https://github.com/ncannasse/castle.git
@@ -20,13 +19,14 @@
 -lib random
 -lib seedyrng
 -lib haxe-concurrent
+-lib heaps:git:https://github.com/HeapsIO/heaps.git
 
 # -lib domkit:git:https://github.com/HeapsIO/domkit.git
 # -lib oauth
 
 -D domkit
 -D heaps_enable_hl_mp3
+-D no-deprecation-warnings
 
 --macro Helper.init()
 
--D no-deprecation-warnings

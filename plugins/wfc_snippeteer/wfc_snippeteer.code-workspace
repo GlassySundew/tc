@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../.haxelib"
+		}
+	],
+	"settings": {
+		"haxe.displayServer": {},
+		"haxe.displayPort": "auto"
+	}
+}

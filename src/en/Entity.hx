@@ -86,7 +86,19 @@ class Entity extends NetNode {
 
 	public override function init() {
 		super.init();
-		model.footX.val;
+		model.footX.addOnVal(
+			( oldVal ) -> if ( M.fabs( model.footX.val - oldVal ) > 0 )
+				model.onMoveInvalidate = true
+		);
+		model.footY.addOnVal(
+			( oldVal ) -> if ( M.fabs( model.footY.val - oldVal ) > 0 ) {
+				model.onMoveInvalidate = true;
+			}
+		);
+		model.footZ.addOnVal(
+			( oldVal ) -> if ( M.fabs( model.footZ.val - oldVal ) > 0 )
+				model.onMoveInvalidate = true
+		);
 	}
 
 	/**
@@ -241,7 +253,12 @@ class Entity extends NetNode {
 		onFrame.dispatch();
 	}
 
-	public function headlessPostUpdate() {}
+	public function headlessPostUpdate() {
+		if ( model.onMoveInvalidate ) {
+			onMove.dispatch();
+			model.onMoveInvalidate = false;
+		}
+	}
 
 	public function headlessFrameEnd() {}
 
@@ -277,6 +294,11 @@ class Entity extends NetNode {
 		if ( M.fabs( model.dy ) <= 0.0005 * tmod ) model.dy = 0;
 		model.dz *= Math.pow( model.frict, tmod );
 		if ( M.fabs( model.dz ) <= 0.0005 * tmod ) model.dz = 0;
+
+		if ( model.onMoveInvalidate ) {
+			onMove.dispatch();
+			model.onMoveInvalidate = false;
+		}
 	}
 
 	public function frameEnd() {

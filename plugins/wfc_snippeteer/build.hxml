@@ -1,0 +1,14 @@
+
+-D hide_plugin
+
+-cp src
+-lib hide:git:https://github.com/HeapsIO/hide.git
+-lib hxnodejs
+-lib heeps
+-lib castle
+--macro hide.Plugin.init()
+-js wfc-snippeteer-plug.js
+-dce no
+-debug
+-D resourcesPath=./
+HideImports

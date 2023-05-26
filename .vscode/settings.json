@@ -5,8 +5,6 @@
 		"titleBar.activeBackground": "#1a6b59",
 		"titleBar.activeForeground": "#ffffff"
 	},
-	"python.formatting.provider": "yapf",
-	"python.pythonPath": "/usr/bin/python2",
 	"files.watcherExclude": {
 		"**/dump/**": true,
 		"**/*.pak": true
@@ -18,24 +16,5 @@
 	"css.lint.unknownProperties": "ignore",
 	"css.lint.vendorPrefix": "ignore",
 	"less.lint.propertyIgnoredDueToDisplay": "ignore",
-	"eslint.quiet": true,
-	
-	"haxe.configurations": [
-		{
-			"label": "hl.debug.hxml",
-			"args": [
-				"hxml/debug/hl.debug.hxml"
-			]
-		},
-		{
-			"label": "hl.server.debug.hxml",
-			"args": [
-				"hxml/debug/hl.server.debug.hxml"
-			]
-		},
-	],
-	// "haxe.enableCompilationServer": false
-	// ,
-	// "telemetry.enableTelemetry": false,
-	// "telemetry.enableCrashReporter": false
+	"eslint.quiet": true
 }
